@@ -284,7 +284,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
         >>> from astropy.nddata import StdDevUncertainty
         >>> import numpy as np
-        >>> data = np.ones((3,3), dtype=np.float)
+        >>> data = np.ones((3,3), dtype=float)
         >>> ndd1 = NDAstroData(data, uncertainty=StdDevUncertainty(data))
         >>> ndd2 = NDAstroData(data, uncertainty=StdDevUncertainty(data))
         >>> ndd3 = ndd1.add(ndd2)
