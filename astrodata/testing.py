@@ -1,5 +1,4 @@
-"""
-Fixtures to be used in tests in DRAGONS
+"""Fixtures to be used in tests in DRAGONS
 """
 
 import os
@@ -20,9 +19,8 @@ URL = 'https://archive.gemini.edu/file/'
 
 def assert_most_close(actual, desired, max_miss, rtol=1e-7, atol=0,
                       equal_nan=True, verbose=True):
-    """
-    Raises an AssertionError if the number of elements in two objects that are
-    not equal up to desired tolerance is greater than expected.
+    """Raises an AssertionError if the number of elements in two objects that
+    are not equal up to desired tolerance is greater than expected.
 
     See Also
     --------
@@ -32,18 +30,25 @@ def assert_most_close(actual, desired, max_miss, rtol=1e-7, atol=0,
     ----------
     actual : array_like
         Array obtained.
+
     desired : array_like
         Array desired.
+
     max_miss : iny
         Maximum number of mismatched elements.
+
     rtol : float, optional
         Relative tolerance.
+
     atol : float, optional
         Absolute tolerance.
+
     equal_nan : bool, optional.
         If True, NaNs will compare equal.
+
     verbose : bool, optional
         If True, the conflicting values are appended to the error message.
+
     Raises
     ------
     AssertionError
@@ -69,18 +74,20 @@ def assert_most_close(actual, desired, max_miss, rtol=1e-7, atol=0,
 
 
 def assert_most_equal(actual, desired, max_miss, verbose=True):
-    """
-    Raises an AssertionError if more than `n` elements in two objects are not
+    """Raises an AssertionError if more than `n` elements in two objects are not
     equal. For more information, check :func:`numpy.testing.assert_equal`.
 
     Parameters
     ----------
     actual : array_like
         The object to check.
+
     desired : array_like
         The expected object.
+
     max_miss : int
         Maximum number of mismatched elements.
+
     verbose : bool, optional
         If True, the conflicting values are appended to the error message.
 
@@ -108,14 +115,14 @@ def assert_most_equal(actual, desired, max_miss, verbose=True):
 
 
 def assert_same_class(ad, ad_ref):
-    """
-    Compare if two :class:`~astrodata.AstroData` (or any subclass) have the
+    """Compare if two :class:`~astrodata.AstroData` (or any subclass) have the
     same class.
 
     Parameters
     ----------
         ad : :class:`astrodata.AstroData` or any subclass
             AstroData object to be checked.
+
         ad_ref : :class:`astrodata.AstroData` or any subclass
             AstroData object used as reference
     """
@@ -127,9 +134,8 @@ def assert_same_class(ad, ad_ref):
 
 
 def compare_models(model1, model2, rtol=1e-7, atol=0., check_inverse=True):
-    """
-    Check that any two models are the same, within some tolerance on parameters
-    (using the same defaults as numpy.assert_allclose()).
+    """Check that any two models are the same, within some tolerance on
+    parameters (using the same defaults as numpy.assert_allclose()).
 
     This is constructed like a test, rather than returning True/False, in order
     to provide more useful information as to how the models differ when a test
@@ -214,9 +220,11 @@ def download_from_archive(filename, sub_path='raw_files', env_var='DRAGONS_TEST'
     ----------
     filename : str
         The filename, e.g. N20160524S0119.fits
+
     sub_path : str
         By default the file is stored at the root of the cache directory, but
         using ``path`` allows to specify a sub-directory.
+
     env_var: str
         Environment variable containing the path to the cache directory.
 
@@ -252,8 +260,7 @@ def download_from_archive(filename, sub_path='raw_files', env_var='DRAGONS_TEST'
 
 
 def get_associated_calibrations(filename, nbias=5):
-    """
-    Queries Gemini Observatory Archive for associated calibrations to reduce
+    """Queries Gemini Observatory Archive for associated calibrations to reduce
     the data that will be used for testing.
 
     Parameters
@@ -280,8 +287,7 @@ def get_associated_calibrations(filename, nbias=5):
 
 
 class ADCompare:
-    """
-    Compare two AstroData instances to determine whether they are basically
+    """Compare two AstroData instances to determine whether they are basically
     the same. Various properties (both data and metadata) can be compared
     """
     # These are the keywords relating to a FITS WCS that we won't check
@@ -299,27 +305,33 @@ class ADCompare:
     def run_comparison(self, max_miss=0, rtol=1e-7, atol=0, compare=None,
                        ignore=None, ignore_fits_wcs=True, ignore_kw=None,
                        raise_exception=True):
-        """
-        Perform a comparison between the two AD objects in this instance.
+        """Perform a comparison between the two AD objects in this instance.
 
         Parameters
         ----------
         max_miss: int
             maximum number of elements in each array that can disagree
+
         rtol: float
             relative tolerance allowed between array elements
+
         atol: float
             absolute tolerance allowed between array elements
+
         compare: list/None
             list of comparisons to perform
+
         ignore: list/None
             list of comparisons to ignore
+
         ignore_fits_wcs: bool
             ignore FITS keywords relating to WCS (to allow a comparison
             between an in-memory AD and one on disk if you're not interested
             in these, without needed to save to disk)
+
         ignore_kw: sequence/None
             additional keywords to ignore in headers
+
         raise_exception: bool
             raise an AssertionError if the comparison fails? If False,
             the errordict is returned, which may be useful if a very
@@ -515,14 +527,14 @@ class ADCompare:
         return errormsg
 
 def ad_compare(ad1, ad2, **kwargs):
-    """
-    Compares the tags, headers, and pixel values of two images. This is simply
-    a wrapper for ADCompare.run_comparison() for backward-compatibility.
+    """Compares the tags, headers, and pixel values of two images. This is
+    simply a wrapper for ADCompare.run_comparison() for backward-compatibility.
 
     Parameters
     ----------
     ad1: AstroData
         first AD objects
+
     ad2: AstroData
         second AD object
 

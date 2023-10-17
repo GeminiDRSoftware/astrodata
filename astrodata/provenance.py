@@ -1,3 +1,8 @@
+"""Provides functions for adding provenance information to
+`~astrodata.core.AstroData` objects.
+"""
+# TODO: This could be inherited by AstroData, instead of being helper
+# functions.
 import json
 
 from astropy.table import Table
@@ -5,8 +10,7 @@ from datetime import datetime
 
 
 def add_provenance(ad, filename, md5, primitive, timestamp=None):
-    """
-    Add the given provenance entry to the full set of provenance records on
+    """Add the given provenance entry to the full set of provenance records on
     this object.
 
     Provenance is added even if the incoming md5 is None or ''.  This indicates
@@ -15,11 +19,19 @@ def add_provenance(ad, filename, md5, primitive, timestamp=None):
     Parameters
     ----------
     ad : `astrodata.AstroData`
-    filename : str
-    md5 : str
-    primitive : str
-    timestamp : `datetime.datetime`
+        AstroData object to add provenance record to.
 
+    filename : str
+        Name of the file that was used to create this object.
+
+    md5 : str
+        MD5 checksum of the file that was used to create this object.
+
+    primitive : str
+        Name of the primitive performed.
+
+    timestamp : `datetime.datetime`
+        Date of the operation.  If None, the current time is used.
     """
     # Handle data where the md5 is None. It will need to be a string type to
     # store in the FITS table.
@@ -52,23 +64,25 @@ def add_provenance(ad, filename, md5, primitive, timestamp=None):
 
 
 def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
-    """
-    Add the given History entry to the full set of history records on this
+    """Add the given History entry to the full set of history records on this
     object.
 
     Parameters
     ----------
     ad : `astrodata.AstroData`
         AstroData object to add history record to.
+
     timestamp_start : `datetime.datetime`
         Date of the start of this operation.
+
     timestamp_stop : `datetime.datetime`
         Date of the end of this operation.
+
     primitive : str
         Name of the primitive performed.
+
     args : str
         Arguments used for the primitive call.
-
     """
     # If the ad instance has the old 'PROVHISTORY' extenstion name, rename it
     # now to 'HISTORY'
@@ -130,8 +144,7 @@ def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
 
 
 def clone_provenance(provenance_data, ad):
-    """
-    For a single input's provenance, copy it into the output
+    """For a single input's provenance, copy it into the output
     `AstroData` object as appropriate.
 
     This takes a dictionary with a source filename, md5 and both its
@@ -144,10 +157,9 @@ def clone_provenance(provenance_data, ad):
         Pointer to the `~astrodata.AstroData` table with the provenance
         information.  *Note* this may be the output `~astrodata.AstroData`
         as well, so we need to handle that.
+
     ad : `astrodata.AstroData`
         Outgoing `~astrodata.AstroData` object to add provenance data to.
-
-
     """
     pd = [(prov[1], prov[2], prov[3], prov[0]) for prov in provenance_data]
     for p in pd:
@@ -155,13 +167,12 @@ def clone_provenance(provenance_data, ad):
 
 
 def clone_history(history_data, ad):
-    """
-    For a single input's history, copy it into the output
-    `AstroData` object as appropriate.
+    """For a single input's history, copy it into the output `AstroData` object
+    as appropriate.
 
-    This takes a dictionary with a source filename, md5 and both its
-    original provenance and history information.  It duplicates
-    the history data into the outgoing `AstroData` ad object.
+    This takes a dictionary with a source filename, md5 and both its original
+    provenance and history information.  It duplicates the history data into
+    the outgoing `AstroData` ad object.
 
     Parameters
     ----------
@@ -169,10 +180,10 @@ def clone_history(history_data, ad):
         pointer to the `AstroData` table with the history information.
         *Note* this may be the output `~astrodata.AstroData` as well, so we
         need to handle that.
+
     ad : `astrodata.AstroData`
         Outgoing `~astrodata.AstroData` object to add history data
         to.
-
     """
     primitive_col_idx, args_col_idx, timestamp_start_col_idx, \
         timestamp_stop_col_idx = find_history_column_indices(ad)
@@ -184,6 +195,7 @@ def clone_history(history_data, ad):
 
 
 def find_history_column_indices(ad):
+    """Find the column indices for the history table."""
     if hasattr(ad, 'HISTORY'):
         primitive_col_idx = None
         args_col_idx = None
@@ -198,6 +210,7 @@ def find_history_column_indices(ad):
                 timestamp_start_col_idx = idx
             elif colname == 'timestamp_stop':
                 timestamp_stop_col_idx = idx
+
     else:
         # defaults
         primitive_col_idx = 0
@@ -210,8 +223,7 @@ def find_history_column_indices(ad):
 
 
 def provenance_summary(ad, provenance=True, history=True):
-    """
-    Generate a pretty text display of the provenance information for an
+    """Generate a pretty text display of the provenance information for an
     `~astrodata.core.AstroData`.
 
     This pulls the provenance and history information from a
@@ -223,8 +235,10 @@ def provenance_summary(ad, provenance=True, history=True):
     ----------
     ad : :class:`~astrodata.core.AstroData`
         Input data to read provenance from
+
     provenance : bool
         True to show provenance
+
     history : bool
         True to show the history with associated parameters and timestamps
 
@@ -238,6 +252,7 @@ def provenance_summary(ad, provenance=True, history=True):
             retval = f"Provenance\n----------\n{ad.PROVENANCE}\n"
         else:
             retval = "No Provenance found\n"
+
     if history:
         if provenance:
             retval += "\n"  # extra blank line between

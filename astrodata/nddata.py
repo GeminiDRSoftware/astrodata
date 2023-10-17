@@ -1,5 +1,4 @@
-"""
-This module implements a derivative class based on NDData with some Mixins,
+"""This module implements a derivative class based on NDData with some Mixins,
 implementing windowing and on-the-fly data scaling.
 """
 
@@ -23,9 +22,8 @@ __all__ = ['NDAstroData']
 
 
 class ADVarianceUncertainty(VarianceUncertainty):
-    """
-    Subclass VarianceUncertainty to check for negative values.
-    """
+    """Subclass VarianceUncertainty to check for negative values."""
+
     @VarianceUncertainty.array.setter
     def array(self, value):
         if value is not None and np.any(value < 0):
@@ -36,8 +34,7 @@ class ADVarianceUncertainty(VarianceUncertainty):
 
 
 class AstroDataMixin:
-    """
-    A Mixin for ``NDData``-like classes (such as ``Spectrum1D``) to enable
+    """A Mixin for ``NDData``-like classes (such as ``Spectrum1D``) to enable
     them to behave similarly to ``AstroData`` objects.
 
     These behaviors are:
@@ -49,9 +46,9 @@ class AstroDataMixin:
         4.  Additional attributes such as OBJMASK can be extracted from
             the .meta['other'] dict
     """
+
     def __getattr__(self, attribute):
-        """
-        Allow access to attributes stored in self.meta['other'], as we do
+        """Allow access to attributes stored in self.meta['other'], as we do
         with AstroData objects.
         """
         if attribute.isupper():
@@ -66,8 +63,7 @@ class AstroDataMixin:
                     handle_mask=np.bitwise_or, handle_meta=None,
                     uncertainty_correlation=0, compare_wcs='first_found',
                     **kwds):
-        """
-        Override the NDData method so that "bitwise_or" becomes the default
+        """Override the NDData method so that "bitwise_or" becomes the default
         operation to combine masks, rather than "logical_or"
         """
         return super()._arithmetic(
@@ -77,10 +73,9 @@ class AstroDataMixin:
             compare_wcs=compare_wcs, **kwds)
 
     def _slice_wcs(self, slices):
-        """
-        The ``__call__()`` method of gWCS doesn't appear to conform to the
-        APE 14 interface for WCS implementations, and doesn't react to
-        slicing properly. We override NDSlicing's method to do what we want.
+        """The ``__call__()`` method of gWCS doesn't appear to conform to the
+        APE 14 interface for WCS implementations, and doesn't react to slicing
+        properly. We override NDSlicing's method to do what we want.
         """
         if not isinstance(self.wcs, gWCS):
             return self.wcs
@@ -147,8 +142,7 @@ class AstroDataMixin:
 
     @property
     def variance(self):
-        """
-        A convenience property to access the contents of ``uncertainty``.
+        """A convenience property to access the contents of ``uncertainty``.
         """
         arr = self.uncertainty
         if arr is not None:
@@ -161,6 +155,8 @@ class AstroDataMixin:
 
     @property
     def wcs(self):
+        """The WCS of the data. This is a gWCS object, not a FITS WCS object.
+        """
         return super().wcs
 
     @wcs.setter
@@ -171,14 +167,17 @@ class AstroDataMixin:
 
     @property
     def shape(self):
+        """The shape of the data."""
         return self._data.shape
 
     @property
     def size(self):
+        """The size of the data."""
         return self._data.size
 
 
 class FakeArray:
+    """A class that pretends to be an array, but is actually a lazy-loaded"""
 
     def __init__(self, very_faked):
         self.data = very_faked
@@ -194,6 +193,10 @@ class FakeArray:
 
 
 class NDWindowing:
+    """A class to allow "windowed" access to some properties of an
+    ``NDAstroData`` instance. In particular, ``data``, ``uncertainty``,
+    ``variance``, and ``mask`` return clipped data.
+    """
 
     def __init__(self, target):
         self._target = target
@@ -203,18 +206,16 @@ class NDWindowing:
 
 
 class NDWindowingAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
-    """
-    Allows "windowed" access to some properties of an ``NDAstroData`` instance.
-    In particular, ``data``, ``uncertainty``, ``variance``, and ``mask`` return
-    clipped data.
+    """Allows "windowed" access to some properties of an ``NDAstroData``
+    instance.  In particular, ``data``, ``uncertainty``, ``variance``, and
+    ``mask`` return clipped data.
     """
     def __init__(self, target, window):
         self._target = target
         self._window = window
 
     def __getattr__(self, attribute):
-        """
-        Allow access to attributes stored in self.meta['other'], as we do
+        """Allow access to attributes stored in self.meta['other'], as we do
         with AstroData objects.
         """
         if attribute.isupper():
@@ -252,12 +253,13 @@ class NDWindowingAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, ND
 
 
 def is_lazy(item):
+    """Returns True if the item is a lazy-loaded object, False otherwise."""
     return isinstance(item, ImageHDU) or (hasattr(item, 'lazy') and item.lazy)
 
 
 class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
-    """
-    Implements ``NDData`` with all Mixins, plus some ``AstroData`` specifics.
+    """Implements ``NDData`` with all Mixins, plus some ``AstroData``
+    specifics.
 
     This class implements an ``NDData``-like container that supports reading
     and writing as implemented in the ``astropy.io.registry`` and also slicing
@@ -310,13 +312,61 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     See ``NDSlicingMixin`` for a description how slicing works (which
     attributes) are sliced.
-
     """
+
     def __init__(self, data, uncertainty=None, mask=None, wcs=None,
                  meta=None, unit=None, copy=False, window=None, variance=None):
+        """Initialize an ``NDAstroData`` instance.
+        
+        Parameters
+        ----------
+        data : array-like
+            The actual data. This can be a numpy array, a memmap, or a
+            ``fits.ImageHDU`` object.
+        
+        uncertainty : ``NDUncertainty``-like object, optional
+            An object that represents the uncertainty of the data. If not
+            specified, the uncertainty will be set to None.
 
+        mask : array-like, optional
+            An array that represents the mask of the data. If not specified,
+            the mask will be set to None.
+
+        wcs : ``gwcs.WCS`` object, optional
+            The WCS of the data. If not specified, the WCS will be set to None.
+
+        meta : dict-like, optional
+            A dictionary-like object that holds the meta data. If not
+            specified, the meta data will be set to None.
+        
+        unit : ``astropy.units.Unit`` object, optional
+            The unit of the data. If not specified, the unit will be set to
+            None.
+        
+        copy : bool, optional
+            If True, the data, uncertainty, mask, wcs, meta, and unit will be
+            copied. Otherwise, they will be referenced. Default is False.
+        
+        window : ``slice`` object, optional
+            A slice object that represents the window of the data. If not
+            specified, the window will be set to None.
+
+        variance : array-like, optional
+            An array that represents the variance of the data. If not
+            specified, the variance will be set to None.
+
+        Raises
+        ------
+        ValueError
+            If ``uncertainty`` and ``variance`` are both specified.
+
+        Notes
+        -----
+        The ``uncertainty`` and ``variance`` parameters are mutually exclusive.
+        """
         if variance is not None:
             if uncertainty is not None:
+                # TODO: Add error message.
                 raise ValueError()
             uncertainty = ADVarianceUncertainty(variance)
 
@@ -344,9 +394,8 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def window(self):
-        """
-        Interface to access a section of the data, using lazy access whenever
-        possible.
+        """Interface to access a section of the data, using lazy access
+        whenever possible.
 
         Returns
         --------
@@ -359,7 +408,6 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
         >>> ad[0].nddata.window[100:200, 100:200]  # doctest: +SKIP
         <NDWindowingAstrodata .....>
-
         """
         return NDWindowing(self)
 
@@ -400,9 +448,8 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def data(self):
-        """
-        An array representing the raw data stored in this instance.
-        It implements a setter.
+        """An array representing the raw data stored in this instance.  It
+        implements a setter.
         """
         return self._get_simple('_data')
 
@@ -429,6 +476,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def mask(self):
+        """Get or set the mask of the data."""
         return self._get_simple('_mask')
 
     @mask.setter
@@ -437,10 +485,10 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def variance(self):
-        """
-        A convenience property to access the contents of ``uncertainty``,
+        """A convenience property to access the contents of ``uncertainty``,
         squared (as the uncertainty data is stored as standard deviation).
         """
+        # TODO: Is this supposed to be squared?
         arr = self._get_uncertainty()
         if arr is not None:
             return arr.array
@@ -451,8 +499,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
                             else None)
 
     def set_section(self, section, input):
-        """
-        Sets only a section of the data. This method is meant to prevent
+        """Sets only a section of the data. This method is meant to prevent
         fragmentation in the Python heap, by reusing the internal structures
         instead of replacing them with new ones.
 
@@ -460,6 +507,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         -----
         section : ``slice``
             The area that will be replaced
+
         input : ``NDData``-like instance
             This object needs to implement at least ``data``, ``uncertainty``,
             and ``mask``. Their entire contents will replace the data in the
@@ -486,9 +534,11 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def T(self):
+        """Transpose the data. This is not a copy of the data."""
         return self.transpose()
 
     def transpose(self):
+        """Transpose the data. This is not a copy of the data."""
         unc = self.uncertainty
         new_wcs = deepcopy(self.wcs)
         inframe = new_wcs.input_frame

@@ -1,3 +1,4 @@
+"""World Coordinate System (WCS) support for AstroData objects."""
 import functools
 import re
 from collections import namedtuple
@@ -30,8 +31,7 @@ re_cd = re.compile("^CD(\d+)_\d+$", re.IGNORECASE)
 # FITS-WCS -> gWCS
 #-----------------------------------------------------------------------------
 def pixel_frame(naxes, name="pixels"):
-    """
-    Make a CoordinateFrame for pixels
+    """Make a CoordinateFrame for pixels
 
     Parameters
     ----------
@@ -49,9 +49,8 @@ def pixel_frame(naxes, name="pixels"):
 
 
 def fitswcs_to_gwcs(input):
-    """
-    Create and return a gWCS object from a FITS header or NDData object.
-    If it can't construct one, it should quietly return None.
+    """Create and return a gWCS object from a FITS header or NDData object.  If
+    it can't construct one, it should quietly return None.
     """
     # coordinate names for CelestialFrame
     coordinate_outputs = {'alpha_C', 'delta_C'}
@@ -123,17 +122,16 @@ def fitswcs_to_gwcs(input):
 # -----------------------------------------------------------------------------
 
 def gwcs_to_fits(ndd, hdr=None):
-    """
-    Convert a gWCS object to a collection of FITS WCS keyword/value pairs,
+    """Convert a gWCS object to a collection of FITS WCS keyword/value pairs,
     if possible. If the FITS WCS is only approximate, this should be indicated
-    with a dict entry {'FITS-WCS': 'APPROXIMATE'}. If there is no suitable
-    FITS representation, then a ValueError or NotImplementedError can be
-    raised.
+    with a dict entry {'FITS-WCS': 'APPROXIMATE'}. If there is no suitable FITS
+    representation, then a ValueError or NotImplementedError can be raised.
 
     Parameters
     ----------
     ndd : `astropy.nddata.NDData`
         The NDData whose wcs attribute we want converted
+
     hdr : `astropy.io.fits.Header`
         A Header object that may contain some useful keywords
 
@@ -141,7 +139,6 @@ def gwcs_to_fits(ndd, hdr=None):
     -------
     dict
         values to insert into the FITS header to express this WCS
-
     """
     if hdr is None:
         hdr = {}
@@ -342,14 +339,14 @@ def gwcs_to_fits(ndd, hdr=None):
 # -----------------------------------------------------------------------------
 
 def model_is_affine(model):
-    """"
-    Test a Model for affinity. This is currently done by checking the
-    name of its class (or the class names of all its submodels)
+    """"Test a Model for affinity. This is currently done by checking the name
+    of its class (or the class names of all its submodels)
 
-    TODO: Is this the right thing to do? We could compute the affine
-    matrices *assuming* affinity, and then check that a number of random
-    points behave as expected. Is that better?
+    TODO: Is this the right thing to do? We could compute the affine matrices
+    *assuming* affinity, and then check that a number of random points behave
+    as expected. Is that better?
     """
+    # TODO: See docstring
     if isinstance(model, dict):  # handle fix_inputs()
         return True
     try:
@@ -363,20 +360,21 @@ def model_is_affine(model):
 
 
 def calculate_affine_matrices(func, shape, origin=None):
-    """
-    Compute the matrix and offset necessary of an affine transform that
-    represents the supplied function. This is done by computing the
-    linear matrix along all axes extending from the centre of the region,
-    and then calculating the offset such that the transformation is
-    accurate at the centre of the region. The matrix and offset are returned
-    in the standard python order (i.e., y-first for 2D).
+    """Compute the matrix and offset necessary of an affine transform that
+    represents the supplied function. This is done by computing the linear
+    matrix along all axes extending from the centre of the region, and then
+    calculating the offset such that the transformation is accurate at the
+    centre of the region. The matrix and offset are returned in the standard
+    python order (i.e., y-first for 2D).
 
     Parameters
     ----------
     func : callable
         function that maps input->output coordinates
+
     shape : sequence
         shape to use for fiducial points
+
     origin : sequence/None
         if a sequence, then use this as the opposite vertex (it must be
         the same length as "shape")
@@ -385,7 +383,6 @@ def calculate_affine_matrices(func, shape, origin=None):
     -------
     AffineMatrices(array, array)
         affine matrix and offset
-
     """
     indim = len(shape)
     try:
@@ -416,8 +413,7 @@ def calculate_affine_matrices(func, shape, origin=None):
 # This stuff will hopefully all go into gwcs.utils
 # -------------------------------------------------------------------------
 def read_wcs_from_header(header):
-    """
-    Extract basic FITS WCS keywords from a FITS Header.
+    """Extract basic FITS WCS keywords from a FITS Header.
 
     Parameters
     ----------
@@ -496,8 +492,7 @@ def read_wcs_from_header(header):
 
 
 def get_axes(header):
-    """
-    Matches input with spectral and sky coordinate axes.
+    """Matches input with spectral and sky coordinate axes.
 
     Parameters
     ----------
@@ -508,7 +503,6 @@ def get_axes(header):
     -------
     sky_inmap, spectral_inmap, unknown : list
         indices in the output representing sky and spectral coordinates.
-
     """
     if isinstance(header, fits.Header):
         wcs_info = read_wcs_from_header(header)
@@ -543,7 +537,17 @@ def get_axes(header):
 
 
 def _is_skysys_consistent(ctype, sky_inmap):
-    """ Determine if the sky axes in CTYPE match to form a standard celestial system."""
+    """Determine if the sky axes in CTYPE match to form a standard celestial
+    system.
+
+    Parameters
+    ----------
+    ctype : list
+        List of CTYPE values.
+
+    sky_inmap : list
+        List of indices in the output representing sky coordinates.
+    """
     if len(sky_inmap) != 2:
         raise ValueError("{} sky coordinate axes found. "
                          "There must be exactly 2".format(len(sky_inmap)))
@@ -563,14 +567,14 @@ def _is_skysys_consistent(ctype, sky_inmap):
 
 
 def _get_contributing_axes(wcs_info, world_axes):
-    """
-    Returns a tuple indicating which axes in the pixel frame make a
+    """Returns a tuple indicating which axes in the pixel frame make a
     contribution to an axis or axes in the output frame.
 
     Parameters
     ----------
     wcs_info : dict
         dict of WCS information
+
     world_axes : int or iterable of int
         axes in the world coordinate system
 
@@ -589,15 +593,12 @@ def _get_contributing_axes(wcs_info, world_axes):
 
 
 def make_fitswcs_transform(input):
-    """
-    Create a basic FITS WCS transform.
-    It does not include distortions.
+    """Create a basic FITS WCS transform.  It does not include distortions.
 
     Parameters
     ----------
     header : `astropy.io.fits.Header` or dict
         FITS Header (or dict) with basic WCS information
-
     """
     other = None
     if isinstance(input, fits.Header):
@@ -643,16 +644,14 @@ def make_fitswcs_transform(input):
 
 
 def fitswcs_image(header):
-    """
-    Make a complete transform from CRPIX-shifted pixels to
-    sky coordinates from FITS WCS keywords. A Mapping is inserted
-    at the beginning, which may be removed later
+    """Make a complete transform from CRPIX-shifted pixels to sky coordinates
+    from FITS WCS keywords. A Mapping is inserted at the beginning, which may
+    be removed later
 
     Parameters
     ----------
     header : `astropy.io.fits.Header` or dict
         FITS Header or dict with basic FITS WCS keywords.
-
     """
     if isinstance(header, fits.Header):
         wcs_info = read_wcs_from_header(header)
@@ -710,16 +709,14 @@ def fitswcs_image(header):
 
 
 def fitswcs_other(header, other=None):
-    """
-    Create WCS linear transforms for any axes not associated with
-    celestial coordinates. We require that each world axis aligns
-    precisely with only a single pixel axis.
+    """Create WCS linear transforms for any axes not associated with celestial
+    coordinates. We require that each world axis aligns precisely with only a
+    single pixel axis.
 
     Parameters
     ----------
     header : `astropy.io.fits.Header` or dict
         FITS Header or dict with basic FITS WCS keywords.
-
     """
     # We *always* want the wavelength solution model to be called "WAVE"
     # even if the CTYPE keyword is "AWAV"
@@ -784,14 +781,14 @@ def fitswcs_other(header, other=None):
 
 
 def remove_axis_from_frame(frame, axis):
-    """
-    Remove the numbered axis from a CoordinateFrame and return a modified
+    """Remove the numbered axis from a CoordinateFrame and return a modified
     CoordinateFrame instance.
 
     Parameters
     ----------
     frame: CoordinateFrame
         The frame from which an axis is to be removed
+
     axis: int
         index of the axis to be removed
 
@@ -827,16 +824,16 @@ def remove_axis_from_frame(frame, axis):
 
 
 def remove_axis_from_model(model, axis):
-    """
-    Take a model where one output (axis) is no longer required and try to
+    """Take a model where one output (axis) is no longer required and try to
     construct a new model whether that output is removed. If the number of
-    inputs is reduced as a result, then report which input (axis) needs to
-    be removed.
+    inputs is reduced as a result, then report which input (axis) needs to be
+    removed.
 
     Parameters
     ----------
     model: astropy.modeling.Model instance
         model to modify
+
     axis: int
         Output axis number to be removed from the model
 
@@ -919,8 +916,7 @@ def remove_axis_from_model(model, axis):
 
 
 def remove_unused_world_axis(ext):
-    """
-    Remove a single axis from the output frame of the WCS if it has no
+    """Remove a single axis from the output frame of the WCS if it has no
     dependence on input pixel location.
 
     Parameters

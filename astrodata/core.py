@@ -1,3 +1,7 @@
+"""This is the core module of the AstroData package. It provides the
+`AstroData` class, which is the main interface to manipulate astronomical
+data sets.
+"""
 import inspect
 import logging
 import os
@@ -26,7 +30,7 @@ from .utils import (assign_only_single_slice, astro_data_descriptor,
 NO_DEFAULT = object()
 
 
-_arit_doc = """
+_ARIT_DOC = """
     Performs {name} by evaluating ``self {op} operand``.
 
     Parameters
@@ -41,8 +45,7 @@ _arit_doc = """
 
 
 class AstroData:
-    """
-    Base class for the AstroData software package. It provides an interface
+    """Base class for the AstroData software package. It provides an interface
     to manipulate astronomical data sets.
 
     Parameters
@@ -84,11 +87,12 @@ class AstroData:
         self._indices = indices
 
         self.is_single = is_single
-        """ If this data provider represents a single slice out of a whole
-        dataset, return True. Otherwise, return False. """
 
+        # If this data provider represents a single slice out of a whole
+        # dataset, return True. Otherwise, return False.
         if tables is not None and not isinstance(tables, dict):
             raise ValueError('tables must be a dict')
+
         self._tables = tables or {}
 
         self._phu = phu or fits.Header()
@@ -99,8 +103,7 @@ class AstroData:
         self._path = None
 
     def __deepcopy__(self, memo):
-        """
-        Returns a new instance of this class.
+        """Returns a new instance of this class.
 
         Parameters
         ----------
@@ -118,8 +121,7 @@ class AstroData:
         return obj
 
     def _keyword_for(self, name):
-        """
-        Returns the FITS keyword name associated to ``name``.
+        """Returns the FITS keyword name associated to ``name``.
 
         Parameters
         ----------
@@ -249,6 +251,7 @@ class AstroData:
     @deprecated("Access to headers through this property is deprecated and "
                 "will be removed in the future. Use '.hdr' instead.")
     def header(self):
+        """Deprecated header access. Use ``.hdr`` instead."""
         return [self.phu] + [ndd.meta['header'] for ndd in self._nddata]
 
     @property
@@ -258,8 +261,7 @@ class AstroData:
 
     @property
     def descriptors(self):
-        """
-        Returns a sequence of names for the methods that have been
+        """Returns a sequence of names for the methods that have been
         decorated as descriptors.
 
         Returns
@@ -288,8 +290,7 @@ class AstroData:
 
     @property
     def is_sliced(self):
-        """
-        If this data provider instance represents the whole dataset, return
+        """If this data provider instance represents the whole dataset, return
         False. If it represents a slice out of the whole, return True.
         """
         return self._indices is not None
@@ -317,11 +318,17 @@ class AstroData:
         If the `AstroData` object is sliced, this returns only the NDData
         objects of the sliced extensions. And if this is a single extension
         object, the NDData object is returned directly (i.e. not a list).
-
         """
         return self._nddata[0] if self.is_single else self._nddata
 
     def table(self):
+        """Return a dictionary of `astropy.table.Table` objects.
+        
+        Notes
+        -----
+        This returns a _copy_ of the tables, so modifying them will not
+        affect the original ones.
+        """
         # FIXME: do we need this in addition to .tables ?
         return self._tables.copy()
 
@@ -345,13 +352,15 @@ class AstroData:
     @property
     @returns_list
     def shape(self):
+        """Return the shape of the data array for each extension as a list of
+        shapes.
+        """
         return [nd.shape for nd in self._nddata]
 
     @property
     @returns_list
     def data(self):
-        """
-        A list of the arrays (or single array, if this is a single slice)
+        """A list of the arrays (or single array, if this is a single slice)
         corresponding to the science data attached to each extension.
         """
         return [nd.data for nd in self._nddata]
@@ -370,8 +379,7 @@ class AstroData:
     @property
     @returns_list
     def uncertainty(self):
-        """
-        A list of the uncertainty objects (or a single object, if this is
+        """A list of the uncertainty objects (or a single object, if this is
         a single slice) attached to the science data, for each extension.
 
         The objects are instances of AstroPy's `astropy.nddata.NDUncertainty`,
@@ -392,8 +400,7 @@ class AstroData:
     @property
     @returns_list
     def mask(self):
-        """
-        A list of the mask arrays (or a single array, if this is a single
+        """A list of the mask arrays (or a single array, if this is a single
         slice) attached to the science data, for each extension.
 
         For objects that miss a mask, `None` will be provided instead.
@@ -408,9 +415,8 @@ class AstroData:
     @property
     @returns_list
     def variance(self):
-        """
-        A list of the variance arrays (or a single array, if this is a single
-        slice) attached to the science data, for each extension.
+        """A list of the variance arrays (or a single array, if this is a
+        single slice) attached to the science data, for each extension.
 
         For objects that miss uncertainty information, `None` will be provided
         instead.
@@ -452,8 +458,7 @@ class AstroData:
                 yield self[n]
 
     def __getitem__(self, idx):
-        """
-        Returns a sliced view of the instance. It supports the standard
+        """Returns a sliced view of the instance. It supports the standard
         Python indexing syntax.
 
         Parameters
@@ -466,11 +471,12 @@ class AstroData:
         TypeError
             If trying to slice an object when it doesn't make sense (e.g.
             slicing a single slice)
+
         ValueError
             If `slice` does not belong to one of the recognized types
+
         IndexError
             If an index is out of range
-
         """
         if self.is_single:
             raise TypeError("Can't slice a single slice!")
@@ -490,8 +496,7 @@ class AstroData:
         return obj
 
     def __delitem__(self, idx):
-        """
-        Called to implement deletion of ``self[idx]``.  Supports standard
+        """Called to implement deletion of ``self[idx]``.  Supports standard
         Python syntax (including negative indices).
 
         Parameters
@@ -504,18 +509,16 @@ class AstroData:
         -------
         IndexError
             If `idx` is out of range.
-
         """
         if self.is_sliced:
             raise TypeError("Can't remove items from a sliced object")
         del self._all_nddatas[idx]
 
     def __getattr__(self, attribute):
-        """
-        Called when an attribute lookup has not found the attribute in the
-        usual places (not an instance attribute, and not in the class tree
-        for ``self``).
-
+        """Called when an attribute lookup has not found the attribute in the
+        usual places (not an instance attribute, and not in the class tree for
+        ``self``).
+        
         Parameters
         ----------
         attribute : str
@@ -525,7 +528,6 @@ class AstroData:
         -------
         AttributeError
             If the attribute could not be found/computed.
-
         """
         # I we're working with single slices, let's look some things up
         # in the ND object
@@ -540,17 +542,16 @@ class AstroData:
                              f"attribute {attribute!r}")
 
     def __setattr__(self, attribute, value):
-        """
-        Called when an attribute assignment is attempted, instead of the
+        """Called when an attribute assignment is attempted, instead of the
         normal mechanism.
 
         Parameters
         ----------
         attribute : str
             The attribute's name.
+
         value : object
             The value to be assigned to the attribute.
-
         """
 
         def _my_attribute(attr):
@@ -603,8 +604,7 @@ class AstroData:
                                      "for this instance")
 
     def __contains__(self, attribute):
-        """
-        Implements the ability to use the ``in`` operator with an
+        """Implements the ability to use the ``in`` operator with an
         `AstroData` object.
 
         Parameters
@@ -628,11 +628,10 @@ class AstroData:
 
     @property
     def exposed(self):
-        """
-        A collection of strings with the names of objects that can be accessed
-        directly by name as attributes of this instance, and that are not part
-        of its standard interface (i.e. data objects that have been added
-        dynamically).
+        """A collection of strings with the names of objects that can be
+        accessed directly by name as attributes of this instance, and that are
+        not part of its standard interface (i.e. data objects that have been
+        added dynamically).
 
         Examples
         ---------
@@ -751,6 +750,7 @@ class AstroData:
             ltab, rtab = set(self._tables), set(op_table)
             for tab in (rtab - ltab):
                 self._tables[tab] = op_table[tab]
+
         else:
             for n in range(len(self)):
                 ndd[ind[n]] = operator(ndd[ind[n]], operand)
@@ -759,46 +759,46 @@ class AstroData:
         return self._oper(partial(fn, handle_mask=np.bitwise_or,
                                   handle_meta='first_found'), operand)
 
-    @format_doc(_arit_doc, name='addition', op='+')
+    @format_doc(_ARIT_DOC, name='addition', op='+')
     def __add__(self, oper):
         copy = deepcopy(self)
         copy += oper
         return copy
 
-    @format_doc(_arit_doc, name='subtraction', op='-')
+    @format_doc(_ARIT_DOC, name='subtraction', op='-')
     def __sub__(self, oper):
         copy = deepcopy(self)
         copy -= oper
         return copy
 
-    @format_doc(_arit_doc, name='multiplication', op='*')
+    @format_doc(_ARIT_DOC, name='multiplication', op='*')
     def __mul__(self, oper):
         copy = deepcopy(self)
         copy *= oper
         return copy
 
-    @format_doc(_arit_doc, name='division', op='/')
+    @format_doc(_ARIT_DOC, name='division', op='/')
     def __truediv__(self, oper):
         copy = deepcopy(self)
         copy /= oper
         return copy
 
-    @format_doc(_arit_doc, name='inplace addition', op='+=')
+    @format_doc(_ARIT_DOC, name='inplace addition', op='+=')
     def __iadd__(self, oper):
         self._standard_nddata_op(NDDataObject.add, oper)
         return self
 
-    @format_doc(_arit_doc, name='inplace subtraction', op='-=')
+    @format_doc(_ARIT_DOC, name='inplace subtraction', op='-=')
     def __isub__(self, oper):
         self._standard_nddata_op(NDDataObject.subtract, oper)
         return self
 
-    @format_doc(_arit_doc, name='inplace multiplication', op='*=')
+    @format_doc(_ARIT_DOC, name='inplace multiplication', op='*=')
     def __imul__(self, oper):
         self._standard_nddata_op(NDDataObject.multiply, oper)
         return self
 
-    @format_doc(_arit_doc, name='inplace division', op='/=')
+    @format_doc(_ARIT_DOC, name='inplace division', op='/=')
     def __itruediv__(self, oper):
         self._standard_nddata_op(NDDataObject.divide, oper)
         return self

@@ -1,3 +1,4 @@
+"""Factory for AstroData objects."""
 import logging
 import os
 from contextlib import contextmanager
@@ -9,10 +10,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 class AstroDataError(Exception):
-    pass
+    """Exception raised when there is a problem with the AstroData class."""
 
 
 class AstroDataFactory:
+    """Factory class for AstroData objects."""
 
     _file_openers = (
         fits.open,
@@ -24,9 +26,8 @@ class AstroDataFactory:
     @staticmethod
     @contextmanager
     def _openFile(source):
-        """
-        Internal static method that takes a ``source``, assuming that it is a
-        string pointing to a file to be opened.
+        """Internal static method that takes a ``source``, assuming that it is
+        a string pointing to a file to be opened.
 
         If this is the case, it will try to open the file and return an
         instance of the appropriate native class to be able to manipulate it
@@ -34,7 +35,6 @@ class AstroDataFactory:
 
         If ``source`` is not a string, it will be returned verbatim, assuming
         that it represents an already opened file.
-
         """
         if isinstance(source, (str, os.PathLike)):
             stats = os.stat(source)
@@ -60,9 +60,8 @@ class AstroDataFactory:
             yield source
 
     def addClass(self, cls):
-        """
-        Add a new class to the AstroDataFactory registry. It will be used when
-        instantiating an AstroData class for a FITS file.
+        """Add a new class to the AstroDataFactory registry. It will be used
+        when instantiating an AstroData class for a FITS file.
         """
         if not hasattr(cls, '_matches_data'):
             raise AttributeError("Class '{}' has no '_matches_data' method"
@@ -70,9 +69,8 @@ class AstroDataFactory:
         self._registry.add(cls)
 
     def getAstroData(self, source):
-        """
-        Takes either a string (with the path to a file) or an HDUList as input,
-        and tries to return an AstroData instance.
+        """Takes either a string (with the path to a file) or an HDUList as
+        input, and tries to return an AstroData instance.
 
         It will raise exceptions if the file is not found, or if there is no
         match for the HDUList, among the registered AstroData classes.
@@ -84,7 +82,6 @@ class AstroDataFactory:
         ----------
         source : `str` or `pathlib.Path` or `fits.HDUList`
             The file path or HDUList to read.
-
         """
         candidates = []
         with self._openFile(source) as opened:
@@ -119,9 +116,9 @@ class AstroDataFactory:
         phu : `fits.PrimaryHDU` or `fits.Header` or `dict` or `list`
             FITS primary HDU or header, or something that can be used to create
             a fits.Header (a dict, a list of "cards").
+
         extensions : list of HDUs
             List of HDU objects.
-
         """
         lst = fits.HDUList()
         if phu is not None:
