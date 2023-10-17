@@ -1,3 +1,12 @@
+"""Functions used when interacting with FITS files and HDUs.
+
+.. |NDData| replace:: :class:`~astropy.nddata.NDData`
+.. |NDDataRef| replace:: :class:`~astropy.nddata.NDDataRef`
+.. |BinTableHDU| replace:: :class:`~astropy.io.fits.BinTableHDU`
+.. |TableHDU| replace:: :class:`~astropy.io.fits.TableHDU`
+.. |NDAstroData| replace:: :class:`~astrodata.nddata.NDAstroData`
+.. |NDAstroDataRef| replace:: :class:`~astrodata.nddata.NDAstroDataRef`
+"""
 import gc
 import logging
 import os
@@ -41,7 +50,6 @@ class FitsHeaderCollection:
     ----------
     headers : list of `astropy.io.fits.Header`
         List of Header objects.
-
     """
     def __init__(self, headers):
         self._headers = list(headers)
@@ -59,6 +67,7 @@ class FitsHeaderCollection:
             self.set(key, value=value)
 
     def set(self, key, value=None, comment=None):
+        """Set a keyword in all the headers."""
         for header in self._headers:
             header.set(key, value=value, comment=comment)
 
@@ -80,6 +89,7 @@ class FitsHeaderCollection:
         return ret
 
     def get(self, key, default=None):
+        """Get a keyword, defaulting to None."""
         try:
             return self[key]
         except KeyError as err:
@@ -92,6 +102,7 @@ class FitsHeaderCollection:
         self.remove(key)
 
     def remove(self, key):
+        """Remove a keyword from all the headers."""
         deleted = 0
         for header in self._headers:
             try:
@@ -103,9 +114,11 @@ class FitsHeaderCollection:
             raise KeyError(f"'{key}' is not on any of the extensions")
 
     def get_comment(self, key):
+        """Get the comment for a keyword, from all the headers, as a list."""
         return [header.comments[key] for header in self._headers]
 
     def set_comment(self, key, comment):
+        """Set the comment for a keyword in all the headers."""
         def _inner_set_comment(header):
             if key not in header:
                 raise KeyError(f"Keyword {key!r} not available")
@@ -123,6 +136,29 @@ class FitsHeaderCollection:
 
 
 def new_imagehdu(data, header, name=None):
+    """Create a new ImageHDU from data and header.
+
+    Parameters
+    ----------
+    data : `numpy.ndarray`
+        The data array.
+
+    header : `astropy.io.fits.Header`
+        The header.
+
+    name : str
+        The extension name.
+    
+    Notes
+    -----
+    Assigning data in a delayed way, won't reset BZERO/BSCALE in the header,
+    for some reason. Need to investigated. Maybe astropy.io.fits bug. Figure
+    out WHY were we delaying in the first place.
+
+    Example: 
+    >>> i = ImageHDU(data=DELAYED, header=header.copy(), name=name)
+    >>> i.data = data
+    """
     # Assigning data in a delayed way, won't reset BZERO/BSCALE in the header,
     # for some reason. Need to investigated. Maybe astropy.io.fits bug. Figure
     # out WHY were we delaying in the first place.
@@ -132,20 +168,19 @@ def new_imagehdu(data, header, name=None):
 
 
 def table_to_bintablehdu(table, extname=None):
-    """
-    Convert an astropy Table object to a BinTableHDU before writing to disk.
+    """Convert an astropy Table object to a BinTableHDU before writing to disk.
 
     Parameters
     ----------
     table: astropy.table.Table instance
         the table to be converted to a BinTableHDU
+
     extname: str
         name to go in the EXTNAME field of the FITS header
 
     Returns
     -------
     BinTableHDU
-
     """
     # remove header to avoid warning from table_to_hdu
     table_header = table.meta.pop('header', None)
@@ -179,6 +214,7 @@ def table_to_bintablehdu(table, extname=None):
 
 
 def header_for_table(table):
+    """Return a FITS header for a table."""
     table_header = table.meta.pop('header', None)
     fits_header = fits.table_to_hdu(table).header
     if table_header:
@@ -188,12 +224,27 @@ def header_for_table(table):
 
 
 def add_header_to_table(table):
+    """Add a FITS header to a table."""
     header = header_for_table(table)
     table.meta['header'] = header
     return header
 
 
 def _process_table(table, name=None, header=None):
+    """Convert a BinTableHDU or TableHDU to an astropy Table object.
+    
+    Arguments
+    ---------
+    table : |BinTableHDU| or |TableHDU| or |Table|
+        The table to convert. If it's already an |Table|, it will be returned
+        as is.
+
+    name : str
+        The name to assign to the table.
+
+    header : `astropy.io.fits.Header`
+        The header to assign to the table.
+    """
     if isinstance(table, (BinTableHDU, TableHDU)):
         obj = Table(table.data, meta={'header': header or table.header})
         for i, col in enumerate(obj.columns, start=1):
@@ -217,15 +268,46 @@ def _process_table(table, name=None, header=None):
 
 
 def card_filter(cards, include=None, exclude=None):
+    """Filter a list of cards, lazily returning only those that match the
+    criteria.
+
+    Parameters
+    ----------
+    cards : iterable
+        The cards to filter.
+
+    include : iterable of str
+        Only cards with these keywords will be returned.
+    
+    exclude : iterable of str
+        Cards with these keywords will be skipped.
+    
+    Yields
+    ------
+    card : tuple
+        A card that matches the criteria.
+    """
     for card in cards:
         if include is not None and card[0] not in include:
             continue
         elif exclude is not None and card[0] in exclude:
             continue
+
         yield card
 
 
 def update_header(headera, headerb):
+    """Update headera with the cards from headerb, but only if they are
+    different.
+
+    Parameters
+    ----------
+    headera : `astropy.io.fits.Header`
+        The header to update.
+
+    headerb : `astropy.io.fits.Header`
+        The header to update from.
+    """
     cardsa = tuple(tuple(cr) for cr in headera.cards)
     cardsb = tuple(tuple(cr) for cr in headerb.cards)
 
@@ -283,15 +365,25 @@ def fits_ext_comp_key(ext):
 
 
 class FitsLazyLoadable:
+    """Class to delay loading of data from a FITS file."""
 
     def __init__(self, obj):
+        """Initializes the object.
+        
+        Parameters
+        ----------
+        obj : `astropy.io.fits.ImageHDU` or `astropy.io.fits.BinTableHDU`
+            The HDU to delay loading from.
+        """
         self._obj = obj
         self.lazy = True
 
     def _create_result(self, shape):
+        """Create an empty array to hold the data."""
         return np.empty(shape, dtype=self.dtype)
 
     def _scale(self, data):
+        """Scale the data, if necessary."""
         bscale = self._obj._orig_bscale
         bzero = self._obj._orig_bzero
         if bscale == 1 and bzero == 0:
@@ -304,22 +396,24 @@ class FitsLazyLoadable:
 
     @property
     def header(self):
+        """The header of the HDU."""
         return self._obj.header
 
     @property
     def data(self):
+        """The data of the HDU."""
         res = self._create_result(self.shape)
         res[:] = self._scale(self._obj.data)
         return res
 
     @property
     def shape(self):
+        """The shape of the data."""
         return self._obj.shape
 
     @property
     def dtype(self):
-        """
-        Need to to some overriding of astropy.io.fits since it doesn't
+        """Need to to some overriding of astropy.io.fits since it doesn't
         know about BITPIX=8
         """
         bitpix = self._obj._orig_bitpix
@@ -340,6 +434,24 @@ class FitsLazyLoadable:
 
 
 def _prepare_hdulist(hdulist, default_extension='SCI', extname_parser=None):
+    """Prepare an HDUList for reading.
+    
+    Parameters
+    ----------
+    hdulist : `astropy.io.fits.HDUList`
+        The HDUList to prepare.
+    
+    default_extension : str
+        The name of the default extension.
+    
+    extname_parser : callable
+        A function to parse the EXTNAME of an HDU.
+
+    Returns
+    -------
+    hdulist : `astropy.io.fits.HDUList`
+        The prepared HDUList.
+    """
     new_list = []
     highest_ver = 0
     recognized = set()
@@ -392,12 +504,27 @@ def _prepare_hdulist(hdulist, default_extension='SCI', extname_parser=None):
 
 
 def read_fits(cls, source, extname_parser=None):
-    """
-    Takes either a string (with the path to a file) or an HDUList as input, and
-    tries to return a populated AstroData (or descendant) instance.
+    """Takes either a string (with the path to a file) or an HDUList as input,
+    and tries to return a populated AstroData (or descendant) instance.
 
     It will raise exceptions if the file is not found, or if there is no match
     for the HDUList, among the registered AstroData classes.
+
+    Parameters
+    ----------
+    cls : class
+        The class to instantiate.
+
+    source : str or `astropy.io.fits.HDUList`
+        The path to the file, or an HDUList.
+    
+    extname_parser : callable
+        A function to parse the EXTNAME of an HDU.
+
+    Returns
+    -------
+    ad : `astrodata.AstroData` or descendant
+        The populated AstroData object. This is of the type specified by cls.
     """
 
     ad = cls()
@@ -644,21 +771,27 @@ def windowedOp(func, sequence, kernel, shape=None, dtype=None,
     ----------
     func : callable
         The function to apply.
+
     sequence : list of NDData
         List of NDData objects.
+
     kernel : tuple of int
         Shape of the blocks.
+
     shape : tuple of int
         Shape of inputs. Defaults to ``sequence[0].shape``.
+
     dtype : str or dtype
         Type of the output array. Defaults to ``sequence[0].dtype``.
+
     with_uncertainty : bool
         Compute uncertainty?
+
     with_mask : bool
         Compute mask?
+
     **kwargs
         Additional args are passed to ``func``.
-
     """
 
     def generate_boxes(shape, kernel):
@@ -745,16 +878,30 @@ def windowedOp(func, sequence, kernel, shape=None, dtype=None,
 # to be self-consistent with one another anyway.
 
 def wcs_to_asdftablehdu(wcs, extver=None):
-    """
-    Serialize a gWCS object as a FITS TableHDU (ASCII) extension.
-
+    """Serialize a gWCS object as a FITS TableHDU (ASCII) extension.
+    
     The ASCII table is actually a mini ASDF file. The constituent AstroPy
     models must have associated ASDF "tags" that specify how to serialize them.
 
     In the event that serialization as pure ASCII fails (this should not
     happen), a binary table representation will be used as a fallback.
-    """
 
+    Returns None (issuing a warning) if the WCS object cannot be serialized,
+    so the rest of the file can still be written.
+
+    Parameters
+    ----------
+    wcs : gWCS
+        The gWCS object to serialize.
+
+    extver : int
+        The EXTVER to assign to the extension.
+    
+    Returns
+    -------
+    hdu : TableHDU or BinTableHDU
+        The FITS table extension containing the serialized WCS object.
+    """
     # Create a small ASDF file in memory containing the WCS object
     # representation because there's no public API for generating only the
     # relevant YAML subsection and an ASDF file handles the "tags" properly.
@@ -798,13 +945,11 @@ def wcs_to_asdftablehdu(wcs, extver=None):
 
 
 def asdftablehdu_to_wcs(hdu):
-    """
-    Recreate a gWCS object from its serialization in a FITS table extension.
+    """Recreate a gWCS object from its serialization in a FITS table extension.
 
     Returns None (issuing a warning) if the extension cannot be parsed, so
     the rest of the file can still be read.
     """
-
     ver = hdu.header.get('EXTVER', -1)
 
     if isinstance(hdu, (TableHDU, BinTableHDU)):

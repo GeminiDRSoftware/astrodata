@@ -1,3 +1,4 @@
+"""Utility functions and classes for AstroData objects."""
 import inspect
 import warnings
 from collections import namedtuple
@@ -14,13 +15,14 @@ __all__ = ('assign_only_single_slice', 'astro_data_descriptor',
 
 
 class AstroDataDeprecationWarning(DeprecationWarning):
-    pass
+    """Warning class for deprecated AstroData methods."""
 
 
 warnings.simplefilter("always", AstroDataDeprecationWarning)
 
 
 def deprecated(reason):
+    """Wrapper that will issue a warning when a deprecated function is used."""
     def decorator_wrapper(fn):
         @wraps(fn)
         def wrapper(*args, **kw):
@@ -35,6 +37,7 @@ def deprecated(reason):
 
 
 def normalize_indices(slc, nitems):
+    """Normalize a slice or index to a list of indices."""
     multiple = True
     if isinstance(slc, slice):
         start, stop, step = slc.indices(nitems)
@@ -59,12 +62,12 @@ def normalize_indices(slc, nitems):
 
 
 class TagSet(namedtuple('TagSet', 'add remove blocked_by blocks if_present')):
-    """
-    Named tuple that is used by tag methods to return which actions should be
-    performed on a tag set. All the attributes are optional, and any
-    combination of them can be used, allowing to create complex tag structures.
-    Read the documentation on the tag-generating algorithm if you want to
-    better understand the interactions.
+    """Named tuple that is used by tag methods to return which actions should
+    be performed on a tag set.
+    
+    All the attributes are optional, and any combination of them can be used,
+    allowing to create complex tag structures.  Read the documentation on the
+    tag-generating algorithm if you want to better understand the interactions.
 
     The simplest TagSet, though, tends to just add tags to the global set.
 
@@ -76,12 +79,16 @@ class TagSet(namedtuple('TagSet', 'add remove blocked_by blocks if_present')):
     ----------
     add : set of str, optional
         Tags to be added to the global set
+
     remove : set of str, optional
         Tags to be removed from the global set
+
     blocked_by : set of str, optional
         Tags that will prevent this TagSet from being applied
+
     blocks : set of str, optional
         Other TagSets containing these won't be applied
+
     if_present : set of str, optional
         This TagSet will be applied only *all* of these tags are present
 
@@ -93,7 +100,6 @@ class TagSet(namedtuple('TagSet', 'add remove blocked_by blocks if_present')):
     TagSet(add={'BIAS', 'CAL'}, remove=set(), blocked_by=set(), blocks=set(), if_present=set())
     >>> TagSet(remove={'BIAS', 'CAL'}) # doctest: +SKIP
     TagSet(add=set(), remove={'BIAS', 'CAL'}, blocked_by=set(), blocks=set(), if_present=set())
-
     """
     def __new__(cls, add=None, remove=None, blocked_by=None, blocks=None,
                 if_present=None):
@@ -105,8 +111,7 @@ class TagSet(namedtuple('TagSet', 'add remove blocked_by blocks if_present')):
 
 
 def astro_data_descriptor(fn):
-    """
-    Decorator that will mark a class method as an AstroData descriptor.
+    """Decorator that will mark a class method as an AstroData descriptor.
     Useful to produce list of descriptors, for example.
 
     If used in combination with other decorators, this one *must* be the
@@ -127,10 +132,9 @@ def astro_data_descriptor(fn):
 
 
 def returns_list(fn):
-    """
-    Decorator to ensure that descriptors that should return a list (of one
-    value per extension) only returns single values when operating on
-    single slices; and vice versa.
+    """Decorator to ensure that descriptors that should return a list (of one
+    value per extension) only returns single values when operating on single
+    slices; and vice versa.
 
     This is a common case, and you can use the decorator to simplify the
     logic of your descriptors.
@@ -180,9 +184,8 @@ def assign_only_single_slice(fn):
 
 
 def astro_data_tag(fn):
-    """
-    Decorator that marks methods of an `AstroData` derived class as part of the
-    tag-producing system.
+    """Decorator that marks methods of an `AstroData` derived class as part of
+    the tag-producing system.
 
     It wraps the method around a function that will ensure a consistent return
     value: the wrapped method can return any sequence of sequences of strings,
@@ -256,16 +259,17 @@ class Section(tuple):
 
     @property
     def ndim(self):
+        """The number of dimensions in the section."""
         return len(self) // 2
 
     @staticmethod
     def from_shape(value):
-        """produce a Section object defining a given shape"""
+        """Produce a Section object defining a given shape."""
         return Section(*[y for x in reversed(value) for y in (0, x)])
 
     @staticmethod
     def from_string(value):
-        """The inverse of __str__, produce a Section object from a string"""
+        """The inverse of __str__, produce a Section object from a string."""
         return Section(*[y for x in value.strip("[]").split(",")
                          for start, end in [x.split(":")]
                          for y in (None if start == '' else int(start)-1,
@@ -273,15 +277,17 @@ class Section(tuple):
 
     def asIRAFsection(self):
         """Produce string of style '[x1:x2,y1:y2]' that is 1-indexed
-        and end-inclusive"""
+        and end-inclusive
+        """
         return ("[" +
                 ",".join([":".join([str(self.__dict__[axis]+1),
                                     str(self.__dict__[axis.replace("1", "2")])])
                           for axis in self._axis_names[::2]]) + "]")
 
     def asslice(self, add_dims=0):
-        """Return the Section object as a slice/list of slices.
-        Higher dimensionality can be achieved with the add_dims parameter."""
+        """Return the Section object as a slice/list of slices.  Higher
+        dimensionality can be achieved with the add_dims parameter.
+        """
         return ((slice(None),) * add_dims +
                 tuple(slice(self.__dict__[axis],
                             self.__dict__[axis.replace("1", "2")])
@@ -300,7 +306,8 @@ class Section(tuple):
 
     def overlap(self, section):
         """Determine whether the two sections overlap. If so, the Section
-        common to both is returned, otherwise None"""
+        common to both is returned, otherwise None
+        """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
         mins = [max(s1, s2) for s1, s2 in zip(self[::2], section[::2])]
