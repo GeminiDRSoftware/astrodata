@@ -14,7 +14,7 @@ from gwcs.wcs import WCS as gWCS
 import astrodata
 from astrodata import wcs as adwcs
 from astrodata.testing import download_from_archive
-from gempy.library.transform import add_longslit_wcs
+# from gempy.library.transform import add_longslit_wcs
 
 
 @pytest.fixture(scope='module')
@@ -50,7 +50,7 @@ def test_calculate_affine_matrices(angle, scale, xoffset, yoffset):
                     atol=1e-10)
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_reading_and_writing_sliced_image(F2_IMAGE):
     ad = astrodata.open(F2_IMAGE)
     result = ad[0].wcs(100, 100, 0)
@@ -132,7 +132,7 @@ def test_remove_axis_from_model_5():
     assert_allclose(new_model(0), (0, 7))
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_remove_unused_world_axis(F2_IMAGE):
     """A test with an intermediate frame"""
     ad = astrodata.open(F2_IMAGE)
@@ -151,7 +151,7 @@ def test_remove_unused_world_axis(F2_IMAGE):
         assert getattr(ad[0].wcs, frame).naxes == 2
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_gwcs_creation(NIRI_IMAGE):
     """Test that the gWCS object for an image agrees with the FITS WCS"""
     ad = astrodata.open(NIRI_IMAGE)
@@ -163,7 +163,7 @@ def test_gwcs_creation(NIRI_IMAGE):
             assert wcs_sky.separation(gwcs_sky) < 0.01 * u.arcsec
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_adding_longslit_wcs(GMOS_LONGSLIT):
     """Test that adding the longslit WCS doesn't interfere with the sky
     coordinates of the WCS"""
@@ -202,7 +202,7 @@ def test_adding_longslit_wcs(GMOS_LONGSLIT):
     assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_loglinear_axis(NIRI_IMAGE):
     """Test that we can add a log-linear axis and write and read it"""
     ad = astrodata.open(NIRI_IMAGE)

@@ -12,8 +12,8 @@ import pytest
 from astropy.table import Table
 from astropy.utils.data import download_file
 
-from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
-from gempy.library import astrotools as at
+# from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
+# from gempy.library import astrotools as at
 
 URL = 'https://archive.gemini.edu/file/'
 

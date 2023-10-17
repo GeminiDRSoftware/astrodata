@@ -145,7 +145,7 @@ def test_extver3(tmp_path, GSAOI_DARK):
     assert [hdr['EXTVER'] for hdr in ad.hdr] == [1, 2, 4, 5, 6]
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_can_add_and_del_extension(GMOSN_SPECT):
     ad = astrodata.open(GMOSN_SPECT)
     original_size = len(ad)
@@ -158,7 +158,7 @@ def test_can_add_and_del_extension(GMOSN_SPECT):
     assert len(ad) == original_size
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_slice(GMOSN_SPECT):
     ad = astrodata.open(GMOSN_SPECT)
     assert ad.is_sliced is False
@@ -211,7 +211,7 @@ def test_slice(GMOSN_SPECT):
         ext[1]
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_slice_single_element(GMOSN_SPECT):
     ad = astrodata.open(GMOSN_SPECT)
     assert ad.is_sliced is False
@@ -232,7 +232,7 @@ def test_slice_single_element(GMOSN_SPECT):
     assert ext.hdr['EXTVER'] == metadata[1]
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_slice_multiple(GMOSN_SPECT):
     ad = astrodata.open(GMOSN_SPECT)
 
@@ -287,7 +287,7 @@ def test_slice_multiple(GMOSN_SPECT):
     del ext.bar
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_slice_data(GMOSN_SPECT):
     ad = astrodata.open(GMOSN_SPECT)
 
@@ -332,7 +332,7 @@ def test_slice_data(GMOSN_SPECT):
     assert slc.nddata[0].mask is ext.mask
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_phu(NIFS_DARK):
     ad = astrodata.open(NIFS_DARK)
 
@@ -355,7 +355,7 @@ def test_phu(NIFS_DARK):
         assert 'DETECTOR' not in ad.phu
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_paths(tmpdir, NIFS_DARK):
     ad = astrodata.open(NIFS_DARK)
     assert ad.orig_filename == 'N20160727S0077.fits'
@@ -395,7 +395,7 @@ def test_paths(tmpdir, NIFS_DARK):
         ad.write()
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_from_hdulist(NIFS_DARK):
     with fits.open(NIFS_DARK) as hdul:
         assert 'ORIGNAME' not in hdul[0].header
@@ -511,7 +511,7 @@ def test_can_append_table_and_access_data(capsys, tmpdir):
         del ad.BOB
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_attributes(GSAOI_DARK):
     ad = astrodata.open(GSAOI_DARK)
     assert ad.shape == [(2048, 2048)] * 4
@@ -541,7 +541,7 @@ def test_attributes(GSAOI_DARK):
         ad.mask = 1
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_set_a_keyword_on_phu_deprecated(NIFS_DARK):
     ad = astrodata.open(NIFS_DARK)
     # Test that setting DETECTOR as an attribute doesn't modify the header
@@ -553,7 +553,7 @@ def test_set_a_keyword_on_phu_deprecated(NIFS_DARK):
 # Regression:
 # Make sure that references to associated
 # extension objects are copied across
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_do_arith_and_retain_features(NIFS_DARK):
     ad = astrodata.open(NIFS_DARK)
     ad[0].NEW_FEATURE = np.array([1, 2, 3, 4, 5])
@@ -618,7 +618,7 @@ def test_update_filename2():
     assert ad.filename == 'origfile_bar.fits'
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_read_a_keyword_from_phu_deprecated():
     """Test deprecated methods to access headers"""
     ad = astrodata.open(download_from_archive('N20110826S0336.fits'))
@@ -668,7 +668,7 @@ def test_read_file(tmpdir):
     assert ad.instrument() == 'darkimager'
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_header_collection(GMOSN_SPECT):
     ad = astrodata.create({})
     assert ad.hdr is None
@@ -718,7 +718,7 @@ def test_header_collection(GMOSN_SPECT):
     assert len(list(hdr)) == 13
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_header_deprecated(GMOSN_SPECT):
     ad = astrodata.open(GMOSN_SPECT)
     with pytest.warns(AstroDataDeprecationWarning):
@@ -734,7 +734,7 @@ def test_header_deprecated(GMOSN_SPECT):
     assert header[0]['ORIGNAME'] == 'N20170529S0168.fits'
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_read_no_extensions(GRACES_SPECT):
     ad = astrodata.open(GRACES_SPECT)
     assert len(ad) == 1
@@ -808,7 +808,7 @@ def test_add_table():
     assert_array_equal(ad[0].OTHERTABLE['col0'], ['aa', 'bb', 'cc'])
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_copy(GSAOI_DARK, capsys):
     ad = astrodata.open(GSAOI_DARK)
     ad.TABLE = Table([['a', 'b', 'c'], [1, 2, 3]])
@@ -838,7 +838,7 @@ def test_copy(GSAOI_DARK, capsys):
     assert captured.out.splitlines()[1:] == captured2.out.splitlines()[1:]
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_crop(GSAOI_DARK):
     ad = astrodata.open(GSAOI_DARK)
     assert set(ad.shape) == {(2048, 2048)}
@@ -848,7 +848,7 @@ def test_crop(GSAOI_DARK):
     assert set(ad.shape) == {(11, 6)}
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_crop_ext(GSAOI_DARK):
     ad = astrodata.open(GSAOI_DARK)
     ext = ad[0]
