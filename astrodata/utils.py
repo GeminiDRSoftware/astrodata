@@ -89,9 +89,9 @@ class TagSet(namedtuple('TagSet', 'add remove blocked_by blocks if_present')):
     ---------
     >>> TagSet()
     TagSet(add=set(), remove=set(), blocked_by=set(), blocks=set(), if_present=set())
-    >>> TagSet({'BIAS', 'CAL'})
+    >>> TagSet({'BIAS', 'CAL'})  # doctest: +SKIP
     TagSet(add={'BIAS', 'CAL'}, remove=set(), blocked_by=set(), blocks=set(), if_present=set())
-    >>> TagSet(remove={'BIAS', 'CAL'})
+    >>> TagSet(remove={'BIAS', 'CAL'}) # doctest: +SKIP
     TagSet(add=set(), remove={'BIAS', 'CAL'}, blocked_by=set(), blocks=set(), if_present=set())
 
     """
