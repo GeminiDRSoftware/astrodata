@@ -496,16 +496,5 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         return self.__class__(
             self.data.T,
             uncertainty=None if unc is None else unc.__class__(unc.array.T),
-            mask=None if self.mask is None else self.mask.T, wcs=new_wcs,
-            meta=self.meta, copy=False
+            mask=None if self.mask is None else self.mask.T, wcs=new_wcs, copy=False
         )
-
-    def _slice(self, item):
-        """Additionally slice things like OBJMASK"""
-        kwargs = super()._slice(item)
-        if 'other' in kwargs['meta']:
-            kwargs['meta'] = deepcopy(self.meta)
-            for k, v in kwargs['meta']['other'].items():
-                if isinstance(v, np.ndarray) and v.shape == self.shape:
-                    kwargs['meta']['other'][k] = v[item]
-        return kwargs
