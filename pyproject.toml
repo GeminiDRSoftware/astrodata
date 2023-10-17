@@ -15,8 +15,13 @@ requires-python = ">=3.9"
 license = { file = "licenses/LICENSE.rst", content-type = "text/plain" }
 
 dependencies = [
-  
+    "asdf",
+    "astropy",
+    "gwcs",
+    "jsonschema",
+    "numpy",
 ]
+
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -24,6 +29,7 @@ test = [
     "pytest",
     "pytest-doctestplus",
 ]
+
 docs = [
     "sphinx",
     "sphinx-automodapi",
@@ -51,6 +57,7 @@ testpaths = [
   "astrodata",
   "docs",
 ]
+
 doctest_plus = "enabled"
 text_file_format = "rst"
 addopts = "--doctest-rst"
