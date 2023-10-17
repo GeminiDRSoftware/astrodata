@@ -156,8 +156,8 @@ def new_imagehdu(data, header, name=None):
     out WHY were we delaying in the first place.
 
     Example: 
-    >>> i = ImageHDU(data=DELAYED, header=header.copy(), name=name)
-    >>> i.data = data
+    >> i = ImageHDU(data=DELAYED, header=header.copy(), name=name)
+    >> i.data = data
     """
     # Assigning data in a delayed way, won't reset BZERO/BSCALE in the header,
     # for some reason. Need to investigated. Maybe astropy.io.fits bug. Figure
