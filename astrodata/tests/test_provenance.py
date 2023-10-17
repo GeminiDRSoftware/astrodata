@@ -138,7 +138,7 @@ def BPM_PROVHISTORY():
     return download_from_archive("bpm_20220128_gmos-s_Ham_11_full_12amp.fits")
 
 
-@pytest.mark.dragons_remote_data
+@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
 def test_convert_provhistory(tmpdir, BPM_PROVHISTORY):
     ad = astrodata.open(BPM_PROVHISTORY)
 
