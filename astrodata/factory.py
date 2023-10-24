@@ -16,9 +16,7 @@ class AstroDataError(Exception):
 class AstroDataFactory:
     """Factory class for AstroData objects."""
 
-    _file_openers = (
-        fits.open,
-    )
+    _file_openers = (fits.open,)
 
     def __init__(self):
         self._registry = set()
@@ -51,11 +49,12 @@ class AstroDataFactory:
                     # format and go for the next opener
                     pass
                 else:
-                    if hasattr(fp, 'close'):
+                    if hasattr(fp, "close"):
                         fp.close()
                     return
-            raise AstroDataError("No access, or not supported format for: {}"
-                                 .format(source))
+            raise AstroDataError(
+                "No access, or not supported format for: {}".format(source)
+            )
         else:
             yield source
 
@@ -63,9 +62,10 @@ class AstroDataFactory:
         """Add a new class to the AstroDataFactory registry. It will be used
         when instantiating an AstroData class for a FITS file.
         """
-        if not hasattr(cls, '_matches_data'):
-            raise AttributeError("Class '{}' has no '_matches_data' method"
-                                 .format(cls.__name__))
+        if not hasattr(cls, "_matches_data"):
+            raise AttributeError(
+                "Class '{}' has no '_matches_data' method".format(cls.__name__)
+            )
         self._registry.add(cls)
 
     def getAstroData(self, source):
@@ -102,7 +102,9 @@ class AstroDataFactory:
             final_candidates.append(cnd)
 
         if len(final_candidates) > 1:
-            raise AstroDataError("More than one class is candidate for this dataset")
+            raise AstroDataError(
+                "More than one class is candidate for this dataset"
+            )
         elif not final_candidates:
             raise AstroDataError("No class matches this dataset")
 
@@ -131,7 +133,9 @@ class AstroDataFactory:
                 p.header.update(phu)
                 lst.append(p)
             else:
-                raise ValueError("phu must be a PrimaryHDU or a valid header object")
+                raise ValueError(
+                    "phu must be a PrimaryHDU or a valid header object"
+                )
 
         # TODO: Verify the contents of extensions...
         if extensions is not None:

@@ -14,22 +14,23 @@ from gwcs.wcs import WCS as gWCS
 import astrodata
 from astrodata import wcs as adwcs
 from astrodata.testing import download_from_archive
+
 # from gempy.library.transform import add_longslit_wcs
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def F2_IMAGE():
     """Any F2 image with CD3_3=1"""
     return download_from_archive("S20130717S0365.fits")
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def NIRI_IMAGE():
     """Any NIRI image"""
     return download_from_archive("N20180102S0392.fits")
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def GMOS_LONGSLIT():
     """Any GMOS longslit spectrum"""
     return download_from_archive("N20180103S0332.fits")
@@ -37,20 +38,29 @@ def GMOS_LONGSLIT():
 
 @pytest.mark.parametrize("angle", [0, 20, 67, -35])
 @pytest.mark.parametrize("scale", [0.5, 1.0, 2.0])
-@pytest.mark.parametrize("xoffset,yoffset", [(0,0), (10,20)])
+@pytest.mark.parametrize("xoffset,yoffset", [(0, 0), (10, 20)])
 def test_calculate_affine_matrices(angle, scale, xoffset, yoffset):
-    m = ((models.Scale(scale) & models.Scale(scale)) |
-         models.Rotation2D(angle) |
-         (models.Shift(xoffset) & models.Shift(yoffset)))
+    m = (
+        (models.Scale(scale) & models.Scale(scale))
+        | models.Rotation2D(angle)
+        | (models.Shift(xoffset) & models.Shift(yoffset))
+    )
     affine = adwcs.calculate_affine_matrices(m, (100, 100))
     assert_allclose(affine.offset, (yoffset, xoffset), atol=1e-10)
     angle = math.radians(angle)
-    assert_allclose(affine.matrix, ((scale * math.cos(angle), scale * math.sin(angle)),
-                                    (-scale * math.sin(angle), scale * math.cos(angle))),
-                    atol=1e-10)
+    assert_allclose(
+        affine.matrix,
+        (
+            (scale * math.cos(angle), scale * math.sin(angle)),
+            (-scale * math.sin(angle), scale * math.cos(angle)),
+        ),
+        atol=1e-10,
+    )
 
 
-@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
+@pytest.mark.skip(
+    reason="Dragons remote data"
+)  # @pytest.mark.dragons_remote_data
 def test_reading_and_writing_sliced_image(F2_IMAGE):
     ad = astrodata.open(F2_IMAGE)
     result = ad[0].wcs(100, 100, 0)
@@ -76,8 +86,9 @@ def test_remove_axis_from_model():
 
 def test_remove_axis_from_model_2():
     """A test with |-chained models"""
-    model = ((models.Shift(0) & models.Shift(1) & models.Shift(2)) |
-             (models.Scale(2) & models.Rotation2D(90)))
+    model = (models.Shift(0) & models.Shift(1) & models.Shift(2)) | (
+        models.Scale(2) & models.Rotation2D(90)
+    )
     new_model, input_axis = adwcs.remove_axis_from_model(model, 0)
     assert input_axis == 0
     assert new_model.n_submodels == 3
@@ -132,15 +143,16 @@ def test_remove_axis_from_model_5():
     assert_allclose(new_model(0), (0, 7))
 
 
-@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
+@pytest.mark.skip(
+    reason="Dragons remote data"
+)  # @pytest.mark.dragons_remote_data
 def test_remove_unused_world_axis(F2_IMAGE):
     """A test with an intermediate frame"""
     ad = astrodata.open(F2_IMAGE)
     result = ad[0].wcs(1000, 1000, 0)
     new_frame = cf.Frame2D(name="intermediate")
     new_model = models.Shift(100) & models.Shift(200) & models.Identity(1)
-    ad[0].wcs.insert_frame(ad[0].wcs.input_frame,
-                           new_model, new_frame)
+    ad[0].wcs.insert_frame(ad[0].wcs.input_frame, new_model, new_frame)
     ad[0].reset(ad[0].nddata[0])
     new_result = ad[0].wcs(900, 800)
     assert_allclose(new_result, result)
@@ -151,7 +163,9 @@ def test_remove_unused_world_axis(F2_IMAGE):
         assert getattr(ad[0].wcs, frame).naxes == 2
 
 
-@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
+@pytest.mark.skip(
+    reason="Dragons remote data"
+)  # @pytest.mark.dragons_remote_data
 def test_gwcs_creation(NIRI_IMAGE):
     """Test that the gWCS object for an image agrees with the FITS WCS"""
     ad = astrodata.open(NIRI_IMAGE)
@@ -163,7 +177,9 @@ def test_gwcs_creation(NIRI_IMAGE):
             assert wcs_sky.separation(gwcs_sky) < 0.01 * u.arcsec
 
 
-@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
+@pytest.mark.skip(
+    reason="Dragons remote data"
+)  # @pytest.mark.dragons_remote_data
 def test_adding_longslit_wcs(GMOS_LONGSLIT):
     """Test that adding the longslit WCS doesn't interfere with the sky
     coordinates of the WCS"""
@@ -171,7 +187,9 @@ def test_adding_longslit_wcs(GMOS_LONGSLIT):
     frame_name = ad[4].hdr.get("RADESYS", ad[4].hdr["RADECSYS"]).lower()
     crpix1 = ad[4].hdr["CRPIX1"] - 1
     crpix2 = ad[4].hdr["CRPIX2"] - 1
-    gwcs_sky = SkyCoord(*ad[4].wcs(crpix1, crpix2), unit=u.deg, frame=frame_name)
+    gwcs_sky = SkyCoord(
+        *ad[4].wcs(crpix1, crpix2), unit=u.deg, frame=frame_name
+    )
     add_longslit_wcs(ad)
     gwcs_coords = ad[4].wcs(crpix1, crpix2)
     new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
@@ -202,26 +220,34 @@ def test_adding_longslit_wcs(GMOS_LONGSLIT):
     assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
 
 
-@pytest.mark.skip(reason="Dragons remote data")  #@pytest.mark.dragons_remote_data
+@pytest.mark.skip(
+    reason="Dragons remote data"
+)  # @pytest.mark.dragons_remote_data
 def test_loglinear_axis(NIRI_IMAGE):
     """Test that we can add a log-linear axis and write and read it"""
     ad = astrodata.open(NIRI_IMAGE)
     coords = ad[0].wcs(200, 300)
     ad[0].data = np.repeat(ad[0].data[np.newaxis], 5, axis=0)
     new_input_frame = adwcs.pixel_frame(3)
-    loglinear_frame = cf.SpectralFrame(axes_order=(0,), unit=u.nm,
-                                 axes_names=("AWAV",), name="Wavelength in air")
+    loglinear_frame = cf.SpectralFrame(
+        axes_order=(0,),
+        unit=u.nm,
+        axes_names=("AWAV",),
+        name="Wavelength in air",
+    )
     celestial_frame = ad[0].wcs.output_frame
     celestial_frame._axes_order = (1, 2)
-    new_output_frame = cf.CompositeFrame([loglinear_frame, celestial_frame],
-                                         name="world")
-    new_wcs = models.Exponential1D(amplitude=1, tau=2) & ad[0].wcs.forward_transform
-    ad[0].wcs = gWCS([(new_input_frame, new_wcs),
-                      (new_output_frame, None)])
+    new_output_frame = cf.CompositeFrame(
+        [loglinear_frame, celestial_frame], name="world"
+    )
+    new_wcs = (
+        models.Exponential1D(amplitude=1, tau=2) & ad[0].wcs.forward_transform
+    )
+    ad[0].wcs = gWCS([(new_input_frame, new_wcs), (new_output_frame, None)])
     new_coords = ad[0].wcs(2, 200, 300)
     assert_allclose(coords, new_coords[1:])
 
-    #with change_working_dir():
+    # with change_working_dir():
     ad.write("test.fits", overwrite=True)
     ad2 = astrodata.open("test.fits")
     assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)

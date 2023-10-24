@@ -16,16 +16,22 @@ from gwcs.coordinate_frames import Frame2D
 @pytest.fixture
 def testnd():
     shape = (5, 5)
-    hdr = fits.Header({'CRPIX1': 1, 'CRPIX2': 2})
-    nd = NDAstroData(data=np.arange(np.prod(shape)).reshape(shape),
-                     variance=np.ones(shape) + 0.5,
-                     mask=np.zeros(shape, dtype=bool),
-                     wcs=gWCS(models.Shift(1) & models.Shift(2),
-                              input_frame=adwcs.pixel_frame(2),
-                              output_frame=adwcs.pixel_frame(2, name='world')),
-                     unit='ct')
-    nd.meta['other'] = {'OBJMASK': np.arange(np.prod(shape)).reshape(shape),
-                        'OBJCAT': Table([[1,2,3]], names=[['number']])}
+    hdr = fits.Header({"CRPIX1": 1, "CRPIX2": 2})
+    nd = NDAstroData(
+        data=np.arange(np.prod(shape)).reshape(shape),
+        variance=np.ones(shape) + 0.5,
+        mask=np.zeros(shape, dtype=bool),
+        wcs=gWCS(
+            models.Shift(1) & models.Shift(2),
+            input_frame=adwcs.pixel_frame(2),
+            output_frame=adwcs.pixel_frame(2, name="world"),
+        ),
+        unit="ct",
+    )
+    nd.meta["other"] = {
+        "OBJMASK": np.arange(np.prod(shape)).reshape(shape),
+        "OBJCAT": Table([[1, 2, 3]], names=[["number"]]),
+    }
     nd.mask[3, 4] = True
     return nd
 
@@ -40,8 +46,8 @@ def test_var(testnd):
 
 def test_window(testnd):
     win = testnd.window[2:4, 3:5]
-    assert win.unit == 'ct'
-    #assert_array_equal(win.wcs.wcs.crpix, [1, 2])
+    assert win.unit == "ct"
+    # assert_array_equal(win.wcs.wcs.crpix, [1, 2])
     assert_array_equal(win.data, [[13, 14], [18, 19]])
     assert_array_equal(win.mask, [[False, False], [False, True]])
     assert_array_almost_equal(win.uncertainty.array, 1.5)
@@ -49,7 +55,6 @@ def test_window(testnd):
 
 
 def test_windowedOp(testnd):
-
     def stack(arrays):
         arrays = [x for x in arrays]
         data = np.array([arr.data for arr in arrays]).sum(axis=0)
@@ -57,10 +62,13 @@ def test_windowedOp(testnd):
         mask = np.array([arr.mask for arr in arrays]).sum(axis=0)
         return NDAstroData(data=data, variance=unc, mask=mask)
 
-    result = windowedOp(stack, [testnd, testnd],
-                        kernel=(3, 3),
-                        with_uncertainty=True,
-                        with_mask=True)
+    result = windowedOp(
+        stack,
+        [testnd, testnd],
+        kernel=(3, 3),
+        with_uncertainty=True,
+        with_mask=True,
+    )
     assert_array_equal(result.data, testnd.data * 2)
     assert_array_equal(result.uncertainty.array, testnd.uncertainty.array * 2)
     assert result.mask[3, 4] == 2
@@ -82,8 +90,9 @@ def test_transpose(testnd):
 
 
 def test_set_section(testnd):
-    sec = NDData(np.zeros((2, 2)),
-                 uncertainty=VarianceUncertainty(np.ones((2, 2))))
+    sec = NDData(
+        np.zeros((2, 2)), uncertainty=VarianceUncertainty(np.ones((2, 2)))
+    )
     testnd.set_section((slice(0, 2), slice(1, 3)), sec)
     assert_array_equal(testnd[:2, 1:3].data, 0)
     assert_array_equal(testnd[:2, 1:3].variance, 1)
@@ -99,7 +108,7 @@ def test_uncertainty_negative_numbers():
 
     arr[2] = -0.001
 
-    with pytest.warns(RuntimeWarning, match='Negative variance values found.'):
+    with pytest.warns(RuntimeWarning, match="Negative variance values found."):
         result = ADVarianceUncertainty(arr)
 
     assert not np.all(arr >= 0)
@@ -109,7 +118,7 @@ def test_uncertainty_negative_numbers():
     # check that it always works with a VarianceUncertainty instance
     result.array[2] = -0.001
 
-    with pytest.warns(RuntimeWarning, match='Negative variance values found.'):
+    with pytest.warns(RuntimeWarning, match="Negative variance values found."):
         result2 = ADVarianceUncertainty(result)
 
     assert not np.all(arr >= 0)
@@ -122,8 +131,7 @@ def test_wcs_slicing():
     nd = NDAstroData(np.zeros((50, 50)))
     in_frame = Frame2D(name="in_frame")
     out_frame = Frame2D(name="out_frame")
-    nd.wcs = gWCS([(in_frame, models.Identity(2)),
-                   (out_frame, None)])
+    nd.wcs = gWCS([(in_frame, models.Identity(2)), (out_frame, None)])
     assert nd.wcs(10, 10) == (10, 10)
     assert nd[10:].wcs(10, 10) == (10, 20)
     assert nd[..., 10:].wcs(10, 10) == (20, 10)
@@ -132,9 +140,9 @@ def test_wcs_slicing():
 
 
 def test_access_to_other_planes(testnd):
-    assert hasattr(testnd, 'OBJMASK')
+    assert hasattr(testnd, "OBJMASK")
     assert testnd.OBJMASK.shape == testnd.data.shape
-    assert hasattr(testnd, 'OBJCAT')
+    assert hasattr(testnd, "OBJCAT")
     assert isinstance(testnd.OBJCAT, Table)
     assert len(testnd.OBJCAT) == 3
 
@@ -149,5 +157,5 @@ def test_access_to_other_planes_when_windowed(testnd):
     assert len(ndwindow.OBJCAT) == 3
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main()

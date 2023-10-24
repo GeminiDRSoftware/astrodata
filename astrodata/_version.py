@@ -8,7 +8,7 @@ and to be used in the documentation.
 API = 3
 FEATURE = 2
 BUG = 0
-TAG = ''
+TAG = ""
 
 
 def version(short=False, tag=TAG):
@@ -25,7 +25,7 @@ def version(short=False, tag=TAG):
         _version = "{:d}.{:d}".format(API, FEATURE)
 
     else:
-        _tag = '_{:s}'.format(tag) if tag else ''
+        _tag = "_{:s}".format(tag) if tag else ""
         _version = "{:d}.{:d}.{:d}".format(API, FEATURE, BUG) + _tag
 
     return _version
