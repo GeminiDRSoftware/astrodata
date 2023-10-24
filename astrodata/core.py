@@ -91,6 +91,25 @@ class AstroData:
     ):
         if nddata is None:
             nddata = []
+
+        # Check that nddata is either a single or iterable of NDAstroData
+        # objects
+        is_nddata = isinstance(nddata, NDDataObject)
+
+        try:
+            is_nddata_iterable = isinstance(nddata[0], NDDataObject)
+
+        except IndexError:
+            # Fall back on checking if it's a list or tuple---could be empty.
+            is_nddata_iterable = isinstance(nddata, (list, tuple))
+
+        if not (is_nddata or is_nddata_iterable):
+            raise TypeError(
+                f"nddata must be an NDAstroData object or a list of "
+                f"NDAstroData objects, not {type(nddata)} ({nddata})."
+            )
+
+        # If nddata is a single NDAstroData object, make it a list.
         if not isinstance(nddata, (list, tuple)):
             nddata = list(nddata)
 
@@ -175,8 +194,11 @@ class AstroData:
         # Calling inspect.getmembers on `self` would trigger all the
         # properties (tags, phu, hdr, etc.), and that's undesirable. To
         # prevent that, we'll inspect the *class*.
-        filt = lambda x: hasattr(x, "tag_method")
-        for _, method in inspect.getmembers(self.__class__, filt):
+        members = inspect.getmembers(
+            self.__class__, lambda x: hasattr(x, "tag_method")
+        )
+
+        for _, method in members:
             ts = method(self)
             if ts.add or ts.remove or ts.blocks:
                 results.append(ts)
