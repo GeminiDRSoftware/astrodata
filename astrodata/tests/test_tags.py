@@ -5,35 +5,38 @@ from astropy.io import fits
 from astropy.table import Table
 
 import astrodata
-from astrodata import (astro_data_tag, astro_data_descriptor, TagSet,
-                       AstroData, factory, returns_list)
+from astrodata import (
+    astro_data_tag,
+    astro_data_descriptor,
+    TagSet,
+    AstroData,
+    factory,
+    returns_list,
+)
 
 SHAPE = (4, 5)
 
 
 class AstroDataMyInstrument(AstroData):
-    __keyword_dict = dict(
-        array_name='AMPNAME',
-        array_section='CCDSECT'
-    )
+    __keyword_dict = dict(array_name="AMPNAME", array_section="CCDSECT")
 
     @staticmethod
     def _matches_data(source):
-        return source[0].header.get('INSTRUME', '').upper() == 'MYINSTRUMENT'
+        return source[0].header.get("INSTRUME", "").upper() == "MYINSTRUMENT"
 
     @astro_data_tag
     def _tag_instrument(self):
-        return TagSet(['MYINSTRUMENT'])
+        return TagSet(["MYINSTRUMENT"])
 
     @astro_data_tag
     def _tag_image(self):
-        if self.phu.get('GRATING') == 'MIRROR':
-            return TagSet(['IMAGE'])
+        if self.phu.get("GRATING") == "MIRROR":
+            return TagSet(["IMAGE"])
 
     @astro_data_tag
     def _tag_dark(self):
-        if self.phu.get('OBSTYPE') == 'DARK':
-            return TagSet(['DARK'], blocks=['IMAGE', 'SPECT'])
+        if self.phu.get("OBSTYPE") == "DARK":
+            return TagSet(["DARK"], blocks=["IMAGE", "SPECT"])
 
     @astro_data_tag
     def _tag_raise(self):
@@ -56,11 +59,11 @@ class AstroDataMyInstrument(AstroData):
 
     @astro_data_descriptor
     def array_name(self):
-        return self.phu.get(self._keyword_for('array_name'))
+        return self.phu.get(self._keyword_for("array_name"))
 
     @astro_data_descriptor
     def detector_section(self):
-        return self.phu.get(self._keyword_for('array_section'))
+        return self.phu.get(self._keyword_for("array_section"))
 
     @astro_data_descriptor
     def amp_read_area(self):
@@ -77,22 +80,24 @@ def teardown_module():
     factory._registry.remove(AstroDataMyInstrument)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def testfile(tmpdir):
-    hdr = fits.Header({
-        'INSTRUME': 'MYINSTRUMENT',
-        'GRATING': 'MIRROR',
-        'OBSTYPE': 'DARK',
-        'AMPNAME': 'FOO',
-        'CCDSECT': '1:1024',
-    })
+    hdr = fits.Header(
+        {
+            "INSTRUME": "MYINSTRUMENT",
+            "GRATING": "MIRROR",
+            "OBSTYPE": "DARK",
+            "AMPNAME": "FOO",
+            "CCDSECT": "1:1024",
+        }
+    )
     phu = fits.PrimaryHDU(header=hdr)
     hdu = fits.ImageHDU(data=np.ones(SHAPE))
     hdu2 = fits.ImageHDU(data=np.ones(SHAPE) + 1)
     ad = astrodata.create(phu, [hdu, hdu2])
-    tbl = Table([np.zeros(10), np.ones(10)], names=['col1', 'col2'])
+    tbl = Table([np.zeros(10), np.ones(10)], names=["col1", "col2"])
     ad.MYCAT = tbl
-    filename = str(tmpdir.join('fakebias.fits'))
+    filename = str(tmpdir.join("fakebias.fits"))
     ad.write(filename)
     yield filename
     os.remove(filename)
@@ -100,18 +105,26 @@ def testfile(tmpdir):
 
 def test_tags(testfile):
     ad = astrodata.open(testfile)
-    assert ad.descriptors == ('amp_read_area', 'array_name', 'badguy',
-                              'detector_section', 'dispersion_axis', 'gain',
-                              'instrument', 'object', 'telescope')
-    assert ad.tags == {'DARK', 'MYINSTRUMENT'}
+    assert ad.descriptors == (
+        "amp_read_area",
+        "array_name",
+        "badguy",
+        "detector_section",
+        "dispersion_axis",
+        "gain",
+        "instrument",
+        "object",
+        "telescope",
+    )
+    assert ad.tags == {"DARK", "MYINSTRUMENT"}
     assert ad.amp_read_area() == "'FOO':1:1024"
 
 
 def test_keyword_for(testfile):
     ad = astrodata.open(testfile)
-    assert ad._keyword_for('array_name') == 'AMPNAME'
+    assert ad._keyword_for("array_name") == "AMPNAME"
     with pytest.raises(AttributeError, match="No match for 'foobar'"):
-        ad._keyword_for('foobar')
+        ad._keyword_for("foobar")
 
 
 def test_returns_list(testfile):
@@ -131,32 +144,32 @@ def test_info(testfile, capsys):
     ad.info()
     captured = capsys.readouterr()
     out = captured.out.splitlines()
-    assert out[0].endswith('fakebias.fits')
+    assert out[0].endswith("fakebias.fits")
     assert out[1:] == [
-        'Tags: DARK MYINSTRUMENT',
-        '',
-        'Pixels Extensions',
-        'Index  Content                  Type              Dimensions     Format',
-        '[ 0]   science                  NDAstroData       (4, 5)         float64',
-        '[ 1]   science                  NDAstroData       (4, 5)         float64',
-        '',
-        'Other Extensions',
-        '               Type        Dimensions',
-        '.MYCAT         Table       (10, 2)'
+        "Tags: DARK MYINSTRUMENT",
+        "",
+        "Pixels Extensions",
+        "Index  Content                  Type              Dimensions     Format",
+        "[ 0]   science                  NDAstroData       (4, 5)         float64",
+        "[ 1]   science                  NDAstroData       (4, 5)         float64",
+        "",
+        "Other Extensions",
+        "               Type        Dimensions",
+        ".MYCAT         Table       (10, 2)",
     ]
 
     ad[1].info()
     captured = capsys.readouterr()
     out = captured.out.splitlines()
-    assert out[0].endswith('fakebias.fits')
+    assert out[0].endswith("fakebias.fits")
     assert out[1:] == [
-        'Tags: DARK MYINSTRUMENT',
-        '',
-        'Pixels Extensions',
-        'Index  Content                  Type              Dimensions     Format',
-        '[ 0]   science                  NDAstroData       (4, 5)         float64',
-        '',
-        'Other Extensions',
-        '               Type        Dimensions',
-        '.MYCAT         Table       (10, 2)'
+        "Tags: DARK MYINSTRUMENT",
+        "",
+        "Pixels Extensions",
+        "Index  Content                  Type              Dimensions     Format",
+        "[ 0]   science                  NDAstroData       (4, 5)         float64",
+        "",
+        "Other Extensions",
+        "               Type        Dimensions",
+        ".MYCAT         Table       (10, 2)",
     ]

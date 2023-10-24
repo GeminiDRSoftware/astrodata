@@ -11,14 +11,18 @@ import numpy as np
 
 from astropy.io.fits import ImageHDU
 from astropy.modeling import Model, models
-from astropy.nddata import (NDArithmeticMixin, NDData, NDSlicingMixin,
-                            VarianceUncertainty)
+from astropy.nddata import (
+    NDArithmeticMixin,
+    NDData,
+    NDSlicingMixin,
+    VarianceUncertainty,
+)
 from gwcs.wcs import WCS as gWCS
 from .wcs import remove_axis_from_frame
 
 INTEGER_TYPES = (int, np.integer)
 
-__all__ = ['NDAstroData']
+__all__ = ["NDAstroData"]
 
 
 class ADVarianceUncertainty(VarianceUncertainty):
@@ -27,9 +31,11 @@ class ADVarianceUncertainty(VarianceUncertainty):
     @VarianceUncertainty.array.setter
     def array(self, value):
         if value is not None and np.any(value < 0):
-            warnings.warn("Negative variance values found. Setting to zero.",
-                          RuntimeWarning)
-            value = np.where(value >= 0., value, 0.)
+            warnings.warn(
+                "Negative variance values found. Setting to zero.",
+                RuntimeWarning,
+            )
+            value = np.where(value >= 0.0, value, 0.0)
         VarianceUncertainty.array.fset(self, value)
 
 
@@ -53,24 +59,38 @@ class AstroDataMixin:
         """
         if attribute.isupper():
             try:
-                return self.meta['other'][attribute]
+                return self.meta["other"][attribute]
             except KeyError:
                 pass
-        raise AttributeError(f"{self.__class__.__name__!r} object has no "
-                             f"attribute {attribute!r}")
+        raise AttributeError(
+            f"{self.__class__.__name__!r} object has no "
+            f"attribute {attribute!r}"
+        )
 
-    def _arithmetic(self, operation, operand, propagate_uncertainties=True,
-                    handle_mask=np.bitwise_or, handle_meta=None,
-                    uncertainty_correlation=0, compare_wcs='first_found',
-                    **kwds):
+    def _arithmetic(
+        self,
+        operation,
+        operand,
+        propagate_uncertainties=True,
+        handle_mask=np.bitwise_or,
+        handle_meta=None,
+        uncertainty_correlation=0,
+        compare_wcs="first_found",
+        **kwds,
+    ):
         """Override the NDData method so that "bitwise_or" becomes the default
         operation to combine masks, rather than "logical_or"
         """
         return super()._arithmetic(
-            operation, operand, propagate_uncertainties=propagate_uncertainties,
-            handle_mask=handle_mask, handle_meta=handle_meta,
+            operation,
+            operand,
+            propagate_uncertainties=propagate_uncertainties,
+            handle_mask=handle_mask,
+            handle_meta=handle_meta,
             uncertainty_correlation=uncertainty_correlation,
-            compare_wcs=compare_wcs, **kwds)
+            compare_wcs=compare_wcs,
+            **kwds,
+        )
 
     def _slice_wcs(self, slices):
         """The ``__call__()`` method of gWCS doesn't appear to conform to the
@@ -86,14 +106,20 @@ class AstroDataMixin:
         slices = list(slices)
         ndim = len(self.shape)
         if len(slices) > ndim:
-            raise ValueError(f"Too many dimensions specified in slice {slices}")
+            raise ValueError(
+                f"Too many dimensions specified in slice {slices}"
+            )
 
         if Ellipsis in slices:
             if slices.count(Ellipsis) > 1:
-                raise IndexError("Only one ellipsis can be specified in a slice")
+                raise IndexError(
+                    "Only one ellipsis can be specified in a slice"
+                )
             ell_index = slices.index(Ellipsis)
-            slices[ell_index:ell_index+1] = [slice(None)] * (ndim - len(slices) + 1)
-        slices.extend([slice(None)] * (ndim-len(slices)))
+            slices[ell_index : ell_index + 1] = [slice(None)] * (
+                ndim - len(slices) + 1
+            )
+        slices.extend([slice(None)] * (ndim - len(slices)))
 
         mods = []
         mapped_axes = []
@@ -103,10 +129,14 @@ class AstroDataMixin:
                 if slice_.step and slice_.step > 1:
                     raise IndexError("Cannot slice with a step")
                 if slice_.start:
-                    start = length + slice_.start if slice_.start < 1 else slice_.start
+                    start = (
+                        length + slice_.start
+                        if slice_.start < 1
+                        else slice_.start
+                    )
                     if start > 0:
                         model.append(models.Shift(start))
-                mapped_axes.append(max(mapped_axes)+1 if mapped_axes else 0)
+                mapped_axes.append(max(mapped_axes) + 1 if mapped_axes else 0)
             elif isinstance(slice_, INTEGER_TYPES):
                 model.append(models.Const1D(slice_))
                 mapped_axes.append(-1)
@@ -124,12 +154,18 @@ class AstroDataMixin:
 
         slicing_model = reduce(Model.__and__, mods)
         if mapped_axes != list(np.arange(ndim)):
-            slicing_model = models.Mapping(
-                tuple(max(ax, 0) for ax in mapped_axes)) | slicing_model
+            slicing_model = (
+                models.Mapping(tuple(max(ax, 0) for ax in mapped_axes))
+                | slicing_model
+            )
             slicing_model.inverse = models.Mapping(
-                tuple(ax for ax in mapped_axes if ax != -1), n_inputs=ndim)
+                tuple(ax for ax in mapped_axes if ax != -1), n_inputs=ndim
+            )
 
-        if isinstance(slicing_model, models.Identity) and slicing_model.n_inputs == ndim:
+        if (
+            isinstance(slicing_model, models.Identity)
+            and slicing_model.n_inputs == ndim
+        ):
             return self.wcs  # Unchanged!
         new_wcs = deepcopy(self.wcs)
         input_frame = new_wcs.input_frame
@@ -137,26 +173,27 @@ class AstroDataMixin:
             if mapped_axis == -1:
                 input_frame = remove_axis_from_frame(input_frame, axis)
         new_wcs.pipeline[0].frame = input_frame
-        new_wcs.insert_transform(new_wcs.input_frame, slicing_model, after=True)
+        new_wcs.insert_transform(
+            new_wcs.input_frame, slicing_model, after=True
+        )
         return new_wcs
 
     @property
     def variance(self):
-        """A convenience property to access the contents of ``uncertainty``.
-        """
+        """A convenience property to access the contents of ``uncertainty``."""
         arr = self.uncertainty
         if arr is not None:
             return arr.array
 
     @variance.setter
     def variance(self, value):
-        self.uncertainty = (ADVarianceUncertainty(value) if value is not None
-                            else None)
+        self.uncertainty = (
+            ADVarianceUncertainty(value) if value is not None else None
+        )
 
     @property
     def wcs(self):
-        """The WCS of the data. This is a gWCS object, not a FITS WCS object.
-        """
+        """The WCS of the data. This is a gWCS object, not a FITS WCS object."""
         return super().wcs
 
     @wcs.setter
@@ -205,11 +242,14 @@ class NDWindowing:
         return NDWindowingAstroData(self._target, window=slice)
 
 
-class NDWindowingAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
+class NDWindowingAstroData(
+    AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData
+):
     """Allows "windowed" access to some properties of an ``NDAstroData``
     instance.  In particular, ``data``, ``uncertainty``, ``variance``, and
     ``mask`` return clipped data.
     """
+
     def __init__(self, target, window):
         self._target = target
         self._window = window
@@ -220,11 +260,15 @@ class NDWindowingAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, ND
         """
         if attribute.isupper():
             try:
-                return self._target._get_simple(attribute, section=self._window)
+                return self._target._get_simple(
+                    attribute, section=self._window
+                )
             except KeyError:
                 pass
-        raise AttributeError(f"{self.__class__.__name__!r} object has no "
-                             f"attribute {attribute!r}")
+        raise AttributeError(
+            f"{self.__class__.__name__!r} object has no "
+            f"attribute {attribute!r}"
+        )
 
     @property
     def unit(self):
@@ -236,7 +280,7 @@ class NDWindowingAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, ND
 
     @property
     def data(self):
-        return self._target._get_simple('_data', section=self._window)
+        return self._target._get_simple("_data", section=self._window)
 
     @property
     def uncertainty(self):
@@ -249,12 +293,12 @@ class NDWindowingAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, ND
 
     @property
     def mask(self):
-        return self._target._get_simple('_mask', section=self._window)
+        return self._target._get_simple("_mask", section=self._window)
 
 
 def is_lazy(item):
     """Returns True if the item is a lazy-loaded object, False otherwise."""
-    return isinstance(item, ImageHDU) or (hasattr(item, 'lazy') and item.lazy)
+    return isinstance(item, ImageHDU) or (hasattr(item, "lazy") and item.lazy)
 
 
 class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
@@ -314,16 +358,26 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
     attributes) are sliced.
     """
 
-    def __init__(self, data, uncertainty=None, mask=None, wcs=None,
-                 meta=None, unit=None, copy=False, window=None, variance=None):
+    def __init__(
+        self,
+        data,
+        uncertainty=None,
+        mask=None,
+        wcs=None,
+        meta=None,
+        unit=None,
+        copy=False,
+        window=None,
+        variance=None,
+    ):
         """Initialize an ``NDAstroData`` instance.
-        
+
         Parameters
         ----------
         data : array-like
             The actual data. This can be a numpy array, a memmap, or a
             ``fits.ImageHDU`` object.
-        
+
         uncertainty : ``NDUncertainty``-like object, optional
             An object that represents the uncertainty of the data. If not
             specified, the uncertainty will be set to None.
@@ -338,15 +392,15 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         meta : dict-like, optional
             A dictionary-like object that holds the meta data. If not
             specified, the meta data will be set to None.
-        
+
         unit : ``astropy.units.Unit`` object, optional
             The unit of the data. If not specified, the unit will be set to
             None.
-        
+
         copy : bool, optional
             If True, the data, uncertainty, mask, wcs, meta, and unit will be
             copied. Otherwise, they will be referenced. Default is False.
-        
+
         window : ``slice`` object, optional
             A slice object that represents the window of the data. If not
             specified, the window will be set to None.
@@ -370,9 +424,15 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
                 raise ValueError()
             uncertainty = ADVarianceUncertainty(variance)
 
-        super().__init__(FakeArray(data) if is_lazy(data) else data,
-                         None if is_lazy(uncertainty) else uncertainty,
-                         mask, wcs, meta, unit, copy)
+        super().__init__(
+            FakeArray(data) if is_lazy(data) else data,
+            None if is_lazy(uncertainty) else uncertainty,
+            mask,
+            wcs,
+            meta,
+            unit,
+            copy,
+        )
 
         if is_lazy(data):
             self.data = data
@@ -384,7 +444,9 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
             self._data if is_lazy(self._data) else deepcopy(self.data, memo),
             self._uncertainty if is_lazy(self._uncertainty) else None,
             self._mask if is_lazy(self._mask) else deepcopy(self.mask, memo),
-            deepcopy(self.wcs, memo), None, self.unit
+            deepcopy(self.wcs, memo),
+            None,
+            self.unit,
         )
         new.meta = deepcopy(self.meta, memo)
         # Needed to avoid recursion because of uncertainty's weakref to self
@@ -416,7 +478,9 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         if self._uncertainty is not None:
             if is_lazy(self._uncertainty):
                 if section is None:
-                    self.uncertainty = ADVarianceUncertainty(self._uncertainty.data)
+                    self.uncertainty = ADVarianceUncertainty(
+                        self._uncertainty.data
+                    )
                     return self.uncertainty
                 else:
                     return ADVarianceUncertainty(self._uncertainty[section])
@@ -438,7 +502,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
                 else:
                     ret = source[section]
                 return ret
-            elif hasattr(source, 'shape'):
+            elif hasattr(source, "shape"):
                 if section is None or source.shape != self.shape:
                     return np.array(source, copy=False)
                 else:
@@ -451,15 +515,17 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         """An array representing the raw data stored in this instance.  It
         implements a setter.
         """
-        return self._get_simple('_data')
+        return self._get_simple("_data")
 
     @data.setter
     def data(self, value):
         if value is None:
-            raise ValueError("Cannot have None as the data value for an NDData object")
+            raise ValueError(
+                "Cannot have None as the data value for an NDData object"
+            )
 
         if is_lazy(value):
-            self.meta['header'] = value.header
+            self.meta["header"] = value.header
         self._data = value
 
     @property
@@ -477,7 +543,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
     @property
     def mask(self):
         """Get or set the mask of the data."""
-        return self._get_simple('_mask')
+        return self._get_simple("_mask")
 
     @mask.setter
     def mask(self, value):
@@ -495,8 +561,9 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @variance.setter
     def variance(self, value):
-        self.uncertainty = (ADVarianceUncertainty(value) if value is not None
-                            else None)
+        self.uncertainty = (
+            ADVarianceUncertainty(value) if value is not None else None
+        )
 
     def set_section(self, section, input):
         """Sets only a section of the data. This method is meant to prevent
@@ -528,7 +595,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     def __repr__(self):
         if is_lazy(self._data):
-            return self.__class__.__name__ + '(Memmapped)'
+            return self.__class__.__name__ + "(Memmapped)"
         else:
             return super().__repr__()
 
@@ -542,9 +609,15 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         unc = self.uncertainty
         new_wcs = deepcopy(self.wcs)
         inframe = new_wcs.input_frame
-        new_wcs.insert_transform(inframe, models.Mapping(tuple(reversed(range(inframe.naxes)))), after=True)
+        new_wcs.insert_transform(
+            inframe,
+            models.Mapping(tuple(reversed(range(inframe.naxes)))),
+            after=True,
+        )
         return self.__class__(
             self.data.T,
             uncertainty=None if unc is None else unc.__class__(unc.array.T),
-            mask=None if self.mask is None else self.mask.T, wcs=new_wcs, copy=False
+            mask=None if self.mask is None else self.mask.T,
+            wcs=new_wcs,
+            copy=False,
         )

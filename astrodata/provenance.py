@@ -35,29 +35,33 @@ def add_provenance(ad, filename, md5, primitive, timestamp=None):
     """
     # Handle data where the md5 is None. It will need to be a string type to
     # store in the FITS table.
-    md5 = '' if md5 is None else md5
+    md5 = "" if md5 is None else md5
 
     if timestamp is None:
         timestamp = datetime.utcnow().isoformat()
 
-    if hasattr(ad, 'PROVENANCE'):
+    if hasattr(ad, "PROVENANCE"):
         existing_provenance = ad.PROVENANCE
         for row in existing_provenance:
-            if row[1] == filename and \
-                    row[2] == md5 and \
-                    row[3] == primitive:
+            if row[1] == filename and row[2] == md5 and row[3] == primitive:
                 # nothing needed, we already have it
                 return
 
-    if not hasattr(ad, 'PROVENANCE'):
+    if not hasattr(ad, "PROVENANCE"):
         timestamp_data = [timestamp]
         filename_data = [filename]
         md5_data = [md5]
         provenance_added_by_data = [primitive]
         ad.PROVENANCE = Table(
-            [timestamp_data, filename_data, md5_data, provenance_added_by_data],
-            names=('timestamp', 'filename', 'md5', 'provenance_added_by'),
-            dtype=('S28', 'S128', 'S128', 'S128'))
+            [
+                timestamp_data,
+                filename_data,
+                md5_data,
+                provenance_added_by_data,
+            ],
+            names=("timestamp", "filename", "md5", "provenance_added_by"),
+            dtype=("S28", "S128", "S128", "S128"),
+        )
     else:
         provenance = ad.PROVENANCE
         provenance.add_row((timestamp, filename, md5, primitive))
@@ -86,44 +90,65 @@ def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
     """
     # If the ad instance has the old 'PROVHISTORY' extenstion name, rename it
     # now to 'HISTORY'
-    if hasattr(ad, 'PROVHISTORY'):
+    if hasattr(ad, "PROVHISTORY"):
         ad.HISTORY = ad.PROVHISTORY
         del ad.PROVHISTORY
 
     # I modified these indices, so making this method adaptive to existing
     # histories with the old ordering.  This also makes modifying the order
     # in future easier
-    primitive_col_idx, args_col_idx, timestamp_start_col_idx, \
-        timestamp_stop_col_idx = find_history_column_indices(ad)
+    (
+        primitive_col_idx,
+        args_col_idx,
+        timestamp_start_col_idx,
+        timestamp_stop_col_idx,
+    ) = find_history_column_indices(ad)
 
-    if hasattr(ad, 'HISTORY') and None not in (primitive_col_idx, args_col_idx,
-                                               timestamp_stop_col_idx,
-                                               timestamp_start_col_idx):
+    if hasattr(ad, "HISTORY") and None not in (
+        primitive_col_idx,
+        args_col_idx,
+        timestamp_stop_col_idx,
+        timestamp_start_col_idx,
+    ):
         for row in ad.HISTORY:
-            if timestamp_start == row[timestamp_start_col_idx] and \
-                    timestamp_stop == row[timestamp_stop_col_idx] and \
-                    primitive == row[primitive_col_idx] and \
-                    args == row[args_col_idx]:
+            if (
+                timestamp_start == row[timestamp_start_col_idx]
+                and timestamp_stop == row[timestamp_stop_col_idx]
+                and primitive == row[primitive_col_idx]
+                and args == row[args_col_idx]
+            ):
                 # already in the history, skip
                 return
 
-    colsize = len(args)+1
-    if hasattr(ad, 'HISTORY'):
-        colsize = max(colsize, (max(len(ph[args_col_idx])
-                                    for ph in ad.HISTORY) + 1)
-        if args_col_idx is not None else 16)
+    colsize = len(args) + 1
+    if hasattr(ad, "HISTORY"):
+        colsize = max(
+            colsize,
+            (max(len(ph[args_col_idx]) for ph in ad.HISTORY) + 1)
+            if args_col_idx is not None
+            else 16,
+        )
 
-        timestamp_start_arr = [ph[timestamp_start_col_idx]
-                               if timestamp_start_col_idx is not None else ''
-                               for ph in ad.HISTORY]
-        timestamp_stop_arr = [ph[timestamp_stop_col_idx]
-                              if timestamp_stop_col_idx is not None else ''
-                              for ph in ad.HISTORY]
-        primitive_arr = [ph[primitive_col_idx]
-                         if primitive_col_idx is not None else ''
-                         for ph in ad.HISTORY]
-        args_arr = [ph[args_col_idx] if args_col_idx is not None else ''
-                    for ph in ad.HISTORY]
+        timestamp_start_arr = [
+            ph[timestamp_start_col_idx]
+            if timestamp_start_col_idx is not None
+            else ""
+            for ph in ad.HISTORY
+        ]
+        timestamp_stop_arr = [
+            ph[timestamp_stop_col_idx]
+            if timestamp_stop_col_idx is not None
+            else ""
+            for ph in ad.HISTORY
+        ]
+        primitive_arr = [
+            ph[primitive_col_idx] if primitive_col_idx is not None else ""
+            for ph in ad.HISTORY
+        ]
+        args_arr = [
+            ph[args_col_idx] if args_col_idx is not None else ""
+            for ph in ad.HISTORY
+        ]
     else:
         timestamp_start_arr = []
         timestamp_stop_arr = []
@@ -136,11 +161,11 @@ def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
     args_arr.append(args)
 
     dtype = ("S128", "S%d" % colsize, "S28", "S28")
-    ad.HISTORY = Table([primitive_arr, args_arr, timestamp_start_arr,
-                        timestamp_stop_arr],
-                       names=('primitive', 'args', 'timestamp_start',
-                              'timestamp_stop'),
-                       dtype=dtype)
+    ad.HISTORY = Table(
+        [primitive_arr, args_arr, timestamp_start_arr, timestamp_stop_arr],
+        names=("primitive", "args", "timestamp_start", "timestamp_stop"),
+        dtype=dtype,
+    )
 
 
 def clone_provenance(provenance_data, ad):
@@ -185,30 +210,40 @@ def clone_history(history_data, ad):
         Outgoing `~astrodata.AstroData` object to add history data
         to.
     """
-    primitive_col_idx, args_col_idx, timestamp_start_col_idx, \
-        timestamp_stop_col_idx = find_history_column_indices(ad)
-    hd = [(hist[timestamp_start_col_idx], hist[timestamp_stop_col_idx],
-            hist[primitive_col_idx], hist[args_col_idx])
-           for hist in history_data]
+    (
+        primitive_col_idx,
+        args_col_idx,
+        timestamp_start_col_idx,
+        timestamp_stop_col_idx,
+    ) = find_history_column_indices(ad)
+    hd = [
+        (
+            hist[timestamp_start_col_idx],
+            hist[timestamp_stop_col_idx],
+            hist[primitive_col_idx],
+            hist[args_col_idx],
+        )
+        for hist in history_data
+    ]
     for h in hd:
         add_history(ad, h[0], h[1], h[2], h[3])
 
 
 def find_history_column_indices(ad):
     """Find the column indices for the history table."""
-    if hasattr(ad, 'HISTORY'):
+    if hasattr(ad, "HISTORY"):
         primitive_col_idx = None
         args_col_idx = None
         timestamp_start_col_idx = None
         timestamp_stop_col_idx = None
         for idx, colname in enumerate(ad.HISTORY.colnames):
-            if colname == 'primitive':
+            if colname == "primitive":
                 primitive_col_idx = idx
-            elif colname == 'args':
+            elif colname == "args":
                 args_col_idx = idx
-            elif colname == 'timestamp_start':
+            elif colname == "timestamp_start":
                 timestamp_start_col_idx = idx
-            elif colname == 'timestamp_stop':
+            elif colname == "timestamp_stop":
                 timestamp_stop_col_idx = idx
 
     else:
@@ -218,8 +253,12 @@ def find_history_column_indices(ad):
         timestamp_start_col_idx = 2
         timestamp_stop_col_idx = 3
 
-    return primitive_col_idx, args_col_idx, timestamp_start_col_idx, \
-        timestamp_stop_col_idx
+    return (
+        primitive_col_idx,
+        args_col_idx,
+        timestamp_start_col_idx,
+        timestamp_stop_col_idx,
+    )
 
 
 def provenance_summary(ad, provenance=True, history=True):
@@ -248,7 +287,7 @@ def provenance_summary(ad, provenance=True, history=True):
     """
     retval = ""
     if provenance:
-        if hasattr(ad, 'PROVENANCE'):
+        if hasattr(ad, "PROVENANCE"):
             retval = f"Provenance\n----------\n{ad.PROVENANCE}\n"
         else:
             retval = "No Provenance found\n"
@@ -256,14 +295,18 @@ def provenance_summary(ad, provenance=True, history=True):
     if history:
         if provenance:
             retval += "\n"  # extra blank line between
-        if hasattr(ad, 'PROVHISTORY'):
+        if hasattr(ad, "PROVHISTORY"):
             retval += "Warning: File uses old PROVHISTORY extname."
             ad.HISTORY = ad.PROVHISTORY
-        if hasattr(ad, 'HISTORY'):
+        if hasattr(ad, "HISTORY"):
             retval += "History\n-------\n"
 
-            primitive_col_idx, args_col_idx, timestamp_start_col_idx, \
-                timestamp_stop_col_idx = find_history_column_indices(ad)
+            (
+                primitive_col_idx,
+                args_col_idx,
+                timestamp_start_col_idx,
+                timestamp_stop_col_idx,
+            ) = find_history_column_indices(ad)
 
             primitive_col_size = 9
             timestamp_start_col_size = 28
@@ -275,20 +318,25 @@ def provenance_summary(ad, provenance=True, history=True):
                 argsstr = row[args_col_idx]
                 args = json.loads(argsstr)
                 argspp = json.dumps(args, indent=4)
-                for line in argspp.split('\n'):
+                for line in argspp.split("\n"):
                     args_col_size = max(args_col_size, len(line))
-                primitive_col_size = max(primitive_col_size,
-                                         len(row[primitive_col_idx]))
+                primitive_col_size = max(
+                    primitive_col_size, len(row[primitive_col_idx])
+                )
 
             # Titles
-            retval += f'{"Primitive":<{primitive_col_size}} ' \
-                      f'{"Args":<{args_col_size}} ' \
-                      f'{"Start":<{timestamp_start_col_size}} {"Stop"}\n'
+            retval += (
+                f'{"Primitive":<{primitive_col_size}} '
+                f'{"Args":<{args_col_size}} '
+                f'{"Start":<{timestamp_start_col_size}} {"Stop"}\n'
+            )
             # now the lines
-            retval += f'{"":{"-"}<{primitive_col_size}} ' \
-                      f'{"":{"-"}<{args_col_size}} ' \
-                      f'{"":{"-"}<{timestamp_start_col_size}} ' \
-                      f'{"":{"-"}<{timestamp_stop_col_size}}\n'
+            retval += (
+                f'{"":{"-"}<{primitive_col_size}} '
+                f'{"":{"-"}<{args_col_size}} '
+                f'{"":{"-"}<{timestamp_start_col_size}} '
+                f'{"":{"-"}<{timestamp_stop_col_size}}\n'
+            )
 
             # Rows, looping over args lines
             for row in ad.HISTORY:
@@ -302,12 +350,14 @@ def provenance_summary(ad, provenance=True, history=True):
                     args = json.dumps(parseargs, indent=4)
                 except Exception:
                     pass  # ok, just use whatever non-json was in there
-                for argrow in args.split('\n'):
+                for argrow in args.split("\n"):
                     if first:
-                        retval += f'{primitive:<{primitive_col_size}} ' \
-                                  f'{argrow:<{args_col_size}} ' \
-                                  f'{start:<{timestamp_start_col_size}} ' \
-                                  f'{stop}\n'
+                        retval += (
+                            f"{primitive:<{primitive_col_size}} "
+                            f"{argrow:<{args_col_size}} "
+                            f"{start:<{timestamp_start_col_size}} "
+                            f"{stop}\n"
+                        )
                     else:
                         retval += f'{"":<{primitive_col_size}} {argrow}\n'
                     # prep for additional arg rows without duplicating the

@@ -9,9 +9,17 @@ import numpy as np
 
 INTEGER_TYPES = (int, np.integer)
 
-__all__ = ('assign_only_single_slice', 'astro_data_descriptor',
-           'AstroDataDeprecationWarning', 'astro_data_tag', 'deprecated',
-           'normalize_indices', 'returns_list', 'TagSet', 'Section')
+__all__ = (
+    "assign_only_single_slice",
+    "astro_data_descriptor",
+    "AstroDataDeprecationWarning",
+    "astro_data_tag",
+    "deprecated",
+    "normalize_indices",
+    "returns_list",
+    "TagSet",
+    "Section",
+)
 
 
 class AstroDataDeprecationWarning(DeprecationWarning):
@@ -23,16 +31,19 @@ warnings.simplefilter("always", AstroDataDeprecationWarning)
 
 def deprecated(reason):
     """Wrapper that will issue a warning when a deprecated function is used."""
+
     def decorator_wrapper(fn):
         @wraps(fn)
         def wrapper(*args, **kw):
-            current_source = '|'.join(format_stack(inspect.currentframe()))
+            current_source = "|".join(format_stack(inspect.currentframe()))
             if current_source not in wrapper.seen:
                 wrapper.seen.add(current_source)
                 warnings.warn(reason, AstroDataDeprecationWarning)
             return fn(*args, **kw)
+
         wrapper.seen = set()
         return wrapper
+
     return decorator_wrapper
 
 
@@ -42,11 +53,12 @@ def normalize_indices(slc, nitems):
     if isinstance(slc, slice):
         start, stop, step = slc.indices(nitems)
         indices = list(range(start, stop, step))
-    elif (isinstance(slc, INTEGER_TYPES) or
-          (isinstance(slc, tuple) and
-           all(isinstance(i, INTEGER_TYPES) for i in slc))):
+    elif isinstance(slc, INTEGER_TYPES) or (
+        isinstance(slc, tuple)
+        and all(isinstance(i, INTEGER_TYPES) for i in slc)
+    ):
         if isinstance(slc, INTEGER_TYPES):
-            slc = (int(slc),)   # slc's type m
+            slc = (int(slc),)  # slc's type m
             multiple = False
         else:
             multiple = True
@@ -61,10 +73,10 @@ def normalize_indices(slc, nitems):
     return indices, multiple
 
 
-class TagSet(namedtuple('TagSet', 'add remove blocked_by blocks if_present')):
+class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
     """Named tuple that is used by tag methods to return which actions should
     be performed on a tag set.
-    
+
     All the attributes are optional, and any combination of them can be used,
     allowing to create complex tag structures.  Read the documentation on the
     tag-generating algorithm if you want to better understand the interactions.
@@ -101,13 +113,23 @@ class TagSet(namedtuple('TagSet', 'add remove blocked_by blocks if_present')):
     >>> TagSet(remove={'BIAS', 'CAL'}) # doctest: +SKIP
     TagSet(add=set(), remove={'BIAS', 'CAL'}, blocked_by=set(), blocks=set(), if_present=set())
     """
-    def __new__(cls, add=None, remove=None, blocked_by=None, blocks=None,
-                if_present=None):
-        return super().__new__(cls, add or set(),
-                               remove or set(),
-                               blocked_by or set(),
-                               blocks or set(),
-                               if_present or set())
+
+    def __new__(
+        cls,
+        add=None,
+        remove=None,
+        blocked_by=None,
+        blocks=None,
+        if_present=None,
+    ):
+        return super().__new__(
+            cls,
+            add or set(),
+            remove or set(),
+            blocked_by or set(),
+            blocks or set(),
+            if_present or set(),
+        )
 
 
 def astro_data_descriptor(fn):
@@ -148,6 +170,7 @@ def returns_list(fn):
     --------
     A function
     """
+
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
         ret = fn(self, *args, **kwargs)
@@ -165,21 +188,28 @@ def returns_list(fn):
                     return ret
                 else:
                     raise IndexError(
-                        "Incompatible numbers of extensions and elements in {}"
-                        .format(fn.__name__))
+                        "Incompatible numbers of extensions and elements in {}".format(
+                            fn.__name__
+                        )
+                    )
             else:
                 return [ret] * len(self)
+
     return wrapper
 
 
 def assign_only_single_slice(fn):
     """Raise `ValueError` if assigning to a non-single slice."""
+
     @wraps(fn)
     def wrapper(self, *args, **kwargs):
         if not self.is_single:
-            raise ValueError("Trying to assign to an AstroData object that "
-                             "is not a single slice")
+            raise ValueError(
+                "Trying to assign to an AstroData object that "
+                "is not a single slice"
+            )
         return fn(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -201,14 +231,18 @@ def astro_data_tag(fn):
     --------
     A wrapper function
     """
+
     @wraps(fn)
     def wrapper(self):
         try:
             ret = fn(self)
             if ret is not None:
                 if not isinstance(ret, TagSet):
-                    raise TypeError("Tag function {} didn't return a TagSet"
-                                    .format(fn.__name__))
+                    raise TypeError(
+                        "Tag function {} didn't return a TagSet".format(
+                            fn.__name__
+                        )
+                    )
 
                 return TagSet(*tuple(set(s) for s in ret))
         except KeyError:
@@ -226,18 +260,18 @@ class Section(tuple):
 
     def __new__(cls, *args, **kwargs):
         # Ensure that the order of keys is what we want
-        axis_names = [x for axis in "xyzuvw"
-                      for x in (f"{axis}1", f"{axis}2")]
-        _dict = {k: v for k, v in zip(axis_names, args +
-                                      ('',) * len(kwargs))}
+        axis_names = [x for axis in "xyzuvw" for x in (f"{axis}1", f"{axis}2")]
+        _dict = {k: v for k, v in zip(axis_names, args + ("",) * len(kwargs))}
         _dict.update(kwargs)
-        if list(_dict.values()).count('') or (len(_dict) % 2):
+        if list(_dict.values()).count("") or (len(_dict) % 2):
             raise ValueError("Cannot initialize 'Section' object")
         instance = tuple.__new__(cls, tuple(_dict.values()))
         instance._axis_names = tuple(_dict.keys())
         if not all(np.diff(instance)[::2] > 0):
-            raise ValueError("Not all 'Section' end coordinates exceed the "
-                             "start coordinates")
+            raise ValueError(
+                "Not all 'Section' end coordinates exceed the "
+                "start coordinates"
+            )
         return instance
 
     @property
@@ -253,9 +287,11 @@ class Section(tuple):
         raise AttributeError(f"No such attribute '{attr}'")
 
     def __repr__(self):
-        return ("Section(" +
-                ", ".join([f"{k}={self.__dict__[k]}"
-                           for k in self._axis_names]) + ")")
+        return (
+            "Section("
+            + ", ".join([f"{k}={self.__dict__[k]}" for k in self._axis_names])
+            + ")"
+        )
 
     @property
     def ndim(self):
@@ -270,35 +306,54 @@ class Section(tuple):
     @staticmethod
     def from_string(value):
         """The inverse of __str__, produce a Section object from a string."""
-        return Section(*[y for x in value.strip("[]").split(",")
-                         for start, end in [x.split(":")]
-                         for y in (None if start == '' else int(start)-1,
-                                   None if end == '' else int(end))])
+        return Section(
+            *[
+                y
+                for x in value.strip("[]").split(",")
+                for start, end in [x.split(":")]
+                for y in (
+                    None if start == "" else int(start) - 1,
+                    None if end == "" else int(end),
+                )
+            ]
+        )
 
     def asIRAFsection(self):
         """Produce string of style '[x1:x2,y1:y2]' that is 1-indexed
         and end-inclusive
         """
-        return ("[" +
-                ",".join([":".join([str(self.__dict__[axis]+1),
-                                    str(self.__dict__[axis.replace("1", "2")])])
-                          for axis in self._axis_names[::2]]) + "]")
+        return (
+            "["
+            + ",".join(
+                [
+                    ":".join(
+                        [
+                            str(self.__dict__[axis] + 1),
+                            str(self.__dict__[axis.replace("1", "2")]),
+                        ]
+                    )
+                    for axis in self._axis_names[::2]
+                ]
+            )
+            + "]"
+        )
 
     def asslice(self, add_dims=0):
         """Return the Section object as a slice/list of slices.  Higher
         dimensionality can be achieved with the add_dims parameter.
         """
-        return ((slice(None),) * add_dims +
-                tuple(slice(self.__dict__[axis],
-                            self.__dict__[axis.replace("1", "2")])
-                      for axis in reversed(self._axis_names[::2])))
+        return (slice(None),) * add_dims + tuple(
+            slice(self.__dict__[axis], self.__dict__[axis.replace("1", "2")])
+            for axis in reversed(self._axis_names[::2])
+        )
 
     def contains(self, section):
         """Return True if the supplied section is entirely within self"""
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
-        return (all(s2 >= s1 for s1, s2 in zip(self[::2], section[::2])) and
-                all(s2 <= s1 for s1, s2 in zip(self[1::2], section[1::2])))
+        return all(
+            s2 >= s1 for s1, s2 in zip(self[::2], section[::2])
+        ) and all(s2 <= s1 for s1, s2 in zip(self[1::2], section[1::2]))
 
     def is_same_size(self, section):
         """Return True if the Sections are the same size"""
@@ -313,14 +368,22 @@ class Section(tuple):
         mins = [max(s1, s2) for s1, s2 in zip(self[::2], section[::2])]
         maxs = [min(s1, s2) for s1, s2 in zip(self[1::2], section[1::2])]
         try:
-            return self.__class__(*[v for pair in zip(mins, maxs) for v in pair])
+            return self.__class__(
+                *[v for pair in zip(mins, maxs) for v in pair]
+            )
         except ValueError:
             return
 
     def shift(self, *shifts):
         """Shift a section in each direction by the specified amount"""
         if len(shifts) != self.ndim:
-            raise ValueError(f"Number of shifts {len(shifts)} incompatible "
-                             f"with dimensionality {self.ndim}")
-        return self.__class__(*[x + s for x, s in
-                                zip(self, [ss for s in shifts for ss in [s] * 2])])
+            raise ValueError(
+                f"Number of shifts {len(shifts)} incompatible "
+                f"with dimensionality {self.ndim}"
+            )
+        return self.__class__(
+            *[
+                x + s
+                for x, s in zip(self, [ss for s in shifts for ss in [s] * 2])
+            ]
+        )
