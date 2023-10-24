@@ -1,6 +1,26 @@
 A package for managing astronomical data through a uniform interface.
 ---------------------------------------------------------------------
 
+..
+    To-do
+    -----
+
+    .. _astrofaker: https://github.com/GeminiDRSoftware/AstroFaker
+
+    - [x] Set up coverage and testing workflows
+    - [x] Set up pre commmit hooks
+    - [ ] Set up documentation workflow
+    - [ ] Update testing
+        - [ ] Find/generate fake data for testing
+            - [ ] Could use `astrofaker`_?
+            - [ ] Does astropy have a fake data generator?
+            - [ ] Do we need to generate more than edge cases?
+            - [ ] Does astrodata outside of dragons even need to test on data? Is
+                  it reducing anything?
+        - [ ] Update tests requiring local data to use fake data
+        - [ ] Update tests requiring remote data to use fake data
+        - [ ]
+
 License
 -------
 
