@@ -10,21 +10,21 @@ from astropy.io import fits
 from astropy.nddata import NDData, VarianceUncertainty
 from astropy.table import Table
 
-SHAPE = (4, 5)
+SHAPE = (40, 50)
 
 
 @pytest.fixture
 def ad1():
-    hdr = fits.Header({'INSTRUME': 'darkimager', 'OBJECT': 'M42'})
+    hdr = fits.Header({"INSTRUME": "darkimager", "OBJECT": "M42"})
     phu = fits.PrimaryHDU(header=hdr)
-    hdu = fits.ImageHDU(data=np.ones(SHAPE), name='SCI')
+    hdu = fits.ImageHDU(data=np.ones(SHAPE), name="SCI")
     return astrodata.create(phu, [hdu])
 
 
 @pytest.fixture
 def ad2():
     phu = fits.PrimaryHDU()
-    hdu = fits.ImageHDU(data=np.ones(SHAPE) * 2, name='SCI')
+    hdu = fits.ImageHDU(data=np.ones(SHAPE) * 2, name="SCI")
     return astrodata.create(phu, [hdu])
 
 
@@ -36,17 +36,20 @@ def test_attributes(ad1):
     assert data.mean() == 1
     assert np.median(data) == 1
 
-    assert ad1.phu['INSTRUME'] == 'darkimager'
-    assert ad1.instrument() == 'darkimager'
-    assert ad1.object() == 'M42'
+    assert ad1.phu["INSTRUME"] == "darkimager"
+    assert ad1.instrument() == "darkimager"
+    assert ad1.object() == "M42"
 
 
-@pytest.mark.parametrize('op, res, res2', [
-    (operator.add, 3, 3),
-    (operator.sub, -1, 1),
-    (operator.mul, 2, 2),
-    (operator.truediv, 0.5, 2)
-])
+@pytest.mark.parametrize(
+    "op, res, res2",
+    [
+        (operator.add, 3, 3),
+        (operator.sub, -1, 1),
+        (operator.mul, 2, 2),
+        (operator.truediv, 0.5, 2),
+    ],
+)
 def test_arithmetic(op, res, res2, ad1, ad2):
     for data in (ad2, ad2.data):
         result = op(ad1, data)
@@ -72,12 +75,15 @@ def test_arithmetic(op, res, res2, ad1, ad2):
     assert_array_equal(result.data, res2)
 
 
-@pytest.mark.parametrize('op, res, res2', [
-    (operator.iadd, 3, 3),
-    (operator.isub, -1, 1),
-    (operator.imul, 2, 2),
-    (operator.itruediv, 0.5, 2)
-])
+@pytest.mark.parametrize(
+    "op, res, res2",
+    [
+        (operator.iadd, 3, 3),
+        (operator.isub, -1, 1),
+        (operator.imul, 2, 2),
+        (operator.itruediv, 0.5, 2),
+    ],
+)
 def test_arithmetic_inplace(op, res, res2, ad1, ad2):
     for data in (ad2, ad2.data):
         ad = deepcopy(ad1)
@@ -102,12 +108,15 @@ def test_arithmetic_inplace(op, res, res2, ad1, ad2):
         assert isinstance(ad[0].hdr, fits.Header)
 
 
-@pytest.mark.parametrize('op, res', [
-    (operator.add, (3, 7)),
-    (operator.sub, (-1, 3)),
-    (operator.mul, (2, 10)),
-    (operator.truediv, (0.5, 2.5))
-])
+@pytest.mark.parametrize(
+    "op, res",
+    [
+        (operator.add, (3, 7)),
+        (operator.sub, (-1, 3)),
+        (operator.mul, (2, 10)),
+        (operator.truediv, (0.5, 2.5)),
+    ],
+)
 def test_arithmetic_multiple_ext(op, res, ad1):
     ad1.append(np.ones(SHAPE, dtype=np.uint16) + 4)
 
@@ -122,12 +131,15 @@ def test_arithmetic_multiple_ext(op, res, ad1):
         assert_array_equal(result[0].data, res[i])
 
 
-@pytest.mark.parametrize('op, res', [
-    (operator.iadd, (3, 7)),
-    (operator.isub, (-1, 3)),
-    (operator.imul, (2, 10)),
-    (operator.itruediv, (0.5, 2.5))
-])
+@pytest.mark.parametrize(
+    "op, res",
+    [
+        (operator.iadd, (3, 7)),
+        (operator.isub, (-1, 3)),
+        (operator.imul, (2, 10)),
+        (operator.itruediv, (0.5, 2.5)),
+    ],
+)
 def test_arithmetic_inplace_multiple_ext(op, res, ad1):
     ad1.append(np.ones(SHAPE, dtype=np.uint16) + 4)
 
@@ -152,10 +164,15 @@ def test_arithmetic_inplace_multiple_ext(op, res, ad1):
         assert_array_equal(result.data, res[i])
 
 
-@pytest.mark.parametrize('op, arg, res', [('add', 100, 101),
-                                          ('subtract', 100, -99),
-                                          ('multiply', 3, 3),
-                                          ('divide', 2, 0.5)])
+@pytest.mark.parametrize(
+    "op, arg, res",
+    [
+        ("add", 100, 101),
+        ("subtract", 100, -99),
+        ("multiply", 3, 3),
+        ("divide", 2, 0.5),
+    ],
+)
 def test_operations(ad1, op, arg, res):
     result = getattr(ad1, op)(arg)
     assert_array_equal(result.data, res)
@@ -167,10 +184,12 @@ def test_operations(ad1, op, arg, res):
 
 def test_operate():
     ad = astrodata.create({})
-    nd = NDData(data=[[1, 2], [3, 4]],
-                uncertainty=VarianceUncertainty(np.ones((2, 2))),
-                mask=np.identity(2),
-                meta={'header': fits.Header()})
+    nd = NDData(
+        data=[[1, 2], [3, 4]],
+        uncertainty=VarianceUncertainty(np.ones((2, 2))),
+        mask=np.identity(2),
+        meta={"header": fits.Header()},
+    )
     ad.append(nd)
 
     ad.operate(np.sum, axis=1)
@@ -181,21 +200,24 @@ def test_operate():
 
 def test_write_and_read(tmpdir, capsys):
     ad = astrodata.create({})
-    nd = NDData(data=[[1, 2], [3, 4]],
-                uncertainty=VarianceUncertainty(np.ones((2, 2))),
-                mask=np.identity(2),
-                meta={'header': fits.Header()})
+    nd = NDData(
+        data=[[1, 2], [3, 4]],
+        uncertainty=VarianceUncertainty(np.ones((2, 2))),
+        mask=np.identity(2),
+        meta={"header": fits.Header()},
+    )
     ad.append(nd)
 
-    tbl = Table([np.zeros(10), np.ones(10)], names=('a', 'b'))
+    tbl = Table([np.zeros(10), np.ones(10)], names=("a", "b"))
 
-    with pytest.raises(ValueError,
-                       match='Tables should be set directly as attribute'):
-        ad.append(tbl, name='BOB')
+    with pytest.raises(
+        ValueError, match="Tables should be set directly as attribute"
+    ):
+        ad.append(tbl, name="BOB")
 
     ad.BOB = tbl
 
-    tbl = Table([np.zeros(5) + 2, np.zeros(5) + 3], names=('c', 'd'))
+    tbl = Table([np.zeros(5) + 2, np.zeros(5) + 3], names=("c", "d"))
 
     match = "Cannot append table 'BOB' because it would hide a top-level table"
     with pytest.raises(ValueError, match=match):
@@ -206,26 +228,26 @@ def test_write_and_read(tmpdir, capsys):
 
     match = "You can only append NDData derived instances at the top level"
     with pytest.raises(TypeError, match=match):
-        ad[0].MYNDD = NDData(data=np.ones(10), meta={'header': fits.Header()})
+        ad[0].MYNDD = NDData(data=np.ones(10), meta={"header": fits.Header()})
 
-    testfile = str(tmpdir.join('testfile.fits'))
+    testfile = str(tmpdir.join("testfile.fits"))
     ad.write(testfile)
 
     ad = astrodata.open(testfile)
     ad.info()
     captured = capsys.readouterr()
     assert captured.out.splitlines()[3:] == [
-        'Pixels Extensions',
-        'Index  Content                  Type              Dimensions     Format',
-        '[ 0]   science                  NDAstroData       (2, 2)         int64',
-        '          .variance             ADVarianceUncerta (2, 2)         float64',
-        '          .mask                 ndarray           (2, 2)         uint16',
-        '          .BOB2                 Table             (5, 2)         n/a',
-        '          .MYVAL_WITH_A_VERY_LO ndarray           (10,)          int64',
-        '',
-        'Other Extensions',
-        '               Type        Dimensions',
-        '.BOB           Table       (10, 2)'
+        "Pixels Extensions",
+        "Index  Content                  Type              Dimensions     Format",
+        "[ 0]   science                  NDAstroData       (2, 2)         int64",
+        "          .variance             ADVarianceUncerta (2, 2)         float64",
+        "          .mask                 ndarray           (2, 2)         uint16",
+        "          .BOB2                 Table             (5, 2)         n/a",
+        "          .MYVAL_WITH_A_VERY_LO ndarray           (10,)          int64",
+        "",
+        "Other Extensions",
+        "               Type        Dimensions",
+        ".BOB           Table       (10, 2)",
     ]
     assert_array_equal(ad[0].nddata.data[0], nd.data[0])
     assert_array_equal(ad[0].nddata.variance[0], nd.uncertainty.array[0])
@@ -264,10 +286,68 @@ def test_reset(ad1):
     with pytest.raises(TypeError):
         ext.reset(data, variance=1)
 
-    nd = NDData(data=data,
-                uncertainty=VarianceUncertainty(np.ones((2, 2)) * 3),
-                mask=np.ones((2, 2)) * 2, meta={'header': {}})
+    nd = NDData(
+        data=data,
+        uncertainty=VarianceUncertainty(np.ones((2, 2)) * 3),
+        mask=np.ones((2, 2)) * 2,
+        meta={"header": {}},
+    )
     ext.reset(nd)
     assert_array_equal(ext.data, 4)
     assert_array_equal(ext.variance, 3)
     assert_array_equal(ext.mask, 2)
+
+
+@pytest.fixture
+def random_NDAstroData_generator():
+    def _random_NDAstroData_generator(shape):
+        return astrodata.NDAstroData(np.random.random(shape))
+
+    return _random_NDAstroData_generator
+
+
+# Test initialization for AstroData
+def test_AstroData__init__():
+    # Test initialization with no arguments
+    ad = astrodata.AstroData()
+    assert len(ad) == 0
+    assert ad.phu == fits.Header()
+    assert ad.instrument() is None
+    assert ad.object() is None
+
+    # Single data argument
+    data = [astrodata.NDAstroData(np.ones((2, 2)))]
+
+    ad = astrodata.AstroData(data, is_single=True)
+    assert len(ad) == 1
+    assert ad.phu == fits.Header()
+    assert ad.instrument() is None
+    assert ad.object() is None
+
+    # Multiple data arguments
+    data = [
+        astrodata.NDAstroData(np.ones((2, 2))),
+        astrodata.NDAstroData(np.ones((2, 2))),
+    ]
+
+    ad = astrodata.AstroData(data, is_single=False)
+
+    assert len(ad) == 2
+    assert ad.phu == fits.Header()
+    assert ad.instrument() is None
+    assert ad.object() is None
+    assert ad[0].data.shape == (2, 2)
+    assert ad[1].data.shape == (2, 2)
+
+    # Test initialization with a primary header
+    hdr = fits.Header({"INSTRUME": "darkimager", "OBJECT": "M42"})
+    phu = fits.PrimaryHDU(header=hdr)
+
+    with pytest.raises(TypeError):
+        ad = astrodata.AstroData(hdr)
+
+    with pytest.raises(TypeError):
+        ad = astrodata.AstroData(phu)
+
+    # Test initialization with a primary header and data
+    ad = astrodata.AstroData(data, phu)

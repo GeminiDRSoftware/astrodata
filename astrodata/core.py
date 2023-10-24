@@ -20,12 +20,22 @@ from astropy.nddata import NDData
 from astropy.table import Table
 from astropy.utils import format_doc
 
-from .fits import (DEFAULT_EXTENSION, FitsHeaderCollection, _process_table,
-                   read_fits, write_fits)
+from .fits import (
+    DEFAULT_EXTENSION,
+    FitsHeaderCollection,
+    _process_table,
+    read_fits,
+    write_fits,
+)
 from .nddata import ADVarianceUncertainty
 from .nddata import NDAstroData as NDDataObject
-from .utils import (assign_only_single_slice, astro_data_descriptor,
-                    deprecated, normalize_indices, returns_list)
+from .utils import (
+    assign_only_single_slice,
+    astro_data_descriptor,
+    deprecated,
+    normalize_indices,
+    returns_list,
+)
 
 NO_DEFAULT = object()
 
@@ -52,30 +62,33 @@ class AstroData:
     ----------
     nddata : `astrodata.NDAstroData` or list of `astrodata.NDAstroData`
         List of NDAstroData objects.
+
     tables : dict[name, `astropy.table.Table`]
         Dict of table objects.
+
     phu : `astropy.io.fits.Header`
         Primary header.
+
     indices : list of int
         List of indices mapping the `astrodata.NDAstroData` objects that this
         object will access to. This is used when slicing an object, then the
         sliced AstroData will have the ``.nddata`` list from its parent and
         access the sliced NDAstroData through this list of indices.
-
     """
 
     # Derived classes may provide their own __keyword_dict. Being a private
     # variable, each class will preserve its own, and there's no risk of
     # overriding the whole thing
     __keyword_dict = {
-        'instrument': 'INSTRUME',
-        'object': 'OBJECT',
-        'telescope': 'TELESCOP',
-        'ut_date': 'DATE-OBS'
+        "instrument": "INSTRUME",
+        "object": "OBJECT",
+        "telescope": "TELESCOP",
+        "ut_date": "DATE-OBS",
     }
 
-    def __init__(self, nddata=None, tables=None, phu=None, indices=None,
-                 is_single=False):
+    def __init__(
+        self, nddata=None, tables=None, phu=None, indices=None, is_single=False
+    ):
         if nddata is None:
             nddata = []
         if not isinstance(nddata, (list, tuple)):
@@ -86,18 +99,27 @@ class AstroData:
         self._all_nddatas = nddata
         self._indices = indices
 
+        # TODO: Is there no way to know if this is a single frame without
+        # passing an arg?
         self.is_single = is_single
 
         # If this data provider represents a single slice out of a whole
         # dataset, return True. Otherwise, return False.
         if tables is not None and not isinstance(tables, dict):
-            raise ValueError('tables must be a dict')
+            raise ValueError("tables must be a dict")
 
         self._tables = tables or {}
 
         self._phu = phu or fits.Header()
-        self._fixed_settable = {'data', 'uncertainty', 'mask', 'variance',
-                                'wcs', 'path', 'filename'}
+        self._fixed_settable = {
+            "data",
+            "uncertainty",
+            "mask",
+            "variance",
+            "wcs",
+            "path",
+            "filename",
+        }
         self._logger = logging.getLogger(__name__)
         self._orig_filename = None
         self._path = None
@@ -114,10 +136,10 @@ class AstroData:
         """
         obj = self.__class__()
 
-        for attr in ('_phu', '_path', '_orig_filename', '_tables'):
+        for attr in ("_phu", "_path", "_orig_filename", "_tables"):
             obj.__dict__[attr] = deepcopy(self.__dict__[attr])
 
-        obj.__dict__['_all_nddatas'] = [deepcopy(nd) for nd in self._nddata]
+        obj.__dict__["_all_nddatas"] = [deepcopy(nd) for nd in self._nddata]
         return obj
 
     def _keyword_for(self, name):
@@ -143,7 +165,7 @@ class AstroData:
         for cls in self.__class__.mro():
             with suppress(AttributeError, KeyError):
                 # __keyword_dict is a mangled variable
-                return getattr(self, f'_{cls.__name__}__keyword_dict')[name]
+                return getattr(self, f"_{cls.__name__}__keyword_dict")[name]
         else:
             raise AttributeError(f"No match for '{name}'")
 
@@ -153,7 +175,7 @@ class AstroData:
         # Calling inspect.getmembers on `self` would trigger all the
         # properties (tags, phu, hdr, etc.), and that's undesirable. To
         # prevent that, we'll inspect the *class*.
-        filt = lambda x: hasattr(x, 'tag_method')
+        filt = lambda x: hasattr(x, "tag_method")
         for _, method in inspect.getmembers(self.__class__, filt):
             ts = method(self)
             if ts.add or ts.remove or ts.blocks:
@@ -161,8 +183,9 @@ class AstroData:
 
         # Sort by the length of substractions... those that substract
         # from others go first
-        results = sorted(results, key=lambda x: len(x.remove) + len(x.blocks),
-                         reverse=True)
+        results = sorted(
+            results, key=lambda x: len(x.remove) + len(x.blocks), reverse=True
+        )
 
         # Sort by length of blocked_by, those that are never disabled go first
         results = sorted(results, key=lambda x: len(x.blocked_by))
@@ -244,15 +267,17 @@ class AstroData:
         """Return all headers, as a `astrodata.fits.FitsHeaderCollection`."""
         if not self.nddata:
             return None
-        headers = [nd.meta['header'] for nd in self._nddata]
+        headers = [nd.meta["header"] for nd in self._nddata]
         return headers[0] if self.is_single else FitsHeaderCollection(headers)
 
     @property
-    @deprecated("Access to headers through this property is deprecated and "
-                "will be removed in the future. Use '.hdr' instead.")
+    @deprecated(
+        "Access to headers through this property is deprecated and "
+        "will be removed in the future. Use '.hdr' instead."
+    )
     def header(self):
         """Deprecated header access. Use ``.hdr`` instead."""
-        return [self.phu] + [ndd.meta['header'] for ndd in self._nddata]
+        return [self.phu] + [ndd.meta["header"] for ndd in self._nddata]
 
     @property
     def tags(self):
@@ -268,8 +293,9 @@ class AstroData:
         --------
         tuple of str
         """
-        members = inspect.getmembers(self.__class__,
-                                     lambda x: hasattr(x, 'descriptor_method'))
+        members = inspect.getmembers(
+            self.__class__, lambda x: hasattr(x, "descriptor_method")
+        )
         return tuple(mname for (mname, method) in members)
 
     @property
@@ -280,8 +306,10 @@ class AstroData:
         if self.is_single:
             return self._indices[0] + 1
         else:
-            raise ValueError("Cannot return id for an AstroData object "
-                             "that is not a single slice")
+            raise ValueError(
+                "Cannot return id for an AstroData object "
+                "that is not a single slice"
+            )
 
     @property
     def indices(self):
@@ -297,7 +325,7 @@ class AstroData:
 
     def is_settable(self, attr):
         """Return True if the attribute is meant to be modified."""
-        if self.is_sliced and attr in {'path', 'filename'}:
+        if self.is_sliced and attr in {"path", "filename"}:
             return False
         return attr in self._fixed_settable or attr.isupper()
 
@@ -323,7 +351,7 @@ class AstroData:
 
     def table(self):
         """Return a dictionary of `astropy.table.Table` objects.
-        
+
         Notes
         -----
         This returns a _copy_ of the tables, so modifying them will not
@@ -345,9 +373,12 @@ class AstroData:
         an extension.
         """
         if not self.is_single:
-            raise AttributeError('this is only available for extensions')
-        return set(key for key, obj in self.nddata.meta['other'].items()
-                   if isinstance(obj, Table))
+            raise AttributeError("this is only available for extensions")
+        return set(
+            key
+            for key, obj in self.nddata.meta["other"].items()
+            if isinstance(obj, Table)
+        )
 
     @property
     @returns_list
@@ -370,11 +401,12 @@ class AstroData:
     def data(self, value):
         # Setting the ._data in the NDData is a bit kludgy, but we're all
         # grown adults and know what we're doing, isn't it?
-        if hasattr(value, 'shape'):
+        if hasattr(value, "shape"):
             self.nddata._data = value
         else:
-            raise AttributeError("Trying to assign data to be something "
-                                 "with no shape")
+            raise AttributeError(
+                "Trying to assign data to be something " "with no shape"
+            )
 
     @property
     @returns_list
@@ -442,8 +474,10 @@ class AstroData:
         if self.is_single:
             return self.nddata.wcs
         else:
-            raise ValueError("Cannot return WCS for an AstroData object "
-                             "that is not a single slice")
+            raise ValueError(
+                "Cannot return WCS for an AstroData object "
+                "that is not a single slice"
+            )
 
     @wcs.setter
     @assign_only_single_slice
@@ -486,11 +520,13 @@ class AstroData:
             indices = [self._indices[i] for i in indices]
 
         is_single = not isinstance(idx, (tuple, slice))
-        obj = self.__class__(self._all_nddatas,
-                             tables=self._tables,
-                             phu=self.phu,
-                             indices=indices,
-                             is_single=is_single)
+        obj = self.__class__(
+            self._all_nddatas,
+            tables=self._tables,
+            phu=self.phu,
+            indices=indices,
+            is_single=is_single,
+        )
         obj._path = self.path
         obj._orig_filename = self.orig_filename
         return obj
@@ -518,7 +554,7 @@ class AstroData:
         """Called when an attribute lookup has not found the attribute in the
         usual places (not an instance attribute, and not in the class tree for
         ``self``).
-        
+
         Parameters
         ----------
         attribute : str
@@ -533,13 +569,15 @@ class AstroData:
         # in the ND object
         if self.is_single and attribute.isupper():
             with suppress(KeyError):
-                return self.nddata.meta['other'][attribute]
+                return self.nddata.meta["other"][attribute]
 
         if attribute in self._tables:
             return self._tables[attribute]
 
-        raise AttributeError(f"{self.__class__.__name__!r} object has no "
-                             f"attribute {attribute!r}")
+        raise AttributeError(
+            f"{self.__class__.__name__!r} object has no "
+            f"attribute {attribute!r}"
+        )
 
     def __setattr__(self, attribute, value):
         """Called when an attribute assignment is attempted, instead of the
@@ -557,22 +595,30 @@ class AstroData:
         def _my_attribute(attr):
             return attr in self.__dict__ or attr in self.__class__.__dict__
 
-        if (attribute.isupper() and self.is_settable(attribute) and
-                not _my_attribute(attribute)):
+        if (
+            attribute.isupper()
+            and self.is_settable(attribute)
+            and not _my_attribute(attribute)
+        ):
             # This method is meant to let the user set certain attributes of
             # the NDData objects. First we check if the attribute belongs to
             # this object's dictionary.  Otherwise, see if we can pass it down.
             #
             if self.is_sliced and not self.is_single:
-                raise TypeError("This attribute can only be "
-                                "assigned to a single-slice object")
+                raise TypeError(
+                    "This attribute can only be "
+                    "assigned to a single-slice object"
+                )
 
             if attribute == DEFAULT_EXTENSION:
-                raise AttributeError(f"{attribute} extensions should be "
-                                     "appended with .append")
-            elif attribute in {'DQ', 'VAR'}:
-                raise AttributeError(f"{attribute} should be set on the "
-                                     "nddata object")
+                raise AttributeError(
+                    f"{attribute} extensions should be "
+                    "appended with .append"
+                )
+            elif attribute in {"DQ", "VAR"}:
+                raise AttributeError(
+                    f"{attribute} should be set on the " "nddata object"
+                )
 
             add_to = self.nddata if self.is_single else None
             self._append(value, name=attribute, add_to=add_to)
@@ -590,18 +636,21 @@ class AstroData:
             if not self.is_single:
                 raise TypeError("Can't delete attributes on non-single slices")
 
-            other = self.nddata.meta['other']
+            other = self.nddata.meta["other"]
             if attribute in other:
                 del other[attribute]
             else:
-                raise AttributeError(f"{self.__class__.__name__!r} sliced "
-                                     "object has no attribute {attribute!r}")
+                raise AttributeError(
+                    f"{self.__class__.__name__!r} sliced "
+                    "object has no attribute {attribute!r}"
+                )
         else:
             if attribute in self._tables:
                 del self._tables[attribute]
             else:
-                raise AttributeError(f"'{attribute}' is not a global table "
-                                     "for this instance")
+                raise AttributeError(
+                    f"'{attribute}' is not a global table " "for this instance"
+                )
 
     def __contains__(self, attribute):
         """Implements the ability to use the ``in`` operator with an
@@ -619,8 +668,7 @@ class AstroData:
         return attribute in self.exposed
 
     def __len__(self):
-        """Return the number of independent extensions stored by the object.
-        """
+        """Return the number of independent extensions stored by the object."""
         if self._indices is not None:
             return len(self._indices)
         else:
@@ -641,54 +689,60 @@ class AstroData:
         """
         exposed = set(self._tables)
         if self.is_single:
-            exposed |= set(self.nddata.meta['other'])
+            exposed |= set(self.nddata.meta["other"])
         return exposed
 
     def _pixel_info(self):
         for idx, nd in enumerate(self._nddata):
             other_objects = []
             uncer = nd.uncertainty
-            fixed = (('variance', None if uncer is None else uncer),
-                     ('mask', nd.mask))
-            for name, other in fixed + tuple(sorted(nd.meta['other'].items())):
+            fixed = (
+                ("variance", None if uncer is None else uncer),
+                ("mask", nd.mask),
+            )
+            for name, other in fixed + tuple(sorted(nd.meta["other"].items())):
                 if other is None:
                     continue
                 if isinstance(other, Table):
-                    other_objects.append(dict(
-                        attr=name,
-                        type='Table',
-                        dim=str((len(other), len(other.columns))),
-                        data_type='n/a'
-                    ))
+                    other_objects.append(
+                        dict(
+                            attr=name,
+                            type="Table",
+                            dim=str((len(other), len(other.columns))),
+                            data_type="n/a",
+                        )
+                    )
                 else:
-                    dim = ''
-                    if hasattr(other, 'dtype'):
+                    dim = ""
+                    if hasattr(other, "dtype"):
                         dt = other.dtype.name
                         dim = str(other.shape)
-                    elif hasattr(other, 'data'):
+                    elif hasattr(other, "data"):
                         dt = other.data.dtype.name
                         dim = str(other.data.shape)
-                    elif hasattr(other, 'array'):
+                    elif hasattr(other, "array"):
                         dt = other.array.dtype.name
                         dim = str(other.array.shape)
                     else:
-                        dt = 'unknown'
-                    other_objects.append(dict(
-                        attr=name,
-                        type=type(other).__name__,
-                        dim=dim,
-                        data_type=dt
-                    ))
+                        dt = "unknown"
+                    other_objects.append(
+                        dict(
+                            attr=name,
+                            type=type(other).__name__,
+                            dim=dim,
+                            data_type=dt,
+                        )
+                    )
 
             yield dict(
-                idx='[{:2}]'.format(idx),
+                idx="[{:2}]".format(idx),
                 main=dict(
-                    content='science',
+                    content="science",
                     type=type(nd).__name__,
                     dim=str(nd.data.shape),
-                    data_type=nd.data.dtype.name
+                    data_type=nd.data.dtype.name,
                 ),
-                other=other_objects
+                other=other_objects,
             )
 
     def info(self):
@@ -698,8 +752,8 @@ class AstroData:
         # This is fixed. We don't support opening for update
         # print("Mode: readonly")
 
-        text = 'Tags: ' + ' '.join(sorted(self.tags))
-        textwrapper = textwrap.TextWrapper(width=80, subsequent_indent='    ')
+        text = "Tags: " + " ".join(sorted(self.tags))
+        textwrapper = textwrap.TextWrapper(width=80, subsequent_indent="    ")
         for line in textwrapper.wrap(text):
             print(line)
 
@@ -707,17 +761,31 @@ class AstroData:
             main_fmt = "{:6} {:24} {:17} {:14} {}"
             other_fmt = "          .{:20} {:17} {:14} {}"
             print("\nPixels Extensions")
-            print(main_fmt.format("Index", "Content", "Type", "Dimensions",
-                                  "Format"))
+            print(
+                main_fmt.format(
+                    "Index", "Content", "Type", "Dimensions", "Format"
+                )
+            )
             for pi in self._pixel_info():
-                main_obj = pi['main']
-                print(main_fmt.format(
-                    pi['idx'], main_obj['content'][:24], main_obj['type'][:17],
-                    main_obj['dim'], main_obj['data_type']))
-                for other in pi['other']:
-                    print(other_fmt.format(
-                        other['attr'][:20], other['type'][:17], other['dim'],
-                        other['data_type']))
+                main_obj = pi["main"]
+                print(
+                    main_fmt.format(
+                        pi["idx"],
+                        main_obj["content"][:24],
+                        main_obj["type"][:17],
+                        main_obj["dim"],
+                        main_obj["data_type"],
+                    )
+                )
+                for other in pi["other"]:
+                    print(
+                        other_fmt.format(
+                            other["attr"][:20],
+                            other["type"][:17],
+                            other["dim"],
+                            other["data_type"],
+                        )
+                    )
 
         # NOTE: This covers tables, only. Study other cases before
         # implementing a more general solution
@@ -728,8 +796,11 @@ class AstroData:
                 if type(table) is list:
                     # This is not a free floating table
                     continue
-                print(".{:13} {:11} {}".format(
-                    name[:13], 'Table', (len(table), len(table.columns))))
+                print(
+                    ".{:13} {:11} {}".format(
+                        name[:13], "Table", (len(table), len(table.columns))
+                    )
+                )
 
     def _oper(self, operator, operand):
         ind = self.indices
@@ -739,8 +810,11 @@ class AstroData:
                 raise ValueError("Operands are not the same size")
             for n in range(len(self)):
                 try:
-                    data = (operand.nddata if operand.is_single
-                            else operand.nddata[n])
+                    data = (
+                        operand.nddata
+                        if operand.is_single
+                        else operand.nddata[n]
+                    )
                     ndd[ind[n]] = operator(ndd[ind[n]], data)
                 except TypeError:
                     # This may happen if operand is a sliced, single
@@ -748,7 +822,7 @@ class AstroData:
                     ndd[ind[n]] = operator(ndd[ind[n]], operand.nddata)
             op_table = operand.table()
             ltab, rtab = set(self._tables), set(op_table)
-            for tab in (rtab - ltab):
+            for tab in rtab - ltab:
                 self._tables[tab] = op_table[tab]
 
         else:
@@ -756,49 +830,51 @@ class AstroData:
                 ndd[ind[n]] = operator(ndd[ind[n]], operand)
 
     def _standard_nddata_op(self, fn, operand):
-        return self._oper(partial(fn, handle_mask=np.bitwise_or,
-                                  handle_meta='first_found'), operand)
+        return self._oper(
+            partial(fn, handle_mask=np.bitwise_or, handle_meta="first_found"),
+            operand,
+        )
 
-    @format_doc(_ARIT_DOC, name='addition', op='+')
+    @format_doc(_ARIT_DOC, name="addition", op="+")
     def __add__(self, oper):
         copy = deepcopy(self)
         copy += oper
         return copy
 
-    @format_doc(_ARIT_DOC, name='subtraction', op='-')
+    @format_doc(_ARIT_DOC, name="subtraction", op="-")
     def __sub__(self, oper):
         copy = deepcopy(self)
         copy -= oper
         return copy
 
-    @format_doc(_ARIT_DOC, name='multiplication', op='*')
+    @format_doc(_ARIT_DOC, name="multiplication", op="*")
     def __mul__(self, oper):
         copy = deepcopy(self)
         copy *= oper
         return copy
 
-    @format_doc(_ARIT_DOC, name='division', op='/')
+    @format_doc(_ARIT_DOC, name="division", op="/")
     def __truediv__(self, oper):
         copy = deepcopy(self)
         copy /= oper
         return copy
 
-    @format_doc(_ARIT_DOC, name='inplace addition', op='+=')
+    @format_doc(_ARIT_DOC, name="inplace addition", op="+=")
     def __iadd__(self, oper):
         self._standard_nddata_op(NDDataObject.add, oper)
         return self
 
-    @format_doc(_ARIT_DOC, name='inplace subtraction', op='-=')
+    @format_doc(_ARIT_DOC, name="inplace subtraction", op="-=")
     def __isub__(self, oper):
         self._standard_nddata_op(NDDataObject.subtract, oper)
         return self
 
-    @format_doc(_ARIT_DOC, name='inplace multiplication', op='*=')
+    @format_doc(_ARIT_DOC, name="inplace multiplication", op="*=")
     def __imul__(self, oper):
         self._standard_nddata_op(NDDataObject.multiply, oper)
         return self
 
-    @format_doc(_ARIT_DOC, name='inplace division', op='/=')
+    @format_doc(_ARIT_DOC, name="inplace division", op="/=")
     def __itruediv__(self, oper):
         self._standard_nddata_op(NDDataObject.divide, oper)
         return self
@@ -824,60 +900,65 @@ class AstroData:
         obj._oper(obj._rdiv, oper)
         return obj
 
-    def _process_pixel_plane(self, pixim, name=None, top_level=False,
-                             custom_header=None):
+    def _process_pixel_plane(
+        self, pixim, name=None, top_level=False, custom_header=None
+    ):
         # Assume that we get an ImageHDU or something that can be
         # turned into one
         if isinstance(pixim, fits.ImageHDU):
-            nd = NDDataObject(pixim.data, meta={'header': pixim.header})
+            nd = NDDataObject(pixim.data, meta={"header": pixim.header})
         elif isinstance(pixim, NDDataObject):
             nd = pixim
         else:
             nd = NDDataObject(pixim)
 
         if custom_header is not None:
-            nd.meta['header'] = custom_header
+            nd.meta["header"] = custom_header
 
-        header = nd.meta.setdefault('header', fits.Header())
-        currname = header.get('EXTNAME')
+        header = nd.meta.setdefault("header", fits.Header())
+        currname = header.get("EXTNAME")
 
         if currname is None:
-            header['EXTNAME'] = name if name is not None else DEFAULT_EXTENSION
+            header["EXTNAME"] = name if name is not None else DEFAULT_EXTENSION
 
         if top_level:
-            nd.meta.setdefault('other', OrderedDict())
+            nd.meta.setdefault("other", OrderedDict())
 
         return nd
 
     def _append_array(self, data, name=None, header=None, add_to=None):
-        if name in {'DQ', 'VAR'}:
-            raise ValueError(f"'{name}' need to be associated to a "
-                             f"'{DEFAULT_EXTENSION}' one")
+        if name in {"DQ", "VAR"}:
+            raise ValueError(
+                f"'{name}' need to be associated to a "
+                f"'{DEFAULT_EXTENSION}' one"
+            )
 
         if add_to is None:
             # Top level extension
             if name is not None:
                 hname = name
             elif header is not None:
-                hname = header.get('EXTNAME', DEFAULT_EXTENSION)
+                hname = header.get("EXTNAME", DEFAULT_EXTENSION)
             else:
                 hname = DEFAULT_EXTENSION
 
             hdu = fits.ImageHDU(data, header=header)
-            hdu.header['EXTNAME'] = hname
-            ret = self._append_imagehdu(hdu, name=hname, header=None,
-                                        add_to=None)
+            hdu.header["EXTNAME"] = hname
+            ret = self._append_imagehdu(
+                hdu, name=hname, header=None, add_to=None
+            )
         else:
-            ret = add_to.meta['other'][name] = data
+            ret = add_to.meta["other"][name] = data
 
         return ret
 
     def _append_imagehdu(self, hdu, name, header, add_to):
-        if name in {'DQ', 'VAR'} or add_to is not None:
+        if name in {"DQ", "VAR"} or add_to is not None:
             return self._append_array(hdu.data, name=name, add_to=add_to)
         else:
-            nd = self._process_pixel_plane(hdu, name=name, top_level=True,
-                                           custom_header=header)
+            nd = self._process_pixel_plane(
+                hdu, name=name, top_level=True, custom_header=header
+            )
             return self._append_nddata(nd, name, add_to=None)
 
     def _append_raw_nddata(self, raw_nddata, name, header, add_to):
@@ -886,9 +967,9 @@ class AstroData:
         top_level = add_to is None
         if not isinstance(raw_nddata, NDDataObject):
             raw_nddata = NDDataObject(raw_nddata)
-        processed_nddata = self._process_pixel_plane(raw_nddata,
-                                                     top_level=top_level,
-                                                     custom_header=header)
+        processed_nddata = self._process_pixel_plane(
+            raw_nddata, top_level=top_level, custom_header=header
+        )
         return self._append_nddata(processed_nddata, name=name, add_to=add_to)
 
     def _append_nddata(self, new_nddata, name, add_to):
@@ -897,62 +978,76 @@ class AstroData:
         # point, and that's why it's missing from the signature.  'name' is
         # ignored. It's there just to comply with the _append_XXX signature.
         if add_to is not None:
-            raise TypeError("You can only append NDData derived instances "
-                            "at the top level")
+            raise TypeError(
+                "You can only append NDData derived instances "
+                "at the top level"
+            )
 
-        hd = new_nddata.meta['header']
-        hname = hd.get('EXTNAME', DEFAULT_EXTENSION)
+        hd = new_nddata.meta["header"]
+        hname = hd.get("EXTNAME", DEFAULT_EXTENSION)
         if hname == DEFAULT_EXTENSION:
             self._all_nddatas.append(new_nddata)
         else:
-            raise ValueError("Arbitrary image extensions can only be added "
-                             f"in association to a '{DEFAULT_EXTENSION}'")
+            raise ValueError(
+                "Arbitrary image extensions can only be added "
+                f"in association to a '{DEFAULT_EXTENSION}'"
+            )
 
         return new_nddata
 
     def _append_table(self, new_table, name, header, add_to):
         tb = _process_table(new_table, name, header)
-        hname = tb.meta['header'].get('EXTNAME')
+        hname = tb.meta["header"].get("EXTNAME")
 
         def find_next_num(tables):
             table_num = 1
-            while f'TABLE{table_num}' in tables:
+            while f"TABLE{table_num}" in tables:
                 table_num += 1
-            return f'TABLE{table_num}'
+            return f"TABLE{table_num}"
 
         if add_to is None:
             # Find table names for all extensions
             ext_tables = set()
             for nd in self._nddata:
-                ext_tables |= set(key for key, obj in nd.meta['other'].items()
-                                  if isinstance(obj, Table))
+                ext_tables |= set(
+                    key
+                    for key, obj in nd.meta["other"].items()
+                    if isinstance(obj, Table)
+                )
 
             if hname is None:
                 hname = find_next_num(set(self._tables) | ext_tables)
             elif hname in ext_tables:
-                raise ValueError(f"Cannot append table '{hname}' because it "
-                                 "would hide an extension table")
+                raise ValueError(
+                    f"Cannot append table '{hname}' because it "
+                    "would hide an extension table"
+                )
 
             self._tables[hname] = tb
         else:
             if hname in self._tables:
-                raise ValueError(f"Cannot append table '{hname}' because it "
-                                 "would hide a top-level table")
+                raise ValueError(
+                    f"Cannot append table '{hname}' because it "
+                    "would hide a top-level table"
+                )
 
-            add_to.meta['other'][hname] = tb
+            add_to.meta["other"][hname] = tb
         return tb
 
     def _append_astrodata(self, ad, name, header, add_to):
         if not ad.is_single:
-            raise ValueError("Cannot append AstroData instances that are "
-                             "not single slices")
+            raise ValueError(
+                "Cannot append AstroData instances that are "
+                "not single slices"
+            )
         elif add_to is not None:
-            raise ValueError("Cannot append an AstroData slice to "
-                             "another slice")
+            raise ValueError(
+                "Cannot append an AstroData slice to " "another slice"
+            )
 
         new_nddata = deepcopy(ad.nddata)
         if header is not None:
-            new_nddata.meta['header'] = deepcopy(header)
+            new_nddata.meta["header"] = deepcopy(header)
 
         return self._append_nddata(new_nddata, name=None, add_to=None)
 
@@ -1015,21 +1110,28 @@ class AstroData:
 
         """
         if self.is_sliced:
-            raise TypeError("Can't append objects to slices, use "
-                            "'ext.NAME = obj' instead")
+            raise TypeError(
+                "Can't append objects to slices, use "
+                "'ext.NAME = obj' instead"
+            )
 
         # NOTE: Most probably, if we want to copy the input argument, we
         #       should do it here...
         if isinstance(ext, fits.PrimaryHDU):
-            raise ValueError("Only one Primary HDU allowed. "
-                             "Use .phu if you really need to set one")
+            raise ValueError(
+                "Only one Primary HDU allowed. "
+                "Use .phu if you really need to set one"
+            )
         elif isinstance(ext, Table):
-            raise ValueError("Tables should be set directly as attribute, "
-                             "i.e. 'ad.MYTABLE = table'")
+            raise ValueError(
+                "Tables should be set directly as attribute, "
+                "i.e. 'ad.MYTABLE = table'"
+            )
 
         if name is not None and not name.isupper():
-            warnings.warn(f"extension name '{name}' should be uppercase",
-                          UserWarning)
+            warnings.warn(
+                f"extension name '{name}' should be uppercase", UserWarning
+            )
             name = name.upper()
 
         return self._append(ext, name=name, header=header)
@@ -1147,7 +1249,7 @@ class AstroData:
             if mask is None:
                 self.mask = mask
             elif mask == NO_DEFAULT:
-                if hasattr(data, 'mask'):
+                if hasattr(data, "mask"):
                     self.mask = data.mask
             else:
                 raise TypeError("Attempt to set mask inappropriately")
@@ -1161,14 +1263,14 @@ class AstroData:
             if variance is None:
                 self.uncertainty = None
             elif variance == NO_DEFAULT:
-                if hasattr(data, 'uncertainty'):
+                if hasattr(data, "uncertainty"):
                     self.uncertainty = data.uncertainty
             else:
                 raise TypeError("Attempt to set variance inappropriately")
         else:
             self.variance = variance
 
-        if hasattr(data, 'wcs'):
+        if hasattr(data, "wcs"):
             self.wcs = data.wcs
 
     def update_filename(self, prefix=None, suffix=None, strip=False):
@@ -1200,27 +1302,31 @@ class AstroData:
 
         """
         if self.filename is None:
-            if 'ORIGNAME' in self.phu:
-                self.filename = self.phu['ORIGNAME']
+            if "ORIGNAME" in self.phu:
+                self.filename = self.phu["ORIGNAME"]
             else:
-                raise ValueError("A filename needs to be set before it "
-                                 "can be updated")
+                raise ValueError(
+                    "A filename needs to be set before it " "can be updated"
+                )
 
         # Set the ORIGNAME keyword if it's not there
-        if 'ORIGNAME' not in self.phu:
-            self.phu.set('ORIGNAME', self.orig_filename,
-                         'Original filename prior to processing')
+        if "ORIGNAME" not in self.phu:
+            self.phu.set(
+                "ORIGNAME",
+                self.orig_filename,
+                "Original filename prior to processing",
+            )
 
         if strip:
-            root, filetype = os.path.splitext(self.phu['ORIGNAME'])
+            root, filetype = os.path.splitext(self.phu["ORIGNAME"])
             filename, filetype = os.path.splitext(self.filename)
-            m = re.match('(.*){}(.*)'.format(re.escape(root)), filename)
+            m = re.match("(.*){}(.*)".format(re.escape(root)), filename)
             # Do not strip a prefix/suffix unless a new one is provided
             if m:
                 if prefix is None:
                     prefix = m.groups()[0]
                 existing_suffix = m.groups()[1]
-                if '_' in existing_suffix:
+                if "_" in existing_suffix:
                     last_underscore = existing_suffix.rfind("_")
                     root += existing_suffix[:last_underscore]
                     existing_suffix = existing_suffix[last_underscore:]
@@ -1229,21 +1335,21 @@ class AstroData:
                     root, existing_suffix = filename.rsplit("_", 1)
                     existing_suffix = "_" + existing_suffix
                 except ValueError:
-                    root, existing_suffix = filename, ''
+                    root, existing_suffix = filename, ""
             if suffix is None:
                 suffix = existing_suffix
         else:
             root, filetype = os.path.splitext(self.filename)
 
         # Cope with prefix or suffix as None
-        self.filename = (prefix or '') + root + (suffix or '') + filetype
+        self.filename = (prefix or "") + root + (suffix or "") + filetype
 
     def _crop_nd(self, nd, x1, y1, x2, y2):
-        nd.data = nd.data[y1:y2+1, x1:x2+1]
+        nd.data = nd.data[y1 : y2 + 1, x1 : x2 + 1]
         if nd.uncertainty is not None:
-            nd.uncertainty = nd.uncertainty[y1:y2+1, x1:x2+1]
+            nd.uncertainty = nd.uncertainty[y1 : y2 + 1, x1 : x2 + 1]
         if nd.mask is not None:
-            nd.mask = nd.mask[y1:y2+1, x1:x2+1]
+            nd.mask = nd.mask[y1 : y2 + 1, x1 : x2 + 1]
 
     def crop(self, x1, y1, x2, y2):
         """Crop the NDData objects given indices.
@@ -1258,7 +1364,7 @@ class AstroData:
         for nd in self._nddata:
             orig_shape = nd.data.shape
             self._crop_nd(nd, x1, y1, x2, y2)
-            for o in nd.meta['other'].values():
+            for o in nd.meta["other"].values():
                 try:
                     if o.shape == orig_shape:
                         self._crop_nd(o, x1, y1, x2, y2)
@@ -1270,14 +1376,14 @@ class AstroData:
     @astro_data_descriptor
     def instrument(self):
         """Returns the name of the instrument making the observation."""
-        return self.phu.get(self._keyword_for('instrument'))
+        return self.phu.get(self._keyword_for("instrument"))
 
     @astro_data_descriptor
     def object(self):
         """Returns the name of the object being observed."""
-        return self.phu.get(self._keyword_for('object'))
+        return self.phu.get(self._keyword_for("object"))
 
     @astro_data_descriptor
     def telescope(self):
         """Returns the name of the telescope."""
-        return self.phu.get(self._keyword_for('telescope'))
+        return self.phu.get(self._keyword_for("telescope"))
