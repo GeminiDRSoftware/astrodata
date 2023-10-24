@@ -350,4 +350,4 @@ def test_AstroData__init__():
         ad = astrodata.AstroData(phu)
 
     # Test initialization with a primary header and data
-    ad = astrodata.AstroData(data, phu)
+    ad = astrodata.AstroData(data, phu=phu)
