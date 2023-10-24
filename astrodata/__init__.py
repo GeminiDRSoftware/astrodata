@@ -25,7 +25,13 @@ from .core import AstroData
 from .fits import add_header_to_table
 from .factory import AstroDataFactory, AstroDataError
 from .nddata import NDAstroData, AstroDataMixin
-from .utils import *
+from .utils import (
+    TagSet,
+    astro_data_descriptor,
+    astro_data_tag,
+    Section,
+    returns_list,
+)
 from ._version import version
 
 __version__ = version()
