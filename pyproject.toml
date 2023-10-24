@@ -3,8 +3,8 @@ requires = [
   "setuptools>=61.2",
   "setuptools_scm[toml]>=6.2",
   "wheel",
-
 ]
+
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -26,6 +26,19 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 test = [
+    "pytest",
+    "pytest-doctestplus",
+    "coverage"
+]
+
+dev = [
+    "black",
+    "flake8",
+    "isort",
+    "pre-commit",
+    "sphinx",
+    "sphinx-automodapi",
+    "coverage",
     "pytest",
     "pytest-doctestplus",
 ]
@@ -94,5 +107,5 @@ exclude_lines = [
   # Ignore branches that don't pertain to this version of Python
   "pragma: py{ignore_python_version}",
   # Don't complain about IPython completion helper
-  "def _ipython_key_completions_", 
+  "def _ipython_key_completions_",
 ]
