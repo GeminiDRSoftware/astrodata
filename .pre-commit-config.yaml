@@ -25,6 +25,50 @@ repos:
         # black depends on click
         additional_dependencies: ["click>=8"]
 
+# flake8
+-   repo: https://github.com/pycqa/flake8
+    rev: '6.1.0'  # pick a git hash / tag to point to
+    hooks:
+    # Hook for specific errors that should stop the commit
+    -   id: flake8
+        args:
+            - --select=E9,F63,F7,F82
+            - --count
+            - --show-source
+            - --statistics
+            - --exclude="""\.git |
+              \.__pycache__|
+              \.hg|
+              \.mypy_cache|
+              \.tox|
+              \.venv|
+              _build|
+              buck-out|
+              build|
+              dist|
+              docs|
+              tests"""
+
+    -   id: flake8
+        args:
+            - --max-line-length=80
+            - --count
+            - --exit-zero
+            - --statistics
+            - --show-source
+            - --exclude="""\.git |
+              \.__pycache__|
+              \.hg|
+              \.mypy_cache|
+              \.tox|
+              \.venv|
+              _build|
+              buck-out|
+              build|
+              dist|
+              docs|
+              tests"""
+
 -   repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.2.0
     hooks:
