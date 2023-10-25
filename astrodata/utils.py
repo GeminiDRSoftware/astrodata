@@ -31,7 +31,25 @@ warnings.simplefilter("always", AstroDataDeprecationWarning)
 
 
 def deprecated(reason):
-    """Wrapper that will issue a warning when a deprecated function is used."""
+    """Marks a function as deprecated.
+
+    Parameters
+    ----------
+    reason : str
+        The reason why the function is deprecated
+
+    Returns
+    -------
+    function
+        The decorated function
+
+    Usage
+    -----
+
+    >>> @deprecated("Use another function instead")
+    ... def my_function():
+    ...     pass
+    """
 
     def decorator_wrapper(fn):
         @wraps(fn)

@@ -6,6 +6,8 @@ from copy import deepcopy
 
 from astropy.io import fits
 
+from .utils import deprecated
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -20,6 +22,15 @@ class AstroDataFactory:
 
     def __init__(self):
         self._registry = set()
+
+    @deprecated(
+        "Renamed to _open_file, please use that method instead: "
+        "astrodata.factory.AstroDataFactory._open_file"
+    )
+    @staticmethod
+    @contextmanager
+    def _openFile(source):  # pylint: disable=invalid-name
+        return AstroDataFactory._open_file(source)
 
     @staticmethod
     @contextmanager
@@ -72,6 +83,16 @@ class AstroDataFactory:
         else:
             yield source
 
+    @deprecated(
+        "Renamed to add_class, please use that method instead: "
+        "astrodata.factory.AstroDataFactory.add_class"
+    )
+    def addClass(self, cls):  # pylint: disable=invalid-name
+        """Add a new class to the AstroDataFactory registry. It will be used
+        when instantiating an AstroData class for a FITS file.
+        """
+        self.add_class(cls)
+
     def add_class(self, cls):
         """Add a new class to the AstroDataFactory registry. It will be used
         when instantiating an AstroData class for a FITS file.
@@ -82,6 +103,14 @@ class AstroDataFactory:
             )
 
         self._registry.add(cls)
+
+    @deprecated(
+        "Renamed to get_astro_data, please use that method instead: "
+        "astrodata.factory.AstroDataFactory.get_astro_data"
+    )
+    def getAstroData(self, source):  # pylint: disable=invalid-name
+        """Deprecated, see |get_astro_data|."""
+        self.get_astro_data(source)
 
     def get_astro_data(self, source):
         """Takes either a string (with the path to a file) or an HDUList as
@@ -138,6 +167,16 @@ class AstroDataFactory:
             raise AstroDataError("No class matches this dataset")
 
         return final_candidates[0].read(source)
+
+    @deprecated(
+        "Renamed to create_from_scratch, please use that method instead: "
+        "astrodata.factory.AstroDataFactory.create_from_scratch"
+    )
+    def createFromScratch(
+        self, phu, extensions=None
+    ):  # pylint: disable=invalid-name
+        """Deprecated, see |create_from_scratch|."""
+        self.create_from_scratch(phu, extensions=None)
 
     def create_from_scratch(self, phu, extensions=None):
         """Creates an AstroData object from a collection of objects.

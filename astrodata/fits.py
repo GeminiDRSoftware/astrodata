@@ -34,6 +34,8 @@ from astropy.io.fits import (
 )
 from astropy.nddata import NDData
 
+from .utils import deprecated
+
 # NDDataRef is still not in the stable astropy, but this should be the one
 # we use in the future...
 # from astropy.nddata import NDData, NDDataRef as NDDataObject
@@ -861,6 +863,15 @@ def write_fits(ad, filename, overwrite=False):
     """Writes the AstroData object to a FITS file."""
     hdul = ad_to_hdulist(ad)
     hdul.writeto(filename, overwrite=overwrite)
+
+
+@deprecated(
+    "Renamed to 'windowed_operation', this is just an alias for now, "
+    "and will be removed in a future version."
+)
+def windowedOp(*args, **kwargs):  # pylint: disable=invalid-name
+    """Alias for windowed_operation."""
+    return windowed_operation(*args, **kwargs)
 
 
 def windowed_operation(
