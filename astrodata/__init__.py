@@ -39,7 +39,7 @@ __version__ = version()
 factory = AstroDataFactory()
 # Let's make sure that there's at least one class that matches the data
 # (if we're dealing with a FITS file)
-factory.addClass(AstroData)
+factory.add_class(AstroData)
 
-open = factory.getAstroData
-create = factory.createFromScratch
+open = factory.get_astro_data
+create = factory.create_from_scratch
