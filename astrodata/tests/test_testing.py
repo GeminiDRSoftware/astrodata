@@ -15,6 +15,7 @@ def test_download_from_archive_raises_ValueError_if_envvar_does_not_exists():
         download_from_archive("N20180304S0126.fits", env_var="")
 
 
+@pytest.mark.skip(reason="Remote data")
 def test_download_from_archive_raises_IOError_if_path_is_not_accessible():
     env_var = "MY_FAKE_ENV_VAR"
     os.environ["MY_FAKE_ENV_VAR"] = "/not/accessible/path"
@@ -22,6 +23,7 @@ def test_download_from_archive_raises_IOError_if_path_is_not_accessible():
         download_from_archive("N20180304S0126.fits", env_var=env_var)
 
 
+@pytest.mark.skip(reason="Remote data")
 def test_download_from_archive(monkeypatch, tmpdir):
     ncall = 0
 
