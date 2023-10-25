@@ -86,18 +86,25 @@ class FitsHeaderCollection:
         for n, header in enumerate(self._headers):
             try:
                 ret.append(header[key])
+
             except KeyError:
+                logging.debug(
+                    "Assigning None to header missing keyword %s", key
+                )
+
                 missing_at.append(n)
                 ret.append(None)
+
         if missing_at:
             error = KeyError(
-                "The keyword couldn't be found at headers: {}".format(
-                    tuple(missing_at)
-                )
+                f"The keyword couldn't be found at headers: "
+                f"{tuple(missing_at)}"
             )
+
             error.missing_at = missing_at
             error.values = ret
             raise error
+
         return ret
 
     def get(self, key, default=None):
@@ -142,7 +149,7 @@ class FitsHeaderCollection:
             try:
                 _inner_set_comment(header)
             except KeyError as err:
-                raise KeyError(err.args[0] + f" at header {n}")
+                raise KeyError(f"{err.args[0]} at header {n}") from err
 
     def __contains__(self, key):
         return any(tuple(key in h for h in self._headers))
@@ -419,16 +426,22 @@ class FitsLazyLoadable:
 
     def _scale(self, data):
         """Scale the data, if necessary."""
+        # TODO: It would be goot to access these differently. Is this always an
+        # object we control? Even if so, should access through a property, not
+        # a protected member. No friends in python...
+        # pylint: disable=protected-access
         bscale = self._obj._orig_bscale
         bzero = self._obj._orig_bzero
+
         if bscale == 1 and bzero == 0:
             return data
+
         return (bscale * data + bzero).astype(self.dtype)
 
-    def __getitem__(self, sl):
+    def __getitem__(self, arr_slice):
         # TODO: We may want (read: should) create an empty result array before
         # scaling
-        return self._scale(self._obj.section[sl])
+        return self._scale(self._obj.section[arr_slice])
 
     @property
     def header(self):
@@ -452,6 +465,11 @@ class FitsLazyLoadable:
         """Need to to some overriding of astropy.io.fits since it doesn't
         know about BITPIX=8
         """
+        # TODO: It would be goot to access these differently. Is this always an
+        # object we control? Even if so, should access through a property, not
+        # a protected member. No friends in python... These are scattered
+        # throughout the function.
+        # pylint: disable=protected-access
         bitpix = self._obj._orig_bitpix
         if self._obj._orig_bscale == 1 and self._obj._orig_bzero == 0:
             dtype = fits.BITPIX2DTYPE[bitpix]
@@ -462,7 +480,8 @@ class FitsLazyLoadable:
 
         if dtype is None:
             if bitpix < 0:
-                dtype = np.dtype("float{}".format(abs(bitpix)))
+                dtype = np.dtype(f"float{abs(bitpix)}")
+
         if (
             self._obj.header["EXTNAME"] == "DQ"
             or self._obj._uint
@@ -470,6 +489,7 @@ class FitsLazyLoadable:
             and bitpix == 8
         ):
             dtype = np.uint16
+
         return dtype
 
 
@@ -499,7 +519,7 @@ def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
     if len(hdulist) > 1 or (len(hdulist) == 1 and hdulist[0].data is None):
         # MEF file
         # First get HDUs for which EXTVER is defined
-        for n, hdu in enumerate(hdulist):
+        for hdu in hdulist:
             if extname_parser:
                 extname_parser(hdu)
             ver = hdu.header.get("EXTVER")
@@ -532,6 +552,8 @@ def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
         new_list.append(PrimaryHDU(header=hdulist[0].header))
         image = ImageHDU(header=hdulist[0].header, data=hdulist[0].data)
         # Fudge due to apparent issues with assigning ImageHDU from data
+        # TODO: protected members
+        # pylint: disable=protected-access
         image._orig_bscale = hdulist[0]._orig_bscale
         image._orig_bzero = hdulist[0]._orig_bzero
 
@@ -575,20 +597,31 @@ def read_fits(cls, source, extname_parser=None):
         hdulist = fits.open(
             source, memmap=True, do_not_scale_image_data=True, mode="readonly"
         )
+
         ad.path = source
+
     else:
         hdulist = source
+
         try:
             ad.path = source[0].header.get("ORIGNAME")
-        except AttributeError:
+
+        except AttributeError as err:
+            logging.info("Attribute error in read_fits: %s", err)
             ad.path = None
 
+    # TODO: This is a hack to get around the fact that we don't have a
+    # proper way to pass the original filename to the object. This is
+    # needed for the writer to be able to write the ORIGNAME keyword.
+    # pylint: disable=protected-access
     _file = hdulist._file
+
     hdulist = _prepare_hdulist(
         hdulist,
         default_extension=DEFAULT_EXTENSION,
         extname_parser=extname_parser,
     )
+
     if _file is not None:
         hdulist._file = _file
 
@@ -613,11 +646,14 @@ def read_fits(cls, source, extname_parser=None):
     sci_units = [hdu for hdu in hdulist[1:] if hdu.name == DEFAULT_EXTENSION]
 
     seen_vers = []
-    for idx, hdu in enumerate(sci_units):
+
+    for hdu in sci_units:
         seen.add(hdu)
         ver = hdu.header.get("EXTVER", -1)
+
         if ver > -1 and seen_vers.count(ver) == 1:
-            LOGGER.warning(f"Multiple SCI extension with EXTVER {ver}")
+            LOGGER.warning("Multiple SCI extension with EXTVER %s", ver)
+
         seen_vers.append(ver)
         parts = {
             "data": hdu,
@@ -718,6 +754,9 @@ def ad_to_hdulist(ad):
 
     # Find the maximum EXTVER for extensions that belonged with this
     # object if it was read from a FITS file
+    # TODO: Is there a way to access _nddata without using the protected
+    # variable? Should it be a protected variable?
+    # pylint: disable=protected-access
     maxver = max(
         (
             nd.meta["header"].get("EXTVER", 0)
@@ -824,7 +863,7 @@ def write_fits(ad, filename, overwrite=False):
     hdul.writeto(filename, overwrite=overwrite)
 
 
-def windowedOp(
+def windowed_operation(
     func,
     sequence,
     kernel,
@@ -867,12 +906,14 @@ def windowedOp(
     def generate_boxes(shape, kernel):
         if len(shape) != len(kernel):
             raise AssertionError(
-                "Incompatible shape ({}) and kernel ({})".format(shape, kernel)
+                f"Incompatible shape ({shape}) and kernel ({kernel})"
             )
+
         ticks = [
             [(x, x + step) for x in range(0, axis, step)]
             for axis, step in zip(shape, kernel)
         ]
+
         return list(cart_product(*ticks))
 
     if shape is None:
@@ -985,13 +1026,11 @@ def wcs_to_asdftablehdu(wcs, extver=None):
     # relevant YAML subsection and an ASDF file handles the "tags" properly.
     try:
         af = asdf.AsdfFile({"wcs": wcs})
-    except jsonschema.exceptions.ValidationError:
+    except jsonschema.exceptions.ValidationError as err:
         # (The original traceback also gets printed here)
         raise TypeError(
-            "Cannot serialize model(s) for 'WCS' extension {}".format(
-                extver or ""
-            )
-        )
+            f"Cannot serialize model(s) for 'WCS' extension " f"{extver or ''}"
+        ) from err
 
     # ASDF can only dump YAML to a binary file object, so do that and read
     # the contents back from it for storage in a FITS extension:
@@ -1006,25 +1045,31 @@ def wcs_to_asdftablehdu(wcs, extver=None):
     # saving as binary in the unexpected event that this is not possible):
     try:
         wcsbuf = wcsbuf.decode("ascii").splitlines()
-    except UnicodeDecodeError:
+
+    except UnicodeDecodeError as err:
         # This should not happen, but if the ASDF contains binary data in
         # spite of the 'inline' option above, we have to dump the bytes to
         # a non-human-readable binary table rather than an ASCII one:
         LOGGER.warning(
-            "Could not convert WCS {} ASDF to ASCII; saving table "
-            "as binary".format(extver or "")
+            "Could not convert WCS %s ASDF to ASCII; saving table "
+            "as binary (error was %s)",
+            extver or "",
+            err,
         )
+
         hduclass = BinTableHDU
         fmt = "B"
         wcsbuf = np.frombuffer(wcsbuf, dtype=np.uint8)
+
     else:
         hduclass = TableHDU
-        fmt = "A{}".format(max(len(line) for line in wcsbuf))
+        fmt = f"A{max(len(line) for line in wcsbuf)}"
 
     # Construct the FITS table extension:
     col = Column(
         name="gWCS", format=fmt, array=wcsbuf, ascii=hduclass is TableHDU
     )
+
     return hduclass.from_columns([col], name="WCS", ver=extver)
 
 
@@ -1039,11 +1084,15 @@ def asdftablehdu_to_wcs(hdu):
     if isinstance(hdu, (TableHDU, BinTableHDU)):
         try:
             colarr = hdu.data["gWCS"]
-        except KeyError:
+
+        except KeyError as err:
             LOGGER.warning(
-                "Ignoring 'WCS' extension {} with no 'gWCS' table "
-                "column".format(ver)
+                "Ignoring 'WCS' extension %s with no 'gWCS' table "
+                "column (error was %s)",
+                ver,
+                err,
             )
+
             return
 
         # If this table column contains text strings as expected, join the rows
@@ -1069,29 +1118,34 @@ def asdftablehdu_to_wcs(hdu):
             # Try to extract a 'wcs' entry from the YAML:
             try:
                 af = asdf.open(fd)
-            except Exception:
+            except IOError:
                 LOGGER.warning(
-                    "Ignoring 'WCS' extension {}: failed to parse "
-                    "ASDF.\nError was as follows:\n{}".format(
-                        ver, traceback.format_exc()
-                    )
+                    "Ignoring 'WCS' extension %s: failed to parse "
+                    "ASDF.\nError was as follows:\n%s",
+                    ver,
+                    traceback.format_exc(),
                 )
+
                 return
+
             else:
                 with af:
                     try:
                         wcs = af.tree["wcs"]
-                    except KeyError:
+
+                    except KeyError as err:
                         LOGGER.warning(
-                            "Ignoring 'WCS' extension {}: missing "
-                            "'wcs' dict entry.".format(ver)
+                            "Ignoring 'WCS' extension %s: missing "
+                            "'wcs' dict entry. Error was %s",
+                            ver,
+                            err,
                         )
+
                         return
 
     else:
-        LOGGER.warning(
-            "Ignoring non-FITS-table 'WCS' extension {}".format(ver)
-        )
+        LOGGER.warning("Ignoring non-FITS-table 'WCS' extension %s", ver)
+
         return
 
     return wcs
