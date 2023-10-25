@@ -115,10 +115,11 @@ class AstroDataMixin:
                 raise IndexError(
                     "Only one ellipsis can be specified in a slice"
                 )
-            ell_index = slices.index(Ellipsis)
-            slices[ell_index : ell_index + 1] = [slice(None)] * (
-                ndim - len(slices) + 1
-            )
+
+            ell_index = slices.index(Ellipsis) + 1
+            slice_fill = [slice(None)] * (ndim - len(slices) + 1)
+            slices[ell_index:ell_index] = slice_fill
+
         slices.extend([slice(None)] * (ndim - len(slices)))
 
         mods = []
@@ -583,8 +584,14 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         Examples
         ---------
 
-        >>> sec = NDData(np.zeros((100,100)))  # doctest: +SKIP
-        >>> ad[0].nddata.set_section((slice(None,100),slice(None,100)), sec)  # doctest: +SKIP
+        >>> def setup():
+        ...     sec = NDData(np.zeros((100,100)))
+        ...     ad[0].nddata.set_section(
+        ...         (slice(None,100),slice(None,100)),
+        ...         sec
+        ...     )
+        ...
+        >>> setup()  # doctest: +SKIP
 
         """
         self.data[section] = input.data
