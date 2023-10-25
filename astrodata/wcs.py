@@ -1,5 +1,6 @@
 """World Coordinate System (WCS) support for AstroData objects."""
 import functools
+import logging
 import re
 from collections import namedtuple
 from copy import deepcopy
@@ -66,7 +67,8 @@ def fitswcs_to_gwcs(input):
     # transform = gw.make_fitswcs_transform(hdr)
     try:
         transform = make_fitswcs_transform(input)
-    except Exception as e:
+    except Exception as err:
+        logging.warning(f"Could not create gWCS: {err}")
         return None
     outputs = transform.outputs
     try:
@@ -670,17 +672,14 @@ def _is_skysys_consistent(ctype, sky_inmap):
         if ctype[sky_inmap[0]] == item[0]:
             if ctype[sky_inmap[1]] != item[1]:
                 raise ValueError(
-                    "Inconsistent ctype for sky coordinates {0} and {1}".format(
-                        *ctype
-                    )
+                    f"Inconsistent ctype for sky coordinates {ctype}"
                 )
             break
         elif ctype[sky_inmap[1]] == item[0]:
             if ctype[sky_inmap[0]] != item[1]:
                 raise ValueError(
-                    "Inconsistent ctype for sky coordinates {0} and {1}".format(
-                        *ctype
-                    )
+                    f"Inconsistent ctype for sky coordinates "
+                    f"{ctype[0]} and {ctype[1]}"
                 )
             sky_inmap.reverse()
             break

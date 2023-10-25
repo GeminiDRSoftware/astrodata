@@ -426,7 +426,8 @@ class FitsLazyLoadable:
         return (bscale * data + bzero).astype(self.dtype)
 
     def __getitem__(self, sl):
-        # TODO: We may want (read: should) create an empty result array before scaling
+        # TODO: We may want (read: should) create an empty result array before
+        # scaling
         return self._scale(self._obj.section[sl])
 
     @property

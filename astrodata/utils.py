@@ -188,9 +188,8 @@ def returns_list(fn):
                     return ret
                 else:
                     raise IndexError(
-                        "Incompatible numbers of extensions and elements in {}".format(
-                            fn.__name__
-                        )
+                        f"Incompatible numbers of extensions and "
+                        f"elements in {fn.__name__}"
                     )
             else:
                 return [ret] * len(self)

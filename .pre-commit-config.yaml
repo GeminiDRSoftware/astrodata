@@ -36,7 +36,7 @@ repos:
             - --count
             - --show-source
             - --statistics
-            - --exclude="""\.git |
+            - --exclude="""\.git|
               \.__pycache__|
               \.hg|
               \.mypy_cache|
@@ -47,7 +47,8 @@ repos:
               build|
               dist|
               docs|
-              tests"""
+              tests|
+              testing"""
 
     -   id: flake8
         args:
