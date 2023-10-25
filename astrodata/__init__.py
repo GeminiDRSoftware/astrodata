@@ -41,5 +41,6 @@ factory = AstroDataFactory()
 # (if we're dealing with a FITS file)
 factory.add_class(AstroData)
 
+# TODO: Need to replace this with a name that doesn't override the builtin
 open = factory.get_astro_data
 create = factory.create_from_scratch
