@@ -52,7 +52,7 @@ repos:
 
     -   id: flake8
         args:
-            - --max-line-length=80
+            - --max-line-length=79
             - --count
             - --exit-zero
             - --statistics

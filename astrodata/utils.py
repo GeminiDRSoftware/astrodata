@@ -1,5 +1,6 @@
 """Utility functions and classes for AstroData objects."""
 import inspect
+import logging
 import warnings
 from collections import namedtuple
 from functools import wraps
@@ -60,12 +61,15 @@ def normalize_indices(slc, nitems):
         if isinstance(slc, INTEGER_TYPES):
             slc = (int(slc),)  # slc's type m
             multiple = False
+
         else:
             multiple = True
+
         # Normalize negative indices...
         indices = [(x if x >= 0 else nitems + x) for x in slc]
+
     else:
-        raise ValueError("Invalid index: {}".format(slc))
+        raise ValueError(f"Invalid index: {slc}")
 
     if any(i >= nitems for i in indices):
         raise IndexError("Index out of range")
@@ -106,12 +110,30 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
 
     Examples
     ---------
-    >>> TagSet()
-    TagSet(add=set(), remove=set(), blocked_by=set(), blocks=set(), if_present=set())
+    >>> TagSet()  # doctest: +SKIP
+    TagSet(
+        add=set(),
+        remove=set(),
+        blocked_by=set(),
+        blocks=set(),
+        if_present=set()
+    )
     >>> TagSet({'BIAS', 'CAL'})  # doctest: +SKIP
-    TagSet(add={'BIAS', 'CAL'}, remove=set(), blocked_by=set(), blocks=set(), if_present=set())
+    TagSet(
+        add={'BIAS', 'CAL'},
+        remove=set(),
+        blocked_by=set(),
+        blocks=set(),
+        if_present=set()
+    )
     >>> TagSet(remove={'BIAS', 'CAL'}) # doctest: +SKIP
-    TagSet(add=set(), remove={'BIAS', 'CAL'}, blocked_by=set(), blocks=set(), if_present=set())
+    TagSet(
+        add=set(),
+        remove={'BIAS', 'CAL'},
+        blocked_by=set(),
+        blocks=set(),
+        if_present=set()
+    )
     """
 
     def __new__(
@@ -176,12 +198,20 @@ def returns_list(fn):
         ret = fn(self, *args, **kwargs)
         if self.is_single:
             if isinstance(ret, list):
-                # TODO: log a warning if the list is >1 element
                 if len(ret) > 1:
-                    pass
+                    logging.warning(
+                        "Descriptor %s returned a list "
+                        "of %s elements when operating on "
+                        "a single slice",
+                        fn.__name__,
+                        len(ret),
+                    )
+
                 return ret[0]
+
             else:
                 return ret
+
         else:
             if isinstance(ret, list):
                 if len(ret) == len(self):
@@ -238,9 +268,7 @@ def astro_data_tag(fn):
             if ret is not None:
                 if not isinstance(ret, TagSet):
                     raise TypeError(
-                        "Tag function {} didn't return a TagSet".format(
-                            fn.__name__
-                        )
+                        f"Tag function {fn.__name__} didn't return a TagSet"
                     )
 
                 return TagSet(*tuple(set(s) for s in ret))
@@ -317,7 +345,15 @@ class Section(tuple):
             ]
         )
 
-    def asIRAFsection(self):
+    @deprecated(
+        "Renamed to 'as_iraf_section', this is just an alias for now, "
+        "and will be removed in a future version."
+    )
+    def asIRAFsection(self):  # pylint: disable=invalid-name
+        """Deprecated, see as_iraf_section"""
+        return self.as_iraf_section()
+
+    def as_iraf_section(self):
         """Produce string of style '[x1:x2,y1:y2]' that is 1-indexed
         and end-inclusive
         """
