@@ -23,7 +23,7 @@ class AstroDataFactory:
 
     @staticmethod
     @contextmanager
-    def _openFile(source):
+    def _open_file(source):
         """Internal static method that takes a ``source``, assuming that it is
         a string pointing to a file to be opened.
 
@@ -37,38 +37,53 @@ class AstroDataFactory:
         if isinstance(source, (str, os.PathLike)):
             stats = os.stat(source)
             if stats.st_size == 0:
-                LOGGER.warning(f"File {source} is zero size")
+                LOGGER.warning("File %s is zero size", source)
 
             # try vs all handlers
             for func in AstroDataFactory._file_openers:
                 try:
                     fp = func(source)
                     yield fp
-                except Exception:
-                    # Just ignore the error. Assume that it is a not supported
-                    # format and go for the next opener
-                    pass
+
+                except Exception as err:
+                    # TODO: Should be more specific than this.
+                    # Log the exception, if it's a serious error then
+                    # re-raise it, e.g., user exits with Ctrl-C.
+                    LOGGER.error(
+                        "Failed to open %s with %s, got error: %s",
+                        source,
+                        func,
+                        err,
+                    )
+
+                    if isinstance(err, KeyboardInterrupt):
+                        raise err
+
                 else:
                     if hasattr(fp, "close"):
                         fp.close()
+
                     return
+
             raise AstroDataError(
-                "No access, or not supported format for: {}".format(source)
+                f"No access, or not supported format for: {source}"
             )
+
         else:
             yield source
 
-    def addClass(self, cls):
+    def add_class(self, cls):
         """Add a new class to the AstroDataFactory registry. It will be used
         when instantiating an AstroData class for a FITS file.
         """
         if not hasattr(cls, "_matches_data"):
             raise AttributeError(
-                "Class '{}' has no '_matches_data' method".format(cls.__name__)
+                f"Class '{cls.__name__}' has no '_matches_data' method"
             )
+
         self._registry.add(cls)
 
-    def getAstroData(self, source):
+    def get_astro_data(self, source):
         """Takes either a string (with the path to a file) or an HDUList as
         input, and tries to return an AstroData instance.
 
@@ -84,13 +99,25 @@ class AstroDataFactory:
             The file path or HDUList to read.
         """
         candidates = []
-        with self._openFile(source) as opened:
+        with self._open_file(source) as opened:
             for adclass in self._registry:
                 try:
+                    # TODO: accessing protected member
+                    # pylint: disable=protected-access
                     if adclass._matches_data(opened):
                         candidates.append(adclass)
-                except Exception:  # Some problem opening this
-                    pass
+
+                except Exception as err:  # Some problem opening this
+                    # TODO: Should be more specific than this.
+                    if isinstance(err, KeyboardInterrupt):
+                        raise err
+
+                    LOGGER.error(
+                        "Failed to open %s with %s, got error: %s",
+                        source,
+                        adclass,
+                        err,
+                    )
 
         # For every candidate in the list, remove the ones that are base
         # classes for other candidates. That way we keep only the more
@@ -99,18 +126,20 @@ class AstroDataFactory:
         for cnd in candidates:
             if any(cnd in x.mro() for x in candidates if x != cnd):
                 continue
+
             final_candidates.append(cnd)
 
         if len(final_candidates) > 1:
             raise AstroDataError(
                 "More than one class is candidate for this dataset"
             )
+
         elif not final_candidates:
             raise AstroDataError("No class matches this dataset")
 
         return final_candidates[0].read(source)
 
-    def createFromScratch(self, phu, extensions=None):
+    def create_from_scratch(self, phu, extensions=None):
         """Creates an AstroData object from a collection of objects.
 
         Parameters
@@ -126,12 +155,15 @@ class AstroDataFactory:
         if phu is not None:
             if isinstance(phu, fits.PrimaryHDU):
                 lst.append(deepcopy(phu))
+
             elif isinstance(phu, fits.Header):
                 lst.append(fits.PrimaryHDU(header=deepcopy(phu)))
+
             elif isinstance(phu, (dict, list, tuple)):
                 p = fits.PrimaryHDU()
                 p.header.update(phu)
                 lst.append(p)
+
             else:
                 raise ValueError(
                     "phu must be a PrimaryHDU or a valid header object"
@@ -142,4 +174,4 @@ class AstroDataFactory:
             for ext in extensions:
                 lst.append(ext)
 
-        return self.getAstroData(lst)
+        return self.get_astro_data(lst)

@@ -46,7 +46,7 @@ class AstroDataMyInstrument(AstroData):
 
 
 def setup_module():
-    factory.addClass(AstroDataMyInstrument)
+    factory.add_class(AstroDataMyInstrument)
 
 
 def teardown_module():

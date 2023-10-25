@@ -1367,11 +1367,16 @@ class AstroData:
         self.filename = (prefix or "") + root + (suffix or "") + filetype
 
     def _crop_nd(self, nd, x1, y1, x2, y2):
-        nd.data = nd.data[y1 : y2 + 1, x1 : x2 + 1]
+        y_start, y_end = y1, y2 + 1
+        x_start, x_end = x1, x2 + 1
+
+        nd.data = nd.data[y_start:y_end, x_start:x_end]
+
         if nd.uncertainty is not None:
-            nd.uncertainty = nd.uncertainty[y1 : y2 + 1, x1 : x2 + 1]
+            nd.uncertainty = nd.uncertainty[y_start:y_end, x_start:x_end]
+
         if nd.mask is not None:
-            nd.mask = nd.mask[y1 : y2 + 1, x1 : x2 + 1]
+            nd.mask = nd.mask[y_start:y_end, x_start:x_end]
 
     def crop(self, x1, y1, x2, y2):
         """Crop the NDData objects given indices.
