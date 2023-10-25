@@ -239,8 +239,8 @@ class NDWindowing:
     def __init__(self, target):
         self._target = target
 
-    def __getitem__(self, slice):
-        return NDWindowingAstroData(self._target, window=slice)
+    def __getitem__(self, window_slice):
+        return NDWindowingAstroData(self._target, window=window_slice)
 
 
 class NDWindowingAstroData(
@@ -251,9 +251,13 @@ class NDWindowingAstroData(
     ``mask`` return clipped data.
     """
 
+    # pylint: disable=super-init-not-called
     def __init__(self, target, window):
         self._target = target
         self._window = window
+
+        # TODO: __init__ exists in parent classes, but we don't call it.
+        #       Is this a problem?
 
     def __getattr__(self, attribute):
         """Allow access to attributes stored in self.meta['other'], as we do
@@ -277,14 +281,20 @@ class NDWindowingAstroData(
 
     @property
     def wcs(self):
+        # TODO: Accessing protected member from _target
+        # pylint: disable=protected-access
         return self._target._slice_wcs(self._window)
 
     @property
     def data(self):
+        # TODO: Accessing protected member from _target
+        # pylint: disable=protected-access
         return self._target._get_simple("_data", section=self._window)
 
     @property
     def uncertainty(self):
+        # TODO: Accessing protected member from _target
+        # pylint: disable=protected-access
         return self._target._get_uncertainty(section=self._window)
 
     @property
@@ -294,6 +304,8 @@ class NDWindowingAstroData(
 
     @property
     def mask(self):
+        # TODO: Accessing protected member from _target
+        # pylint: disable=protected-access
         return self._target._get_simple("_mask", section=self._window)
 
 
@@ -419,6 +431,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         -----
         The ``uncertainty`` and ``variance`` parameters are mutually exclusive.
         """
+        # TODO: window is not used anywhere. Why is it in the args?
         if variance is not None:
             if uncertainty is not None:
                 # TODO: Add error message.
@@ -536,6 +549,8 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
     @uncertainty.setter
     def uncertainty(self, value):
         if value is not None and not is_lazy(value):
+            # TODO: Accessing protected member from value
+            # pylint: disable=protected-access
             if value._parent_nddata is not None:
                 value = value.__class__(value, copy=False)
             value.parent_nddata = self
@@ -566,7 +581,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
             ADVarianceUncertainty(value) if value is not None else None
         )
 
-    def set_section(self, section, input):
+    def set_section(self, section, input_data):
         """Sets only a section of the data. This method is meant to prevent
         fragmentation in the Python heap, by reusing the internal structures
         instead of replacing them with new ones.
@@ -576,7 +591,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         section : ``slice``
             The area that will be replaced
 
-        input : ``NDData``-like instance
+        input_data : ``NDData``-like instance
             This object needs to implement at least ``data``, ``uncertainty``,
             and ``mask``. Their entire contents will replace the data in the
             area defined by ``section``.
@@ -594,11 +609,13 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         >>> setup()  # doctest: +SKIP
 
         """
-        self.data[section] = input.data
+        self.data[section] = input_data.data
+
         if self.uncertainty is not None:
-            self.uncertainty.array[section] = input.uncertainty.array
+            self.uncertainty.array[section] = input_data.uncertainty.array
+
         if self.mask is not None:
-            self.mask[section] = input.mask
+            self.mask[section] = input_data.mask
 
     def __repr__(self):
         if is_lazy(self._data):
@@ -606,6 +623,8 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         else:
             return super().__repr__()
 
+    # This is a common idiom in numpy, so keep the name.
+    # pylint: disable=invalid-name
     @property
     def T(self):
         """Transpose the data. This is not a copy of the data."""
