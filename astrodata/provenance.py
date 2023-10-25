@@ -345,11 +345,10 @@ def provenance_summary(ad, provenance=True, history=True):
                 start = row[timestamp_start_col_idx]
                 stop = row[timestamp_stop_col_idx]
                 first = True
-                try:
-                    parseargs = json.loads(args)
-                    args = json.dumps(parseargs, indent=4)
-                except Exception:
-                    pass  # ok, just use whatever non-json was in there
+
+                parseargs = json.loads(args)
+                args = json.dumps(parseargs, indent=4)
+
                 for argrow in args.split("\n"):
                     if first:
                         retval += (
@@ -358,11 +357,14 @@ def provenance_summary(ad, provenance=True, history=True):
                             f"{start:<{timestamp_start_col_size}} "
                             f"{stop}\n"
                         )
+
                     else:
                         retval += f'{"":<{primitive_col_size}} {argrow}\n'
                     # prep for additional arg rows without duplicating the
                     # other values
                     first = False
+
         else:
             retval += "No Provenance History found.\n"
+
     return retval
