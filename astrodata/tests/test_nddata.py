@@ -1,16 +1,21 @@
-import numpy as np
-import pytest
-from numpy.testing import assert_array_almost_equal, assert_array_equal
+import warnings
 
-from astrodata.fits import windowed_operation
+import pytest
+
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+import numpy as np
+
 from astrodata import wcs as adwcs
+from astrodata.fits import windowed_operation
 from astrodata.nddata import ADVarianceUncertainty, NDAstroData
+
 from astropy.io import fits
-from astropy.nddata import NDData, VarianceUncertainty
 from astropy.modeling import models
+from astropy.nddata import NDData, VarianceUncertainty
 from astropy.table import Table
-from gwcs.wcs import WCS as gWCS
+
 from gwcs.coordinate_frames import Frame2D
+from gwcs.wcs import WCS as gWCS
 
 
 @pytest.fixture
@@ -104,9 +109,9 @@ def test_uncertainty_negative_numbers():
     arr = np.zeros(5)
 
     # No warning if all 0
-    with pytest.warns(None) as w:
+    with warnings.catch_warnings() as w:
+        warnings.simplefilter("error")
         ADVarianceUncertainty(arr)
-    assert len(w) == 0
 
     arr[2] = -0.001
 
