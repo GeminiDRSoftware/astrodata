@@ -96,7 +96,7 @@ def test_extver(tmp_path):
         ad.append(np.zeros((4, 5)))
     ad.write(testfile)
 
-    ad = astrodata.open(testfile)
+    ad = astrodata.from_file(testfile)
     ext = ad[2]
     assert ext.hdr["EXTNAME"] == "SCI"
     assert ext.hdr["EXTVER"] == 3
@@ -122,7 +122,7 @@ def test_extver2(tmp_path):
     ad.append(fits.ImageHDU(data=data + 7, header=fits.Header({"EXTVER": 3})))
     ad.write(testfile)
 
-    ad = astrodata.open(testfile)
+    ad = astrodata.from_file(testfile)
     assert [hdr["EXTVER"] for hdr in ad.hdr] == [1, 2, 3, 4]
 
 
@@ -132,8 +132,8 @@ def test_extver3(tmp_path, GSAOI_DARK):
     """
     testfile = tmp_path / "test.fits"
 
-    ad1 = astrodata.open(GSAOI_DARK)
-    ad2 = astrodata.open(GSAOI_DARK)
+    ad1 = astrodata.from_file(GSAOI_DARK)
+    ad2 = astrodata.from_file(GSAOI_DARK)
 
     del ad1[2]
     ad1.append(ad2[2])
@@ -141,15 +141,13 @@ def test_extver3(tmp_path, GSAOI_DARK):
 
     ad1.write(testfile)
 
-    ad = astrodata.open(testfile)
+    ad = astrodata.from_file(testfile)
     assert [hdr["EXTVER"] for hdr in ad.hdr] == [1, 2, 4, 5, 6]
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_can_add_and_del_extension(GMOSN_SPECT):
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
     original_size = len(ad)
 
     ourarray = np.array([(1, 2, 3), (11, 12, 13), (21, 22, 23)])
@@ -160,11 +158,9 @@ def test_can_add_and_del_extension(GMOSN_SPECT):
     assert len(ad) == original_size
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_slice(GMOSN_SPECT):
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
     assert ad.is_sliced is False
 
     n_ext = len(ad)
@@ -215,11 +211,9 @@ def test_slice(GMOSN_SPECT):
         ext[1]
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_slice_single_element(GMOSN_SPECT):
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
     assert ad.is_sliced is False
 
     metadata = ("SCI", 2)
@@ -238,11 +232,9 @@ def test_slice_single_element(GMOSN_SPECT):
     assert ext.hdr["EXTVER"] == metadata[1]
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_slice_multiple(GMOSN_SPECT):
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
 
     metadata = ("SCI", 2), ("SCI", 3)
     slc = ad[1, 2]
@@ -296,11 +288,9 @@ def test_slice_multiple(GMOSN_SPECT):
     del ext.bar
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_slice_data(GMOSN_SPECT):
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
 
     slc = ad[1, 2]
     match = (
@@ -345,11 +335,9 @@ def test_slice_data(GMOSN_SPECT):
     assert slc.nddata[0].mask is ext.mask
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_phu(NIFS_DARK):
-    ad = astrodata.open(NIFS_DARK)
+    ad = astrodata.from_file(NIFS_DARK)
 
     # The result of this depends if gemini_instruments was imported or not
     # assert ad.descriptors == ('instrument', 'object', 'telescope')
@@ -370,11 +358,9 @@ def test_phu(NIFS_DARK):
         assert "DETECTOR" not in ad.phu
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_paths(tmpdir, NIFS_DARK):
-    ad = astrodata.open(NIFS_DARK)
+    ad = astrodata.from_file(NIFS_DARK)
     assert ad.orig_filename == "N20160727S0077.fits"
 
     srcdir = os.path.dirname(NIFS_DARK)
@@ -412,13 +398,11 @@ def test_paths(tmpdir, NIFS_DARK):
         ad.write()
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_from_hdulist(NIFS_DARK):
     with fits.open(NIFS_DARK) as hdul:
         assert "ORIGNAME" not in hdul[0].header
-        ad = astrodata.open(hdul)
+        ad = astrodata.from_file(hdul)
         assert ad.path is None
         assert ad.instrument() == "NIFS"
         assert ad.object() == "Dark"
@@ -429,7 +413,7 @@ def test_from_hdulist(NIFS_DARK):
     with fits.open(NIFS_DARK) as hdul:
         # Make sure that when ORIGNAME is set, astrodata use it
         hdul[0].header["ORIGNAME"] = "N20160727S0077.fits"
-        ad = astrodata.open(hdul)
+        ad = astrodata.from_file(hdul)
         assert ad.path == "N20160727S0077.fits"
 
 
@@ -454,7 +438,7 @@ def test_from_hdulist2():
     with pytest.warns(
         UserWarning, match="Skip HDU .* because it has no EXTNAME"
     ):
-        ad = astrodata.open(hdul)
+        ad = astrodata.from_file(hdul)
 
     assert len(ad) == 1
     assert ad.phu["INSTRUME"] == "FISH"
@@ -478,7 +462,7 @@ def test_from_hdulist3():
         ]
     )
 
-    ad = astrodata.open(hdul)
+    ad = astrodata.from_file(hdul)
 
     assert hasattr(ad, "ASCIITAB")
     assert len(ad.ASCIITAB) == 2
@@ -500,7 +484,7 @@ def test_can_make_and_write_ad_object(tmpdir):
     ad.write(testfile)
 
     # Opens file again and tests data is same as above
-    adnew = astrodata.open(testfile)
+    adnew = astrodata.from_file(testfile)
     assert np.array_equal(adnew[0].data, np.arange(10))
 
 
@@ -527,7 +511,7 @@ def test_can_append_table_and_access_data(capsys, tmpdir):
     # Write file and test it exists properly
     testfile = str(tmpdir.join("created_fits_file.fits"))
     ad.write(testfile)
-    adnew = astrodata.open(testfile)
+    adnew = astrodata.from_file(testfile)
     assert adnew.exposed == {"BOB"}
     assert len(adnew.BOB) == 10
 
@@ -537,11 +521,9 @@ def test_can_append_table_and_access_data(capsys, tmpdir):
         del ad.BOB
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_attributes(GSAOI_DARK):
-    ad = astrodata.open(GSAOI_DARK)
+    ad = astrodata.from_file(GSAOI_DARK)
     assert ad.shape == [(2048, 2048)] * 4
     assert [arr.shape for arr in ad.data] == [(2048, 2048)] * 4
     assert [arr.dtype for arr in ad.data] == ["f"] * 4
@@ -571,11 +553,9 @@ def test_attributes(GSAOI_DARK):
         ad.mask = 1
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_set_a_keyword_on_phu_deprecated(NIFS_DARK):
-    ad = astrodata.open(NIFS_DARK)
+    ad = astrodata.from_file(NIFS_DARK)
     # Test that setting DETECTOR as an attribute doesn't modify the header
     ad.phu.DETECTOR = "FooBar"
     assert ad.phu.DETECTOR == "FooBar"
@@ -585,11 +565,9 @@ def test_set_a_keyword_on_phu_deprecated(NIFS_DARK):
 # Regression:
 # Make sure that references to associated
 # extension objects are copied across
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_do_arith_and_retain_features(NIFS_DARK):
-    ad = astrodata.open(NIFS_DARK)
+    ad = astrodata.from_file(NIFS_DARK)
     ad[0].NEW_FEATURE = np.array([1, 2, 3, 4, 5])
     ad2 = ad * 5
     assert_array_equal(ad[0].NEW_FEATURE, ad2[0].NEW_FEATURE)
@@ -652,12 +630,10 @@ def test_update_filename2():
     assert ad.filename == "origfile_bar.fits"
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_read_a_keyword_from_phu_deprecated():
     """Test deprecated methods to access headers"""
-    ad = astrodata.open(download_from_archive("N20110826S0336.fits"))
+    ad = astrodata.from_file(download_from_archive("N20110826S0336.fits"))
 
     with pytest.raises(AttributeError):
         assert ad.phu.DETECTOR == "GMOS + Red1"
@@ -681,7 +657,7 @@ def test_read_invalid_file(tmpdir, caplog):
         pass
 
     with pytest.raises(astrodata.AstroDataError):
-        astrodata.open(testfile)
+        astrodata.from_file(testfile)
 
     assert caplog.records[0].message.endswith("is zero size")
 
@@ -690,7 +666,7 @@ def test_read_empty_file(tmpdir):
     testfile = str(tmpdir.join("test.fits"))
     hdr = fits.Header({"INSTRUME": "darkimager", "OBJECT": "M42"})
     fits.PrimaryHDU(header=hdr).writeto(testfile)
-    ad = astrodata.open(testfile)
+    ad = astrodata.from_file(testfile)
     assert len(ad) == 0
     assert ad.object() == "M42"
     assert ad.instrument() == "darkimager"
@@ -700,20 +676,18 @@ def test_read_file(tmpdir):
     testfile = str(tmpdir.join("test.fits"))
     hdr = fits.Header({"INSTRUME": "darkimager", "OBJECT": "M42"})
     fits.PrimaryHDU(header=hdr).writeto(testfile)
-    ad = astrodata.open(testfile)
+    ad = astrodata.from_file(testfile)
     assert len(ad) == 0
     assert ad.object() == "M42"
     assert ad.instrument() == "darkimager"
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_header_collection(GMOSN_SPECT):
     ad = astrodata.create({})
     assert ad.hdr is None
 
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
     assert len(ad) == 12
     assert len([hdr for hdr in ad.hdr]) == 12
 
@@ -763,18 +737,16 @@ def test_header_collection(GMOSN_SPECT):
     ):
         ad.hdr.set_comment("FOO", "A comment")
 
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
     hdr = ad.hdr
     assert len(list(hdr)) == 12
     hdr._insert(1, fits.Header({"INSTRUME": "darkimager", "OBJECT": "M42"}))
     assert len(list(hdr)) == 13
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_header_deprecated(GMOSN_SPECT):
-    ad = astrodata.open(GMOSN_SPECT)
+    ad = astrodata.from_file(GMOSN_SPECT)
     with pytest.warns(AstroDataDeprecationWarning):
         warnings.simplefilter("always", AstroDataDeprecationWarning)
         header = ad.header
@@ -788,11 +760,9 @@ def test_header_deprecated(GMOSN_SPECT):
     assert header[0]["ORIGNAME"] == "N20170529S0168.fits"
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_read_no_extensions(GRACES_SPECT):
-    ad = astrodata.open(GRACES_SPECT)
+    ad = astrodata.from_file(GRACES_SPECT)
     assert len(ad) == 1
     # header is duplicated for .phu and extension's header
     assert len(ad.phu) == 181
@@ -877,11 +847,9 @@ def test_add_table():
     assert_array_equal(ad[0].OTHERTABLE["col0"], ["aa", "bb", "cc"])
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_copy(GSAOI_DARK, capsys):
-    ad = astrodata.open(GSAOI_DARK)
+    ad = astrodata.from_file(GSAOI_DARK)
     ad.TABLE = Table([["a", "b", "c"], [1, 2, 3]])
     ad[0].MYTABLE = Table([["aa", "bb", "cc"], [1, 2, 3]])
 
@@ -909,11 +877,9 @@ def test_copy(GSAOI_DARK, capsys):
     assert captured.out.splitlines()[1:] == captured2.out.splitlines()[1:]
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_crop(GSAOI_DARK):
-    ad = astrodata.open(GSAOI_DARK)
+    ad = astrodata.from_file(GSAOI_DARK)
     assert set(ad.shape) == {(2048, 2048)}
 
     ad.crop(0, 0, 5, 10)
@@ -921,11 +887,9 @@ def test_crop(GSAOI_DARK):
     assert set(ad.shape) == {(11, 6)}
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@pytest.mark.dragons_remote_data
 def test_crop_ext(GSAOI_DARK):
-    ad = astrodata.open(GSAOI_DARK)
+    ad = astrodata.from_file(GSAOI_DARK)
     ext = ad[0]
     ext.uncertainty = ADVarianceUncertainty(np.ones(ext.shape))
     ext.mask = np.ones(ext.shape, dtype=np.uint8)
@@ -1037,7 +1001,7 @@ def test_round_trip_gwcs(tmpdir):
     # Save & re-load the AstroData instance with its new WCS attribute:
     testfile = str(tmpdir.join("round_trip_gwcs.fits"))
     ad1.write(testfile)
-    ad2 = astrodata.open(testfile)
+    ad2 = astrodata.from_file(testfile)
 
     wcs1 = ad1[0].nddata.wcs
     wcs2 = ad2[0].nddata.wcs
@@ -1084,7 +1048,7 @@ def test_uint_data(dtype, tmp_path):
     data = np.arange(10, dtype=np.int16)
     fits.writeto(testfile, data)
 
-    ad = astrodata.open(str(testfile))
+    ad = astrodata.from_file(str(testfile))
     assert ad[0].data.dtype == data.dtype
     assert_array_equal(ad[0].data, data)
 
