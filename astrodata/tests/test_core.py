@@ -233,7 +233,7 @@ def test_write_and_read(tmpdir, capsys):
     testfile = str(tmpdir.join("testfile.fits"))
     ad.write(testfile)
 
-    ad = astrodata.open(testfile)
+    ad = astrodata.from_file(testfile)
     ad.info()
     captured = capsys.readouterr()
     assert captured.out.splitlines()[3:] == [
