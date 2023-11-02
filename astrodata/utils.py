@@ -364,7 +364,7 @@ class Section(tuple):
         )
 
     @deprecated(
-        "Renamed to 'as_iraf_section', this is just an alias for now, "
+        "Renamed to 'as_iraf_section', this is just an alias for now "
         "and will be removed in a future version."
     )
     def asIRAFsection(self):  # pylint: disable=invalid-name
