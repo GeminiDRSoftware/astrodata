@@ -3,6 +3,7 @@
 import os
 import shutil
 import urllib
+import functools
 import warnings
 import xml.etree.ElementTree as et
 
@@ -272,6 +273,73 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
         )
 
 
+import functools
+import warnings
+
+import functools
+import warnings
+
+
+def fail_once(message):
+    """Decorator that catches an exception and raises a warning with the given
+    message.
+
+    Parameters
+    ----------
+    message : str
+        The warning message to be raised if an exception is caught.
+
+    Returns
+    -------
+    function
+        A decorated function that catches an exception and raises a warning
+        with the given message.
+
+    Examples
+    --------
+    (using two > to avoid doctest failure)
+    >> import sys; sys.stderr = sys.stdout
+    >> @fail_once("Something went wrong!")
+    .. def my_func():
+    ..     raise ValueError("Oops!")
+    ..
+    >> my_func()
+    /.../testing.py:303: UserWarning: Something went wrong!
+        Got ValueError - Oops!
+
+    Notes
+    -----
+    Do not use this function outside of testing. It is meant to be used in
+    tests to catch exceptions and raise warnings instead of failing the test.
+    It will catch all Exceptions, so it should be used with caution even within
+    tests.
+    """
+
+    def decorator(func):
+        failed = False
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            nonlocal failed
+
+            if failed:
+                return
+
+            try:
+                return func(*args, **kwargs)
+
+            except Exception as err:
+                failed = True
+                errname = type(err).__name__
+                warnings.warn(f"{message} \n\tGot {errname} - {err}")
+                return
+
+        return wrapper
+
+    return decorator
+
+
+@fail_once("Could not download from the Gemini archive.")
 def download_from_archive(
     filename, sub_path="raw_files", env_var="DRAGONS_TEST"
 ):
