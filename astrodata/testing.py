@@ -1,9 +1,9 @@
 """Fixtures to be used in tests in DRAGONS
 """
-
 import os
 import shutil
 import urllib
+import warnings
 import xml.etree.ElementTree as et
 
 import numpy as np
@@ -14,7 +14,52 @@ from astropy.utils.data import download_file
 # from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
 # from gempy.library import astrotools as at
 
+# TODO: This is only here to handle specific dragons tests. It should be
+# removed once the tests are updated.
+try:
+    from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
+
+except ImportError:
+    timestamp_keys = {}
+    warnings.warn(
+        "Could not import gemini timestamp keys, install DRAGONS"
+        " to fix this issue."
+    )
+
 URL = "https://archive.gemini.edu/file/"
+
+
+def get_corners(shape):
+    """This is a recursive function to calculate the corner indices
+    of an array of the specified shape.
+
+    Parameters
+    ----------
+    shape : tuple of ints
+        Length of the dimensions of the array
+
+    Taken directly from DRAGONS repository here:
+    https://github.com/GeminiDRSoftware/DRAGONS
+    (11/2/2023)
+
+    This is required for a couple of the legacy tests.
+    """
+    if not type(shape) == tuple:
+        raise TypeError("get_corners argument is non-tuple")
+
+    if len(shape) == 1:
+        corners = [(0,), (shape[0] - 1,)]
+    else:
+        shape_less1 = shape[1 : len(shape)]
+        corners_less1 = get_corners(shape_less1)
+        corners = []
+        for corner in corners_less1:
+            newcorner = (0,) + corner
+            corners.append(newcorner)
+            newcorner = (shape[0] - 1,) + corner
+            corners.append(newcorner)
+
+    return corners
 
 
 def assert_most_close(
@@ -186,7 +231,7 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
 
     # Compare the constituent model definitions:
     for m1, m2 in zip(model1, model2):
-        assert type(m1) == type(m2)
+        assert type(m1) is type(m2)
         assert len(m1.parameters) == len(m2.parameters)
         # NB. For 1D models the degrees match if the numbers of parameters do
         if hasattr(m1, "x_degree"):
@@ -214,7 +259,7 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
     except NotImplementedError:
         inverse2 = None
 
-    assert type(inverse1) == type(inverse2)
+    assert type(inverse1) is type(inverse2)
 
     # Compare inverses only if they exist and are not the forward model itself:
     if inverse1 is None or (inverse1 is model1 and inverse2 is model2):
@@ -569,22 +614,28 @@ class ADCompare:
                     f"Slice {i} frames differ: {frames1} v {frames2}"
                 )
                 return errorlist
+
             for frame in frames1:
                 frame1, frame2 = getattr(wcs1, frame), getattr(wcs2, frame)
                 try:
                     compare_frames(frame1, frame2)
+
                 except AssertionError:
                     errorlist.compare(
                         f"Slice {i} {frame} differs: " f"{frame1} v {frame2}"
                     )
-            corners = at.get_corners(ext1.shape)
+
+            corners = get_corners(ext1.shape)
             world1, world2 = wcs1(*zip(*corners)), wcs2(*zip(*corners))
+
             try:
                 np.testing.assert_allclose(world1, world2)
+
             except AssertionError:
                 errorlist.append(
                     f"Slice {i} world coords differ: {world1} v {world2}"
                 )
+
         return errorlist
 
     def format_errordict(self, errordict):
