@@ -28,6 +28,7 @@ dynamic = ["version"]
 test = [
     "pytest",
     "pytest-doctestplus",
+    "pytest-cov",
     "coverage"
 ]
 
@@ -40,6 +41,7 @@ dev = [
     "sphinx-automodapi",
     "coverage",
     "pytest",
+    "pytest-cov",
     "pytest-doctestplus",
 ]
 
