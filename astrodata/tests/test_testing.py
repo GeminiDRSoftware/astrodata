@@ -11,7 +11,7 @@ from astrodata.testing import assert_same_class, download_from_archive
 
 
 def test_download_from_archive_raises_ValueError_if_envvar_does_not_exists():
-    with pytest.raises(ValueError):
+    with pytest.warns(UserWarning):
         download_from_archive("N20180304S0126.fits", env_var="")
 
 
