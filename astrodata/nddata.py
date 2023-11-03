@@ -223,7 +223,6 @@ class FakeArray:
         self.dtype = np.float32  # Same here
 
     def __getitem__(self, index):
-        # FAKE NEWS!
         return None
 
     def __array__(self):
