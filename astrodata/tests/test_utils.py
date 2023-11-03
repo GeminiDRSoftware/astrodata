@@ -1,10 +1,13 @@
-import numpy as np
-import pytest
-import astropy.units as u
 from astropy.io import fits
 from astropy.table import Table
-from astrodata.fits import header_for_table, card_filter, update_header
+import astropy.units as u
+
+import numpy as np
+
+import pytest
+
 from astrodata import Section
+from astrodata.fits import header_for_table, card_filter, update_header
 
 
 def test_header_for_table():
