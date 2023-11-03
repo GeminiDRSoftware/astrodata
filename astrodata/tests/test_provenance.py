@@ -6,7 +6,7 @@ import pytest
 
 import astrodata
 from astrodata import fits
-from astrodata.testing import download_from_archive
+from astrodata.testing import download_from_archive, skip_if_download_none
 from astrodata.provenance import (
     add_provenance,
     add_history,
@@ -157,11 +157,10 @@ def BPM_PROVHISTORY():
     return download_from_archive("bpm_20220128_gmos-s_Ham_11_full_12amp.fits")
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@skip_if_download_none
+@pytest.mark.dragons_remote_data
 def test_convert_provhistory(tmpdir, BPM_PROVHISTORY):
-    ad = astrodata.open(BPM_PROVHISTORY)
+    ad = astrodata.from_file(BPM_PROVHISTORY)
 
     # This file (should) use the old PROVHISTORY extname
     assert hasattr(ad, "PROVHISTORY")
@@ -179,7 +178,7 @@ def test_convert_provhistory(tmpdir, BPM_PROVHISTORY):
     ad.write()
     assert os.path.exists(testfile)
 
-    ad2 = astrodata.open(testfile)
+    ad2 = astrodata.from_file(testfile)
     assert hasattr(ad2, "HISTORY")
     assert not hasattr(ad2, "PROVHISTORY")
 
