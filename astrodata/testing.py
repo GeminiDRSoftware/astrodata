@@ -4,13 +4,15 @@ import os
 import shutil
 import urllib
 import functools
+import pytest
 import warnings
+import unittest
 import xml.etree.ElementTree as et
 
-import numpy as np
-import pytest
 from astropy.table import Table
 from astropy.utils.data import download_file
+
+import numpy as np
 
 # from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
 # from gempy.library import astrotools as at
@@ -22,12 +24,34 @@ try:
 
 except ImportError:
     timestamp_keys = {}
+    DRAGONS_REPOSITORY = "https://github.com/GeminiDRSoftware/DRAGONS"
     warnings.warn(
-        "Could not import gemini timestamp keys, install DRAGONS"
-        " to fix this issue."
+        f"Could not import gemini timestamp keys, install DRAGONS"
+        f" to use them. See: {DRAGONS_REPOSITORY}"
     )
 
 URL = "https://archive.gemini.edu/file/"
+
+
+def skip_if_download_none(func):
+    """Skip test if download_from_archive is returning None. Otherwise,
+    continue.
+
+    Used as a wrapper for testing functions. Works with nose, pynose, and
+    pytest.
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        if download_from_archive("N20160727S0077.fits") is None:
+            raise unittest.SkipTest(
+                "Skipping test because download_from_archive returned None"
+            )
+
+        else:
+            return func(*args, **kwargs)
+
+    return wrapper
 
 
 def get_corners(shape):
@@ -45,13 +69,14 @@ def get_corners(shape):
 
     This is required for a couple of the legacy tests.
     """
-    if not type(shape) == tuple:
+    if not type(shape) is tuple:
         raise TypeError("get_corners argument is non-tuple")
 
     if len(shape) == 1:
         corners = [(0,), (shape[0] - 1,)]
     else:
-        shape_less1 = shape[1 : len(shape)]
+        size = len(shape)
+        shape_less1 = shape[1:size]
         corners_less1 = get_corners(shape_less1)
         corners = []
         for corner in corners_less1:
@@ -273,75 +298,8 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
         )
 
 
-import functools
-import warnings
-
-import functools
-import warnings
-
-
-def fail_once(message):
-    """Decorator that catches an exception and raises a warning with the given
-    message.
-
-    Parameters
-    ----------
-    message : str
-        The warning message to be raised if an exception is caught.
-
-    Returns
-    -------
-    function
-        A decorated function that catches an exception and raises a warning
-        with the given message.
-
-    Examples
-    --------
-    (using two > to avoid doctest failure)
-    >> import sys; sys.stderr = sys.stdout
-    >> @fail_once("Something went wrong!")
-    .. def my_func():
-    ..     raise ValueError("Oops!")
-    ..
-    >> my_func()
-    /.../testing.py:303: UserWarning: Something went wrong!
-        Got ValueError - Oops!
-
-    Notes
-    -----
-    Do not use this function outside of testing. It is meant to be used in
-    tests to catch exceptions and raise warnings instead of failing the test.
-    It will catch all Exceptions, so it should be used with caution even within
-    tests.
-    """
-
-    def decorator(func):
-        failed = False
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            nonlocal failed
-
-            if failed:
-                return
-
-            try:
-                return func(*args, **kwargs)
-
-            except Exception as err:
-                failed = True
-                errname = type(err).__name__
-                warnings.warn(f"{message} \n\tGot {errname} - {err}")
-                return
-
-        return wrapper
-
-    return decorator
-
-
-@fail_once("Could not download from the Gemini archive.")
 def download_from_archive(
-    filename, sub_path="raw_files", env_var="DRAGONS_TEST"
+    filename, sub_path="raw_files", env_var="ASTRODATA_TEST"
 ):
     """Download file from the archive and store it in the local cache.
 
@@ -362,11 +320,22 @@ def download_from_archive(
     str
         Name of the cached file with the path added to it.
     """
+    # Check that the environment variable is a valid name.
+    if not isinstance(env_var, str) or not env_var.isidentifier():
+        raise ValueError(f"Environment variable name is not valid: {env_var}")
+
     # Find cache path and make sure it exists
     root_cache_path = os.getenv(env_var)
 
     if root_cache_path is None:
-        raise ValueError(f"Environment variable not set: {env_var}")
+        root_cache_path = os.path.join(os.getcwd(), "_test_cache")
+        warnings.warn(
+            f"Environment variable not set: {env_var}, writing "
+            f"to {root_cache_path}"
+        )
+
+        # This is cleaned up once the program finishes.
+        os.environ[env_var] = str(root_cache_path)
 
     root_cache_path = os.path.expanduser(root_cache_path)
 

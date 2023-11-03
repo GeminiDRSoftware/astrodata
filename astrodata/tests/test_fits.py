@@ -1,5 +1,7 @@
 import copy
+import functools
 import os
+import unittest
 import warnings
 
 import numpy as np
@@ -9,7 +11,12 @@ from numpy.testing import assert_allclose, assert_array_equal
 import astrodata
 from astrodata.utils import AstroDataDeprecationWarning
 from astrodata.nddata import ADVarianceUncertainty, NDAstroData
-from astrodata.testing import download_from_archive, compare_models
+from astrodata.testing import (
+    download_from_archive,
+    compare_models,
+    skip_if_download_none,
+)
+
 import astropy
 from astropy import units as u
 from astropy.io import fits
@@ -126,6 +133,8 @@ def test_extver2(tmp_path):
     assert [hdr["EXTVER"] for hdr in ad.hdr] == [1, 2, 3, 4]
 
 
+@skip_if_download_none
+@pytest.mark.dragons_remote_data
 def test_extver3(tmp_path, GSAOI_DARK):
     """Test that original EXTVER are preserved and extensions added
     from another object are renumbered.
@@ -145,6 +154,7 @@ def test_extver3(tmp_path, GSAOI_DARK):
     assert [hdr["EXTVER"] for hdr in ad.hdr] == [1, 2, 4, 5, 6]
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_can_add_and_del_extension(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
@@ -158,6 +168,7 @@ def test_can_add_and_del_extension(GMOSN_SPECT):
     assert len(ad) == original_size
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_slice(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
@@ -211,6 +222,7 @@ def test_slice(GMOSN_SPECT):
         ext[1]
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_slice_single_element(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
@@ -232,6 +244,7 @@ def test_slice_single_element(GMOSN_SPECT):
     assert ext.hdr["EXTVER"] == metadata[1]
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_slice_multiple(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
@@ -288,6 +301,7 @@ def test_slice_multiple(GMOSN_SPECT):
     del ext.bar
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_slice_data(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
@@ -335,6 +349,7 @@ def test_slice_data(GMOSN_SPECT):
     assert slc.nddata[0].mask is ext.mask
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_phu(NIFS_DARK):
     ad = astrodata.from_file(NIFS_DARK)
@@ -358,6 +373,7 @@ def test_phu(NIFS_DARK):
         assert "DETECTOR" not in ad.phu
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_paths(tmpdir, NIFS_DARK):
     ad = astrodata.from_file(NIFS_DARK)
@@ -398,6 +414,7 @@ def test_paths(tmpdir, NIFS_DARK):
         ad.write()
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_from_hdulist(NIFS_DARK):
     with fits.open(NIFS_DARK) as hdul:
@@ -521,6 +538,7 @@ def test_can_append_table_and_access_data(capsys, tmpdir):
         del ad.BOB
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_attributes(GSAOI_DARK):
     ad = astrodata.from_file(GSAOI_DARK)
@@ -553,6 +571,7 @@ def test_attributes(GSAOI_DARK):
         ad.mask = 1
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_set_a_keyword_on_phu_deprecated(NIFS_DARK):
     ad = astrodata.from_file(NIFS_DARK)
@@ -565,6 +584,7 @@ def test_set_a_keyword_on_phu_deprecated(NIFS_DARK):
 # Regression:
 # Make sure that references to associated
 # extension objects are copied across
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_do_arith_and_retain_features(NIFS_DARK):
     ad = astrodata.from_file(NIFS_DARK)
@@ -630,6 +650,7 @@ def test_update_filename2():
     assert ad.filename == "origfile_bar.fits"
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_read_a_keyword_from_phu_deprecated():
     """Test deprecated methods to access headers"""
@@ -682,6 +703,7 @@ def test_read_file(tmpdir):
     assert ad.instrument() == "darkimager"
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_header_collection(GMOSN_SPECT):
     ad = astrodata.create({})
@@ -744,6 +766,7 @@ def test_header_collection(GMOSN_SPECT):
     assert len(list(hdr)) == 13
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_header_deprecated(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
@@ -760,6 +783,7 @@ def test_header_deprecated(GMOSN_SPECT):
     assert header[0]["ORIGNAME"] == "N20170529S0168.fits"
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_read_no_extensions(GRACES_SPECT):
     ad = astrodata.from_file(GRACES_SPECT)
@@ -847,6 +871,7 @@ def test_add_table():
     assert_array_equal(ad[0].OTHERTABLE["col0"], ["aa", "bb", "cc"])
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_copy(GSAOI_DARK, capsys):
     ad = astrodata.from_file(GSAOI_DARK)
@@ -877,6 +902,7 @@ def test_copy(GSAOI_DARK, capsys):
     assert captured.out.splitlines()[1:] == captured2.out.splitlines()[1:]
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_crop(GSAOI_DARK):
     ad = astrodata.from_file(GSAOI_DARK)
@@ -887,6 +913,7 @@ def test_crop(GSAOI_DARK):
     assert set(ad.shape) == {(11, 6)}
 
 
+@skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_crop_ext(GSAOI_DARK):
     ad = astrodata.from_file(GSAOI_DARK)
@@ -929,10 +956,15 @@ def test_round_trip_gwcs(tmpdir):
     # Transformation from detector pixels to pixels in some reference row,
     # removing relative distortions in wavelength:
     det_frame = cf.Frame2D(
-        name="det_mosaic", axes_names=("x", "y"), unit=(u.pix, u.pix)
+        name="det_mosaic",
+        axes_names=("x", "y"),
+        unit=(u.pix, u.pix),
     )
+
     dref_frame = cf.Frame2D(
-        name="dist_ref_row", axes_names=("xref", "y"), unit=(u.pix, u.pix)
+        name="dist_ref_row",
+        axes_names=("xref", "y"),
+        unit=(u.pix, u.pix),
     )
 
     # A made-up example model that looks vaguely like some real distortions:
