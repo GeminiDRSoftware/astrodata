@@ -1,29 +1,20 @@
 """
 Tests for the `astrodata.testing` module.
 """
-
+import importlib
 import os
 
-import astrodata
 import numpy as np
 import pytest
-from astrodata.testing import assert_same_class, download_from_archive
+
+import astrodata
+from astrodata.testing import (
+    assert_same_class,
+    download_from_archive,
+    skip_if_download_none,
+)
 
 
-def test_download_from_archive_raises_ValueError_if_envvar_does_not_exists():
-    with pytest.warns(UserWarning):
-        download_from_archive("N20180304S0126.fits", env_var="")
-
-
-@pytest.mark.skip(reason="Remote data")
-def test_download_from_archive_raises_IOError_if_path_is_not_accessible():
-    env_var = "MY_FAKE_ENV_VAR"
-    os.environ["MY_FAKE_ENV_VAR"] = "/not/accessible/path"
-    with pytest.raises(IOError):
-        download_from_archive("N20180304S0126.fits", env_var=env_var)
-
-
-@pytest.mark.skip(reason="Remote data")
 def test_download_from_archive(monkeypatch, tmpdir):
     ncall = 0
 
@@ -34,19 +25,57 @@ def test_download_from_archive(monkeypatch, tmpdir):
         tmpdir.join(fname).write("")  # create fake file
         return str(tmpdir.join(fname))
 
+    env_var = "TEST_NEW_CACHE"
+    monkeypatch.setenv(env_var, str(tmpdir))
     monkeypatch.setattr("astrodata.testing.download_file", mock_download)
-    monkeypatch.setenv("DRAGONS_TEST", str(tmpdir))
 
-    # first call will use our mock function above
-    fname = download_from_archive("N20170529S0168.fits")
-    assert os.path.exists(fname)
-    assert ncall == 1
+    archive_filename = "THIS_IS_A_TEST.fits"
 
-    # second call will use the cache so we check that our mock function is not
-    # called twice
-    fname = download_from_archive("N20170529S0168.fits")
-    assert os.path.exists(fname)
-    assert ncall == 1
+    # In case fname is not set, we need to set it to something that will fail
+    fname = ".this_does_not_exist.fits"
+
+    try:
+        # first call will use our mock function above
+        fname = astrodata.testing.download_from_archive(archive_filename)
+        assert os.path.exists(fname)
+        assert ncall == 1
+
+        # second call will use the cache so we check that our mock function is not
+        # called twice
+        fname = astrodata.testing.download_from_archive(archive_filename)
+        assert os.path.exists(fname)
+        assert ncall == 1
+
+    finally:
+        # Clean up the downloaded file so the test works next time.
+        if os.path.exists(fname):
+            os.remove(fname)
+
+
+@skip_if_download_none
+@pytest.mark.dragons_remote_data
+def test_download_from_archive_raises_IOError_if_path_is_not_accessible():
+    env_var = "MY_FAKE_ENV_VAR"
+    os.environ["MY_FAKE_ENV_VAR"] = "/not/accessible/path"
+    with pytest.raises(IOError):
+        download_from_archive("N20180304S0126.fits", env_var=env_var)
+
+
+def test_download_from_archive_raises_ValueError_if_envvar_does_not_exists():
+    # This is slightly modified now to only check against environment variables
+    # that cannot be assigned due to being things like empty strings or not
+    # strings.
+    with pytest.raises(ValueError):
+        download_from_archive("N20180304S0126.fits", env_var="")
+
+    with pytest.raises(ValueError):
+        download_from_archive("N20180304S0126.fits", env_var=123)
+
+    with pytest.raises(ValueError):
+        download_from_archive("N20180304S0126.fits", env_var=None)
+
+    with pytest.raises(ValueError):
+        download_from_archive("N20180304S0126.fits", env_var="bing bong")
 
 
 def test_assert_most_close():
