@@ -173,7 +173,9 @@ class AstroDataFactory:
         "astrodata.factory.AstroDataFactory.create_from_scratch"
     )
     def createFromScratch(
-        self, phu, extensions=None
+        self,
+        phu,
+        extensions=None,
     ):  # pylint: disable=invalid-name
         """Deprecated, see |create_from_scratch|."""
         self.create_from_scratch(phu, extensions=None)
