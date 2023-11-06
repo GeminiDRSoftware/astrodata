@@ -790,8 +790,10 @@ def ad_to_hdulist(ad):
             # Catch ValueError as any sort of failure
             try:
                 wcs_dict = gwcs_to_fits(ext, ad.phu)
+
             except (ValueError, NotImplementedError) as e:
                 LOGGER.warning(e)
+
             else:
                 # Must delete keywords if image WCS has been downscaled
                 # from a higher number of dimensions
@@ -805,28 +807,37 @@ def ad_to_hdulist(ad):
                     ):
                         if kw in header:
                             del header[kw]
+
                     for j in range(1, 5):
                         for kw in (f"CD{i}_{j}", f"PC{i}_{j}", f"CRPIX{j}"):
                             if kw in header:
                                 del header[kw]
+
                 # Delete this if it's left over from a previous save
                 if "FITS-WCS" in header:
                     del header["FITS-WCS"]
+
                 try:
                     extensions = wcs_dict.pop("extensions")
+
                 except KeyError:
                     pass
+
                 else:
                     for k, v in extensions.items():
                         ext.meta["other"][k] = v
+
                 header.update(wcs_dict)
+
                 # Use "in" here as the dict entry may be (value, comment)
                 if "APPROXIMATE" not in wcs_dict.get("FITS-WCS", ""):
                     wcs = None  # There's no need to create a WCS extension
 
         hdul.append(new_imagehdu(ext.data, header, "SCI"))
+
         if ext.uncertainty is not None:
             hdul.append(new_imagehdu(ext.uncertainty.array, header, "VAR"))
+
         if ext.mask is not None:
             hdul.append(new_imagehdu(ext.mask, header, "DQ"))
 
@@ -836,10 +847,13 @@ def ad_to_hdulist(ad):
         for name, other in ext.meta.get("other", {}).items():
             if isinstance(other, Table):
                 hdu = table_to_bintablehdu(other, extname=name)
+
             elif isinstance(other, np.ndarray):
                 hdu = new_imagehdu(other, header, name=name)
+
             elif isinstance(other, NDDataObject):
                 hdu = new_imagehdu(other.data, ext.meta["header"])
+
             else:
                 raise ValueError(
                     "I don't know how to write back an object "
