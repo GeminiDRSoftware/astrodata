@@ -186,6 +186,8 @@ class AstroData:
                 # __keyword_dict is a mangled variable
                 return getattr(self, f"_{cls.__name__}__keyword_dict")[name]
 
+        raise AttributeError(f"No match for '{name}'")
+
     def _process_tags(self):
         """Return the tag set (as a set of str) for the current instance."""
         results = []
