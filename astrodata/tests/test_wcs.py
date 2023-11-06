@@ -1,19 +1,22 @@
 import math
+import os
+
 import pytest
+
 import numpy as np
 from numpy.testing import assert_allclose
 
+from astropy import units as u
+from astropy.coordinates import SkyCoord
 from astropy.modeling import models
 from astropy.wcs import WCS
-from astropy.coordinates import SkyCoord
-from astropy import units as u
-from astropy.io.fits import Header
+
 from gwcs import coordinate_frames as cf
 from gwcs.wcs import WCS as gWCS
 
-import astrodata
 from astrodata import wcs as adwcs
-from astrodata.testing import download_from_archive
+from astrodata.testing import download_from_archive, skip_if_download_none
+import astrodata
 
 # from gempy.library.transform import add_longslit_wcs
 
@@ -58,25 +61,30 @@ def test_calculate_affine_matrices(angle, scale, xoffset, yoffset):
     )
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
-def test_reading_and_writing_sliced_image(F2_IMAGE):
-    ad = astrodata.open(F2_IMAGE)
+@skip_if_download_none
+@pytest.mark.dragons_remote_data
+def test_reading_and_writing_sliced_image(F2_IMAGE, tmpdir):
+    ad = astrodata.from_file(F2_IMAGE)
     result = ad[0].wcs(100, 100, 0)
+
     ad[0].reset(ad[0].nddata[0])
     assert_allclose(ad[0].wcs(100, 100), result)
-    ad.write("test.fits", overwrite=True)
-    ad2 = astrodata.open("test.fits")
+
+    test_file_loc = os.path.join(tmpdir, "test.fits")
+
+    ad.write(test_file_loc, overwrite=True)
+    ad2 = astrodata.from_file(test_file_loc)
     assert_allclose(ad2[0].wcs(100, 100), result)
-    ad2.write("test.fits", overwrite=True)
-    ad2 = astrodata.open("test.fits")
+
+    ad2.write(test_file_loc, overwrite=True)
+    ad2 = astrodata.from_file(test_file_loc)
     assert_allclose(ad2[0].wcs(100, 100), result)
 
 
 def test_remove_axis_from_model():
     """A simple test that removes one of three &-linked models"""
     model = models.Shift(0) & models.Shift(1) & models.Shift(2)
+
     for axis in (0, 1, 2):
         new_model, input_axis = adwcs.remove_axis_from_model(model, axis)
         assert input_axis == axis
@@ -90,6 +98,7 @@ def test_remove_axis_from_model_2():
         models.Scale(2) & models.Rotation2D(90)
     )
     new_model, input_axis = adwcs.remove_axis_from_model(model, 0)
+
     assert input_axis == 0
     assert new_model.n_submodels == 3
     assert new_model.offset_0 == 1
@@ -102,10 +111,13 @@ def test_remove_axis_from_model_3():
     model1 = models.Mapping((1, 2, 0))
     model2 = models.Shift(0) & models.Shift(1) & models.Shift(2)
     new_model, input_axis = adwcs.remove_axis_from_model(model1 | model2, 1)
+
     assert input_axis == 2
     assert new_model.n_submodels == 3
     assert_allclose(new_model(0, 10), (10, 2))
+
     new_model, input_axis = adwcs.remove_axis_from_model(model2 | model1, 1)
+
     assert input_axis == 2
     assert new_model.n_submodels == 3
     assert_allclose(new_model(0, 10), (11, 0))
@@ -143,12 +155,11 @@ def test_remove_axis_from_model_5():
     assert_allclose(new_model(0), (0, 7))
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@skip_if_download_none
+@pytest.mark.dragons_remote_data
 def test_remove_unused_world_axis(F2_IMAGE):
     """A test with an intermediate frame"""
-    ad = astrodata.open(F2_IMAGE)
+    ad = astrodata.from_file(F2_IMAGE)
     result = ad[0].wcs(1000, 1000, 0)
     new_frame = cf.Frame2D(name="intermediate")
     new_model = models.Shift(100) & models.Shift(200) & models.Identity(1)
@@ -163,12 +174,11 @@ def test_remove_unused_world_axis(F2_IMAGE):
         assert getattr(ad[0].wcs, frame).naxes == 2
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@skip_if_download_none
+@pytest.mark.dragons_remote_data
 def test_gwcs_creation(NIRI_IMAGE):
     """Test that the gWCS object for an image agrees with the FITS WCS"""
-    ad = astrodata.open(NIRI_IMAGE)
+    ad = astrodata.from_file(NIRI_IMAGE)
     w = WCS(ad[0].hdr)
     for y in range(0, 1024, 200):
         for x in range(0, 1024, 200):
@@ -177,55 +187,56 @@ def test_gwcs_creation(NIRI_IMAGE):
             assert wcs_sky.separation(gwcs_sky) < 0.01 * u.arcsec
 
 
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
-def test_adding_longslit_wcs(GMOS_LONGSLIT):
-    """Test that adding the longslit WCS doesn't interfere with the sky
-    coordinates of the WCS"""
-    ad = astrodata.open(GMOS_LONGSLIT)
-    frame_name = ad[4].hdr.get("RADESYS", ad[4].hdr["RADECSYS"]).lower()
-    crpix1 = ad[4].hdr["CRPIX1"] - 1
-    crpix2 = ad[4].hdr["CRPIX2"] - 1
-    gwcs_sky = SkyCoord(
-        *ad[4].wcs(crpix1, crpix2), unit=u.deg, frame=frame_name
-    )
-    add_longslit_wcs(ad)
-    gwcs_coords = ad[4].wcs(crpix1, crpix2)
-    new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
-    assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
-    # The sky coordinates should not depend on the x pixel value
-    gwcs_coords = ad[4].wcs(0, crpix2)
-    new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
-    assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
+# TODO: LEAVING IN FOR COMPARISON TO DRAGONS TESTS, AND TO REMEMBER DURING TEST
+# MIGRATION
+#
+# @skip_if_download_none
+# @pytest.mark.dragons_remote_data
+# def test_adding_longslit_wcs(GMOS_LONGSLIT):
+#     """Test that adding the longslit WCS doesn't interfere with the sky
+#     coordinates of the WCS"""
+#     ad = astrodata.from_file(GMOS_LONGSLIT)
+#     frame_name = ad[4].hdr.get("RADESYS", ad[4].hdr["RADECSYS"]).lower()
+#     crpix1 = ad[4].hdr["CRPIX1"] - 1
+#     crpix2 = ad[4].hdr["CRPIX2"] - 1
+#     gwcs_sky = SkyCoord(
+#         *ad[4].wcs(crpix1, crpix2), unit=u.deg, frame=frame_name
+#     )
+#     add_longslit_wcs(ad)
+#     gwcs_coords = ad[4].wcs(crpix1, crpix2)
+#     new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
+#     assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
+#     # The sky coordinates should not depend on the x pixel value
+#     gwcs_coords = ad[4].wcs(0, crpix2)
+#     new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
+#     assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
+#
+#     # The sky coordinates also should not depend on the extension
+#     # there are shifts of order 1 pixel because of the rotations of CCDs 1
+#     # and 3, which are incorporated into their raw WCSs. Remember that the
+#     # 12 WCSs are independent at this stage, they don't all map onto the
+#     # WCS of the reference extension
+#     for ext in ad:
+#         gwcs_coords = ext.wcs(0, crpix2)
+#         new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
+#         assert gwcs_sky.separation(new_gwcs_sky) < 0.1 * u.arcsec
+#
+#     # This is equivalent to writing to disk and reading back in
+#     wcs_dict = astrodata.wcs.gwcs_to_fits(ad[4].nddata, ad.phu)
+#     new_gwcs = astrodata.wcs.fitswcs_to_gwcs(Header(wcs_dict))
+#     gwcs_coords = new_gwcs(crpix1, crpix2)
+#     new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
+#     assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
+#     gwcs_coords = new_gwcs(0, crpix2)
+#     new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
+#     assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
 
-    # The sky coordinates also should not depend on the extension
-    # there are shifts of order 1 pixel because of the rotations of CCDs 1
-    # and 3, which are incorporated into their raw WCSs. Remember that the
-    # 12 WCSs are independent at this stage, they don't all map onto the
-    # WCS of the reference extension
-    for ext in ad:
-        gwcs_coords = ext.wcs(0, crpix2)
-        new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
-        assert gwcs_sky.separation(new_gwcs_sky) < 0.1 * u.arcsec
 
-    # This is equivalent to writing to disk and reading back in
-    wcs_dict = astrodata.wcs.gwcs_to_fits(ad[4].nddata, ad.phu)
-    new_gwcs = astrodata.wcs.fitswcs_to_gwcs(Header(wcs_dict))
-    gwcs_coords = new_gwcs(crpix1, crpix2)
-    new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
-    assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
-    gwcs_coords = new_gwcs(0, crpix2)
-    new_gwcs_sky = SkyCoord(*gwcs_coords[1:], unit=u.deg, frame=frame_name)
-    assert gwcs_sky.separation(new_gwcs_sky) < 0.01 * u.arcsec
-
-
-@pytest.mark.skip(
-    reason="Dragons remote data"
-)  # @pytest.mark.dragons_remote_data
+@skip_if_download_none
+@pytest.mark.dragons_remote_data
 def test_loglinear_axis(NIRI_IMAGE):
     """Test that we can add a log-linear axis and write and read it"""
-    ad = astrodata.open(NIRI_IMAGE)
+    ad = astrodata.from_file(NIRI_IMAGE)
     coords = ad[0].wcs(200, 300)
     ad[0].data = np.repeat(ad[0].data[np.newaxis], 5, axis=0)
     new_input_frame = adwcs.pixel_frame(3)
@@ -249,5 +260,5 @@ def test_loglinear_axis(NIRI_IMAGE):
 
     # with change_working_dir():
     ad.write("test.fits", overwrite=True)
-    ad2 = astrodata.open("test.fits")
+    ad2 = astrodata.from_file("test.fits")
     assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
