@@ -237,6 +237,7 @@ class AstroData:
     @staticmethod
     def _matches_data(source):
         # This one is trivial. Will be more specific for subclasses.
+        logging.debug("Using default _matches_data with %s", source)
         return True
 
     @property
@@ -396,6 +397,7 @@ class AstroData:
         """
         if not self.is_single:
             raise AttributeError("this is only available for extensions")
+
         return set(
             key
             for key, obj in self.nddata.meta["other"].items()
@@ -425,9 +427,10 @@ class AstroData:
         # grown adults and know what we're doing, isn't it?
         if hasattr(value, "shape"):
             self.nddata._data = value
+
         else:
             raise AttributeError(
-                "Trying to assign data to be something " "with no shape"
+                "Trying to assign data to be something with no shape"
             )
 
     @property
@@ -537,11 +540,13 @@ class AstroData:
         if self.is_single:
             raise TypeError("Can't slice a single slice!")
 
-        indices, multiple = normalize_indices(idx, nitems=len(self))
+        indices, _ = normalize_indices(idx, nitems=len(self))
+
         if self._indices:
             indices = [self._indices[i] for i in indices]
 
         is_single = not isinstance(idx, (tuple, slice))
+
         obj = self.__class__(
             self._all_nddatas,
             tables=self._tables,
@@ -549,8 +554,10 @@ class AstroData:
             indices=indices,
             is_single=is_single,
         )
+
         obj._path = self.path
         obj._orig_filename = self.orig_filename
+
         return obj
 
     def __delitem__(self, idx):
@@ -756,16 +763,20 @@ class AstroData:
                         )
                     )
 
-            yield dict(
-                idx="[{:2}]".format(idx),
-                main=dict(
-                    content="science",
-                    type=type(nd).__name__,
-                    dim=str(nd.data.shape),
-                    data_type=nd.data.dtype.name,
-                ),
+            main_dict = dict(
+                content="science",
+                type=type(nd).__name__,
+                dim=str(nd.data.shape),
+                data_type=nd.data.dtype.name,
+            )
+
+            out_dict = dict(
+                idx=f"[{idx:2}]",
+                main=main_dict,
                 other=other_objects,
             )
+
+            yield out_dict
 
     def info(self):
         """Prints out information about the contents of this instance."""
@@ -984,11 +995,15 @@ class AstroData:
             return self._append_nddata(nd, name, add_to=None)
 
     def _append_raw_nddata(self, raw_nddata, name, header, add_to):
+        logging.debug("Appending data to nddata: %s", name)
+
         # We want to make sure that the instance we add is whatever we specify
         # as NDDataObject, instead of the random one that the user may pass
         top_level = add_to is None
+
         if not isinstance(raw_nddata, NDDataObject):
             raw_nddata = NDDataObject(raw_nddata)
+
         processed_nddata = self._process_pixel_plane(
             raw_nddata, top_level=top_level, custom_header=header
         )
@@ -1007,13 +1022,17 @@ class AstroData:
 
         hd = new_nddata.meta["header"]
         hname = hd.get("EXTNAME", DEFAULT_EXTENSION)
+
         if hname == DEFAULT_EXTENSION:
             self._all_nddatas.append(new_nddata)
+
         else:
             raise ValueError(
-                "Arbitrary image extensions can only be added "
+                f"Arbitrary image extensions can only be added "
                 f"in association to a '{DEFAULT_EXTENSION}'"
             )
+
+        logging.debug("Appending data to nddata: %s", name)
 
         return new_nddata
 
@@ -1054,17 +1073,21 @@ class AstroData:
                 )
 
             add_to.meta["other"][hname] = tb
+
         return tb
 
     def _append_astrodata(self, ad, name, header, add_to):
+        logging.debug("Appending astrodata object: %s", name)
+
         if not ad.is_single:
             raise ValueError(
                 "Cannot append AstroData instances that are "
                 "not single slices"
             )
+
         elif add_to is not None:
             raise ValueError(
-                "Cannot append an AstroData slice to " "another slice"
+                "Cannot append an AstroData slice to another slice"
             )
 
         new_nddata = deepcopy(ad.nddata)
@@ -1267,28 +1290,39 @@ class AstroData:
         try:
             if mask.shape != self.data.shape and check:
                 raise ValueError("Mask shape incompatible with data shape")
-        except AttributeError:
+
+        except AttributeError as err:
             if mask is None:
                 self.mask = mask
+
             elif mask == NO_DEFAULT:
                 if hasattr(data, "mask"):
                     self.mask = data.mask
+
             else:
-                raise TypeError("Attempt to set mask inappropriately")
+                raise TypeError("Attempt to set mask inappropriately") from err
+
         else:
             self.mask = mask
+
         # Set variance, with checking if required
         try:
             if variance.shape != self.data.shape and check:
                 raise ValueError("Variance shape incompatible with data shape")
-        except AttributeError:
+
+        except AttributeError as err:
             if variance is None:
                 self.uncertainty = None
+
             elif variance == NO_DEFAULT:
                 if hasattr(data, "uncertainty"):
                     self.uncertainty = data.uncertainty
+
             else:
-                raise TypeError("Attempt to set variance inappropriately")
+                raise TypeError(
+                    "Attempt to set variance inappropriately"
+                ) from err
+
         else:
             self.variance = variance
 
@@ -1296,19 +1330,17 @@ class AstroData:
             self.wcs = data.wcs
 
     def update_filename(self, prefix=None, suffix=None, strip=False):
-        """
-        Update the "filename" attribute of the AstroData object.
+        """Update the "filename" attribute of the AstroData object.
 
         A prefix and/or suffix can be specified. If ``strip=True``, these will
         replace the existing prefix/suffix; if ``strip=False``, they will
         simply be prepended/appended.
 
-        The current filename is broken down into its existing prefix, root,
-        and suffix using the ``ORIGNAME`` phu keyword, if it exists and is
-        contained within the current filename. Otherwise, the filename is
-        split at the last underscore and the part before is assigned as the
-        root and the underscore and part after the suffix. No prefix is
-        assigned.
+        The current filename is broken down into its existing prefix, root, and
+        suffix using the ``ORIGNAME`` phu keyword, if it exists and is
+        contained within the current filename. Otherwise, the filename is split
+        at the last underscore and the part before is assigned as the root and
+        the underscore and part after the suffix. No prefix is assigned.
 
         Note that, if ``strip=True``, a prefix or suffix will only be stripped
         if '' is specified.
@@ -1317,18 +1349,24 @@ class AstroData:
         ----------
         prefix: str, optional
             New prefix (None => leave alone)
+
         suffix: str, optional
             New suffix (None => leave alone)
+
         strip: bool, optional
             Strip existing prefixes and suffixes if new ones are given?
 
+        Raises
+        ------
+        ValueError
+            If the filename cannot be determined
         """
         if self.filename is None:
             if "ORIGNAME" in self.phu:
                 self.filename = self.phu["ORIGNAME"]
             else:
                 raise ValueError(
-                    "A filename needs to be set before it " "can be updated"
+                    "A filename needs to be set before it can be updated"
                 )
 
         # Set the ORIGNAME keyword if it's not there
@@ -1347,19 +1385,28 @@ class AstroData:
             if m:
                 if prefix is None:
                     prefix = m.groups()[0]
+
                 existing_suffix = m.groups()[1]
+
                 if "_" in existing_suffix:
                     last_underscore = existing_suffix.rfind("_")
                     root += existing_suffix[:last_underscore]
                     existing_suffix = existing_suffix[last_underscore:]
+
             else:
                 try:
                     root, existing_suffix = filename.rsplit("_", 1)
                     existing_suffix = "_" + existing_suffix
-                except ValueError:
+
+                except ValueError as err:
+                    logging.info(
+                        "Could not split filename (ValueError): %s", err
+                    )
                     root, existing_suffix = filename, ""
+
             if suffix is None:
                 suffix = existing_suffix
+
         else:
             root, filetype = os.path.splitext(self.filename)
 
