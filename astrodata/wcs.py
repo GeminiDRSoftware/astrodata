@@ -325,8 +325,10 @@ def gwcs_to_fits(ndd, hdr=None):
         wcs_dict["FITS-WCS"] = ("APPROXIMATE", "FITS WCS is approximate")
 
     affine = calculate_affine_matrices(transform, ndd.shape)
+
     # Convert to x-first order
     affine_matrix = np.flip(affine.matrix)
+
     # Require an inverse to write out
     wcs_dict.update(
         {
@@ -335,6 +337,7 @@ def gwcs_to_fits(ndd, hdr=None):
             for i, _ in enumerate(world_axes)
         }
     )
+
     # Don't overwrite CTYPEi keywords we've already created
     wcs_dict.update(
         {
@@ -345,9 +348,11 @@ def gwcs_to_fits(ndd, hdr=None):
     )
 
     crval = [wcs_dict[f"CRVAL{i+1}"] for i, _ in enumerate(world_axes)]
+
     try:
         crval[lon_axis] = 0
         crval[lat_axis] = 0
+
     except NameError:
         pass
 
@@ -356,15 +361,16 @@ def gwcs_to_fits(ndd, hdr=None):
     modified_wcs_center = transform(*pix_center)
     if nworld_axes == 1:
         modified_wcs_center = (modified_wcs_center,)
-    for world_axis, (wcs_val, modified_wcs_val) in enumerate(
-        zip(wcs_center, modified_wcs_center), start=1
-    ):
+
+    wcs_gen = enumerate(zip(wcs_center, modified_wcs_center), start=1)
+    for world_axis, (wcs_val, modified_wcs_val) in wcs_gen:
         if wcs_val > 0 and np.isclose(modified_wcs_val, np.log(wcs_val)):
             for j, _ in enumerate(ndd.shape, start=1):
                 wcs_dict[f"CD{world_axis}_{j}"] *= crval[world_axis - 1]
                 wcs_dict[f"CTYPE{world_axis}"] = (
                     wcs_dict[f"CTYPE{world_axis}"][:4] + "-LOG"
                 )
+
             crval[world_axis - 1] = np.log(crval[world_axis - 1])
 
     # This (commented) line fails for un-invertable Tabular2D
@@ -377,14 +383,21 @@ def gwcs_to_fits(ndd, hdr=None):
         crval2 = wcs(*(crpix - 1))
         try:
             sky_center = coord.SkyCoord(
-                nat2cel.lon.value, nat2cel.lat.value, unit=u.deg
+                nat2cel.lon.value,
+                nat2cel.lat.value,
+                unit=u.deg,
             )
+
         except NameError:
             pass
+
         else:
             sky_center2 = coord.SkyCoord(
-                crval2[lon_axis], crval2[lat_axis], unit=u.deg
+                crval2[lon_axis],
+                crval2[lat_axis],
+                unit=u.deg,
             )
+
             if sky_center.separation(sky_center2).arcsec > 0.01:
                 wcs_dict["FITS-WCS"] = (
                     "APPROXIMATE",
@@ -393,6 +406,7 @@ def gwcs_to_fits(ndd, hdr=None):
 
     if len(ndd.shape) == 1:
         wcs_dict["CRPIX1"] = crpix
+
     else:
         # Comply with FITS standard, must define CRPIXj for "extra" axes
         wcs_dict.update(
@@ -406,9 +420,11 @@ def gwcs_to_fits(ndd, hdr=None):
                 )
             }
         )
+
     for i, unit in enumerate(wcs.output_frame.unit, start=1):
         try:
             wcs_dict[f"CUNIT{i}"] = unit.name
+
         except AttributeError:
             pass
 
@@ -426,7 +442,7 @@ def gwcs_to_fits(ndd, hdr=None):
 
 
 def model_is_affine(model):
-    """ "Test a Model for affinity. This is currently done by checking the name
+    """Test a Model for affinity. This is currently done by checking the name
     of its class (or the class names of all its submodels)
 
     TODO: Is this the right thing to do? We could compute the affine matrices
@@ -436,8 +452,10 @@ def model_is_affine(model):
     # TODO: See docstring
     if isinstance(model, dict):  # handle fix_inputs()
         return True
+
     try:
         return np.logical_and.reduce([model_is_affine(m) for m in model])
+
     except TypeError:
         # TODO: Delete "Const" one fix_inputs() broadcastingis fixed
         return model.__class__.__name__[:5] in (
