@@ -781,7 +781,7 @@ class AstroData:
     def info(self):
         """Prints out information about the contents of this instance."""
 
-        print("Filename: {}".format(self.path if self.path else "Unknown"))
+        print(f"Filename: {self.path if self.path else 'Unknown'}")
         # This is fixed. We don't support opening for update
         # print("Mode: readonly")
 
@@ -826,13 +826,12 @@ class AstroData:
             print("\nOther Extensions")
             print("               Type        Dimensions")
             for name, table in sorted(self._tables.items()):
-                if type(table) is list:
+                if isinstance(table, list):
                     # This is not a free floating table
                     continue
+
                 print(
-                    ".{:13} {:11} {}".format(
-                        name[:13], "Table", (len(table), len(table.columns))
-                    )
+                    f".{name[:13]:13s} {'Table':11s} {len(table), len(table.columns)}"
                 )
 
     def _oper(self, operator, operand):
@@ -1380,7 +1379,8 @@ class AstroData:
         if strip:
             root, filetype = os.path.splitext(self.phu["ORIGNAME"])
             filename, filetype = os.path.splitext(self.filename)
-            m = re.match("(.*){}(.*)".format(re.escape(root)), filename)
+            m = re.match(f"(.*){re.escape(root)}(.*)", filename)
+
             # Do not strip a prefix/suffix unless a new one is provided
             if m:
                 if prefix is None:
