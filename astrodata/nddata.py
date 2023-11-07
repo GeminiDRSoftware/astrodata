@@ -379,7 +379,6 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         meta=None,
         unit=None,
         copy=False,
-        window=None,
         variance=None,
     ):
         """Initialize an ``NDAstroData`` instance.
@@ -412,10 +411,6 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         copy : bool, optional
             If True, the data, uncertainty, mask, wcs, meta, and unit will be
             copied. Otherwise, they will be referenced. Default is False.
-
-        window : ``slice`` object, optional
-            A slice object that represents the window of the data. If not
-            specified, the window will be set to None.
 
         variance : array-like, optional
             An array that represents the variance of the data. If not
@@ -539,6 +534,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
         if is_lazy(value):
             self.meta["header"] = value.header
+
         self._data = value
 
     @property
