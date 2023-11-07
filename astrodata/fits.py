@@ -7,26 +7,22 @@
 .. |NDAstroData| replace:: :class:`~astrodata.nddata.NDAstroData`
 .. |NDAstroDataRef| replace:: :class:`~astrodata.nddata.NDAstroDataRef`
 """
+from collections import OrderedDict
+from copy import deepcopy
+from io import BytesIO
+from itertools import product as cart_product, zip_longest
 import gc
 import logging
 import os
 import traceback
 import warnings
-from collections import OrderedDict
-from copy import deepcopy
-from io import BytesIO
-from itertools import product as cart_product, zip_longest
 
-import asdf
-import astropy
-import jsonschema
-import numpy as np
 from astropy import units as u
 from astropy.io import fits
 from astropy.io.fits import (
-    DELAYED,
     BinTableHDU,
     Column,
+    DELAYED,
     HDUList,
     ImageHDU,
     PrimaryHDU,
@@ -34,15 +30,21 @@ from astropy.io.fits import (
 )
 from astropy.nddata import NDData
 
-from .utils import deprecated
-
 # NDDataRef is still not in the stable astropy, but this should be the one
 # we use in the future...
 # from astropy.nddata import NDData, NDDataRef as NDDataObject
 from astropy.table import Table
+
+import asdf
+import astropy
+import jsonschema
+import numpy as np
+
+
 from gwcs.wcs import WCS as gWCS
 
 from .nddata import ADVarianceUncertainty, NDAstroData as NDDataObject
+from .utils import deprecated
 from .wcs import fitswcs_to_gwcs, gwcs_to_fits
 
 DEFAULT_EXTENSION = "SCI"
@@ -628,6 +630,7 @@ def read_fits(cls, source, extname_parser=None):
         hdulist._file = _file
 
     # Initialize the object containers to a bare minimum
+    # pylint: disable=no-member
     if "ORIGNAME" not in hdulist[0].header and ad.orig_filename is not None:
         hdulist[0].header.set(
             "ORIGNAME",
@@ -636,7 +639,12 @@ def read_fits(cls, source, extname_parser=None):
         )
 
     ad.phu = hdulist[0].header
+
+    # This is hashable --- we can use it to check if we've seen this object
+    # before.
+    # pylint: disable=unhashable-member
     seen = {hdulist[0]}
+
     skip_names = {DEFAULT_EXTENSION, "REFCAT", "MDF"}
 
     def associated_extensions(ver):
@@ -868,6 +876,7 @@ def ad_to_hdulist(ad):
             hdul.append(table_to_bintablehdu(table, extname=name))
 
     # Additional FITS compatibility, add to PHU
+    # pylint: disable=no-member
     hdul[0].header["NEXTEND"] = len(hdul) - 1
 
     return hdul
@@ -947,6 +956,7 @@ def windowed_operation(
                 "Can't calculate final shape: sequence elements "
                 "disagree on shape, and none was provided"
             )
+
         shape = sequence[0].shape
 
     if dtype is None:
@@ -959,10 +969,12 @@ def windowed_operation(
         meta=sequence[0].meta,
         wcs=sequence[0].wcs,
     )
+
     # Delete other extensions because we don't know what to do with them
     result.meta["other"] = OrderedDict()
 
     # The Astropy logger's "INFO" messages aren't warnings, so have to fudge
+    # pylint: disable=no-member
     log_level = astropy.logger.conf.log_level
     astropy.log.setLevel(astropy.logger.WARNING)
 
@@ -985,6 +997,7 @@ def windowed_operation(
                         result.meta["other"][k] = v
 
             gc.collect()
+
     finally:
         astropy.log.setLevel(log_level)  # and reset
 
