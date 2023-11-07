@@ -194,7 +194,11 @@ class AstroDataMixin:
 
     @property
     def wcs(self):
-        """The WCS of the data. This is a gWCS object, not a FITS WCS object."""
+        """The WCS of the data. This is a gWCS object, not a FITS WCS object.
+
+        This is returning wcs from an inhertited class, see NDData.wcs for more
+        details.
+        """
         return super().wcs
 
     @wcs.setter
@@ -425,11 +429,13 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         -----
         The ``uncertainty`` and ``variance`` parameters are mutually exclusive.
         """
-        # TODO: window is not used anywhere. Why is it in the args?
         if variance is not None:
             if uncertainty is not None:
-                # TODO: Add error message.
-                raise ValueError()
+                raise ValueError(
+                    f"Cannot specify both uncertainty and variance"
+                    f"({uncertainty = }, {variance = })."
+                )
+
             uncertainty = ADVarianceUncertainty(variance)
 
         super().__init__(
@@ -520,7 +526,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def data(self):
-        """An array representing the raw data stored in this instance.  It
+        """An array representing the raw data stored in this instance. It
         implements a setter.
         """
         return self._get_simple("_data")
@@ -528,9 +534,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
     @data.setter
     def data(self, value):
         if value is None:
-            raise ValueError(
-                "Cannot have None as the data value for an NDData object"
-            )
+            raise ValueError(f"Cannot set data to {value}.")
 
         if is_lazy(value):
             self.meta["header"] = value.header
@@ -548,7 +552,9 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
             # pylint: disable=protected-access
             if value._parent_nddata is not None:
                 value = value.__class__(value, copy=False)
+
             value.parent_nddata = self
+
         self._uncertainty = value
 
     @property
