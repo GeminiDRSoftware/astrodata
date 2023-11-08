@@ -1,18 +1,20 @@
 """Fixtures to be used in tests in DRAGONS
 """
+import functools
 import os
 import shutil
-import urllib
-import functools
-import pytest
-import warnings
 import unittest
+import urllib
+import warnings
 import xml.etree.ElementTree as et
 
 from astropy.table import Table
 from astropy.utils.data import download_file
 
 import numpy as np
+
+# Disable pylint import error
+# pylint: disable=import-outside-toplevel
 
 # from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
 # from gempy.library import astrotools as at
@@ -48,8 +50,7 @@ def skip_if_download_none(func):
                 "Skipping test because download_from_archive returned None"
             )
 
-        else:
-            return func(*args, **kwargs)
+        return func(*args, **kwargs)
 
     return wrapper
 
@@ -69,7 +70,7 @@ def get_corners(shape):
 
     This is required for a couple of the legacy tests.
     """
-    if not type(shape) is tuple:
+    if not isinstance(shape, tuple):
         raise TypeError("get_corners argument is non-tuple")
 
     if len(shape) == 1:
@@ -139,20 +140,24 @@ def assert_most_close(
             verbose=verbose,
         )
 
-    except AssertionError as e:
+    except AssertionError as err:
         n_miss = (
-            e.args[0].split("\n")[3].split(":")[-1].split("(")[0].split("/")[0]
+            err.args[0]
+            .split("\n")[3]
+            .split(":")[-1]
+            .split("(")[0]
+            .split("/")[0]
         )
         n_miss = int(n_miss.strip())
 
         if n_miss > max_miss:
             error_message = (
-                "%g mismatching elements are more than the " % n_miss
-                + "expected %g." % max_miss
-                + "\n".join(e.args[0].split("\n")[3:])
+                f"{n_miss} mismatching elements are more than the "
+                + f"expected {max_miss}."
+                + "\n".join(err.args[0].split("\n")[3:])
             )
 
-            raise AssertionError(error_message)
+            raise AssertionError(error_message) from err
 
 
 def assert_most_equal(actual, desired, max_miss, verbose=True):
@@ -182,20 +187,26 @@ def assert_most_equal(actual, desired, max_miss, verbose=True):
 
     try:
         assert_equal(actual, desired, err_msg="", verbose=verbose)
-    except AssertionError as e:
+
+    except AssertionError as err:
         n_miss = (
-            e.args[0].split("\n")[3].split(":")[-1].split("(")[0].split("/")[0]
+            err.args[0]
+            .split("\n")[3]
+            .split(":")[-1]
+            .split("(")[0]
+            .split("/")[0]
         )
+
         n_miss = int(n_miss.strip())
 
         if n_miss > max_miss:
             error_message = (
-                "%g mismatching elements are more than the " % n_miss
-                + "expected %g." % max_miss
-                + "\n".join(e.args[0].split("\n")[3:])
+                f"{n_miss} mismatching elements are more than the "
+                + f"expected {max_miss}."
+                + "\n".join(err.args[0].split("\n")[3:])
             )
 
-            raise AssertionError(error_message)
+            raise AssertionError(error_message) from err
 
 
 def assert_same_class(ad, ad_ref):
@@ -237,7 +248,6 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
     (eg. the orders in SIP?), but it does cover our common use of compound
     models involving orthonormal polynomials etc.
     """
-
     from astropy.modeling import Model
     from numpy.testing import assert_allclose
 
@@ -402,6 +412,11 @@ class ADCompare:
         self.ad1 = ad1
         self.ad2 = ad2
 
+        self.max_miss = None
+        self.rtol = None
+        self.atol = None
+        self.ignore_kw = None
+
     def run_comparison(
         self,
         max_miss=0,
@@ -453,8 +468,10 @@ class ADCompare:
         self.rtol = rtol
         self.atol = atol
         self.ignore_kw = self.fits_keys if ignore_fits_wcs else set([])
+
         if ignore_kw:
             self.ignore_kw.update(ignore_kw)
+
         if compare is None:
             compare = (
                 "filename",
@@ -466,6 +483,7 @@ class ADCompare:
                 "attributes",
                 "wcs",
             )
+
         if ignore is not None:
             compare = [c for c in compare if c not in ignore]
 
@@ -474,8 +492,10 @@ class ADCompare:
             errorlist = getattr(self, func_name)()
             if errorlist:
                 errordict[func_name] = errorlist
+
         if errordict and raise_exception:
             raise AssertionError(self.format_errordict(errordict))
+
         return errordict
 
     def numext(self):
@@ -484,17 +504,25 @@ class ADCompare:
         if numext1 != numext2:
             return [f"{numext1} v {numext2}"]
 
+        return []
+
     def filename(self):
         """Check the filenames are equal"""
         fname1, fname2 = self.ad1.filename, self.ad2.filename
+
         if fname1 != fname2:
             return [f"{fname1} v {fname2}"]
+
+        return []
 
     def tags(self):
         """Check the tags are equal"""
         tags1, tags2 = self.ad1.tags, self.ad2.tags
+
         if tags1 != tags2:
             return [f"{tags1}\n  v {tags2}"]
+
+        return []
 
     def phu(self):
         """Check the PHUs agree"""
@@ -504,8 +532,8 @@ class ADCompare:
             self.ad2.phu,
             ignore=self.ignore_kw.union({"NEXTEND"}),
         )
-        if errorlist:
-            return errorlist
+
+        return errorlist
 
     def hdr(self):
         """Check the extension headers agree"""
@@ -539,14 +567,18 @@ class ADCompare:
             ):
                 try:
                     v1, v2 = hdr1[kw], hdr2[kw]
+
                 except KeyError:  # Missing keyword in AD2
                     continue
+
                 try:
                     if abs(v1 - v2) >= 0.01:
                         errorlist.append(f"{kw} value mismatch: {v1} v {v2}")
+
                 except TypeError:
                     if v1 != v2:
                         errorlist.append(f"{kw} value inequality: {v1} v {v2}")
+
         return errorlist
 
     def refcat(self):
@@ -555,10 +587,13 @@ class ADCompare:
         refcat2 = getattr(self.ad2, "REFCAT", None)
         if (refcat1 is None) ^ (refcat2 is None):
             return [f"presence: {refcat1 is not None} v {refcat2 is not None}"]
-        elif refcat1 is not None:  # and refcat2 must also exist
+
+        if refcat1 is not None:  # and refcat2 must also exist
             len1, len2 = len(refcat1), len(refcat2)
             if len1 != len2:
                 return [f"lengths: {len1} v {len2}"]
+
+        return []
 
     def attributes(self):
         """Check extension-level attributes"""
@@ -643,9 +678,12 @@ class ADCompare:
                     f"{wcs1 is not None} {wcs2 is not None}"
                 )
                 continue
-            elif wcs1 is None:  # and wcs2 is also None
+
+            if wcs1 is None:  # and wcs2 is also None
                 continue
+
             frames1, frames2 = wcs1.available_frames, wcs2.available_frames
+
             if frames1 != frames2:
                 errorlist.append(
                     f"Slice {i} frames differ: {frames1} v {frames2}"
@@ -704,4 +742,4 @@ def ad_compare(ad1, ad2, **kwargs):
     bool: are the two AD instances basically the same?
     """
     compare = ADCompare(ad1, ad2).run_comparison(**kwargs)
-    return compare == {}
+    return not compare
