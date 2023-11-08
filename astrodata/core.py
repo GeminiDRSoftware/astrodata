@@ -257,12 +257,16 @@ class AstroData:
         if self.path is not None:
             return os.path.basename(self.path)
 
+        return self.path
+
     @filename.setter
     def filename(self, value):
         if os.path.isabs(value):
             raise ValueError("Cannot set the filename to an absolute path!")
-        elif self.path is None:
+
+        if self.path is None:
             self.path = os.path.abspath(value)
+
         else:
             dirname = os.path.dirname(self.path)
             self.path = os.path.join(dirname, value)
@@ -328,11 +332,11 @@ class AstroData:
         """
         if self.is_single:
             return self._indices[0] + 1
-        else:
-            raise ValueError(
-                "Cannot return id for an AstroData object "
-                "that is not a single slice"
-            )
+
+        raise ValueError(
+            "Cannot return id for an AstroData object "
+            "that is not a single slice"
+        )
 
     @property
     def indices(self):
@@ -359,8 +363,8 @@ class AstroData:
         """
         if self._indices is not None:
             return [self._all_nddatas[i] for i in self._indices]
-        else:
-            return self._all_nddatas
+
+        return self._all_nddatas
 
     @property
     def nddata(self):
@@ -498,11 +502,11 @@ class AstroData:
         """Returns the list of WCS objects for each extension."""
         if self.is_single:
             return self.nddata.wcs
-        else:
-            raise ValueError(
-                "Cannot return WCS for an AstroData object "
-                "that is not a single slice"
-            )
+
+        raise ValueError(
+            "Cannot return WCS for an AstroData object "
+            "that is not a single slice"
+        )
 
     @wcs.setter
     @assign_only_single_slice
@@ -644,13 +648,15 @@ class AstroData:
                     f"{attribute} extensions should be "
                     "appended with .append"
                 )
-            elif attribute in {"DQ", "VAR"}:
+
+            if attribute in {"DQ", "VAR"}:
                 raise AttributeError(
                     f"{attribute} should be set on the " "nddata object"
                 )
 
             add_to = self.nddata if self.is_single else None
             self._append(value, name=attribute, add_to=add_to)
+
             return
 
         super().__setattr__(attribute, value)
@@ -700,8 +706,8 @@ class AstroData:
         """Return the number of independent extensions stored by the object."""
         if self._indices is not None:
             return len(self._indices)
-        else:
-            return len(self._all_nddatas)
+
+        return len(self._all_nddatas)
 
     @property
     def exposed(self):
@@ -719,6 +725,7 @@ class AstroData:
         exposed = set(self._tables)
         if self.is_single:
             exposed |= set(self.nddata.meta["other"])
+
         return exposed
 
     def _pixel_info(self):
@@ -729,52 +736,59 @@ class AstroData:
                 ("variance", None if uncer is None else uncer),
                 ("mask", nd.mask),
             )
+
             for name, other in fixed + tuple(sorted(nd.meta["other"].items())):
                 if other is None:
                     continue
+
                 if isinstance(other, Table):
                     other_objects.append(
-                        dict(
-                            attr=name,
-                            type="Table",
-                            dim=str((len(other), len(other.columns))),
-                            data_type="n/a",
-                        )
+                        {
+                            "attr": name,
+                            "type": "Table",
+                            "dim": str((len(other), len(other.columns))),
+                            "data_type": "n/a",
+                        }
                     )
+
                 else:
                     dim = ""
                     if hasattr(other, "dtype"):
                         dt = other.dtype.name
                         dim = str(other.shape)
+
                     elif hasattr(other, "data"):
                         dt = other.data.dtype.name
                         dim = str(other.data.shape)
+
                     elif hasattr(other, "array"):
                         dt = other.array.dtype.name
                         dim = str(other.array.shape)
+
                     else:
                         dt = "unknown"
-                    other_objects.append(
-                        dict(
-                            attr=name,
-                            type=type(other).__name__,
-                            dim=dim,
-                            data_type=dt,
-                        )
-                    )
 
-            main_dict = dict(
-                content="science",
-                type=type(nd).__name__,
-                dim=str(nd.data.shape),
-                data_type=nd.data.dtype.name,
-            )
+                    obj_dict = {
+                        "attr": name,
+                        "type": type(other).__name__,
+                        "dim": dim,
+                        "data_type": dt,
+                    }
 
-            out_dict = dict(
-                idx=f"[{idx:2}]",
-                main=main_dict,
-                other=other_objects,
-            )
+                    other_objects.append(obj_dict)
+
+            main_dict = {
+                "content": "science",
+                "type": type(nd).__name__,
+                "dim": str(nd.data.shape),
+                "data_type": nd.data.dtype.name,
+            }
+
+            out_dict = {
+                "idx": f"[{idx:2}]",
+                "main": main_dict,
+                "other": other_objects,
+            }
 
             yield out_dict
 
@@ -987,11 +1001,11 @@ class AstroData:
     def _append_imagehdu(self, hdu, name, header, add_to):
         if name in {"DQ", "VAR"} or add_to is not None:
             return self._append_array(hdu.data, name=name, add_to=add_to)
-        else:
-            nd = self._process_pixel_plane(
-                hdu, name=name, top_level=True, custom_header=header
-            )
-            return self._append_nddata(nd, name, add_to=None)
+
+        nd = self._process_pixel_plane(
+            hdu, name=name, top_level=True, custom_header=header
+        )
+        return self._append_nddata(nd, name, add_to=None)
 
     def _append_raw_nddata(self, raw_nddata, name, header, add_to):
         logging.debug("Appending data to nddata: %s", name)
@@ -1084,7 +1098,7 @@ class AstroData:
                 "not single slices"
             )
 
-        elif add_to is not None:
+        if add_to is not None:
             raise ValueError(
                 "Cannot append an AstroData slice to another slice"
             )
@@ -1166,7 +1180,8 @@ class AstroData:
                 "Only one Primary HDU allowed. "
                 "Use .phu if you really need to set one"
             )
-        elif isinstance(ext, Table):
+
+        if isinstance(ext, Table):
             raise ValueError(
                 "Tables should be set directly as attribute, "
                 "i.e. 'ad.MYTABLE = table'"

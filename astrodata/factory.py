@@ -56,7 +56,7 @@ class AstroDataFactory:
                     fp = func(source)
                     yield fp
 
-                except Exception as err:
+                except Exception as err:  # pylint: disable=broad-except
                     # TODO: Should be more specific than this.
                     # Log the exception, if it's a serious error then
                     # re-raise it, e.g., user exits with Ctrl-C.
@@ -66,9 +66,6 @@ class AstroDataFactory:
                         func,
                         err,
                     )
-
-                    if isinstance(err, KeyboardInterrupt):
-                        raise err
 
                 else:
                     if hasattr(fp, "close"):
@@ -80,8 +77,7 @@ class AstroDataFactory:
                 f"No access, or not supported format for: {source}"
             )
 
-        else:
-            yield source
+        yield source
 
     @deprecated(
         "Renamed to add_class, please use that method instead: "
@@ -136,10 +132,8 @@ class AstroDataFactory:
                     if adclass._matches_data(opened):
                         candidates.append(adclass)
 
-                except Exception as err:  # Some problem opening this
+                except Exception as err:  # pylint: disable=broad-except
                     # TODO: Should be more specific than this.
-                    if isinstance(err, KeyboardInterrupt):
-                        raise err
 
                     LOGGER.error(
                         "Failed to open %s with %s, got error: %s",
@@ -163,7 +157,7 @@ class AstroDataFactory:
                 "More than one class is candidate for this dataset"
             )
 
-        elif not final_candidates:
+        if not final_candidates:
             raise AstroDataError("No class matches this dataset")
 
         return final_candidates[0].read(source)
@@ -178,7 +172,7 @@ class AstroDataFactory:
         extensions=None,
     ):  # pylint: disable=invalid-name
         """Deprecated, see |create_from_scratch|."""
-        self.create_from_scratch(phu, extensions=None)
+        self.create_from_scratch(phu=phu, extensions=extensions)
 
     def create_from_scratch(self, phu, extensions=None):
         """Creates an AstroData object from a collection of objects.
@@ -191,6 +185,16 @@ class AstroDataFactory:
 
         extensions : list of HDUs
             List of HDU objects.
+
+        Returns
+        -------
+        `astrodata.AstroData`
+            An AstroData instance.
+
+        Raises
+        ------
+        ValueError
+            If ``phu`` is not a valid object.
         """
         lst = fits.HDUList()
         if phu is not None:
