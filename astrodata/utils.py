@@ -227,20 +227,18 @@ def returns_list(fn):
 
                 return ret[0]
 
-            else:
+            return ret
+
+        if isinstance(ret, list):
+            if len(ret) == len(self):
                 return ret
 
-        else:
-            if isinstance(ret, list):
-                if len(ret) == len(self):
-                    return ret
-                else:
-                    raise IndexError(
-                        f"Incompatible numbers of extensions and "
-                        f"elements in {fn.__name__}"
-                    )
-            else:
-                return [ret] * len(self)
+            raise IndexError(
+                f"Incompatible numbers of extensions and "
+                f"elements in {fn.__name__}"
+            )
+
+        return [ret] * len(self)
 
     return wrapper
 
@@ -306,12 +304,17 @@ class Section(tuple):
     def __new__(cls, *args, **kwargs):
         # Ensure that the order of keys is what we want
         axis_names = [x for axis in "xyzuvw" for x in (f"{axis}1", f"{axis}2")]
-        _dict = {k: v for k, v in zip(axis_names, args + ("",) * len(kwargs))}
+
+        _dict = dict(zip(axis_names, args + ("",) * len(kwargs)))
+
         _dict.update(kwargs)
+
         if list(_dict.values()).count("") or (len(_dict) % 2):
             raise ValueError("Cannot initialize 'Section' object")
+
         instance = tuple.__new__(cls, tuple(_dict.values()))
         instance._axis_names = tuple(_dict.keys())
+
         if not all(np.diff(instance)[::2] > 0):
             raise ValueError(
                 "Not all 'Section' end coordinates exceed the "
@@ -418,14 +421,23 @@ class Section(tuple):
         """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
+
         mins = [max(s1, s2) for s1, s2 in zip(self[::2], section[::2])]
         maxs = [min(s1, s2) for s1, s2 in zip(self[1::2], section[1::2])]
+
         try:
             return self.__class__(
                 *[v for pair in zip(mins, maxs) for v in pair]
             )
-        except ValueError:
-            return
+
+        except ValueError as err:
+            logging.warning(
+                "Sections do not overlap, recieved %s: %s",
+                err.__class__.__name__,
+                err,
+            )
+
+            return None
 
     def shift(self, *shifts):
         """Shift a section in each direction by the specified amount"""
