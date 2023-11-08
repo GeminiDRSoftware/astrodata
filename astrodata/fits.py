@@ -336,7 +336,8 @@ def card_filter(cards, include=None, exclude=None):
     for card in cards:
         if include is not None and card[0] not in include:
             continue
-        elif exclude is not None and card[0] in exclude:
+
+        if exclude is not None and card[0] in exclude:
             continue
 
         yield card
@@ -539,18 +540,21 @@ def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
         for hdu in hdulist:
             if hdu in recognized:
                 continue
-            elif isinstance(hdu, ImageHDU):
+
+            if isinstance(hdu, ImageHDU):
                 highest_ver += 1
                 if "EXTNAME" not in hdu.header:
                     hdu.header["EXTNAME"] = (
                         default_extension,
                         "Added by AstroData",
                     )
+
                 if hdu.header.get("EXTVER") in (-1, None):
                     hdu.header["EXTVER"] = (highest_ver, "Added by AstroData")
 
             new_list.append(hdu)
             recognized.add(hdu)
+
     else:
         # Uh-oh, a single image FITS file
         new_list.append(PrimaryHDU(header=hdulist[0].header))
@@ -564,6 +568,7 @@ def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
         for keyw in ("SIMPLE", "EXTEND"):
             if keyw in image.header:
                 del image.header[keyw]
+
         image.header["EXTNAME"] = (default_extension, "Added by AstroData")
         image.header["EXTVER"] = (1, "Added by AstroData")
         new_list.append(image)
@@ -897,6 +902,7 @@ def windowedOp(*args, **kwargs):  # pylint: disable=invalid-name
     return windowed_operation(*args, **kwargs)
 
 
+# TODO: Need to refactor this function
 def windowed_operation(
     func,
     sequence,
@@ -982,7 +988,7 @@ def windowed_operation(
 
     try:
         for coords in boxes:
-            section = tuple([slice(start, end) for (start, end) in coords])
+            section = tuple(slice(start, end) for (start, end) in coords)
             out = func(
                 [element.window[section] for element in sequence], **kwargs
             )
@@ -1013,7 +1019,7 @@ def windowed_operation(
                     other[name] = NDDataObject(
                         np.empty(shape, dtype=obj.data.dtype)
                     )
-                section = tuple([slice(start, end) for (start, end) in coords])
+                section = tuple(slice(start, end) for (start, end) in coords)
                 other[name].set_section(section, obj)
                 del other[name, coords]
 
@@ -1131,7 +1137,7 @@ def asdftablehdu_to_wcs(hdu):
                 err,
             )
 
-            return
+            return None
 
         # If this table column contains text strings as expected, join the rows
         # as separate lines of a string buffer and encode the resulting YAML as
@@ -1156,6 +1162,7 @@ def asdftablehdu_to_wcs(hdu):
             # Try to extract a 'wcs' entry from the YAML:
             try:
                 af = asdf.open(fd)
+
             except IOError:
                 LOGGER.warning(
                     "Ignoring 'WCS' extension %s: failed to parse "
@@ -1164,26 +1171,25 @@ def asdftablehdu_to_wcs(hdu):
                     traceback.format_exc(),
                 )
 
-                return
+                return None
 
-            else:
-                with af:
-                    try:
-                        wcs = af.tree["wcs"]
+            with af:
+                try:
+                    wcs = af.tree["wcs"]
 
-                    except KeyError as err:
-                        LOGGER.warning(
-                            "Ignoring 'WCS' extension %s: missing "
-                            "'wcs' dict entry. Error was %s",
-                            ver,
-                            err,
-                        )
+                except KeyError as err:
+                    LOGGER.warning(
+                        "Ignoring 'WCS' extension %s: missing "
+                        "'wcs' dict entry. Error was %s",
+                        ver,
+                        err,
+                    )
 
-                        return
+                    return None
 
     else:
         LOGGER.warning("Ignoring non-FITS-table 'WCS' extension %s", ver)
 
-        return
+        return None
 
     return wcs
