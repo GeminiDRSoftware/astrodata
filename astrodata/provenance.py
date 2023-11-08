@@ -3,10 +3,10 @@
 """
 # TODO: This could be inherited by AstroData, instead of being helper
 # functions.
+from datetime import datetime
 import json
 
 from astropy.table import Table
-from datetime import datetime
 
 
 def add_provenance(ad, filename, md5, primitive, timestamp=None):
@@ -135,20 +135,24 @@ def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
             else ""
             for ph in ad.HISTORY
         ]
+
         timestamp_stop_arr = [
             ph[timestamp_stop_col_idx]
             if timestamp_stop_col_idx is not None
             else ""
             for ph in ad.HISTORY
         ]
+
         primitive_arr = [
             ph[primitive_col_idx] if primitive_col_idx is not None else ""
             for ph in ad.HISTORY
         ]
+
         args_arr = [
             ph[args_col_idx] if args_col_idx is not None else ""
             for ph in ad.HISTORY
         ]
+
     else:
         timestamp_start_arr = []
         timestamp_stop_arr = []
@@ -160,7 +164,7 @@ def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
     primitive_arr.append(primitive)
     args_arr.append(args)
 
-    dtype = ("S128", "S%d" % colsize, "S28", "S28")
+    dtype = ("S128", f"S{colsize}", "S28", "S28")
     ad.HISTORY = Table(
         [primitive_arr, args_arr, timestamp_start_arr, timestamp_stop_arr],
         names=("primitive", "args", "timestamp_start", "timestamp_stop"),
