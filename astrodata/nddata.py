@@ -182,9 +182,7 @@ class AstroDataMixin:
     @property
     def variance(self):
         """A convenience property to access the contents of ``uncertainty``."""
-        arr = self.uncertainty
-        if arr is not None:
-            return arr.array
+        return getattr(self.uncertainty.array, "array", None)
 
     @variance.setter
     def variance(self, value):
@@ -304,6 +302,8 @@ class NDWindowingAstroData(
     def variance(self):
         if self.uncertainty is not None:
             return self.uncertainty.array
+
+        return None
 
     @property
     def mask(self):
@@ -496,12 +496,15 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
                         self._uncertainty.data
                     )
                     return self.uncertainty
-                else:
-                    return ADVarianceUncertainty(self._uncertainty[section])
-            elif section is not None:
+
+                return ADVarianceUncertainty(self._uncertainty[section])
+
+            if section is not None:
                 return self._uncertainty[section]
-            else:
-                return self._uncertainty
+
+            return self._uncertainty
+
+        return None
 
     def _get_simple(self, target, section=None):
         """Only use 'section' for image-like objects that have the same shape
@@ -513,16 +516,21 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
                     ret = np.empty(source.shape, dtype=source.dtype)
                     ret[:] = source.data
                     setattr(self, target, ret)
+
                 else:
                     ret = source[section]
+
                 return ret
-            elif hasattr(source, "shape"):
+
+            if hasattr(source, "shape"):
                 if section is None or source.shape != self.shape:
                     return np.array(source, copy=False)
-                else:
-                    return np.array(source, copy=False)[section]
-            else:
-                return source
+
+                return np.array(source, copy=False)[section]
+
+            return source
+
+        return None
 
     @property
     def data(self):
@@ -573,8 +581,11 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         """
         # TODO: Is this supposed to be squared?
         arr = self._get_uncertainty()
+
         if arr is not None:
             return arr.array
+
+        return arr
 
     @variance.setter
     def variance(self, value):
@@ -621,8 +632,8 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
     def __repr__(self):
         if is_lazy(self._data):
             return self.__class__.__name__ + "(Memmapped)"
-        else:
-            return super().__repr__()
+
+        return super().__repr__()
 
     # This is a common idiom in numpy, so keep the name.
     # pylint: disable=invalid-name
