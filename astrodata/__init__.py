@@ -28,6 +28,7 @@ __all__ = [
     "add_header_to_table",
     "astro_data_descriptor",
     "astro_data_tag",
+    "from_file",
     "create",
     "open",
     "returns_list",
