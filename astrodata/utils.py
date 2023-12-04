@@ -288,6 +288,7 @@ def astro_data_tag(fn):
                     )
 
                 return TagSet(*tuple(set(s) for s in ret))
+
         except KeyError:
             pass
 
@@ -320,6 +321,7 @@ class Section(tuple):
                 "Not all 'Section' end coordinates exceed the "
                 "start coordinates"
             )
+
         return instance
 
     @property
@@ -332,6 +334,7 @@ class Section(tuple):
     def __getattr__(self, attr):
         if attr in self._axis_names:
             return self.__dict__[attr]
+
         raise AttributeError(f"No such attribute '{attr}'")
 
     def __repr__(self):
@@ -407,9 +410,15 @@ class Section(tuple):
         """Return True if the supplied section is entirely within self"""
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
-        return all(
-            s2 >= s1 for s1, s2 in zip(self[::2], section[::2])
-        ) and all(s2 <= s1 for s1, s2 in zip(self[1::2], section[1::2]))
+
+        con1 = all(s2 >= s1 for s1, s2 in zip(self[::2], section[::2]))
+
+        if not con1:
+            return False
+
+        con2 = all(s2 <= s1 for s1, s2 in zip(self[1::2], section[1::2]))
+
+        return con1 and con2
 
     def is_same_size(self, section):
         """Return True if the Sections are the same size"""

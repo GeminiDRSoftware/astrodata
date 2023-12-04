@@ -523,10 +523,14 @@ def calculate_affine_matrices(func, shape, origin=None):
     next_indim = indim + 1
     points[:, 1:next_indim] += np.eye(indim) * points[:, 0]
     points[:, next_indim:] -= np.eye(indim) * points[:, 0]
+
     if ndim > 1:
-        transformed = np.array(
-            list(zip(*list(func(*point[:indim]) for point in points.T)))
-        ).T
+        transformed = list(
+            zip(*list(func(*point[:indim]) for point in points.T))
+        )
+
+        transformed = np.array(transformed).T
+
     else:
         transformed = np.array([func(*points)]).T
     matrix = np.array(
