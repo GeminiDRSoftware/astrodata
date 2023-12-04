@@ -6,16 +6,17 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+# The full version, including alpha/beta/rc tags
+from astrodata import __version__
+
+release = __version__
+
 
 # -- Project information -----------------------------------------------------
 
 project = "astrodata"
 copyright = "2022, "
 author = ""
-
-# The full version, including alpha/beta/rc tags
-from astrodata import __version__
-release = __version__
 
 # -- General configuration ---------------------------------------------------
 
@@ -32,6 +33,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.doctest",
     "sphinx.ext.mathjax",
+    # "sphinx.ext.autosummary",
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
 ]
@@ -67,11 +69,14 @@ html_theme = "alabaster"
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ["_static"]
 
-# By default, when rendering docstrings for classes, sphinx.ext.autodoc will 
-# make docs with the class-level docstring and the class-method docstrings, 
-# but not the __init__ docstring, which often contains the parameters to 
+# By default, when rendering docstrings for classes, sphinx.ext.autodoc will
+# make docs with the class-level docstring and the class-method docstrings,
+# but not the __init__ docstring, which often contains the parameters to
 # class constructors across the scientific Python ecosystem. The option below
 # will append the __init__ docstring to the class-level docstring when rendering
 # the docs. For more options, see:
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#confval-autoclass_content
 autoclass_content = "both"
+
+# Automodapi options
+numpydoc_show_class_members = False
