@@ -50,6 +50,7 @@ docs = [
     "sphinx-automodapi",
     "sphinx-autoapi",
     "tomli; python_version <\"3.11\"",
+    "myst_parser",
 ]
 
 
