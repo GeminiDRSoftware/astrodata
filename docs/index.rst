@@ -7,6 +7,9 @@ This is the documentation for astrodata.
    :maxdepth: 2
    :caption: Contents:
 
+.. automodapi:: astrodata
+   :no-inheritance-diagram:
+
 Indices and tables
 ==================
 
