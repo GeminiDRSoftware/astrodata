@@ -111,7 +111,7 @@ class AstroData:
 
         # If nddata is a single NDAstroData object, make it a list.
         if not isinstance(nddata, (list, tuple)):
-            nddata = list(nddata)
+            nddata = [nddata]
 
         # _all_nddatas contains all the extensions from the original file or
         # object.  And _indices is used to map extensions for sliced objects.
@@ -225,6 +225,7 @@ class AstroData:
                 # sure that all of them are. Otherwise, skip...
                 if len(tags & is_present) != len(is_present):
                     continue
+
             allowed = (len(tags & blocked_by) + len(plus & blocked)) == 0
             if allowed:
                 # This set is not being blocked by others...
