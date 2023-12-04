@@ -325,7 +325,7 @@ class Section(tuple):
         return instance
 
     @property
-    def __dict__(self):
+    def axis_dict(self):
         return dict(zip(self._axis_names, self))
 
     def __getnewargs__(self):
@@ -333,14 +333,14 @@ class Section(tuple):
 
     def __getattr__(self, attr):
         if attr in self._axis_names:
-            return self.__dict__[attr]
+            return self.axis_dict[attr]
 
         raise AttributeError(f"No such attribute '{attr}'")
 
     def __repr__(self):
         return (
             "Section("
-            + ", ".join([f"{k}={self.__dict__[k]}" for k in self._axis_names])
+            + ", ".join([f"{k}={self.axis_dict[k]}" for k in self._axis_names])
             + ")"
         )
 
@@ -387,8 +387,8 @@ class Section(tuple):
                 [
                     ":".join(
                         [
-                            str(self.__dict__[axis] + 1),
-                            str(self.__dict__[axis.replace("1", "2")]),
+                            str(self.axis_dict[axis] + 1),
+                            str(self.axis_dict[axis.replace("1", "2")]),
                         ]
                     )
                     for axis in self._axis_names[::2]
@@ -402,7 +402,7 @@ class Section(tuple):
         dimensionality can be achieved with the add_dims parameter.
         """
         return (slice(None),) * add_dims + tuple(
-            slice(self.__dict__[axis], self.__dict__[axis.replace("1", "2")])
+            slice(self.axis_dict[axis], self.axis_dict[axis.replace("1", "2")])
             for axis in reversed(self._axis_names[::2])
         )
 
