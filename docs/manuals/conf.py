@@ -470,6 +470,4 @@ rst_epilog = """
 .. |RSUserManual| replace:: :raw-html:`<a href="http://dragons-recipe-system-users-manual.readthedocs.io/en/{v}/">Recipe System User Manual<a>`
 
 
-""".format(
-    v=rtdurl
-)
+""".format(v=rtdurl)
