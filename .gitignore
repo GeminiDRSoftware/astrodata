@@ -168,3 +168,9 @@ cython_debug/
 
 # Testing
 _test*
+
+# Docs
+_build
+
+# Test data
+test.fits
