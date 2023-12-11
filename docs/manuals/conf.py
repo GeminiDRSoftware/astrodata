@@ -385,7 +385,7 @@ def run_api_doc(_):
         The .rst files will be generated. After that, you can use PyCharm's
         build helper.
     """
-    build_packages = ["astrodata", "gemini_instruments"]
+    build_packages = ["astrodata"]  # , "gemini_instruments"]
 
     current_path = os.path.abspath(os.path.dirname(__file__))
     root_path = os.path.abspath(os.path.join(current_path, "..", ".."))

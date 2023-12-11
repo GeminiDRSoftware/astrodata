@@ -96,4 +96,6 @@ rst_prolog = """
 .. |open| replace:: :func:`~astrodata.open`
 .. |return_list| replace:: :func:`~astrodata.return_list`
 .. |version| replace:: :func:`~astrodata.version`
+.. |UserGuide| replace:: :doc:`User Guide </manuals/usermanual/index>`
+.. |DeveloperGuide| replace:: :doc:`Developer Guide </manuals/progmanual/index>`
 """
