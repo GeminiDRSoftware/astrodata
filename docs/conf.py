@@ -15,7 +15,7 @@ release = __version__
 # -- Project information -----------------------------------------------------
 
 project = "astrodata"
-copyright = "2022, "
+copyright = "2023, "
 author = ""
 
 # -- General configuration ---------------------------------------------------
@@ -80,3 +80,20 @@ autoclass_content = "both"
 
 # Automodapi options
 numpydoc_show_class_members = False
+
+
+# Add replacement patterns for all the docs
+rst_prolog = """
+.. |AstroData| replace:: :class:`~astrodata.AstroData`
+.. |AstroDataError| replace:: :class:`~astrodata.AstroDataError`
+.. |AstroDataMixin| replace:: :class:`~astrodata.AstroDataMixin`
+.. |NDAstroData| replace:: :class:`~astrodata.NDAstroData`
+.. |Section| replace:: :class:`~astrodata.Section`
+.. |TagSet| replace:: :class:`~astrodata.TagSet`
+.. |astro_data_descriptor| replace:: :func:`~astrodata.astro_data_descriptor`
+.. |astro_data_tag| replace:: :func:`~astrodata.astro_data_tag`
+.. |create| replace:: :func:`~astrodata.create`
+.. |open| replace:: :func:`~astrodata.open`
+.. |return_list| replace:: :func:`~astrodata.return_list`
+.. |version| replace:: :func:`~astrodata.version`
+"""
