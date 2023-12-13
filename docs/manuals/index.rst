@@ -18,12 +18,14 @@ Astrodata Manual
    cheatsheet
    usermanual/index
    progmanual/index
+   full_api
 
 This documentation provides different levels of information:
 
 - :doc:`cheatsheet` - A refresher on common astrodata operations
 - :doc:`usermanual/index` - How to code with astrodata
 - :doc:`progmanual/index` - How to code for astrodata
+- :doc:`full_api` - The full API documentation for developers.
 
 
 .. raw:: latex
