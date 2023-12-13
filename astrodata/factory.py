@@ -23,11 +23,11 @@ class AstroDataFactory:
     def __init__(self):
         self._registry = set()
 
+    @staticmethod
     @deprecated(
         "Renamed to _open_file, please use that method instead: "
         "astrodata.factory.AstroDataFactory._open_file"
     )
-    @staticmethod
     @contextmanager
     def _openFile(source):  # pylint: disable=invalid-name
         return AstroDataFactory._open_file(source)
