@@ -57,6 +57,8 @@ class AstroDataMixin:
         """Allow access to attributes stored in self.meta['other'], as we do
         with AstroData objects.
         """
+        # TODO: Is this necessary? I don't know if attr access should be
+        # restricted to uppercase things.
         if attribute.isupper():
             try:
                 return self.meta["other"][attribute]
@@ -81,6 +83,7 @@ class AstroDataMixin:
         """Override the NDData method so that "bitwise_or" becomes the default
         operation to combine masks, rather than "logical_or"
         """
+        # TODO: What is this doing, and where?
         return super()._arithmetic(
             operation,
             operand,
@@ -182,7 +185,7 @@ class AstroDataMixin:
     @property
     def variance(self):
         """A convenience property to access the contents of ``uncertainty``."""
-        return getattr(self.uncertainty.array, "array", None)
+        return getattr(self.uncertainty, "array", None)
 
     @variance.setter
     def variance(self, value):
