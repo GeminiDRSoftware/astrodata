@@ -57,13 +57,14 @@ class AstroDataMixin:
         """Allow access to attributes stored in self.meta['other'], as we do
         with AstroData objects.
         """
-        # TODO: Is this necessary? I don't know if attr access should be
-        # restricted to uppercase things.
         if attribute.isupper():
             try:
                 return self.meta["other"][attribute]
+
+            # Does this ever happen? If so under what circumstances?
             except KeyError:
                 pass
+
         raise AttributeError(
             f"{self.__class__.__name__!r} object has no "
             f"attribute {attribute!r}"
@@ -317,7 +318,7 @@ class NDWindowingAstroData(
 
 def is_lazy(item):
     """Returns True if the item is a lazy-loaded object, False otherwise."""
-    return isinstance(item, ImageHDU) or (hasattr(item, "lazy") and item.lazy)
+    return isinstance(item, ImageHDU) or getattr(item, "lazy", False)
 
 
 class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
