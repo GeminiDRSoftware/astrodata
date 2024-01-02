@@ -46,9 +46,21 @@ class AstroDataFactory:
         that it represents an already opened file.
         """
         if isinstance(source, (str, os.PathLike)):
+            # Check that the file exists.
+            if not os.path.isfile(source):
+                raise FileNotFoundError(f"Path is not a file: {source}")
+
+            # Check that the file has nonzero size.
             stats = os.stat(source)
+
             if stats.st_size == 0:
                 LOGGER.warning("File %s is zero size", source)
+
+            if not AstroDataFactory._file_openers:
+                raise AstroDataError(
+                    "No file openers registered. Register some using"
+                    " 'add_class' method."
+                )
 
             # try vs all handlers
             for func in AstroDataFactory._file_openers:
@@ -66,6 +78,10 @@ class AstroDataFactory:
                         func,
                         err,
                     )
+
+                    # Handle nonexistent files.
+                    if isinstance(err, FileNotFoundError):
+                        raise err
 
                 else:
                     if hasattr(fp, "close"):
@@ -99,6 +115,13 @@ class AstroDataFactory:
             )
 
         self._registry.add(cls)
+
+    def remove_class(self, cls: type | str):
+        """Remove a class from the AstroDataFactory registry."""
+        if isinstance(cls, str):
+            cls = next((c for c in self._registry if c.__name__ == cls), None)
+
+        self._registry.remove(cls)
 
     @deprecated(
         "Renamed to get_astro_data, please use that method instead: "
@@ -134,7 +157,6 @@ class AstroDataFactory:
 
                 except Exception as err:  # pylint: disable=broad-except
                     # TODO: Should be more specific than this.
-
                     LOGGER.error(
                         "Failed to open %s with %s, got error: %s",
                         source,
