@@ -7,21 +7,34 @@ AstroData and Derivatives
 *************************
 
 The |AstroData| class is the main interface to the package. When opening files
-or creating new objects, a derivative of this class is returned, as the
+or creating new objects, a derivative of this class is returned, as the base
 |AstroData| class is not intended to be used directly. It provides the logic to
 calculate the :ref:`tag set <ad_tags>` for an image, which is common to all
 data products. Aside from that, it lacks any kind of specialized knowledge
 about the different instruments that produce the FITS files. More importantly,
-it defines two methods (``info`` and ``load``) as abstract, meaning that the
-class cannot be instantiated directly: a derivative must implement those
-methods in order to be useful. Such derivatives can also implement descriptors,
-which provide processed metadata in a way that abstracts the user from the raw
-information (e.g., the keywords in FITS headers).
+it defines two methods (``info`` and ``load``) that read in and offer access to
+data in FITS files.  When extending to other file types, these methods should
+be re-implemented.  |AstroData| also defines several useful properties and
+methods for FITS files specifically, such as ``phu``, ``hdr``, and ``write``,
+that should also be overridden when extending to other file types.
 
-|AstroData| does define a common interface, though. Much of it consists on
-implementing semantic behavior (access to components through indices, like a
-list; arithmetic using standard operators; etc), mostly by implementing
-standard Python methods:
+..
+  The |AstroData| class is the main interface to the package. When opening files
+  or creating new objects, a derivative of this class is returned, as the base
+  |AstroData| class is not intended to be used directly. It provides the logic to
+  calculate the :ref:`tag set <ad_tags>` for an image, which is common to all
+  data products. Aside from that, it lacks any kind of specialized knowledge
+  about the different instruments that produce the FITS files. More importantly,
+  it defines two methods (``info`` and ``load``) as abstract, meaning that the
+  class cannot be instantiated directly: a derivative must implement those
+  methods in order to be useful. Such derivatives can also implement descriptors,
+  which provide processed metadata in a way that abstracts the user from the raw
+  information (e.g., the keywords in FITS headers).
+
+|AstroData| defines a common interface. Much of it consists of implementing
+semantic behavior (access to components through indices, like a list;
+arithmetic using standard operators; etc), mostly by implementing standard
+Python methods:
 
 * Defines a common ``__init__`` function.
 
@@ -39,8 +52,11 @@ standard Python methods:
   only allows to append new data blocks, not to replace them in one sweeping
   move.
 
-* Implements ``__iadd__``, ``__isub__``, ``__imul__``, ``__itruediv__``, and
-  their not-in-place versions, based on them.
+.. TODO: Previously this said that it was their not-in-place equivalents based
+   on these, but that doesn't make a lot of sense to me. Need to check the
+   implementation.
+* Implements ``__add__``, ``__sub__``, ``__mul__``, ``__truediv__``, and
+  their in-place equivalents, based on them.
 
 There are a few other methods. For a detailed discussion, please refer to the
 :ref:`api`.
@@ -51,127 +67,293 @@ The ``tags`` Property
 =====================
 
 Additionally, and crucial to the package, AstroData offers a ``tags`` property,
-that under the hood calculates textual tags that describe the object
-represented by an instance, and returns a set of strings. Returning a set (as
-opposed to a list, or other similar structure) is intentional, because it is
-fast to compare sets, e.g., testing for membership; or calculating intersection,
-etc., to figure out if a certain dataset belongs to an arbitrary category.
+that returns a resolved set of textual tags that describe the object
+represented by an instance (as a set of strings). This is useful for quickly
+determining if a certain dataset belongs to an arbitrary category.
 
 The implementation for the tags property is just a call to
 ``AstroData._process_tags()``. This function implements the actual logic behind
 calculating the tag set (described :ref:`below <ad_tags>`). A derivative class
-could redefine the algorithm, or build upon it.
+could override this to provide a different logic, but this is not recommended
+unless there is a very good reason to do so.
 
+.. TODO: Need to add this example to the tags page.
+For an example of how tags are resolved, seet :ref:`ad_tags`.
 
 Writing an ``AstroData`` Derivative
 ===================================
 
-The first step when creating new |AstroData| derivative hierarchy would be to
-create a new class that knows how to deal with some kind of specific data in a
-broad sense.
+We will step through the process of creating a new |AstroData| derivative.
 
-|AstroData| implements both ``.info()`` and ``.load()`` in ways that are
-specific to FITS files. It also introduces a number of FITS-specific methods
-and properties, e.g.:
+.. creating_astrodata_derivative:
 
-* The properties ``phu`` and ``hdr``, which return the primary header and
-  a list of headers for the science HDUs, respectively.
+Create a new class
+------------------
 
-* A ``write`` method, which will write the data back to a FITS file.
+The first step to creating a new |AstroData| derivative is to create a new
+class that inherits from |AstroData|. If the new class is intended to handle
+non-FITS files, it should override the ``info`` and ``load`` methods. In this
+case, we will create a class to handle the following ASCII file:
 
-* A ``_matches_data`` **static** method, which is very important, involved in
-  guiding for the automatic class choice algorithm during data loading. We'll
-  talk more about this when dealing with :ref:`registering our classes
-  <class_registration>`.
+.. code-block:: text
+  Wavelength (nm)  Flux (erg/cm2/s/nm)
+  1.0              1.0
+  2.0              1.5
+  3.0              2.0
+  4.0              2.5
+  5.0              3.0
+  6.0              2.5
+  7.0              1.0
 
-It also defines the first few descriptors, which are common to all Gemini data:
-``instrument``, ``object``, and ``telescope``, which are good examples of simple
-descriptors that just map a PHU keyword without applying any conversion.
+Let's create our class to just override the info and load methods, and return a
+formatted string containing  the information in the header of the file when the
+``AstroData.info`` method is called:
 
-A typical AstroData programmer will extend this class (|AstroData|). Any of
-the classes under the ``gemini_instruments`` package can be used as examples,
-but we'll describe the important bits here.
+.. code-block:: python
+
+    from astrodata import AstroData, NDAstroData
+
+    class AstroDataMyFile(AstroData):
+        _wavelength: None | NDAstroData
+        _flux: None | NDAstroData
+        _header: list[str]
 
 
-Create a package for it
------------------------
+        def __init__(self, source):
+            super().__init__(source)
+            self._wavelength = None
+            self._flux = None
+            self._header = []
 
-This is not strictly necessary, but simplifies many things, as we'll see when
-talking about *registration*. The package layout is up to the designer, so you
-can decide how to do it. For DRAGONS we've settled on the following
-recommendation for our internal process (just to keep things familiar)::
+        @staticmethod
+        def _matches_data(source):
+            return source.lower().endswith('.txt')
+
+        def info(self) -> str:
+            def batch(iterable, n=1):
+                l = len(iterable)
+                for ndx in range(0, l, n):
+                    yield iterable[ndx:min(ndx + n, l)]
+
+            # Just printing out information retrieved from the text file
+            # header.
+            return ' || '.join(
+              f'{w:>10} {f:>10}'
+              for w, f in batch(self._header, 2)
+            )
+
+        def load(self, path: str):
+            with open(path, 'r') as f:
+                # First line is the header info
+                self._header = f.readline().split()
+
+                # This should keep units with the data
+                self._header = [
+                  (col, unit)
+                  for col, unit in zip(self._header[0::2], self._header[1::2])
+                ]
+
+                for line in f:
+                      w, f = line.split()
+                      self._wavelength.append(float(w))
+                      self._flux.append(float(f))
+
+We now have a class that can be used to load and store data from our ASCII
+file. The ``info`` method returns a formatted string containing the header
+information, and the ``load`` method reads in the data from the file. The
+``_matches_data`` method is used to determine if the file is of the correct
+type. In this case, we are just checking that the file extension is ``.txt``.
+
+However, suppose we only want to use this class for files that contain
+wavelength and flux information and nothing else. In that case, we can check
+the header information in the ``_matches_data`` method:
+
+.. code-block:: python
+
+    @staticmethod
+    def _matches_data(source):
+        if isinstance(source, str):
+            with open(source, 'r') as f:
+                header = f.readline().split()
+
+        else:
+            header = source.readline().split()
+
+        exact_match = ('Wavelength', 'Flux')
+
+        return all(col in header for col in ('Wavelength', 'Flux'))
+
+.. note::
+  To conserve space in this document, we will only include modified code
+  snippets (with any necessary context) for the rest of the examples. At the
+  end of the document there will be an executable with the "final" code. Feel
+  free to use this code as a template.
+
+If there were other metadata contained in the file header, such as intrument
+and mode information, we could use that to determine if the file is of the
+correct type.
+
+Code Organization (Optional)
+----------------------------
+
+The code for our new class can be placed in a single file, but it is often
+useful to organize our code into multiple files depending on their scope and
+purpose.
+
+In DRAGONS, astrodata classes for individual instruments are organized into
+packages. We'll use DRAGONS' GMOS instrument as an example (see
+`the DRAGONS repository <https://github.com/GeminiDRSoftware/DRAGONS/tree/master/gemini_instruments/gmos>`_
+for the full code). It has the following structure:
+
+.. code-block:: text
 
     gemini_instruments
         __init__.py
-        instrument_name
+        gmos
+            tests/
             __init__.py
             adclass.py
             lookup.py
 
-Where ``instrument_name`` would be the package name (for Gemini we group all
-our derivative packages under ``gemini_instruments``, and we would import
-``gemini_instruments.gmos``, for example). ``__init__.py`` and ``adclass.py``
-would be the only required modules under our recommended layout, with
-``lookup.py`` being there just to hold hard-coded values in a module separate
-from the main logic.
+Where ``adclass.py`` contains the ``AstroDataGmos`` class, and ``lookup.py``
+contains a dictionary of filter names and their central wavelengths. The
+``__init__.py`` files are used to import the classes and functions that are
+needed by the package. For example, the ``gmos/__init__.py`` file contains the
+following:
 
-``adclass.py`` would contain the declaration of the derivative class, and
-``__init__.py`` will contain any code needed to register our class with the
-|AstroData| system upon import.
+.. code-block:: python
+
+    __all__ = ['AstroDataGmos']
+
+    from astrodata import factory
+    from ..gemini import addInstrumentFilterWavelengths
+    from .adclass import AstroDataGmos
+    from .lookup import filter_wavelengths
+
+    factory.addClass(AstroDataGmos)
+    # Use the generic GMOS name for both GMOS-N and GMOS-S
+    addInstrumentFilterWavelengths('GMOS', filter_wavelengths)
+
+``lookup.py`` contains information that is specific to the instrument but is
+not explicitly required by the ``AstroDataGmos`` class. In this case, it is a
+dictionary of filter names and their central wavelengths. The
+``addInstrumentFilterWavelengths`` function is used to add this information to
+the ``AstroDataGemini`` class, which is the parent class of ``AstroDataGmos``.
+This function is defined in the ``gemini/__init__.py`` file, which is imported
+by ``gmos/__init__.py``. The motivation here is to keep these lookup data
+separated from the class so changes to these data are only reflected in one and
+will not modify the class itself.
+
+The ``tests/`` directory contains unit tests for the ``AstroDataGmos`` class.
+Determining the nature and scale of tests is left to the developer.
+
+..
+    The first step when creating new |AstroData| derivative hierarchy would be to
+    create a new class that knows how to deal with some kind of specific data in a
+    broad sense.
+
+    |AstroData| implements both ``.info()`` and ``.load()`` in ways that are
+    specific to FITS files. It also introduces a number of FITS-specific methods
+    and properties, e.g.:
+
+    * The properties ``phu`` and ``hdr``, which return the primary header and
+      a list of headers for the science HDUs, respectively.
+
+    * A ``write`` method, which will write the data back to a FITS file.
+
+    * A ``_matches_data`` **static** method, which is very important, involved in
+      guiding for the automatic class choice algorithm during data loading. We'll
+      talk more about this when dealing with :ref:`registering our classes
+      <class_registration>`.
+
+    It also defines the first few descriptors, which are common to all Gemini data:
+    ``instrument``, ``object``, and ``telescope``, which are good examples of simple
+    descriptors that just map a PHU keyword without applying any conversion.
+
+    A typical AstroData programmer will extend this class (|AstroData|). Any of
+    the classes under the ``gemini_instruments`` package can be used as examples,
+    but we'll describe the important bits here.
 
 
-Create your derivative class
-----------------------------
+    Create a package for it
+    -----------------------
 
-This is an excerpt of a typical derivative module::
+    This is not strictly necessary, but simplifies many things, as we'll see when
+    talking about *registration*. The package layout is up to the designer, so you
+    can decide how to do it. For DRAGONS we've settled on the following
+    recommendation for our internal process (just to keep things familiar)::
 
-    from astrodata import astro_data_tag, astro_data_descriptor, TagSet
-    from astrodata import AstroData
+        gemini_instruments
+            __init__.py
+            instrument_name
+                __init__.py
+                adclass.py
+                lookup.py
 
-    from . import lookup
+    Where ``instrument_name`` would be the package name (for Gemini we group all
+    our derivative packages under ``gemini_instruments``, and we would import
+    ``gemini_instruments.gmos``, for example). ``__init__.py`` and ``adclass.py``
+    would be the only required modules under our recommended layout, with
+    ``lookup.py`` being there just to hold hard-coded values in a module separate
+    from the main logic.
 
-    class AstroDataInstrument(AstroData):
-        __keyword_dict = dict(
-            array_name = 'AMPNAME',
-            array_section = 'CCDSECT'
-        )
+    ``adclass.py`` would contain the declaration of the derivative class, and
+    ``__init__.py`` will contain any code needed to register our class with the
+    |AstroData| system upon import.
 
-        @staticmethod
-        def _matches_data(source):
-            return source[0].header.get('INSTRUME', '').upper() == 'MYINSTRUMENT'
 
-        @astro_data_tag
-        def _tag_instrument(self):
-           return TagSet(['MYINSTRUMENT'])
+    Create your derivative class
+    ----------------------------
 
-        @astro_data_tag
-        def _tag_image(self):
-            if self.phu.get('GRATING') == 'MIRROR':
-                return TagSet(['IMAGE'])
+    This is an excerpt of a typical derivative module::
 
-        @astro_data_tag
-        def _tag_dark(self):
-            if self.phu.get('OBSTYPE') == 'DARK':
-                return TagSet(['DARK'], blocks=['IMAGE', 'SPECT'])
+        from astrodata import astro_data_tag, astro_data_descriptor, TagSet
+        from astrodata import AstroData
 
-        @astro_data_descriptor
-        def array_name(self):
-            return self.phu.get(self._keyword_for('array_name'))
+        from . import lookup
 
-        @astro_data_descriptor
-        def amp_read_area(self):
-            ampname = self.array_name()
-            detector_section = self.detector_section()
-            return "'{}':{}".format(ampname, detector_section)
+        class AstroDataInstrument(AstroData):
+            __keyword_dict = dict(
+                array_name = 'AMPNAME',
+                array_section = 'CCDSECT'
+            )
 
-.. note::
-   An actual Gemini Facility Instrument class will derive from
-   ``gemini_instruments.AstroDataGemini``, but this is irrelevant
-   for the example.
+            @staticmethod
+            def _matches_data(source):
+                return source[0].header.get('INSTRUME', '').upper() == 'MYINSTRUMENT'
 
-The class typically relies on functionality declared elsewhere, in some
-ancestor, e.g., the tag set computation and the ``_keyword_for`` method are
-defined at |AstroData|.
+            @astro_data_tag
+            def _tag_instrument(self):
+              return TagSet(['MYINSTRUMENT'])
+
+            @astro_data_tag
+            def _tag_image(self):
+                if self.phu.get('GRATING') == 'MIRROR':
+                    return TagSet(['IMAGE'])
+
+            @astro_data_tag
+            def _tag_dark(self):
+                if self.phu.get('OBSTYPE') == 'DARK':
+                    return TagSet(['DARK'], blocks=['IMAGE', 'SPECT'])
+
+            @astro_data_descriptor
+            def array_name(self):
+                return self.phu.get(self._keyword_for('array_name'))
+
+            @astro_data_descriptor
+            def amp_read_area(self):
+                ampname = self.array_name()
+                detector_section = self.detector_section()
+                return "'{}':{}".format(ampname, detector_section)
+
+    .. note::
+      An actual Gemini Facility Instrument class will derive from
+      ``gemini_instruments.AstroDataGemini``, but this is irrelevant
+      for the example.
+
+    The class typically relies on functionality declared elsewhere, in some
+    ancestor, e.g., the tag set computation and the ``_keyword_for`` method are
+    defined at |AstroData|.
 
 Some highlights:
 
