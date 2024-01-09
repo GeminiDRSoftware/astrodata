@@ -49,6 +49,7 @@ __version__ = version()
 # they are very difficult to write tests for, or to have users work on
 # themselves.
 factory = AstroDataFactory()
+
 # Let's make sure that there's at least one class that matches the data
 # (if we're dealing with a FITS file)
 factory.add_class(AstroData)
