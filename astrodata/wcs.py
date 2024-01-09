@@ -630,9 +630,11 @@ def read_wcs_from_header(header):
             for axis, unused in enumerate(np.all(cd == 0, axis=0))
             if unused
         ]
+
         unused_world_axes += list(
             range(wcsaxes, wcsaxes + len(unspecified_pixel_axes))
         )
+
         for pixel_axis, world_axis in zip(
             unspecified_pixel_axes, unused_world_axes
         ):

@@ -1,3 +1,4 @@
+# pragma: no cover
 """Fixtures to be used in tests in DRAGONS
 """
 import functools
