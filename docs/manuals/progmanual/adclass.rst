@@ -20,25 +20,12 @@ methods for FITS files specifically, such as :meth:`astrodata.AstroData.phu`,
 :meth:`astrodata.AstroData.hdr`, and :meth:`astrodata.AstroData.write`,
 that should also be overridden when extending to other file types.
 
-..
-  The |AstroData| class is the main interface to the package. When opening files
-  or creating new objects, a derivative of this class is returned, as the base
-  |AstroData| class is not intended to be used directly. It provides the logic to
-  calculate the :ref:`tag set <ad_tags>` for an image, which is common to all
-  data products. Aside from that, it lacks any kind of specialized knowledge
-  about the different instruments that produce the FITS files. More importantly,
-  it defines two methods (``info`` and ``load``) as abstract, meaning that the
-  class cannot be instantiated directly: a derivative must implement those
-  methods in order to be useful. Such derivatives can also implement descriptors,
-  which provide processed metadata in a way that abstracts the user from the raw
-  information (e.g., the keywords in FITS headers).
-
 |AstroData| defines a common interface. Much of it consists of implementing
 semantic behavior (access to components through indices, like a list;
 arithmetic using standard operators; etc), mostly by implementing standard
 Python methods:
 
-* Defines a common ``__init__`` function.
+* Defines a common :meth:`~astrodata.AstroData.__init__` function.
 
 * Implements ``__deepcopy__``.
 
