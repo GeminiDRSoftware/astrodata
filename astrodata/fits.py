@@ -438,6 +438,10 @@ class FitsLazyLoadable:
         bscale = self._obj._orig_bscale
         bzero = self._obj._orig_bzero
 
+        # If bscale is None, then the data is already scaled
+        if bscale is None:
+            return data
+
         if bscale == 1 and bzero == 0:
             return data
 
@@ -898,7 +902,7 @@ def write_fits(ad, filename, overwrite=False):
     "and will be removed in a future version."
 )
 def windowedOp(*args, **kwargs):  # pylint: disable=invalid-name
-    """Alias for windowed_operation."""
+    """Deprecated alias for windowed_operation."""
     return windowed_operation(*args, **kwargs)
 
 
