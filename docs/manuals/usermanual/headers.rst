@@ -73,7 +73,7 @@ function.  For example::
     >>> help(ad.filter_name)
 
 The full list of standard descriptors is available in the Appendix
-:ref:`descriptors`.
+|Descriptors|.
 
 Accessing Metadata
 ==================
@@ -130,7 +130,7 @@ Some descriptors accept arguments.  For example::
     'g'
 
 A full list of standard descriptors is available in the Appendix
-:ref:`descriptors`.
+|Descriptors|.
 
 
 Accessing Metadata Directly
@@ -296,7 +296,7 @@ the extensions.
 
 Gemini has defined a standard list of descriptors that should be defined
 one way or another for each instrument to ensure the re-usability of our
-algorithms.  That list is provided in the Appendix :ref:`descriptors`.
+algorithms.  That list is provided in the Appendix |Descriptors|.
 
 For more information on adding to Astrodata, see the Astrodata Programmer
 Manual.

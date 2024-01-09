@@ -56,7 +56,14 @@ master_doc = "index"
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"python": ("https://docs.python.org/", None)}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/", None),
+    "astropy": ("http://docs.astropy.org/en/stable/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "gemini_instruments": ("https://dragons.readthedocs.io/en/latest/", None),
+}
+
+intersphinx_disabled_reftypes = ["*"]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -129,7 +136,7 @@ rst_prolog = """
 .. |RSUserManual| replace:: :raw-html:`<a href="http://dragons-recipe-system-users-manual.readthedocs.io/en/{v}/">Recipe System User Manual<a>`
 
 .. |Tags| replace:: :ref:`Tags`
-.. |Descriptors| replace:: :ref:`Descriptors`
+.. |Descriptors| replace:: :ref:`ad_descriptors`
 
 .. TODO: below are broken links
 
