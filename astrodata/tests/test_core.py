@@ -1,5 +1,8 @@
-import operator
+# Disable pylint
+# pylint: skip-file
 from copy import deepcopy
+import operator
+import os
 
 import numpy as np
 import pytest
@@ -351,3 +354,105 @@ def test_AstroData__init__():
 
     # Test initialization with a primary header and data
     ad = astrodata.AstroData(data, phu=phu)
+
+
+def test_single_nddata():
+    # Test when data is a single NDData object
+    data = astrodata.NDAstroData(np.ones((2, 2)))
+    ad = astrodata.AstroData(data, is_single=True)
+    assert len(ad) == 1
+    assert ad.phu == fits.Header()
+    assert ad.instrument() is None
+
+
+def test_bad_tables():
+    # Error should be raised if a table is not a dict
+    data = [astrodata.NDAstroData(np.ones((2, 2)))]
+    tbl = Table([np.zeros(10), np.ones(10)], names=("a", "b"))
+
+    with pytest.raises(ValueError):
+        astrodata.AstroData(data, is_single=True, tables=tbl)
+
+
+def test_process_tags_is_present():
+    # When is_present is True, tags are tested to ensure teh correct tags are
+    # present and the correct number of tags are present.
+    from astrodata.utils import TagSet
+
+    # Create a TagSet that requires other tags to be present.
+    class TestAstroData(astrodata.AstroData):
+        @astrodata.astro_data_tag
+        def _tag_self(self):
+            tags = TagSet(
+                {"A", "B", "C", "D"},
+                if_present={"blah", "bing", "bong"},
+            )
+            return tags
+
+    # Create an AstroData object without the required tags present.
+    nddata = astrodata.NDAstroData(np.ones((2, 2)))
+    ad = TestAstroData([nddata])
+
+    # Check that the tags are present.
+    assert ad.tags == set()
+
+    # Add the required tags.
+    class NewTestAstroData(TestAstroData):
+        @astrodata.astro_data_tag
+        def _other_tags(self):
+            tags = TagSet({"blah", "bing", "bong"})
+            return tags
+
+    # Create an AstroData object with the required tags present.
+    ad = NewTestAstroData([nddata])
+
+    # Check that the tags are present.
+    assert ad.tags == {"A", "B", "C", "D", "blah", "bing", "bong"}
+
+
+def test_absolute_path_filename(tmpdir, ad1):
+    # Make a temporary directory and set the filename to be an absolute path.
+    path = os.path.abspath(str(tmpdir))
+    filename = os.path.join(path, "test.fits")
+
+    with pytest.raises(ValueError):
+        ad1.filename = filename
+
+
+def test_setter_orig_filename(tmpdir, ad1):
+    ad1.orig_filename = os.path.join(tmpdir, "test.fits")
+
+
+def test_multi_slice_wcs(ad1):
+    ad1.is_single = False
+    with pytest.raises(ValueError):
+        ad1[0:2].wcs
+
+
+def test_pixel_info(ad1):
+    # Test pixel information for a single NDAstroData object
+    pixel_info = ad1._pixel_info()
+
+    for pixel in pixel_info:
+        assert isinstance(pixel, dict)
+
+    # Test pixel information for multiple NDAstroData objects
+    ad1.is_single = False
+    pixel_info = ad1._pixel_info()
+
+    for pixel in pixel_info:
+        assert isinstance(pixel, dict)
+
+    nddata = astrodata.NDAstroData(np.ones((2, 2)))
+
+    for nd in ad1._nddata:
+        for name in tuple(sorted(nd.meta["other"])):
+            if hasattr(nd.meta["other"][name], "dtype"):
+                del nd.meta["other"][name].dtype
+
+            nd.meta["other"][name].data = nddata
+
+    pixel_info = ad1._pixel_info()
+
+    for pixel in pixel_info:
+        assert isinstance(pixel, dict)
