@@ -172,5 +172,5 @@ _test*
 # Docs
 _build
 
-# Test data
+# Test data (sometimes pops up when tests fail very badly)
 test.fits
