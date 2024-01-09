@@ -52,6 +52,11 @@ applications dealing with large arrays, particularly when using Python. Given
 the choice to optimize for speed or for memory consumption, we've chosen the
 latter, which is the more pressing issue.
 
+.. _ad_slices:
+
+Slicing
+-------
+
 We've added another new property, ``window``, that can be used to
 explicitly exploit the `astropy.io.fits`'s ``section`` property, to (again)
 avoid loading unneeded data to memory. This property returns an instance of
