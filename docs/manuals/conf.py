@@ -395,7 +395,7 @@ def run_api_doc(_):
     for p in build_packages:
         build_path = os.path.join(root_path, p)
 
-        ignore_paths = ["doc", "test*", "**/test*"]
+        ignore_paths = ["doc*", "test*", "**/test*"]
         ignore_paths = [os.path.join(build_path, i, "*") for i in ignore_paths]
 
         argv = [
@@ -404,7 +404,7 @@ def run_api_doc(_):
             # "--separate",
             "--module",
             "--output-dir",
-            "api/",
+            "docs/manuals/api/",
             build_path,
         ] + ignore_paths
 

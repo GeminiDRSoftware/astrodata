@@ -7,7 +7,7 @@ Introduction
 ************
 
 AstroData is a Python package that provides a common interface to astronomical
-data. Originally part of the |DRAGONS|_ package, which is the data reduction
+data. Originally part of the |DRAGONS| package, which is the data reduction
 package for the Gemini Observatory, it has been split into its own package to
 allow its use in other projects and to be developed by a wider, public core to
 suit the needs of data reduction across the field of astronomy.
@@ -20,15 +20,16 @@ methods to access the data in a consistent manner, regardless of the
 underlying data format.
 
 The |AstroData| class is not intended to be used directly by the user. Instead,
-the user should use the |astrodata.from_file| function, which will return an
-|AstroData| object. The |astrodata.from_file| function will determine the type of
+the user should use the :func:`~astrodata.from_file` function, which will return an
+|AstroData| object. The :func:`~astrodata.from_file` function will determine the type of
 data file being opened and return the appropriate subclass of |AstroData|.
 
 For the programmer using |AstroData| to develop a data reduction pipeline, the
 |AstroData| class should be subclassed to provide the functionality required
-and to register the new class with the |astrodata.from_file| function.
+and to register the new class with the :func:`~astrodata.from_file` function.
 
 .. TODO: Link to a list of these examples here
+
 Several examples may be found throughout the documentation (see |Examples|). A
 simple example is shown below as a complete, executable introduction.
 

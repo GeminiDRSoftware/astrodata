@@ -12,10 +12,12 @@ or creating new objects, a derivative of this class is returned, as the base
 calculate the :ref:`tag set <ad_tags>` for an image, which is common to all
 data products. Aside from that, it lacks any kind of specialized knowledge
 about the different instruments that produce the FITS files. More importantly,
-it defines two methods (``info`` and ``load``) that read in and offer access to
+it defines two methods (:meth:`~astrodata.AstroData.info` and
+:meth:`~astrodata.AstroData.load`) that read in and offer access to
 data in FITS files.  When extending to other file types, these methods should
 be re-implemented.  |AstroData| also defines several useful properties and
-methods for FITS files specifically, such as ``phu``, ``hdr``, and ``write``,
+methods for FITS files specifically, such as :meth:`astrodata.AstroData.phu`,
+:meth:`astrodata.AstroData.hdr`, and :meth:`astrodata.AstroData.write`,
 that should also be overridden when extending to other file types.
 
 ..
@@ -55,6 +57,7 @@ Python methods:
 .. TODO: Previously this said that it was their not-in-place equivalents based
    on these, but that doesn't make a lot of sense to me. Need to check the
    implementation.
+
 * Implements ``__add__``, ``__sub__``, ``__mul__``, ``__truediv__``, and
   their in-place equivalents, based on them.
 
@@ -78,6 +81,7 @@ could override this to provide a different logic, but this is not recommended
 unless there is a very good reason to do so.
 
 .. TODO: Need to add this example to the tags page.
+
 For an example of how tags are resolved, seet :ref:`ad_tags`.
 
 Writing an ``AstroData`` Derivative
@@ -96,6 +100,7 @@ non-FITS files, it should override the ``info`` and ``load`` methods. In this
 case, we will create a class to handle the following ASCII file:
 
 .. code-block:: text
+
   Wavelength (nm)  Flux (erg/cm2/s/nm)
   1.0              1.0
   2.0              1.5
@@ -179,9 +184,15 @@ the header information in the ``_matches_data`` method:
         else:
             header = source.readline().split()
 
-        exact_match = ('Wavelength', 'Flux')
+        # Check that the header contains no extra information.
+        if any(col not in ('Wavelength', 'Flux') for col, _ in header):
+            return False
 
-        return all(col in header for col in ('Wavelength', 'Flux'))
+        # Check that the header contains both wavelength and flux information.
+        return all(
+          any(col == name for col, _ in header)
+          for name in ('Wavelength', 'Flux')
+        )
 
 .. note::
   To conserve space in this document, we will only include modified code
@@ -192,6 +203,8 @@ the header information in the ``_matches_data`` method:
 If there were other metadata contained in the file header, such as intrument
 and mode information, we could use that to determine if the file is of the
 correct type.
+
+.. _code_organization:
 
 Code Organization (Optional)
 ----------------------------
@@ -471,31 +484,21 @@ Finally, you need to include your class in the **AstroData Registry**. This is
 an internal structure with a list of all the |AstroData|\-derived classes that
 we want to make available for our programs. Including the classes in this
 registry is an important step, because a file should be opened using
-`astrodata.open` or `astrodata.create`, which uses the registry to identify
-the appropriate class (via the ``_matches_data`` methods), instead of having
-the user specify it explicitly.
+`astrodata.from_file` or `astrodata.create_from_scratch`, which uses the
+registry to identify the appropriate class (via the ``_matches_data`` methods),
+instead of having the user specify it explicitly.
 
-The version of AstroData prior to DRAGONS had an auto-discovery mechanism, that
-explored the source tree looking for the relevant classes and other related
-information. This forced a fixed directory structure (because the code needed
-to know where to look for files), and gave the names of files and classes
-semantic meaning (to know *which* files to look into, for example). Aside from
-the rigidness of the scheme, this introduced all sort of inefficiencies,
-including an unacceptably high overhead when importing the AstroData package
-for the first time during execution.
-
-In this new version of AstroData we've introduced a more manageable scheme,
-that places the discovery responsibility on the programmer. A typical
-``__init__.py`` file on an instrument package will look like this::
+A typical ``__init__.py`` file on an instrument package (example above) will
+look like this::
 
     __all__ = ['AstroDataMyInstrument']
 
     from astrodata import factory
     from .adclass import AstroDataMyInstrument
 
-    factory.addClass(AstroDataMyInstrument)
+    factory.add_class(AstroDataMyInstrument)
 
-The call to ``factory.addClass`` is the one registering the class. This step
+The call to ``factory.add_class`` is the one registering the class. This step
 **needs** to be done **before** the class can be used effectively in the
 AstroData system. Placing the registration step in the ``__init__.py`` file is
 convenient, because importing the package will be enough!

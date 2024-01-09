@@ -42,7 +42,7 @@ This documentation provides different levels of information:
    :maxdepth: 1
 
    appendix_descriptors
-   api
+..   api
 
 .. ******************
 .. Indices and tables

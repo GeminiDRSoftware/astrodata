@@ -98,4 +98,42 @@ rst_prolog = """
 .. |version| replace:: :func:`~astrodata.version`
 .. |UserGuide| replace:: :doc:`User Guide </manuals/usermanual/index>`
 .. |DeveloperGuide| replace:: :doc:`Developer Guide </manuals/progmanual/index>`
+
+
+.. _`Anaconda`: https://www.anaconda.com/
+.. _`Astropy`: http://docs.astropy.org/en/stable/
+.. _`Conda`: https://conda.io/docs/
+.. _`Numpy`: https://numpy.org/doc/stable/
+.. |numpy| replace:: `Numpy`_
+.. |astropy| replace:: `Astropy`_
+
+.. |astrodata| replace:: :mod:`~astrodata`
+.. |geminidr| replace:: :mod:`~geminidr`
+.. |gemini_instruments| replace:: :mod:`gemini_instruments`
+.. |gemini| replace:: ``gemini``
+.. |Mapper| replace:: :class:`~recipe_system.mappers.baseMapper.Mapper`
+.. |mappers| replace:: :mod:`recipe_system.mappers`
+.. |NDData| replace:: :class:`~astropy.nddata.NDData`
+.. |PrimitiveMapper| replace:: :class:`~recipe_system.mappers.primitiveMapper.PrimitiveMapper`
+.. |RecipeMapper| replace:: :class:`~recipe_system.mappers.recipeMapper.RecipeMapper`
+.. |recipe_system| replace:: :mod:`recipe_system`
+.. |Reduce| replace:: :class:`~recipe_system.reduction.coreReduce.Reduce`
+.. |reduce| replace:: ``reduce``
+.. |Table| replace:: :class:`~astropy.table.Table`
+
+.. role:: raw-html(raw)
+   :format: html
+
+.. |DRAGONS| replace:: :raw-html:`<a href="https://dragons.readthedocs.io/en/{v}/">DRAGONS</a>`
+.. |RSProgManual| replace:: :raw-html:`<a href="http://dragons-recipe-system-programmers-manual.readthedocs.io/en/{v}/">Recipe System Programmer Manual</a>`
+.. |RSUserManual| replace:: :raw-html:`<a href="http://dragons-recipe-system-users-manual.readthedocs.io/en/{v}/">Recipe System User Manual<a>`
+
+.. |Tags| replace:: :ref:`Tags`
+.. |Descriptors| replace:: :ref:`Descriptors`
+
+.. TODO: below are broken links
+
+.. |Index| replace:: `Index`
+.. |Examples| replace:: `Examples`
+
 """
