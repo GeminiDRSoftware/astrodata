@@ -2,17 +2,22 @@
 """Fixtures to be used in tests in DRAGONS
 """
 import functools
+import io
 import os
 import shutil
+import tempfile
 import unittest
 import urllib
 import warnings
 import xml.etree.ElementTree as et
 
+from astropy.io import fits
 from astropy.table import Table
 from astropy.utils.data import download_file
 
 import numpy as np
+
+from typing import Iterable
 
 # Disable pylint import error
 # pylint: disable=import-outside-toplevel
@@ -744,3 +749,103 @@ def ad_compare(ad1, ad2, **kwargs):
     """
     compare = ADCompare(ad1, ad2).run_comparison(**kwargs)
     return not compare
+
+
+__HDUL_LIKE_TYPE = fits.HDUList | list[fits.hdu.FitsHDU]
+
+
+def create_test_file(
+    path: os.PathLike | None = None,
+    hdus: __HDUL_LIKE_TYPE | None = None,
+    n_extensions: int = 1,
+    image_shape: tuple[int, int] | None = None,
+    include_header_keys: Iterable[str] | None = None,
+    file_type: str = "fits",
+) -> str:
+    """Create a temporary file of a given type and return a path to the file.
+
+    Arguments
+    ---------
+    path : os.PathLike | None
+        The path to the file to be created. If None, a temporary file is
+        created.
+
+    hdus : HDUList | list[HDUBase] | None
+        The HDUList or list of HDUBase objects to be written to the file.  If
+        None, a file with a primary HDU and n_extension extension HDUs are
+        generated.
+
+    n_extensions : int
+        The number of extension HDUs to be created if hdus is None.
+        Default is 1 (primary HDU + single extension)
+
+    image_shape : tuple[int, int] | None
+        The shape of the image to be created in the primary HDU. If None, no
+        image is created.
+
+    include_header_keys : Iterable[str] | None
+        A list of header keywords to be included in the primary HDU. If None,
+        no header keywords are included.
+
+    file_type : str
+        The type of file to be created. Default is 'fits'.
+    """
+    # Supported types for generating fake data.
+    supported_types = {"fits"}
+    if file_type not in supported_types:
+        raise NotImplementedError(f"File type {file_type} not supported.")
+
+    # If HDUs are provided, other arguments (other than n_extensions) should
+    # raise an error.
+    if hdus is not None and any((image_shape, include_header_keys)):
+        warnings.warn(
+            "Arguments image_shape and include_header_keys are ignored when "
+            "hdus is provided."
+        )
+
+    # Only one file type (fits) is supported at the moment. Eventually this
+    # will be factored out into its own function.
+    if hdus is None:
+        hdus = []
+
+        image_shape = image_shape or (100, 100)
+
+        primary_hdu = fits.PrimaryHDU(np.zeros(image_shape))
+
+        if include_header_keys is not None:
+            for key in include_header_keys:
+                primary_hdu.header[key] = "TEST_VALUE"
+
+        hdus.append(primary_hdu)
+
+        for i in range(n_extensions):
+            hdus.append(fits.ImageHDU(np.zeros(image_shape), name=f"EXT{i+1}"))
+
+    if file_type == "fits":
+        file_data = io.BytesIO()
+        fits.HDUList(hdus).writeto(file_data)
+
+    else:
+        raise NotImplementedError(f"File type {file_type} not supported.")
+
+    if path is None:
+        temp_file, path = tempfile.mkstemp(suffix=f".{file_type}")
+
+    else:
+        if not path.endswith(f".{file_type}"):
+            directory = os.path.dirname(path)
+            file_name = os.path.basename(path).replace(".file_type", "")
+            temp_file, path = tempfile.mkstemp(
+                suffix=f".{file_type}", dir=directory, prefix=file_name
+            )
+
+        else:
+            temp_file, path = tempfile.mkstemp(suffix=f".{file_type}")
+
+    file = os.fdopen(temp_file, "w+b")
+
+    file.write(file_data.getvalue())
+
+    file.flush()
+
+    return path
