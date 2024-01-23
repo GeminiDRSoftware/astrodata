@@ -7,8 +7,8 @@ Introduction
 ************
 
 AstroData is a Python package that provides a common interface to astronomical
-data. Originally part of the |DRAGONS| package, which is the data reduction
-package for the Gemini Observatory, it has been split into its own package to
+data. Originally part of the |DRAGONS| package, the data reduction package
+developed at the Gemini Observatory, it has been split into its own package to
 allow its use in other projects and to be developed by a wider, public core to
 suit the needs of data reduction across the field of astronomy.
 
@@ -78,7 +78,7 @@ simple example is shown below as a complete, executable introduction.
     ...             return TagSet(['MY_TAG'])
     ...
     ...         # Not strictly necessary, but here for completeness.
-    ...         return None
+    ...         return TagSet()
     ...
     ...     @astro_data_descriptor
     ...     def my_descriptor(self):
