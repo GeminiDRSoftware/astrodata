@@ -551,18 +551,18 @@ favors decoupling between modules, which is generally a good idea.
 
 .. rubric:: Footnotes
 
-.. [#keywdict] Note that the keyword dictionary is a "private" property of the
+.. [#keywdict] The keyword dictionary is a "private" property of the
    class (due to the double-underscore prefix). Each class can define its own
    set, which will not be replaced by derivative classes. ``_keyword_for`` is
    aware of this and will look up each class up the inheritance chain, in turn,
    when looking up for keywords.
 
-.. [#tagset1] Notice that the example functions will return only
+.. [#tagset1] The example functions will return only
    a `~astrodata.TagSet`, if appropriate. This is OK, remember that *every
    function* in Python returns a value, which will be ``None``, implicitly, if
    you don't specify otherwise.
 
-.. [#extver] An ``EXTVER`` keyword is not formally required as the
+.. [#extver] An ``EXTVER`` keyword is not explicitly required; the
    `astrodata.fits.read_fits` method will assign the lowest available integer
    to a ``SCI`` header with no ``EXTVER`` keyword (or if its value is -1). But
    we wish to be able to identify the original ``im1`` header by assigning it
