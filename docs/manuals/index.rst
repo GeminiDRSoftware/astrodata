@@ -27,6 +27,7 @@ This documentation provides different levels of information:
 - :doc:`progmanual/index` - How to code for astrodata
 - :doc:`full_api` - The full API documentation for developers.
 
+If you need support related to |astrodata|, see :ref:`ad_support`.
 
 .. raw:: latex
 
