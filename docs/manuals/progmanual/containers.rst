@@ -6,69 +6,130 @@
 Data Containers
 ***************
 
-A third, and very important part of the AstroData core package is the data
-container. We have chosen to extend Astropy's |NDData| with our own
-requirements, particularly lazy-loading of data using by opening the FITS files
-in read-only, memory-mapping mode, and exploiting the windowing capability of
-`astropy.io.fits` (using ``section``) to reduce our memory requirements, which
-becomes important when reducing data (e.g., stacking).
+The AstroData package is built around the concept of data containers. These are
+objects that contain the data for a single observation, and determine the
+structure of these data in memory. We have extended the Astropy |NDData| class
+to provide the core functionality of these containers, and added a number of
+mixins to provide additional functionality.
 
-We'll describe here how we depart from |NDData|, and how do we integrate the
-data containers with the rest of the package. Please refer to |NDData| for the
-full interface.
+Specifically, we extend |NDData| with the following:
+* `astrodata.NDAstroData` - the main data container class
+* `astrodata.NDAstroDataMixin` - a mixin class that adds additional functionality
+to |NDData|, such as the ability to access image planes and tables stored in
+the ``meta`` dict as attributes of the object
+* `astrodata.NDArithmeticMixin` - a mixin class that adds arithmetic functionality
+* `astrodata.NDSlicingMixin` - a mixin class that adds slicing functionality
 
-Our main data container is `astrodata.NDAstroData`. Fundamentally, it is
-a derivative of `astropy.nddata.NDData`, plus a number of mixins to add
+..
+  A third, and very important part of the AstroData core package is the data
+  container. We have chosen to extend Astropy's |NDData| with our own
+  requirements, particularly lazy-loading of data using by opening the FITS files
+  in read-only, memory-mapping mode, and exploiting the windowing capability of
+  `astropy.io.fits` (using ``section``) to reduce our memory requirements, which
+  becomes important when reducing data (e.g., stacking).
+
+..
+  We'll describe here how we depart from |NDData|, and how do we integrate the
+  data containers with the rest of the package. Please refer to |NDData| for the
+  full interface.
+
+.. _ad_nddata:
+
+|NDAstroData| class
+-------------------
+
+Our main data container is |NDAstroData|. Fundamentally, it is
+a derivative of :class:`astropy.nddata.NDData`, plus a number of mixins to add
 functionality::
 
     class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         ...
 
-This allows us out of the box to have proper arithmetic with error
-propagation, and slicing the data with the array syntax.
+With these mixings, |NDAstroData| is extended to allow for ease and efficiency
+of use, as if a common array, with extra features such as uncertainty
+propogation and efficient slicing with typically array syntax.
 
-Our first customization is ``NDAstroData.__init__``. It relies mostly on the
-upstream initialization, but customizes it because our class is initialized
-with lazy-loaded data wrapped around a custom class
-(`astrodata.fits.FitsLazyLoadable`) that mimics a `astropy.io.fits` HDU
-instance just enough to play along with |NDData|'s initialization code.
+Upon initialization (see :meth:`astrodata.AstroData.__init__`), the
+``AstroData`` class will attempt to open the file in memory-mapping mode, which
+is the default mode for opening FITS files in Astropy. This means that the data
+is not loaded into memory until it is accessed, and is discarded from memory
+when it is no longer needed. This is particularly important for large data
+sets common in astronomy.
 
-``FitsLazyLoadable`` is an integral part of our memory-mapping scheme, and
-among other things it will scale data on the fly, as memory-mapped FITS data
-can only be read unscaled. Our NDAstroData redefines the properties ``data``,
-``uncertainty``, and ``mask``, in two ways:
+Much of |NDAstrodata| acts to mimic the behavior of |NDData| and
+:mod:`astropy.io.fits` objects, but is designed to be extensible to other
+formats and means of storing, accessing, and manipulating data.
 
-* To deal with the fact that our class is storing ``FitsLazyLoadable``
-  instances, not arrays, as |NDData| would expect. This is to keep data out
-  of memory as long as possible.
+..
+  Our first customization is ``NDAstroData.__init__``. It relies mostly on the
+  upstream initialization, but customizes it because our class is initialized
+  with lazy-loaded data wrapped around a custom class
+  (`astrodata.fits.FitsLazyLoadable`) that mimics a `astropy.io.fits` HDU
+  instance just enough to play along with |NDData|'s initialization code.
 
-* To replace lazy-loaded data with a real in-memory array, under certain
-  conditions (e.g., if the data is modified, as we won't apply the changes to the
-  original file!)
+.. TODO: Frankly still not convinced this works at all
+    ``FitsLazyLoadable`` is an integral part of our memory-mapping scheme, and
+    among other things it will scale data on the fly, as memory-mapped FITS data
+    can only be read unscaled. Our NDAstroData redefines the properties ``data``,
+    ``uncertainty``, and ``mask``, in two ways:
 
-Our obsession with lazy-loading and discarding data is directed to reduce
-memory fragmentation as much as possible. This is a real problem that can hit
-applications dealing with large arrays, particularly when using Python. Given
-the choice to optimize for speed or for memory consumption, we've chosen the
-latter, which is the more pressing issue.
+    * To deal with the fact that our class is storing ``FitsLazyLoadable``
+      instances, not arrays, as |NDData| would expect. This is to keep data out
+      of memory as long as possible.
+
+    * To replace lazy-loaded data with a real in-memory array, under certain
+      conditions (e.g., if the data is modified, as we won't apply the changes to the
+      original file!)
+
+    Our obsession with lazy-loading and discarding data is directed to reduce
+    memory fragmentation as much as possible. This is a real problem that can hit
+    applications dealing with large arrays, particularly when using Python. Given
+    the choice to optimize for speed or for memory consumption, we've chosen the
+    latter, which is the more pressing issue.
 
 .. _ad_slices:
 
 Slicing
 -------
 
-We've added another new property, ``window``, that can be used to
-explicitly exploit the `astropy.io.fits`'s ``section`` property, to (again)
-avoid loading unneeded data to memory. This property returns an instance of
-``NDWindowing`` which, when sliced, in turn produces an instance of
-``NDWindowingAstroData``, itself a proxy of ``NDAstroData``. This scheme may
-seem complex, but it was deemed the easiest and cleanest way to achieve the
-result that we were looking for.
+.. TODO: Again... not sure this is really happenning. I need to write a test
+  that actually checks if the data is being lazily loaded or not.
 
-The base ``NDAstroData`` class provides the memory-mapping functionality,
-with other important behaviors added by the ``AstroDataMixin``, which can
-be used with other |NDData|-like classes (such as ``Spectrum1D``) to add
-additional convenience.
+One can already slice |NDAstroData| objects as with |NDData|, as normal Python arrays::
+      >>> ad = astrodata.from_file('some_file.fits')
+      >>> ad.shape
+      (2048, 2048)
+      >>> ad[100:200, 100:200].shape
+      (100, 100)
+
+It's also useful to access specific "windows" in the data, which is implemented
+in |NDAstroData| such that only the data necessary to access a window is loaded
+into memory.
+
+The :meth:`astrodata.AstroData.window` property returns an instance of
+:class:`~astrodata.nddata.NDWindowing`, which only references the |AstroData|
+object being windowed (i.e., it contains no direct references to the data).
+|NDWindowingAstroData|, which has references
+pointing to the memory mapped data requested by the window.
+
+..
+  We've added another new property, ``window``, that can be used to
+  explicitly exploit the `astropy.io.fits`'s ``section`` property, to (again)
+  avoid loading unneeded data to memory. This property returns an instance of
+  ``NDWindowing`` which, when sliced, in turn produces an instance of
+  ``NDWindowingAstroData``, itself a proxy of ``NDAstroData``. This scheme may
+  seem complex, but it was deemed the easiest and cleanest way to achieve the
+  result that we were looking for.
+
+The base ``NDAstroData`` class provides the memory-mapping functionality built
+upon by |NDWindowingAstroData|, with other important behaviors added by the
+other mixins.
+
+..
+  The base ``NDAstroData`` class provides the memory-mapping functionality,
+  with other important behaviors added by the ``AstroDataMixin``, which can
+  be used with other |NDData|-like classes (such as ``Spectrum1D``) to add
+  additional convenience.
 
 One addition is the ``variance`` property, which allows direct access and
 setting of the data's uncertainty, without the user needing to explicitly wrap
@@ -81,9 +142,19 @@ whenever the array is accessed.
 attributes during arithmetic operations from ``logical_or`` to ``bitwise_or``,
 since the individual bits in the mask have separate meanings.
 
+.. TODO: This section may shine light on the WCS issues I've encountered
+  writing slicing tests, so I'm leaving it intact for now.
+
 The way slicing affects the ``wcs`` is also changed since DRAGONS regularly
 uses the callable nature of ``gWCS`` objects and this is broken by the standard
 slicing method.
+
+
+.. Is this tested? I don't remember seeing any tests that check if these
+   attributes are automatically sliced in teh same way/properly.
+
+.. TODO: Check source for where this feature is implemented and write a test
+   for it.
 
 Finally, the additional image planes and tables stored in the ``meta`` dict
 are exposed as attributes of the ``NDAstroData`` object, and any image planes
@@ -91,6 +162,10 @@ that have the same shape as the parent ``NDAstroData`` object will be handled
 by ``NDWindowingAstroData``. Sections will be ignored when accessing image
 planes with a different shape, as well as tables.
 
+.. TODO: Need a new "Planned Features" environment that can be parsed and built
+   as a standalone page for future reference.
+
+.. TODO: This might be something to have a stretch goal for affiliation.
 
 .. note::
 
