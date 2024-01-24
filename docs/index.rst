@@ -8,6 +8,7 @@ This is the documentation for astrodata.
    :caption: Contents:
 
    manuals/index
+   examples/index
    api_short
 
 
