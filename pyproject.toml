@@ -51,6 +51,8 @@ docs = [
     "sphinx-autoapi",
     "tomli; python_version <\"3.11\"",
     "myst_parser",
+    "sphinx-rtd-theme",
+    "sphinx-rtd-dark-mode",
 ]
 
 
