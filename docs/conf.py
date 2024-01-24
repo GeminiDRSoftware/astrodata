@@ -36,6 +36,7 @@ extensions = [
     # "sphinx.ext.autosummary",
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
+    "sphinx_rtd_dark_mode",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -60,7 +61,8 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/", None),
     "astropy": ("http://docs.astropy.org/en/stable/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
-    "gemini_instruments": ("https://dragons.readthedocs.io/en/latest/", None),
+    # "gemini_instruments": ("https://dragons.readthedocs.io/en/latest/", None),
+    "DRAGONS": ("https://dragons.readthedocs.io/en/stable/", None),
 }
 
 intersphinx_disabled_reftypes = ["*"]
@@ -69,7 +71,13 @@ intersphinx_disabled_reftypes = ["*"]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
+
+# Options for the theme
+html_theme_options = {
+    "body_max_width": "none",
+}
+
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -100,7 +108,8 @@ rst_prolog = """
 .. |astro_data_descriptor| replace:: :func:`~astrodata.astro_data_descriptor`
 .. |astro_data_tag| replace:: :func:`~astrodata.astro_data_tag`
 .. |create| replace:: :func:`~astrodata.create`
-.. |open| replace:: :func:`~astrodata.open`
+.. |open| replace:: :func:`~astrodata.from_file`
+.. |from_file| replace:: :func:`~astrodata.from_file`
 .. |return_list| replace:: :func:`~astrodata.return_list`
 .. |version| replace:: :func:`~astrodata.version`
 .. |UserGuide| replace:: :doc:`User Guide </manuals/usermanual/index>`
@@ -115,32 +124,37 @@ rst_prolog = """
 .. |astropy| replace:: `Astropy`_
 
 .. |astrodata| replace:: :mod:`~astrodata`
-.. |geminidr| replace:: :mod:`~geminidr`
-.. |gemini_instruments| replace:: :mod:`gemini_instruments`
-.. |gemini| replace:: ``gemini``
 .. |Mapper| replace:: :class:`~recipe_system.mappers.baseMapper.Mapper`
-.. |mappers| replace:: :mod:`recipe_system.mappers`
 .. |NDData| replace:: :class:`~astropy.nddata.NDData`
+.. |NDWindowing| replace:: :class:`~astropy.nddata.NDWindowing`
+.. |NDWindowingAstroData| replace:: :class:`~astrodata.nddata.NDWindowingAstroData`
 .. |PrimitiveMapper| replace:: :class:`~recipe_system.mappers.primitiveMapper.PrimitiveMapper`
 .. |RecipeMapper| replace:: :class:`~recipe_system.mappers.recipeMapper.RecipeMapper`
-.. |recipe_system| replace:: :mod:`recipe_system`
 .. |Reduce| replace:: :class:`~recipe_system.reduction.coreReduce.Reduce`
-.. |reduce| replace:: ``reduce``
 .. |Table| replace:: :class:`~astropy.table.Table`
+.. |gemini_instruments| replace:: :mod:`DRAGONS:gemini_instruments`
+.. |geminidr| replace:: :mod:`DRAGONS:geminidr`
+.. |gemini| replace:: `Gemini Observatory <https://www.gemini.edu>`__
+.. |mappers| replace:: :mod:`recipe_system.mappers`
+.. |recipe_system| replace:: :mod:`recipe_system`
+.. |reduce| replace:: ``reduce``
 
 .. role:: raw-html(raw)
    :format: html
 
-.. |DRAGONS| replace:: :raw-html:`<a href="https://dragons.readthedocs.io/en/{v}/">DRAGONS</a>`
-.. |RSProgManual| replace:: :raw-html:`<a href="http://dragons-recipe-system-programmers-manual.readthedocs.io/en/{v}/">Recipe System Programmer Manual</a>`
-.. |RSUserManual| replace:: :raw-html:`<a href="http://dragons-recipe-system-users-manual.readthedocs.io/en/{v}/">Recipe System User Manual<a>`
+.. |DRAGONS| replace:: `DRAGONS <https://dragons.readthedocs.io/>`__
+.. |RSProgManual| replace:: `Recipe System Programmer Manual <http://dragons-recipe-system-programmers-manual.readthedocs.io/en/{v}/>`__
+.. |RSUserManual| replace:: `Recipe System User Manual <http://dragons-recipe-system-users-manual.readthedocs.io/en/{v}/>`__
+.. |DRAGONS_install| replace:: `DRAGONS Installation <https://dragons.readthedocs.io/projects/recipe-system-users-manual/en/stable/install.html>`__
+.. |DRAGONS_installation| replace:: |DRAGONS_install|
 
 .. |Tags| replace:: :ref:`Tags`
 .. |Descriptors| replace:: :ref:`ad_descriptors`
+
+.. |IssueTracker| replace:: `Issue Tracker <https://github.com/teald/astrodata/issues>`__
 
 .. TODO: below are broken links
 
 .. |Index| replace:: `Index`
 .. |Examples| replace:: `Examples`
-
 """
