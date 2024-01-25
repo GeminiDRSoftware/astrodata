@@ -18,6 +18,12 @@ be done to achieve science quality data.
 User Examples
 -------------
 
+.. toctree::
+    :maxdepth: 2
+    :glob:
+
+    usermanual_structure_examples/1_example_structure.rst
+
 .. _generic_examples_developer:
 
 Developer Examples
