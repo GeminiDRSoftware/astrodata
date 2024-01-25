@@ -6,73 +6,116 @@
 The AstroData Object
 ********************
 
-The |AstroData| object is an internal representation of a file on disk.
-As of this version, only a FITS layer has been written, but |AstroData| itself
-is not limited to FITS.
+The |AstroData| object represents the data and metadata of a single file on
+disk.  As of this version, |AstroData| has a default implementation supporting
+the FITS file format. If you wish to extend |AstroData| to support other file
+formats, see :ref:`astrodata`.
 
-The internal structure of the |AstroData| object makes uses of
-:class:`astropy.nddata.NDData`, :mod:`astropy.table`, and
-:class:`astropy.io.fits.Header`, the latter simply because it is a
-convenient ordered dictionary.
+The internal structure of the |AstroData| object makes uses of astropy's
+:class:`~astropy.nddata.NDData`, :mod:`~astropy.table`, and
+:class:`~astropy.io.fits.Header`, the latter simply because it is a convenient
+ordered dictionary.
 
-**Try it yourself**
+.. TODO: delete when covered in examples
+    **Try it yourself**
 
-Download the data package (:ref:`datapkg`) if you wish to follow along and run the
-examples.  Then ::
+    Download the data package (:ref:`datapkg`) if you wish to follow along and run the
+    examples.  Then ::
 
-    $ cd <path>/ad_usermanual/playground
-    $ python
+        $ cd <path>/ad_usermanual/playground
+        $ python
+
+
+Example location
+----------------
+
+The examples in this section can be found here: :ref:`user_structure_examples`.
 
 
 Global vs Extension-specific
 ============================
-At the very top level, the structure is divided in two types of information.
-In the first category, there is the information that applies to the data
-globally, for example the information that would be stored in a FITS Primary
-Header Unit, a table from a catalog that matches the RA and DEC of the field,
-etc.  In the second category, there is the information specific to individual
-science pixel extensions, for example the gain of the amplifier, the data
-themselves, the error on those data, etc.
 
-Let us look at an example.  The :meth:`~astrodata.AstroData.info` method shows
-the content of the |AstroData| object and its organization, from the user's
-perspective.::
+At the top level, the |AstroData| structure is divided in two types of
+information.  In the first category, there is the information that applies to
+the data globally, for example the information that would be stored in a FITS
+Primary Header Unit, a table from a catalog that matches the RA and DEC of the
+field, etc.  In the second category, there is the information specific to
+individual science pixel extensions, for example the gain of the amplifier, the
+data themselves, the error on those data, etc.
+
+.. TODO: Turn the below code blocks into an example
+
+The composition and amount of information depends on the contents of the file
+itself. This information varies dramatically between observatories, so ensure
+that you have characterized your data well. Accessing the contents of an
+|AstroData| object is done through the :meth:`~astrodata.AstroData.info`
+method.
+
+.. doctest::
 
     >>> import astrodata
-    >>> import gemini_instruments
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
+    >>> ad = astrodata.from_file('example_mef_file.fits')
     >>> ad.info()
-    Filename: N20170609S0154_varAdded.fits
-    Tags: ACQUISITION GEMINI GMOS IMAGE NORTH OVERSCAN_SUBTRACTED OVERSCAN_TRIMMED
-        PREPARED SIDEREAL
+
+    Filename: example_mef_file.fits
+    Tags: MY_TAG1 MY_TAG2 MY_TAG3
 
     Pixels Extensions
     Index  Content                  Type              Dimensions     Format
     [ 0]   science                  NDAstroData       (2112, 256)    float32
-              .variance             ndarray           (2112, 256)    float32
-              .mask                 ndarray           (2112, 256)    uint16
-              .OBJCAT               Table             (6, 43)        n/a
-              .OBJMASK              ndarray           (2112, 256)    uint8
+            .variance             ndarray           (2112, 256)    float32
     [ 1]   science                  NDAstroData       (2112, 256)    float32
-              .variance             ndarray           (2112, 256)    float32
-              .mask                 ndarray           (2112, 256)    uint16
-              .OBJCAT               Table             (8, 43)        n/a
-              .OBJMASK              ndarray           (2112, 256)    uint8
+            .variance             ndarray           (2112, 256)    float32
     [ 2]   science                  NDAstroData       (2112, 256)    float32
-              .variance             ndarray           (2112, 256)    float32
-              .mask                 ndarray           (2112, 256)    uint16
-              .OBJCAT               Table             (7, 43)        n/a
-              .OBJMASK              ndarray           (2112, 256)    uint8
+            .variance             ndarray           (2112, 256)    float32
     [ 3]   science                  NDAstroData       (2112, 256)    float32
-              .variance             ndarray           (2112, 256)    float32
-              .mask                 ndarray           (2112, 256)    uint16
-              .OBJCAT               Table             (5, 43)        n/a
-              .OBJMASK              ndarray           (2112, 256)    uint8
+            .variance             ndarray           (2112, 256)    float32
 
     Other Extensions
-                   Type        Dimensions
-    .REFCAT        Table       (245, 16)
+                Type        Dimensions
+    .REFERENCE  Table      (245, 16)
+
+..
+    Let us look at an example.  The :meth:`~astrodata.AstroData.info` method shows
+    the content of the |AstroData| object and its organization, from the user's
+    perspective.::
+
+        >>> import astrodata
+        >>> import gemini_instruments
+
+        >>> ad = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
+        >>> ad.info()
+        Filename: N20170609S0154_varAdded.fits
+        Tags: ACQUISITION GEMINI GMOS IMAGE NORTH OVERSCAN_SUBTRACTED OVERSCAN_TRIMMED
+            PREPARED SIDEREAL
+
+        Pixels Extensions
+        Index  Content                  Type              Dimensions     Format
+        [ 0]   science                  NDAstroData       (2112, 256)    float32
+                .variance             ndarray           (2112, 256)    float32
+                .mask                 ndarray           (2112, 256)    uint16
+                .OBJCAT               Table             (6, 43)        n/a
+                .OBJMASK              ndarray           (2112, 256)    uint8
+        [ 1]   science                  NDAstroData       (2112, 256)    float32
+                .variance             ndarray           (2112, 256)    float32
+                .mask                 ndarray           (2112, 256)    uint16
+                .OBJCAT               Table             (8, 43)        n/a
+                .OBJMASK              ndarray           (2112, 256)    uint8
+        [ 2]   science                  NDAstroData       (2112, 256)    float32
+                .variance             ndarray           (2112, 256)    float32
+                .mask                 ndarray           (2112, 256)    uint16
+                .OBJCAT               Table             (7, 43)        n/a
+                .OBJMASK              ndarray           (2112, 256)    uint8
+        [ 3]   science                  NDAstroData       (2112, 256)    float32
+                .variance             ndarray           (2112, 256)    float32
+                .mask                 ndarray           (2112, 256)    uint16
+                .OBJCAT               Table             (5, 43)        n/a
+                .OBJMASK              ndarray           (2112, 256)    uint8
+
+        Other Extensions
+                    Type        Dimensions
+        .REFCAT        Table       (245, 16)
 
 
 The "Pixel Extensions" contain the pixel data.  Each extension is represented

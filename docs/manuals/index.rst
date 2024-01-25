@@ -18,6 +18,7 @@ Astrodata Manual
    cheatsheet
    usermanual/index
    progmanual/index
+   ../examples/index
    full_api
 
 This documentation provides different levels of information:
@@ -26,6 +27,7 @@ This documentation provides different levels of information:
 - :doc:`usermanual/index` - How to code with astrodata
 - :doc:`progmanual/index` - How to code for astrodata
 - :doc:`full_api` - The full API documentation for developers.
+- :doc:`../examples/index` - Examples of how to use astrodata
 
 If you need support related to |astrodata|, see :ref:`ad_support`.
 
