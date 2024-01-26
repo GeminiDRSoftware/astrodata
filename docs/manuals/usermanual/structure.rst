@@ -31,6 +31,8 @@ Example location
 
 The examples in this section can be found here: :ref:`user_structure_examples`.
 
+Walkthrough
+-----------
 
 Global vs Extension-specific
 ============================
@@ -51,11 +53,23 @@ that you have characterized your data well. Accessing the contents of an
 |AstroData| object is done through the :meth:`~astrodata.AstroData.info`
 method.
 
-.. doctest::
+.. testsetup::
+
+    import os
+
+
+    example_fits_file = os.path.dirname(__file__)
+    example_fits_file = os.path.join(
+        example_fits_file,
+        "../../examples/data/example_mef_file.fits"
+    )
+
+.. code::python
 
     >>> import astrodata
 
-    >>> ad = astrodata.from_file('example_mef_file.fits')
+    # You can find the example file in the examples/data directory.
+    >>> ad = astrodata.from_file(example_fits_file)
     >>> ad.info()
 
     Filename: example_mef_file.fits
@@ -118,40 +132,49 @@ method.
         .REFCAT        Table       (245, 16)
 
 
-The "Pixel Extensions" contain the pixel data.  Each extension is represented
-individually in a list (0-indexed like all Python lists).  The science pixel
-data, its associated metadata (extension header), and any other pixel or table
-extensions directly associated with that science pixel data are stored in
-a |NDAstroData| object which is a subclass of astropy |NDData|. We will
-return to this structure later. An |AstroData| extension is accessed like
-any list: ``ad[0]``. To access the science pixels, one uses ``ad[0].data``; for
-the object mask of the first extension, ``ad[0].OBJMASK``.
+The "Pixel Extensions" contain the pixel data (in this case, something specific
+to our data type).  Each extension is represented individually in a list
+(0-indexed like all Python lists).  The science pixel data, its associated
+metadata (extension header), and any other pixel or table extensions directly
+associated with that science pixel data are stored in a |NDAstroData| object
+which subclasses astropy's |NDData|. An |AstroData| extension is accessed like
+any list: ``ad[0]`` will return the first image. To access the science pixels,
+one uses ``ad[0].data``; for the object mask of the first extension,
+``ad[0].OBJMASK``; etc.
 
-In the example above, the "Other Extensions" at the bottom of the
-:meth:`~astrodata.AstroData.info` display contains a ``REFCAT`` table which in
-this case is a list of stars from a catalog that overlaps the field of view
-covered by the pixel data. The "Other Extensions" are global extensions. They
-are not attached to any pixel extension in particular. To access a global
-extension one simply uses the name of that extension: ``ad.REFCAT``.
+.. TODO: incorporate this into the example
+    In the example above, the "Other Extensions" at the bottom of the
+    :meth:`~astrodata.AstroData.info` display contains a ``REFCAT`` table which in
+    this case is a list of stars from a catalog that overlaps the field of view
+    covered by the pixel data. The "Other Extensions" are global extensions. They
+    are not attached to any pixel extension in particular. To access a global
+    extension one simply uses the name of that extension: ``ad.REFCAT``.
 
 
-Organization of the Global Information
-======================================
-All the global information is stored in attributes of the |AstroData| object.
-The global headers, or Primary Header Unit (PHU), is stored in the ``phu``
-attribute as an :class:`astropy.io.fits.Header`.
+Organization of Global Information
+==================================
 
-Any global tables, like ``REFCAT`` above, are stored in the private attribute
-``_tables`` as a Python dictionary with the name (eg. "REFCAT") as the key.
-All tables are stored as :class:`astropy.table.Table`. Access to those table
-is done using the key directly as if it were a normal attribute, eg.
-``ad.REFCAT``. Header information for the table, if read in from a FITS table,
-is stored in the ``meta`` attribute of the :class:`astropy.table.Table`, eg.
-``ad.REFCAT.meta['header']``. It is for information only, it is not used.
+All the global information can be accessed as attributes of the |AstroData|
+object.  The global headers, or Primary Header Unit (PHU), is stored in the
+``phu`` attribute as an :class:`astropy.io.fits.Header`.
+
+.. TODO: Put in a link to a good gemini example below where it says
+    GEMINI_EXAMPLE
+
+Any global tables are stored in the private attribute ``_tables``. For example,
+if we had a ``REFCAT`` global table as part of our data (see example
+:needs_replacement:`GEMINI_EXAMPLE` a Python dictionary with the name (eg.
+"REFCAT") as the key.  All tables are stored as :class:`astropy.table.Table`.
+Access to those table is done using the key directly as if it were a normal
+attribute, eg.  ``ad.REFCAT``. Header information for the table, if read in
+from a FITS table, is stored in the ``meta`` attribute of the
+:class:`astropy.table.Table`, eg.  ``ad.REFCAT.meta['header']``. It is for
+information only, it is not used.
 
 
 Organization of the Extension-specific Information
 ==================================================
+
 The pixel data are stored in the |AstroData| attribute ``nddata`` as a list
 of |NDAstroData| object. The |NDAstroData| object is a subclass of astropy
 |NDData| and it is fully compatible with any function expecting an |NDData| as
@@ -224,10 +247,12 @@ only updated when the object is written to disk as a FITS file.  The WCS is
 retrieved as follows: ``ad[0].wcs``.
 
 
-A Note on Memory Usage
-======================
-When an file is opened, the headers are loaded into memory, but the pixels
-are not. The pixel data are loaded into memory only when they are first
-needed. This is not real "memory mapping", more of a delayed loading. This
-is useful when someone is only interested in the metadata, especially when
-the files are very large.
+.. TODO: Need to rephrase or replace the following subsection
+    A Note on Memory Usage
+    ======================
+
+    When an file is opened, the headers are loaded into memory, but the pixels
+    are not. The pixel data are loaded into memory only when they are first
+    needed. This is not real "memory mapping", more of a delayed loading. This
+    is useful when someone is only interested in the metadata, especially when
+    the files are very large.
