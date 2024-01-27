@@ -15,7 +15,7 @@ release = __version__
 # -- Project information -----------------------------------------------------
 
 project = "astrodata"
-copyright = "2023, "
+copyright = "2023-present, NOIRLab/Gemini Observatories"
 author = ""
 
 # -- General configuration ---------------------------------------------------
@@ -83,6 +83,9 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ["_static"]
+
+# TODO: Need to move this file into the directory above it (./_static)
+html_css_files = ["manuals/_static/color_styles.css"]
 
 # By default, when rendering docstrings for classes, sphinx.ext.autodoc will
 # make docs with the class-level docstring and the class-method docstrings,
@@ -157,4 +160,8 @@ rst_prolog = """
 
 .. |Index| replace:: `Index`
 .. |Examples| replace:: `Examples`
+
+.. Definitions for colors, special notes, etc.
+
+.. role:: needs_replacement
 """
