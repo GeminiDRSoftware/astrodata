@@ -1,0 +1,20 @@
+/* Handles color styles for text in the documentation.
+
+If a role is defined here, it should have a corresponding role added to the
+conf.py file to be used in the documentation.
+
+*/
+
+/* Color styles for text in the documentation. */
+.red {
+    color: #ff0000;
+}
+
+.extra-bold {
+    font-weight: 900;
+}
+
+.needs-replacement {
+    color: #ff0000;
+    font-weight: 900;
+}
