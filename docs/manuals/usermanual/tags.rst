@@ -2,28 +2,78 @@
 
 .. _tags:
 
-**************
-Astrodata Tags
-**************
+***************
+Astrodata |Tag|
+***************
 
-What are the Astrodata Tags?
-============================
-The Astrodata Tags identify the data represented in the |AstroData| object.
-When a file on disk is opened with |astrodata|, the headers are inspected to
-identify which specific |AstroData| class needs to be loaded,
-:class:`~gemini_instruments.gmos.AstroDataGmos`,
-:class:`~gemini_instruments.niri.AstroDataNiri`, etc. Based on the class the data is
-associated with, a list of "tags" will be defined. The tags will tell whether the
-file is a flatfield or a dark, if it is a raw dataset, or if it has been processed by the
-recipe system, if it is imaging or spectroscopy. The tags will tell the
-users and the system what that data is and also give some information about
-the processing status.
+What is an Astrodata |Tag|?
+===========================
 
-As a side note, the tags are used by DRAGONS Recipe System to match recipes
-and primitives to the data.
+|Tag| is a way to describe the data in an |AstroData| object. Tags are used to
+idenfity the type of |AstroData| object to be created when |open| is called.
+
+A |Tag| is added to an |AstroData| object by defining a function wrapped with
+the :func:`~astrodata.astro_data_tag` decorator.  The function must return a
+:class:`~astrodata.TagSet` object, which describes the behavior of a tag.
+
+For example, the following function defines a tag called "RAW"
+
+.. testsetup::
+
+    from astrodata import TagSet, astro_data_tag
+
+.. doctest::
+
+    class RawAstroData(AstroData):
+        @astro_data_tag
+        def _tag_raw(self):
+            """Identify if this is raw data"""
+            if self.phu.get('PROCTYPE') == 'RAW':
+                return TagSet(['RAW'])
+
+Now, if we call |open| on a file that has a PROCTYPE keyword set to "RAW", the
+|AstroData| object will have the "`RAW`" tag
+
+.. testsetup::
+    >>> from astrodata import testing
+
+
+
+.. doctest::
+    >>> ad = astrodata.open('somefile.fits')
+    >>> ad.tags
+    {'RAW'}
+
+From here, these tag sets can be used to understand what the data is describing
+and how best to process it. It can also contain information about the state of
+processing (e.g., ``RAW`` vs ``PROCESSED``), or any important flags.
+
+.. _ad_tags: :ref:`../progmanual/tags.rst`
+
+These tags are meant to work well with FITS data, using the headers to
+determine what the data is.  However, they can be used with any data type that
+can be described by a set of tags, as long as they are properly defined by the
+developer (see ad_tags_ for more information about developing with |Tag|).
+
+..
+    The Astrodata Tags identify the data represented in the |AstroData| object.
+    When a file on disk is opened with |astrodata|, the headers are inspected to
+    identify which specific |AstroData| class needs to be loaded,
+    :class:`~gemini_instruments.gmos.AstroDataGmos`,
+    :class:`~gemini_instruments.niri.AstroDataNiri`, etc. Based on the class the data is
+    associated with, a list of "tags" will be defined. The tags will tell whether the
+    file is a flatfield or a dark, if it is a raw dataset, or if it has been processed by the
+    recipe system, if it is imaging or spectroscopy. The tags will tell the
+    users and the system what that data is and also give some information about
+    the processing status.
+
+For some examples of tags in production code, see the |gemini_instruments|
+package, which defined a number of |AstroData| derivatives used as part of the
+|DRAGONS| data reduction library for reading as well as processing data.
 
 Using the Astrodata Tags
 ========================
+
 **Try it yourself**
 
 Download the data package (:ref:`datapkg`) if you wish to follow along and run the
@@ -64,109 +114,158 @@ has been trimmed away.  The tags do NOT include all the processing steps. Rather
 at least from the time being, it focuses on steps that matter when associating
 calibrations.
 
-The tags can be used when coding.  For example::
+The tags can be used when coding.  For example
+
+.. doctest::
 
     >>> if 'GMOS' in ad.tags:
-    ...   print('I am GMOS')
+    ...    print('I am GMOS')
     ... else:
-    ...   print('I am these instead:', ad.tags)
-    ...
+    ...    print('I am these instead:', ad.tags)
 
-And::
+And
+
+.. doctest::
 
     >>> if {'IMAGE', 'GMOS'}.issubset(ad.tags):
     ...   print('I am a GMOS Image.')
-    ...
 
-Using typewalk
-==============
-In DRAGONS, there is a convenience tool that will list the Astrodata tags
-for all the FITS file in a directory.
+.. TODO: Below needs to be ported back to DRAGONS documentation since it is a
+    part of gempy (I think, definitely a part of DRAGONS no matter what)
 
-To try it, from the shell, not Python, go to the "playdata" directory and
-run typewalk::
+    Using typewalk
+    ==============
+    In DRAGONS, there is a convenience tool that will list the Astrodata tags
+    for all the FITS file in a directory.
 
-    % cd <path>/ad_usermanual/playdata
-    % typewalk
+    To try it, from the shell, not Python, go to the "playdata" directory and
+    run typewalk::
 
-    directory:  /data/workspace/ad_usermanual/playdata
-     N20170521S0925_forStack.fits ...... (GEMINI) (GMOS) (IMAGE) (NORTH) (OVERSCAN_SUBTRACTED) (OVERSCAN_TRIMMED) (PREPARED) (SIDEREAL)
-     N20170521S0926_forStack.fits ...... (GEMINI) (GMOS) (IMAGE) (NORTH) (OVERSCAN_SUBTRACTED) (OVERSCAN_TRIMMED) (PREPARED) (PROCESSED) (PROCESSED_SCIENCE) (SIDEREAL)
-     N20170609S0154.fits ............... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
-     N20170609S0154_varAdded.fits ...... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (OVERSCAN_SUBTRACTED) (OVERSCAN_TRIMMED) (PREPARED) (SIDEREAL)
-     estgsS20080220S0078.fits .......... (GEMINI) (GMOS) (LONGSLIT) (LS) (PREPARED) (PROCESSED) (PROCESSED_SCIENCE) (SIDEREAL) (SOUTH) (SPECT)
-     gmosifu_cube.fits ................. (GEMINI) (GMOS) (IFU) (NORTH) (ONESLIT_RED) (PREPARED) (PROCESSED) (PROCESSED_SCIENCE) (SIDEREAL) (SPECT)
-     new154.fits ....................... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
-    Done DataSpider.typewalk(..)
+        % cd <path>/ad_usermanual/playdata
+        % typewalk
 
-``typewalk`` can be used to select specific data based on tags, and even create
-lists::
+        directory:  /data/workspace/ad_usermanual/playdata
+        N20170521S0925_forStack.fits ...... (GEMINI) (GMOS) (IMAGE) (NORTH) (OVERSCAN_SUBTRACTED) (OVERSCAN_TRIMMED) (PREPARED) (SIDEREAL)
+        N20170521S0926_forStack.fits ...... (GEMINI) (GMOS) (IMAGE) (NORTH) (OVERSCAN_SUBTRACTED) (OVERSCAN_TRIMMED) (PREPARED) (PROCESSED) (PROCESSED_SCIENCE) (SIDEREAL)
+        N20170609S0154.fits ............... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
+        N20170609S0154_varAdded.fits ...... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (OVERSCAN_SUBTRACTED) (OVERSCAN_TRIMMED) (PREPARED) (SIDEREAL)
+        estgsS20080220S0078.fits .......... (GEMINI) (GMOS) (LONGSLIT) (LS) (PREPARED) (PROCESSED) (PROCESSED_SCIENCE) (SIDEREAL) (SOUTH) (SPECT)
+        gmosifu_cube.fits ................. (GEMINI) (GMOS) (IFU) (NORTH) (ONESLIT_RED) (PREPARED) (PROCESSED) (PROCESSED_SCIENCE) (SIDEREAL) (SPECT)
+        new154.fits ....................... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
+        Done DataSpider.typewalk(..)
 
-    % typewalk --tags RAW
-    directory:  /data/workspace/ad_usermanual/playdata
-     N20170609S0154.fits ............... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
-     new154.fits ....................... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
-    Done DataSpider.typewalk(..)
+    ``typewalk`` can be used to select specific data based on tags, and even create
+    lists::
 
-::
+        % typewalk --tags RAW
+        directory:  /data/workspace/ad_usermanual/playdata
+        N20170609S0154.fits ............... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
+        new154.fits ....................... (ACQUISITION) (GEMINI) (GMOS) (IMAGE) (NORTH) (RAW) (SIDEREAL) (UNPREPARED)
+        Done DataSpider.typewalk(..)
 
-    % typewalk --tags RAW -o rawfiles.lis
-    % cat rawfiles.lis
-    # Auto-generated by typewalk, vv2.0 (beta)
-    # Written: Tue Mar  6 13:06:06 2018
-    # Qualifying types: RAW
-    # Qualifying logic: AND
-    # -----------------------
-    /Users/klabrie/data/tutorials/ad_usermanual/playdata/N20170609S0154.fits
-    /Users/klabrie/data/tutorials/ad_usermanual/playdata/new154.fits
+    ::
+
+        % typewalk --tags RAW -o rawfiles.lis
+        % cat rawfiles.lis
+        # Auto-generated by typewalk, vv2.0 (beta)
+        # Written: Tue Mar  6 13:06:06 2018
+        # Qualifying types: RAW
+        # Qualifying logic: AND
+        # -----------------------
+        /Users/klabrie/data/tutorials/ad_usermanual/playdata/N20170609S0154.fits
+        /Users/klabrie/data/tutorials/ad_usermanual/playdata/new154.fits
 
 
 
 Creating New Astrodata Tags [Advanced Topic]
 ============================================
-For proper and complete instructions on how to create Astrodata Tags and
-the |AstroData| class that hosts the tags, the reader is invited to refer to the
-Astrodata Programmer Manual. Here we provide a simple introduction that
-might help some readers better understand Astrodata Tags, or serve as a
-quick reference for those who have written Astrodata Tags in the past but need
-a little refresher.
 
-The Astrodata Tags are defined in an |AstroData| class.  The |AstroData|
-class specific to an instrument is located in a separate package, not in
-|astrodata|. For example, for Gemini instruments, all the various |AstroData|
-classes are contained in the |gemini_instruments| package.
+The |ProgManual| describes how to create new |AstroData| classes for new
+instruments (specifically, see ad_tags_). This section describes the very basic
+steps for a new user to create self-defined tags.
 
-An Astrodata Tag is a function within the instrument's |AstroData| class.
-The tag function is distinguished from normal functions by applying the
-:func:`~astrodata.astro_data_tag` decorator to it.
-The tag function returns a :class:`astrodata.TagSet`.
+.. TODO: add example file.
 
-For example::
+The content of this section is based on the example file
+:ref:`ad_tag_example_user.py <ad_tag_example_user>`. That file can be used as a
+full reference.
 
-    class AstroDataGmos(AstroDataGemini):
-        ...
-        @astro_data_tag
-        def _tag_arc(self):
-            if self.phu.get('OBSTYPE) == 'ARC':
-                return TagSet(['ARC', 'CAL'])
+.. testsetup::
 
-The tag function looks at the headers and if the keyword "OBSTYPE" is set
-to "ARC", the tags "ARC" and "CAL" (for calibration) will be assigned to the
-|AstroData| object.
+    >>> from astrodata import AstroData, TagSet, astro_data_tag
+
+.. doctest::
+
+    >>> class MyAstroData(AstroData):
+    ...     @astro_data_tag
+    ...     def _tag_mytag(self):
+    ...         return TagSet(['MYTAG'])
+    ...
+
+The |astro_data_tag| decorator is used to identify the function as a tag
+function. While not strictly necessary, it is recommended to use the
+``_tag`` prefix in the function name to make it clear that it is a tag
+function. When a file is opened using |open|, the |AstroData| class will
+automatically call all the tag functions to determine the tags for the
+|AstroData| object, and then determine if the file being opened is
+appropriately tagged for the |AstroData| class. If it is not, the class is
+not used to load in the object and its data; otherwise, it attempts to resolve
+all known |AstroData| types to construct the appropriate instance.
+
+|AstroData| only knows of *registered* |AstroData| class types. To register our
+class, we use |factory|:
+
+.. doctest::
+    >>> import astrodata.factory as factory
+    >>> factory.addClass(MyAstroData)
+    >>> print(factory.getClasses())
+    [<class 'astrodata.ad_tag_example_user.MyAstroData'>]
+
+We now see our class is registered, and can use |open| to open a file that has
+the identifying tag:
+
+.. doctest::
+
+    # Fake FITS file with a MYTAG keyword
+    >>> ad = astrodata.open('mytag.fits')
+    >>> ad.tags
+    {'MYTAG'}
+
+    # Create one from scratch with the MYTAG keyword
+    >>> from astrodata import create_from_scratch
+    >>> from astropy.io import fits
+    >>> phu = fits.PrimaryHDU(header={'MYTAG': True}).header
+    >>> ad = create_from_scratch(phu)
+    >>> print(ad.tags)
+    {'MYTAG'}
+    >>> type(ad)
+    <class 'astrodata.ad_tag_example_user.MyAstroData'>
+
+
+The tag function looks at the provided headers and if the keyword "OBSTYPE" is
+set to "ARC", the tags "ARC" and "CAL" (for calibration) will be assigned to
+the |AstroData| object.
+
+.. warning::
+    |Tag| functionality is primarily designed with FITS files in mind.  If you
+    are extending |AstroData| to work with other data types, you will need to
+    define your own tag functions that specifically handle resolving tags for
+    that file type.
+
+    This does **not** mean that you cannot use |AstroData| with other data
+    types. It just means that you will need to define your own tag functions in
+    such a way that they do not use, e.g., ``self.phu`` if no such
+    concept/equivalent exists in your desired file type.
 
 A whole suite of such tag functions is needed to fully characterize all
-types of data an instrument can produce.
+types of data an instrument can produce. |gemini_instruments| is an
+example of a package defining a number of |AstroData| types that use the
+tag system to automaticlaly and precisely identify the specific instrument
+used to produce the data, and to process it accordingly.
 
-Tags are about what the dataset is, not it's flavor.  The Astrodata
-"descriptors" (see the section on :ref:`headers`) will describe the flavor.
-For example, tags will say that the data is an image, but the descriptor
-will say whether it is B-band or R-band. Tags are used for recipe and
-primitive selection.  A way to understand the difference between a tag and
-a descriptor is in terms of the recipe that will be selected: A GMOS image
-will use the same recipe whether it's a B-band or R-band image. However,
-a GMOS longslit spectrum will need a very different recipe.  A bias is
-reduced differently from a science image, there should be a tag differentiating
-a bias from a science image.  (There is for GMOS.)
+Tags should be exact and precise. For quantities and values that are
+not so well defined (for example, the type of observation), descriptors
+are used. For more information about descriptors, see the section on
+:ref:`headers`.
 
-For more information on adding to Astrodata, see the Astrodata Programmer
-Manual.
+For more information on adding to |astrodata|, see the |ProgManual|.
