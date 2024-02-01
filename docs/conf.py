@@ -117,6 +117,10 @@ rst_prolog = """
 .. |version| replace:: :func:`~astrodata.version`
 .. |UserGuide| replace:: :doc:`User Guide </manuals/usermanual/index>`
 .. |DeveloperGuide| replace:: :doc:`Developer Guide </manuals/progmanual/index>`
+.. |ProgrammerGuide| replace:: |DeveloperGuide|
+.. |UserManual| replace:: |UserGuide|
+.. |ProgManual| replace:: |DeveloperGuide|
+.. |ProgrammerManual| replace:: |DeveloperGuide|
 
 
 .. _`Anaconda`: https://www.anaconda.com/
@@ -141,6 +145,8 @@ rst_prolog = """
 .. |mappers| replace:: :mod:`recipe_system.mappers`
 .. |recipe_system| replace:: :mod:`recipe_system`
 .. |reduce| replace:: ``reduce``
+.. |astrodata_descriptor| replace:: :func:`~astrodata.astro_data_descriptor`
+.. |factory| replace:: :class:`~astrodata.factory.AstroDataFactory`
 
 .. role:: raw-html(raw)
    :format: html
@@ -152,6 +158,7 @@ rst_prolog = """
 .. |DRAGONS_installation| replace:: |DRAGONS_install|
 
 .. |Tags| replace:: :ref:`Tags`
+.. |Tag| replace:: :class:`~astrodata.Tag`
 .. |Descriptors| replace:: :ref:`ad_descriptors`
 
 .. |IssueTracker| replace:: `Issue Tracker <https://github.com/teald/astrodata/issues>`__
