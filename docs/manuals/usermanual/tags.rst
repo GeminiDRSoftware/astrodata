@@ -186,9 +186,9 @@ steps for a new user to create self-defined tags.
 
 .. TODO: add example file.
 
+
 The content of this section is based on the example file
-:ref:`ad_tag_example_user.py <ad_tag_example_user>`. That file can be used as a
-full reference.
+:needs_replacement:`EXAMPLE FILE`. That file can be used as a full reference.
 
 .. testsetup::
 
