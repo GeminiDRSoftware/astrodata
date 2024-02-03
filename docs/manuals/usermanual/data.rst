@@ -6,31 +6,47 @@
 Pixel Data
 **********
 
-**Try it yourself**
+The most important part of an |AstroData| object is the pixel data.
+Manipulating and interacting with pixel data is a common task in astronomy, and
+|astrodata| provides a number of tools, as well as many familiar operations, to
+make working with such data efficient and straightforward.
 
-Download the data package (:ref:`datapkg`) if you wish to follow along and run the
-examples.  Then ::
+..
+    **Try it yourself**
 
-    $ cd <path>/ad_usermanual/playground
-    $ python
+    Download the data package (:ref:`datapkg`) if you wish to follow along and run the
+    examples.  Then ::
 
-Then import core astrodata and the Gemini astrodata configurations. ::
+        $ cd <path>/ad_usermanual/playground
+        $ python
 
-    >>> import astrodata
-    >>> import gemini_instruments
+    Then import core astrodata and the Gemini astrodata configurations. ::
+
+        >>> import astrodata
+        >>> import gemini_instruments
 
 
 Operate on Pixel Data
 =====================
-The pixel data are stored in the ``AstroData`` object as a list of
-``NDAstroData`` objects.  The ``NDAstroData`` is a subclass of Astropy's
-``NDData`` class which combines in one "package" the pixel values, the
-variance, and the data quality plane or mask (as well as associated meta-data).
-The data can be retrieved as a standard NumPy ``ndarray``.
 
-In the sections below, we will present several typical examples of data
-manipulation.  But first let's start with a quick example on how to access
-the pixel data. ::
+.. todo:: Check that NDData is correctly linked to the Astropy documentation.
+
+The pixel data are stored in the |AstroData| object as a list of
+|NDAstroData| objects.  The |NDAstroData| is a subclass of Astropy's
+|NDData| class which combines in one "package" the pixel values, the
+variance, and the data quality plane or mask (as well as associated meta-data).
+The data can be retrieved as a standard NumPy |NDArray|.
+
+Accessing pixel data can be done with the ``.data`` attribute.  The
+``.data`` attribute is a NumPy |NDArray|.  The ``.data`` attribute is
+a property of the |NDAstroData| object, and it is the pixel data itself.
+
+.. testsetup::
+    import astrodata
+
+.. todo:: Replace example
+
+.. doctest::
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
 
@@ -47,39 +63,54 @@ the pixel data. ::
     333170484
     333055206
 
-In this example, we first access the pixels for the second extensions.
-Remember that in Python, list are zero-indexed, hence we access the second
-extension as ``ad[1]``.   The ``.data`` attribute contains a NumPy ``ndarray``.
-In the for-loop, for each extension, we get the data and use the NumPy
-``.sum()`` method to sum the pixel values.   Anything that can be done
-with a ``ndarray`` can be done on ``AstroData`` pixel data.
+.. note::
+    Remember that extensions can be accessed by index, with index ``0`` being
+    the first extension, **not** the primary header unit (for FITS files).
+
+In this example, we first access the pixels for the second extension. The
+``.data`` attribute contains a NumPy |NDArray|.  In the for-loop, for each
+extension, we get the data and use the NumPy ``.sum()`` method to sum the pixel
+values.   Anything that can be done with a |NDArray| can be done on
+|AstroData| pixel data.
 
 
 Arithmetic on AstroData Objects
 ===============================
-``AstroData`` objects support basic in-place arithmetics with these methods:
+
+|AstroData| objects support basic in-place arithmetics with these methods:
+
+.. |add| replace:: ``.add()``
+.. |subtract| replace:: ``.subtract()``
+.. |multiply| replace:: ``.multiply()``
+.. |divide| replace:: ``.divide()``
 
 +----------------+-------------+
-| addition       | .add()      |
+| addition       | |add|       |
 +----------------+-------------+
-| subtraction    | .subtract() |
+| subtraction    | |subtract|  |
 +----------------+-------------+
-| multiplication | .multiply() |
+| multiplication | |multiply|  |
 +----------------+-------------+
-| division       | .divide()   |
+| division       | |divide|    |
 +----------------+-------------+
 
-Normal, not in-place, arithmetics is also possible using the standard
-operators, ``+``, ``-``, ``*``, and ``/``.
+.. todo:: Check if this is proper implemented in the code.
 
-The big advantage of using ``AstroData`` to do arithmetics is that the
-variance and mask, if present, will be propagated through to the output
-``AstroData`` object.  We will explore the variance propagation in the next
-section and mask usage later in this chapter.
+In-place operations are also supported with the standard in-place assignment
+operators ``+=``, ``-=``, ``*=``, and ``/=``.  Normal, not in-place,
+arithmetics is also possible using the standard operators, ``+``, ``-``, ``*``,
+and ``/``.
+
+When performing these operations, any variance or masks present will be
+propagated forward to the resulting |AstroData| object (or during in-place
+operations).
+
 
 Simple operations
 -----------------
-Here are a few examples of arithmetics on ``AstroData`` objects.::
+Here are a few examples of arithmetics on |AstroData| objects.
+
+.. doctest::
 
     >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
 
@@ -103,34 +134,46 @@ Here are a few examples of arithmetics on ``AstroData`` objects.::
     >>> ad = ad / ad.exposure_time()
     >>> ad /= ad.exposure_time()
 
-When the syntax ``adout = adin + 1`` is used, the output variable is a copy
+When the syntax ``adout = adin + 1`` is used, the output variable is a *copy*
 of the original.  In the examples above we reassign the result back onto the
 original.  The two other forms, ``ad.add()`` and ``ad +=`` are in-place
 operations.
 
 When a descriptor returns a list because the value changes for each
-extension, a for-loop is needed::
+extension, a for-loop is needed
+
+.. doctest::
 
     >>> for (ext, gain) in zip(ad, ad.gain()):
     ...     ext.multiply(gain)
 
+
 If you want to do the above but on a new object, leaving the original unchanged,
-use ``deepcopy`` first. ::
+use ``deepcopy`` first.
+
+.. doctest::
 
     >>> from copy import deepcopy
     >>> adcopy = deepcopy(ad)
     >>> for (ext, gain) in zip(adcopy, adcopy.gain()):
     ...     ext.multiply(gain)
 
+.. warning::
+    The ``deepcopy`` function is a powerful tool but it can be slow,
+    memory-consuming, and it can lead to unexpected results if the object being
+    copied contains references to other objects.  It is not recommended to use
+    it unless you are sure you need it. *In many situations, you can avoid
+    using it.*
 
 Operator Precedence
 -------------------
-The ``AstroData`` arithmetics methods can be stringed together but beware that
+
+The |AstroData| arithmetics methods can be stringed together but beware that
 there is no operator precedence when that is done.  For arithmetics that
 involve more than one operation, it is probably safer to use the normal
 Python operator syntax.  Here is a little example to illustrate the difference.
 
-::
+.. doctest::
 
     >>> ad.add(5).multiply(10).subtract(5)
 
@@ -140,50 +183,66 @@ Python operator syntax.  Here is a little example to illustrate the difference.
 This is because the methods modify the object in-place, one operation after
 the other from left to right.  This also means that the original is modified.
 
-This example applies the expected operator precedence::
+This example applies the expected operator precedence
+
+.. doctest::
 
     >>> ad = ad + ad * 3 - 40.
     >>> # means: ad = ad + (ad * 3) - 40.
 
 If you need a copy, leaving the original untouched, which is sometimes useful
 you can use ``deepcopy`` or just use the normal operator and assign to a new
-variable.::
+variable.
+
+.. doctest::
 
     >>> adnew = ad + ad * 3 - 40.
 
 
 Variance
 ========
-When doing arithmetic on an ``AstroData`` object, if a variance is present
+
+When doing arithmetic on an |AstroData| object, if a variance is present
 it will be propagated appropriately to the output no matter which syntax
 you use (the methods or the Python operators).
 
 Adding a Variance Plane
 -----------------------
-In this example, we will add the poisson noise to an ``AstroData`` dataset.
+In this example, we will add the poisson noise to an |AstroData| dataset.
 The data is still in ADU, therefore the poisson noise as variance is
 ``signal / gain``.   We want to set the variance for each of the pixel
 extensions.
 
-::
+.. doctest::
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
 
     >>> for (extension, gain) in zip(ad, ad.gain()):
     ...    extension.variance = extension.data / gain
 
-Check ``ad.info()``, you will see a variance plane for each of the four
-extensions.
+Check :meth:`~astrodata.AstroData.info`, you will see a variance plane for each
+of the four extensions.
 
 Automatic Variance Propagation
 ------------------------------
-As mentioned before, if present, the variance plane will be propagated to the
-resulting ``AstroData`` object when doing arithmetics.  The variance
-calculation assumes that the data are not correlated.
+
+If present, any variance plane will be propagated to the resulting |AstroData|
+object when doing arithmetics.
+
+.. todo:: Is there a way to add correlated noise handling? e.g., a way to say
+    "turn off variance propogation"
+
+.. note::
+
+    The variance propagation assumes the data are not correlated. If the data
+    are correlated, the variance propagation will be incorrect.  In that case,
+    the variance should be calculated from the data themselves.
 
 Let's look into an example.
 
-::
+.. todo:: Update this example
+
+.. doctest::
 
     >>> #     output = x * x
     >>> # var_output = var * x^2 + var * x^2
@@ -201,42 +260,54 @@ Let's look into an example.
 
 Data Quality Plane
 ==================
-The NDData ``mask`` stores the data quality plane.  The simplest form is a
-True/False array of the same size at the pixel array.  In Astrodata we favor
-a bit array that allows for additional information about why the pixel is being
-masked.   For example at Gemini here is our bit mapping for bad pixels.
 
-+---------------+-------+
-| Meaning       | Value |
-+===============+=======+
-| Bad pixel     |   1   |
-+---------------+-------+
-| Non Linear    |   2   |
-+---------------+-------+
-| Saturated     |   4   |
-+---------------+-------+
-| Cosmic Ray    |   8   |
-+---------------+-------+
-| No Data       |  16   |
-+---------------+-------+
-| Overlap       |  32   |
-+---------------+-------+
-| Unilluminated |  64   |
-+---------------+-------+
+The |NDData| ``mask`` stores the data quality plane.  The simplest form is a
+True/False array of the same size at the pixel array.  In Astrodata we favor a
+bit array that allows for additional information about why the pixel is being
+masked.  For example, Gemini bit masks use the following for bad pixels:
 
-(These definitions are located in ``geminidr.gemini.lookups.DQ_definitions``.)
++---------------+-------+---------+
+| Meaning       | Value | Binary  |
++===============+=======+=========+
+| Good pixel    | 0     | 0000000 |
++---------------+-------+---------+
+| Bad pixel     | 1     | 0000001 |
++---------------+-------+---------+
+| Non Linear    | 2     | 0000010 |
++---------------+-------+---------+
+| Saturated     | 4     | 0000100 |
++---------------+-------+---------+
+| Cosmic Ray    | 8     | 0001000 |
++---------------+-------+---------+
+| No Data       | 16    | 0010000 |
++---------------+-------+---------+
+| Overlap       | 32    | 0100000 |
++---------------+-------+---------+
+| Unilluminated | 64    | 1000000 |
++---------------+-------+---------+
 
-So a pixel marked 10 in the mask, would be a "non-linear" "cosmic ray".  The
-``AstroData`` masks are propagated with bitwise-OR operation.  For example,
-let's say that we are stacking frames. A pixel is set as bad (value 1)
-in one frame, saturated in another (value 4), and fine in all the other
-the frames (value 0).  The mask of the resulting stack will be assigned
-a value of 5 for that pixel.
+.. todo:: link to this in the DRAGONS docs
+
+.. _DQ_def_link: https://github.com/GeminiDRSoftware/DRAGONS/blob/f7cbfe8a7ecf575eeabc32ca6fc9da9a3ec0f3e8/geminidr/gemini/lookups/DQ_definitions.py
+
+.. note::
+    These definitions are located in
+    `geminidr.gemini.lookups.DQ_definitions <DQ_def_link>`_.  The are
+    defined as ``np.uint16`` type integers.
+
+So a pixel marked 10 (binary 0001010) in the mask, would be a "non-linear"
+"cosmic ray".  The |AstroData| masks are propagated with bitwise-OR operation.
+For example, let's say that we are stacking frames. A pixel is set as bad
+(value 1 (0000001)) in one frame, saturated in another (value 4 (0000100)), and
+fine in all the other the frames (value 0 (000000)).  The mask of the resulting
+stack will be assigned a value of 5 (0000101) for that pixel.
 
 These bitmasks will work like any other NumPy True/False mask.  There is a
 usage example below using the mask.
 
-The mask can be accessed as follow::
+The mask can be accessed as follows:
+
+.. doctest::
 
     >>> ad = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
     >>> ad.info()
@@ -246,21 +317,28 @@ The mask can be accessed as follow::
 
 Display
 =======
-Since the data is stored in the ``AstroData`` object as a NumPy ``ndarray``
-any tool that works on ``ndarray`` can be used.  To display to DS9 there
-is the ``imexam`` package.  The ``numdisplay`` package is still available for
-now but it is no longer supported by STScI.  We will show
-how to use ``imexam`` to display and read the cursor position.  Read the
-documentation on that tool to learn more about what else it has
-to offer.
 
-Displaying with imexam
-----------------------
+Since the data is stored in the |AstroData| object as a NumPy |NDArray| any
+tool that works on |NDArray| can be used.  To display in |DS9| there is the
+``imexam`` package.   We will show how to use ``imexam`` to display and read
+the cursor position.  Read the documentation on that tool to learn more about
+what else it has to offer (.
+
+.. warning::
+    The ``numdisplay`` package is still available for now but it is no longer
+    supported by STScI.
+
+.. todo:: need to revamp this section
+
+Displaying with ``imexam``
+--------------------------
 
 Here is an example how to display pixel data to DS9 with ``imexam``.  You must
-start ``ds9`` before running this example.
+start |DS9| before running this example.
 
-::
+.. todo:: Replace example and need to check that this doesn't blcok the tests...
+
+.. code::python
 
     >>> import imexam
     >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
@@ -292,7 +370,7 @@ tuple with three values will be returned:  the x and
 y coordinates **in 0-based system**, and the value of the key the user
 hit.
 
-::
+.. code::python
 
     >>> import imexam
     >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
@@ -315,28 +393,28 @@ hit.
     >>> keystroke = cursor_coo[2]
     >>> print('You pressed this key: %s' % keystroke)
 
+.. todo:: This should be its own page, probably
 
 Useful tools from the NumPy, SciPy, and Astropy Packages
 ========================================================
-Like for the Display section, this section is not really specific to
-Astrodata but is rather a quick show-and-tell of a few things that can
-be done on the pixels with the big scientific packages NumPy, SciPy,
-and Astropy.
 
-Those three packages are very large and rich.  They have their own
-extensive documentation and it is highly recommend for the users to learn about what
-they have to offer.  It might save you from re-inventing the wheel.
+Scientific libraries in python provide a rich menagerie of tools for data
+analysis and visualization.  They have their own extensive documentation and it
+is highly recommend for the users to learn about what they have to offer.  It
+might save you from re-inventing the wheel for many common tasks (or uncommon
+ones!).
 
-The pixels, the variance, and the mask are stored as NumPy ``ndarray``'s.
-Let us go through some basic examples, just to get a feel for how the
-data in an ``AstroData`` object can be manipulated.
+The pixels, variance, and mask are stored as NumPy |NDArray|'s.  Let us go
+through some basic examples, just to get a feel for how the data in an
+|AstroData| object can be manipulated.
 
 ndarray
 -------
-The data are contained in NumPy ``ndarray`` objects.  Any tools that works
-on an ``ndarray`` can be used with Astrodata.
 
-::
+The data are contained in NumPy |NDArray| objects.  Any tools that works
+on an |NDArray| can be used with Astrodata.
+
+.. doctest::
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
 
@@ -354,16 +432,17 @@ on an ``ndarray`` can be used with Astrodata.
     >>> data.dtype
     dtype('uint16')
 
-The two most important thing to remember for users coming from the IRAF
-world or the Fortran world are that the array has the y-axis in the first
-index, the x-axis in the second, and that the array indices are zero-indexed,
-not one-indexed.  The examples above illustrate those two critical
-differences.
+The two most important things to remember for users coming from the IRAF world
+or the Fortran world are that the array has the y-axis in the first index, the
+x-axis in the second, and that the array indices are zero-indexed, not
+one-indexed.  The examples above illustrate those two critical differences.
 
-It is sometimes useful to know the data type of the values stored in the
-array.  Here, the file is a raw dataset, fresh off the telescope.  No
-operations has been done on the pixels yet.  The data type of Gemini raw
-datasets is always "Unsigned integer (0 to 65535)", ``uint16``.
+It is sometimes useful to know the data type of the values stored in the array.
+Here, the file is a raw dataset, fresh off the telescope.  No operations has
+been done on the pixels yet.  The data type of Gemini raw datasets is always
+"Unsigned integer (0 to 65535)", ``uint16``.
+
+.. todo:: What's the proper way of doing this in numpy without an operation?
 
 .. warning::
     Beware that doing arithmetic on ``uint16`` can lead to unexpected
@@ -371,7 +450,9 @@ datasets is always "Unsigned integer (0 to 65535)", ``uint16``.
     is higher than the range allowed by ``uint16``, the output value will
     be "wrong".  The data type will not be modified to accommodate the large
     value.  A workaround, and a safety net, is to multiply the array by
-    ``1.0`` to force the conversion to a ``float64``. ::
+    ``1.0`` to force the conversion to a ``float64``.
+
+    .. doctest::
 
         >>> a = np.array([65535], dtype='uint16')
         >>> a + a
@@ -383,10 +464,11 @@ datasets is always "Unsigned integer (0 to 65535)", ``uint16``.
 
 Simple Numpy Statistics
 -----------------------
+
 A lot of functions and methods are available in NumPy to probe the array,
 too many to cover here, but here are a couple examples.
 
-::
+.. doctest::
 
     >>> import numpy as np
 
@@ -397,25 +479,26 @@ too many to cover here, but here are a couple examples.
     >>> np.average(data)
     >>> np.median(data)
 
-Note how ``mean()`` is called differently from the other two. ``mean()``
-is a ``ndarray`` method, the others are NumPy functions. The implementation
-details are clearly well beyond the scope of this manual, but when looking
-for the tool you need, keep in mind that there are two sets of functions to
-look into. Duplications like ``.mean()`` and ``np.average()`` can happen,
-but they are not the norm. The readers are strongly encouraged to refer to
-the NumPy documentation to find the tool they need.
+As shown, both array methods like ``.mean()`` as well as numpy ``ufunc``
+functions like  ``np.average()`` can be used.
+
+See the NumPy documentation for more information and more functions that are
+available for use in that library.
 
 
 Clipped Statistics
 ------------------
-It is common in astronomy to apply clipping to the statistics, a clipped
-average, for example.   The NumPy ``ma`` module can be used to create masks
-of the values to reject.  In the examples below, we calculated the clipped
-average of the first pixel extension with a rejection threshold set to
-+/- 3 times the standard deviation.
 
-Before Astropy, it was possible to do something like that with only
-NumPy tools, like in this example::
+It is common in astronomy to apply clipping to the statistics (e.g., a clipped
+average). The NumPy ``ma`` module can be used to create masks of the values
+to reject. In the examples below, we calculated the clipped average of the
+first pixel extension with a rejection threshold set to +/- 3 times the
+standard deviation.
+
+Before Astropy, it was possible to do something like that with only NumPy
+tools, like in this example
+
+.. doctest::
 
     >>> import numpy as np
 
@@ -425,13 +508,20 @@ NumPy tools, like in this example::
     >>> stddev = data.std()
     >>> mean = data.mean()
 
-    >>> clipped_mean = np.ma.masked_outside(data, mean-3*stddev, mean+3*stddev).mean()
+    >>> clipped_mean = np.ma.masked_outside(
+    ...     data,
+    ...     mean-3*stddev,
+    ...     mean+3*stddev
+    ... ).mean()
 
-There is no iteration in that example.  It is a straight one-time clipping.
+There is no iteration in that example. It is a one-time clipping of the data
+specifically for this calculation.
 
 For something more robust, there is an Astropy function that can help, in
 particular by adding an iterative process to the calculation.  Here is
-how it is done::
+how it is done
+
+.. doctest::
 
     >>> import numpy as np
     >>> from astropy.stats import sigma_clip
@@ -444,14 +534,15 @@ how it is done::
 
 Filters with SciPy
 ------------------
-Another common operation is the filtering of an image, for example convolving
-with a gaussian filter.  The SciPy module ``ndimage.filters`` offers
-several functions for image processing.  See the SciPy documentation for
-more information.
+
+Another common operation is the filtering of an image, (e.g., convolusion with
+a gaussian filter).  The SciPy module ``ndimage.filters`` offers several
+functions for image processing.  See the SciPy documentation for more
+information.
 
 The example below applies a gaussian filter to the pixel array.
 
-::
+.. doctest::
 
     >>> from scipy.ndimage import filters
     >>> import imexam
@@ -478,10 +569,14 @@ The example below applies a gaussian filter to the pixel array.
     >>> # When you are convinced it's been convolved, stop the blinking.
     >>> ds9.blink(blink=False)
 
+.. todo:: what is meant by "this particular kernel"? leaving this unedited on
+    the first pass for clarity later.
+
 Note that there is an Astropy way to do this convolution, with tools in
 ``astropy.convolution`` package.  Beware that for this particular kernel
 we have found that the Astropy ``convolve`` function is extremely slow
 compared to the SciPy solution.
+
 This is because the SciPy function is optimized for a Gaussian convolution
 while the generic ``convolve`` function in Astropy can take in any kernel.
 Being able to take in any kernel is a very powerful feature, but the cost
@@ -491,6 +586,7 @@ your needs.
 
 Many other tools
 ----------------
+
 There are many, many other tools available out there.  Here are the links to
 the three big projects we have featured in this section.
 
@@ -498,14 +594,19 @@ the three big projects we have featured in this section.
 * SciPy: `www.scipy.org <http://www.scipy.org>`_
 * Astropy:  `www.astropy.org <http://www.astropy.org>`_
 
+.. todo:: This should be its own page, probably
+
 Using the Astrodata Data Quality Plane
 ======================================
+
 Let us look at an example where the use of the Astrodata mask is
 necessary to get correct statistics.  A GMOS imaging frame has large sections
 of unilluminated pixels; the edges are not illuminated and there are two
 bands between the three CCDs that represent the physical gap between the
 CCDs.  Let us have a look at the pixels to have a better sense of the
-data::
+data
+
+.. doctest::
 
     >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
     >>> import imexam
@@ -514,12 +615,17 @@ data::
     >>> ds9.view(ad[0].data)
     >>> ds9.scale('zscale')
 
-See how the right and left portions of the frame are not exposed to the sky,
-and the 45 degree angle cuts of the four corners.  The chip gaps too.
-If we wanted to do statistics on the whole frames, we certainly would not want
-to include those unilluminated areas.  We would want to mask them out.
+.. todo:: Was this suuposed to have an associated image in the documentation?
+    does it exist in the docs? (Nope, need to generate it probably)
 
-Let us have a look at the mask associated with that image::
+See how the right and left portions of the frame are not exposed to the sky,
+and the 45 degree angle cuts of the four corners.  The chip gaps too.  If we
+wanted to do statistics on the whole frames, we certainly would not want to
+include those unilluminated areas.  We would want to mask them out.
+
+Let us have a look at the mask associated with that image
+
+.. doctest::
 
     >>> ds9.view(ad[0].mask)
     >>> ds9.scale('zscale')
@@ -533,7 +639,7 @@ just do an average.  This is just illustrative.  We show various ways to
 accomplish the task; choose the one that best suits your need or that you
 find most readable.
 
-::
+.. doctest::
 
     >>> import numpy as np
 
@@ -561,46 +667,46 @@ more than one operation on the masked array.  For example::
 
 Manipulate Data Sections
 ========================
-So far we have shown examples using the entire data array.  It is possible
-to work on sections of that array.  If you are already familiar with
-Python, you probably already know how to do most if not all of what is in
-this section.  For readers new to Python, and especially those coming
-from IRAF, there are a few things that are worth explaining.
 
-When indexing a NumPy ``ndarray``, the left most number refers to the
-highest dimension's axis.  For example, in a 2D array, the IRAF section
-are in (x-axis, y-axis) format, while in Python they are in
-(y-axis, x-axis) format.  Also important to remember is that the ``ndarray``
-is 0-indexed, rather than 1-indexed like in Fortran or IRAF.
+So far we have shown examples using the entire data array.  It is possible to
+work on sections of that array.  If you are already familiar with Python, the
+following discussion about slixing is the same as you've seen throughout your
+Python coding experience.  For readers new to Python, and especially those
+coming from IRAF, there are a few things that are worth explaining.
 
-Putting it all together, a pixel position (x,y) = (50,75) in IRAF or from
-the cursor on a DS9 frame, is accessed in Python as ``data[74,49]``.
-Similarly, the IRAF section [10:20, 30:40] translate in Python to
-[9:20, 29:40].  Also remember that when slicing in Python, the upper limit
-of the slice is not included in the slice.  This is why here we request
-20 and 40 rather 19 and 39.
+When indexing a NumPy |NDArray|, the left most number refers to the highest
+dimension's axis.  For example, in a 2D array, the IRAF section are in (x-axis,
+y-axis) format, while in Python they are in (y-axis, x-axis) format.  Also
+important to remember is that the |NDArray| is 0-indexed, rather than 1-indexed
+like in Fortran or IRAF.
 
-Let's put it in action.
+Putting it all together, a pixel position (x,y) = (50,75) in IRAF or from the
+cursor on a DS9 frame, is accessed in Python as ``data[74,49]``.  Similarly,
+the IRAF section [10:20, 30:40] translate in Python to [9:20, 29:40].  Also
+remember that when slicing in Python, the upper limit of the slice is not
+included in the slice.  This is why here we request 20 and 40 rather 19 and 39.
 
 Basic Statistics on Section
 ---------------------------
+
 In this example, we do simple statistics on a section of the image.
 
-::
+.. doctest::
 
     >>> import numpy as np
 
     >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
     >>> data = ad[0].data
 
-    >>> # Get statistics for a 25x25 pixel-wide box centered on pixel
-    >>> # (50,75)  (DS9 frame coordinate)
+    # Get statistics for a 25x25 pixel-wide box centered on pixel
+    # (50,75)  (DS9 frame coordinate)
     >>> xc = 49
     >>> yc = 74
     >>> buffer = 25
     >>> (xlow, xhigh) = (xc - buffer//2, xc + buffer//2 + 1)
     >>> (ylow, yhigh) = (yc - buffer//2, yc + buffer//2 + 1)
-    >>> # The section is [62:87, 37:62]
+
+    # The section is [62:87, 37:62]
     >>> stamp = data[ylow:yhigh, xlow:xhigh]
     >>> mean = stamp.mean()
     >>> median = np.median(stamp)
@@ -612,25 +718,29 @@ In this example, we do simple statistics on a section of the image.
     ... %.2f  %.2f   %.2f    %.2f  %.2f' % \
     ... (mean, median, stddev, minimum, maximum))
 
-Have you noticed that the median is calculated with a function rather
-than a method?  This is simply because the ``ndarray`` object does not
-have a method to calculate the median.
+.. todo:: implement a median method if it's that important
+    Have you noticed that the median is calculated with a function rather
+    than a method?  This is simply because the |NDArray| object does not
+    have a method to calculate the median.
+
+.. todo:: turn below example into a full example file
 
 Example - Overscan Subtraction with Trimming
 --------------------------------------------
+
 Several concepts from previous sections and chapters are used in this
 example.  The Descriptors are used to retrieve the overscan section and
 the data section information from the headers.  Statistics are done on the
-NumPy ``ndarray`` representing the pixel data.  Astrodata arithmetics is
+NumPy |NDArray| representing the pixel data.  Astrodata arithmetics is
 used to subtract the overscan level.  Finally, the overscan section is
-trimmed off and the modified ``AstroData`` object is written to a new file
+trimmed off and the modified |AstroData| object is written to a new file
 on disk.
 
 To make the example more complete, and to show that when the pixel data
 array is trimmed, the variance (and mask) arrays are also trimmed, let us
 add a variance plane to our raw data frame.
 
-::
+.. doctest::
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
 
@@ -654,30 +764,30 @@ add a variance plane to our raw data frame.
     [ 3]   science                  NDAstroData       (2112, 288)    uint16
               .variance             ndarray           (2112, 288)    float64
 
-    >>> # Let's operate on the first extension.
-    >>> #
-    >>> # The section descriptors return the section in a Python format
-    >>> # ready to use, 0-indexed.
+    # Let's operate on the first extension.
+    #
+    # The section descriptors return the section in a Python format
+    # ready to use, 0-indexed.
     >>> oversec = ad[0].overscan_section()
     >>> datasec = ad[0].data_section()
 
-    >>> # Measure the overscan level
+    # Measure the overscan level
     >>> mean_overscan = ad[0].data[oversec.y1: oversec.y2, oversec.x1: oversec.x2].mean()
 
-    >>> # Subtract the overscan level.  The variance will be propagated.
+    # Subtract the overscan level.  The variance will be propagated.
     >>> ad[0].subtract(mean_overscan)
 
-    >>> # Trim the data to remove the overscan section and keep only
-    >>> # the data section.  Note that the WCS will be automatically
-    >>> # adjusted when the trimming is done.
-    >>> #
-    >>> # Here we work on the NDAstroData object to have the variance
-    >>> # trimmed automatically to the same size as the science array.
-    >>> # To reassign the cropped NDAstroData, we use the reset() method.
+    # Trim the data to remove the overscan section and keep only
+    # the data section.  Note that the WCS will be automatically
+    # adjusted when the trimming is done.
+    #
+    # Here we work on the NDAstroData object to have the variance
+    # trimmed automatically to the same size as the science array.
+    # To reassign the cropped NDAstroData, we use the reset() method.
     >>> ad[0].reset(ad[0].nddata[datasec.y1:datasec.y2, datasec.x1:datasec.x2]
 
-    >>> # Now look at the dimensions of the first extension, science
-    >>> # and variance.  That extension is smaller than the others.
+    # Now look at the dimensions of the first extension, science
+    # and variance.  That extension is smaller than the others.
     >>> ad.info()
     Filename: ../playdata/N20170609S0154.fits
     Tags: ACQUISITION GEMINI GMOS IMAGE NORTH RAW SIDEREAL UNPREPARED
@@ -693,17 +803,17 @@ add a variance plane to our raw data frame.
     [ 3]   science                  NDAstroData       (2112, 288)    uint16
               .variance             ndarray           (2112, 288)    float64
 
-    >>> # We can write this to a new file
+    # We can write this to a new file
     >>> ad.write('partly_overscan_corrected.fits')
 
 A new feature presented in this example is the ability to work on the
-``NDAstroData`` object directly.  This is particularly useful when cropping
+|NDAstroData| object directly.  This is particularly useful when cropping
 the science pixel array as one will want the variance and the mask arrays
-cropped exactly the same way.  Taking a section of the ``NDAstroData``
+cropped exactly the same way.  Taking a section of the |NDAstroData|
 object (ad[0].nddata[y1:y2, x1:x2]), instead of just the ``.data`` array,
 does all that for us.
 
-To reassign the cropped ``NDAstroData`` to the extension one uses the
+To reassign the cropped |NDAstroData| to the extension one uses the
 ``.reset()`` method as shown in the example.
 
 Of course to do the overscan correction correctly and completely, one would
@@ -711,15 +821,16 @@ loop over all four extensions.  But that's the only difference.
 
 Data Cubes
 ==========
+
 Reduced Integral Field Unit (IFU) data is commonly represented as a cube,
-a three-dimensional array.  The ``data`` component of an ``AstroData``
+a three-dimensional array.  The ``data`` component of an |AstroData|
 object extension can be such a cube, and it can be manipulated and explored
 with NumPy, AstroPy, SciPy, imexam, like we did already in this section
 with 2D arrays.  We can use matplotlib to plot the 1D spectra represented
 in the third dimension.
 
 In Gemini IFU cubes, the first axis is the X-axis, the second, the Y-axis,
-and the wavelength is in the third axis.  Remember that in a ``ndarray``
+and the wavelength is in the third axis.  Remember that in a |NDArray|
 that order is reversed (wlen, y, x).
 
 In the example below we "collapse" the cube along the wavelenth axis to

@@ -41,7 +41,7 @@ Python methods:
   only allows to append new data blocks, not to replace them in one sweeping
   move.
 
-.. TODO: Previously this said that it was their not-in-place equivalents based
+.. todo:: Previously this said that it was their not-in-place equivalents based
    on these, but that doesn't make a lot of sense to me. Need to check the
    implementation.
 
@@ -67,7 +67,7 @@ calculating the tag set (described :ref:`below <ad_tags>`). A derivative class
 could override this to provide a different logic, but this is not recommended
 unless there is a very good reason to do so.
 
-.. TODO: Need to add this example to the tags page.
+.. todo:: Need to add this example to the tags page.
 
 For an example of how tags are resolved, seet :ref:`ad_tags`.
 

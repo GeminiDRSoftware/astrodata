@@ -75,7 +75,7 @@ Or you can install it from the source code::
         $ cd astrodata # Or the directory where you cloned the repository
         $ pip install -e .
 
-.. TODO: Need to link to gemini_instruments specifically. Would like to use
+.. todo:: Need to link to gemini_instruments specifically. Would like to use
     intersphinx but it's struggling with readthedocs it seems.
 
     Is there an option that isn't turned on in the dragons readthedocs?
