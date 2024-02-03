@@ -130,7 +130,7 @@ And
     >>> if {'IMAGE', 'GMOS'}.issubset(ad.tags):
     ...   print('I am a GMOS Image.')
 
-.. TODO: Below needs to be ported back to DRAGONS documentation since it is a
+.. todo:: Below needs to be ported back to DRAGONS documentation since it is a
     part of gempy (I think, definitely a part of DRAGONS no matter what)
 
     Using typewalk
@@ -184,7 +184,7 @@ The |ProgManual| describes how to create new |AstroData| classes for new
 instruments (specifically, see ad_tags_). This section describes the very basic
 steps for a new user to create self-defined tags.
 
-.. TODO: add example file.
+.. todo:: add example file.
 
 
 The content of this section is based on the example file

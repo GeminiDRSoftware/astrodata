@@ -68,7 +68,7 @@ keywords to look at for that instrument.  However, once the concept of "filter"
 is coded as a Descriptor (which happens in |gemini_instruments|), the user only
 needs to call the ``filter_name()`` descriptor to retrieve the information.
 
-.. TODO: I don't know what this is trying to explain. This may be more
+.. todo:: I don't know what this is trying to explain. This may be more
     confusing in the long run, since it's conflating method-like descriptors
     and attribute-like tags.
 
@@ -112,7 +112,7 @@ file and all the descriptors are ready to be used.
     another class that has descriptors, the new class will have those
     descriptors as well unless they are explicitly overridden.
 
-.. TODO: Need to test this...
+.. todo:: Need to test this...
     Most Descriptor names are readily understood, but one can get a short
     description of what the Descriptor refers to by calling the Python help
     function.  For example::
@@ -120,7 +120,7 @@ file and all the descriptors are ready to be used.
         >>> help(ad.airmass)
         >>> help(ad.filter_name)
 
-.. TODO: Migrate to DRAGONS docs.
+.. todo:: Migrate to DRAGONS docs.
     The full list of standard descriptors is available in the Appendix
     |Descriptors|.
 
@@ -136,7 +136,7 @@ to any datasets with an |AstroData| class.
 
 Here are a few examples using Descriptors
 
-.. TODO: REPLACE BELOW EXAMPLE
+.. todo:: REPLACE BELOW EXAMPLE
 
 .. doctest::
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
@@ -205,7 +205,7 @@ new data:
 Descriptors across multiple extensions
 --------------------------------------
 
-.. TODO: Rewrite this example and accompanying section
+.. todo:: Rewrite this example and accompanying section
 
 The dataset used in this section has 4 extensions.  When the descriptor
 value can be different for each extension, the descriptor will return a
@@ -225,7 +225,7 @@ Some descriptors accept arguments.  For example::
     >>> ad.filter_name(pretty=True)
     'g'
 
-.. TODO: MOVE TO DRAGONS DOCS
+.. todo:: MOVE TO DRAGONS DOCS
     A full list of standard descriptors is available in the Appendix
     |Descriptors|.
 
@@ -250,7 +250,7 @@ the extension headers are accessed slightly differently.  The attribute
 
 Here are some examples of direct header access
 
-.. TODO: replace example
+.. todo:: replace example
 
 .. doctest::
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
@@ -273,7 +273,7 @@ Whole Headers
 
 Entire headers can be retrieved as ``fits`` ``Header`` objects
 
-.. TODO: replace example
+.. todo:: replace example
 
 .. doctest::
 
@@ -331,7 +331,7 @@ Delete a keyword
     >>> del ad[0].hdr['NEWKEY']
 
 
-.. TODO: This should probably be its own page
+.. todo:: This should probably be its own page
 
 .. _world_coordinates:
 
@@ -377,7 +377,7 @@ Adding Descriptors [Advanced Topic]
 
 To learn how to add descriptors to |AstroData|, see the |progmanual|.
 
-.. TODO: I don't know if this is really useful, since it's entirely duplicated
+.. todo:: I don't know if this is really useful, since it's entirely duplicated
     information in the progmanual. could be useful to have a brief overview of
     how to define a descriptor.
 

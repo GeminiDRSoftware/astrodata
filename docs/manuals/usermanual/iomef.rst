@@ -1,4 +1,4 @@
-.. TODO: Need to update the examples
+.. todo:: Need to update the examples
 
 .. iomef.rst
 
@@ -43,7 +43,7 @@ The file on disk is loaded into the |AstroData| class associated with the
 instrument the data is from. This association is done automatically based on
 header content.
 
-.. TODO: replace EXAMPLE FILE with the actul example
+.. todo:: replace EXAMPLE FILE with the actul example
 
 .. doctest::
     >>> import astrodata
@@ -66,7 +66,7 @@ The original path and filename are also stored. If you were to write
 the |AstroData| object to disk without specifying anything, path and
 file name would be set to ``None``.
 
-.. TODO: Update when updating the example
+.. todo:: Update when updating the example
 
 .. doctest::
     >>> ad.path
@@ -111,7 +111,7 @@ returns a :class:`numpy.ndarray`. The list of |NDAstroData| is zero-indexed.
     Remember that in a :class:`~numpy.ndarray` the 'y-axis' of the image is
     accessed through the first number.
 
-.. TODO: need to review how this implemented and update this. It's pretty
+.. todo:: need to review how this implemented and update this. It's pretty
     confusing the way it's worded right now (not something trivial to word
     precisely and comprehensibly, either).
 
@@ -193,7 +193,7 @@ The tables are stored internally as :class:`astropy.table.Table` objects.
     >>> type(refcat)
     <class 'astropy.table.table.Table'>
 
-.. TODO: I *think* I've implemented the note below, but if not then I need to
+.. todo:: I *think* I've implemented the note below, but if not then I need to
     do it (very straightforward)
 
 .. note::
@@ -418,7 +418,7 @@ Changing ``ad.filename`` also changes the filename in the ``ad.path``. The
 sequence above will write 'new154.fits' not in the current directory but
 rather to the directory that is specified in ``ad.path``.
 
-.. TODO: Need to update the code to change the filename, this seems a little
+.. todo:: Need to update the code to change the filename, this seems a little
     sus to me.
 
     Maybe introduce an "original filename" attribute that is not changed when
@@ -579,7 +579,7 @@ information.
 These pixel arrays are added to specific slice of the astrodata object they are
 associated with.
 
-.. TODO: Make sure this flows with the previous example.
+.. todo:: Make sure this flows with the previous example.
 
 Building on the |AstroData| object we created in the previously, we can add a
 new pixel array directly to the slice(s) of the |AstroData| object it should be
@@ -594,7 +594,7 @@ When the file is written to disk as a MEF, an extension will be created with
 ``EXTNAME = EXTRADATA`` and an ``EXTVER`` that matches the slice's ``EXTVER``,
 in this case is would be ``1``.
 
-.. TODO: Need to revisit below after working on tables section
+.. todo:: Need to revisit below after working on tables section
 
 Represent a table as a FITS binary table in an ``AstroData`` object
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

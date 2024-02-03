@@ -16,7 +16,7 @@ The internal structure of the |AstroData| object makes uses of astropy's
 :class:`~astropy.io.fits.Header`, the latter simply because it is a convenient
 ordered dictionary.
 
-.. TODO: delete when covered in examples
+.. todo:: delete when covered in examples
     **Try it yourself**
 
     Download the data package (:ref:`datapkg`) if you wish to follow along and run the
@@ -45,7 +45,7 @@ field, etc.  In the second category, there is the information specific to
 individual science pixel extensions, for example the gain of the amplifier, the
 data themselves, the error on those data, etc.
 
-.. TODO: Turn the below code blocks into an example
+.. todo:: Turn the below code blocks into an example
 
 The composition and amount of information depends on the contents of the file
 itself. This information varies dramatically between observatories, so ensure
@@ -142,7 +142,7 @@ any list: ``ad[0]`` will return the first image. To access the science pixels,
 one uses ``ad[0].data``; for the object mask of the first extension,
 ``ad[0].OBJMASK``; etc.
 
-.. TODO: incorporate this into the example
+.. todo:: incorporate this into the example
     In the example above, the "Other Extensions" at the bottom of the
     :meth:`~astrodata.AstroData.info` display contains a ``REFCAT`` table which in
     this case is a list of stars from a catalog that overlaps the field of view
@@ -158,7 +158,7 @@ All the global information can be accessed as attributes of the |AstroData|
 object.  The global headers, or Primary Header Unit (PHU), is stored in the
 ``phu`` attribute as an :class:`astropy.io.fits.Header`.
 
-.. TODO: Put in a link to a good gemini example below where it says
+.. todo:: Put in a link to a good gemini example below where it says
     GEMINI_EXAMPLE
 
 Any global tables are stored in the private attribute ``_tables``. For example,
@@ -247,7 +247,7 @@ only updated when the object is written to disk as a FITS file.  The WCS is
 retrieved as follows: ``ad[0].wcs``.
 
 
-.. TODO: Need to rephrase or replace the following subsection
+.. todo:: Need to rephrase or replace the following subsection
     A Note on Memory Usage
     ======================
 
