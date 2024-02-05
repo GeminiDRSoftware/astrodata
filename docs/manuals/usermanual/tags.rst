@@ -272,4 +272,5 @@ not so well defined (for example, the type of observation), descriptors
 are used. For more information about descriptors, see the section on
 :ref:`headers`.
 
-For more information on adding to |astrodata|, see the |ProgManual|.
+For more information on creating and working with Tags, as well as developing
+with/for |astrodata|, see the |ProgManual|.
