@@ -10,7 +10,6 @@ from astrodata import (
     astro_data_descriptor,
     TagSet,
     AstroData,
-    factory,
     returns_list,
 )
 
@@ -72,12 +71,11 @@ class AstroDataMyInstrument(AstroData):
         return "'{}':{}".format(ampname, detector_section)
 
 
-def setup_module():
+def setup_function():
+    """Add the new class to the factory."""
+    import astrodata.factory as factory
+
     factory.add_class(AstroDataMyInstrument)
-
-
-def teardown_module():
-    factory._registry.remove(AstroDataMyInstrument)
 
 
 @pytest.fixture(scope="function")
