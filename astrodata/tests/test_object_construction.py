@@ -10,7 +10,7 @@ import astropy.units as u
 from numpy.testing import assert_array_equal
 import numpy as np
 
-from astrodata import AstroData, factory
+from astrodata import AstroData
 from astrodata.testing import download_from_archive, skip_if_download_none
 import astrodata
 
@@ -50,12 +50,11 @@ class AstroDataMyInstrument(AstroData):
         return source[0].header.get("INSTRUME", "").upper() == "MYINSTRUMENT"
 
 
-def setup_module():
+def setup_function():
+    """Add a test instrument class to the registry."""
+    import astrodata.factory as factory
+
     factory.add_class(AstroDataMyInstrument)
-
-
-def teardown_module():
-    factory._registry.remove(AstroDataMyInstrument)
 
 
 def test_create_with_no_data():
@@ -311,7 +310,7 @@ def test_table_with_units(tmp_path):
     ad[0].TABLE1 = Table([[1]])
     ad[0].TABLE1["col0"].unit = "mag(cm2 electron / erg)"
 
-    with warnings.catch_warnings() as w:
+    with warnings.catch_warnings():
         warnings.simplefilter("error")
         ad.write(testfile)
 
