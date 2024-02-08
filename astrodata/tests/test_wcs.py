@@ -62,7 +62,7 @@ def test_calculate_affine_matrices(angle, scale, xoffset, yoffset):
 
 
 # TODO
-# @pytest.mark.skip(reason="This may not have worked/been running before.")
+@pytest.mark.skip(reason="WCS unused axes problem")
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_reading_and_writing_sliced_image(F2_IMAGE, tmpdir):
