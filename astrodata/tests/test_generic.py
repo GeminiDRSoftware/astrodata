@@ -248,8 +248,8 @@ def test_create_class_with_descriptors(
     assert isinstance(ad, TestClass)
 
     # Check the descriptors
-    assert ad.descriptor1 == 1
-    assert ad.descriptor2 == 2
+    assert ad.descriptor1() == 1
+    assert ad.descriptor2() == 2
 
     # With a fresh factory, the class should not be registered.
     factory = fresh_factory
@@ -264,5 +264,5 @@ def test_create_class_with_descriptors(
     assert isinstance(ad, TestClass)
 
     # Check the descriptors
-    assert ad.descriptor1 == 1
-    assert ad.descriptor2 == 2
+    assert ad.descriptor1() == 1
+    assert ad.descriptor2() == 2

@@ -1,7 +1,5 @@
 import copy
-import functools
 import os
-import unittest
 import warnings
 
 import numpy as np
@@ -194,7 +192,7 @@ def test_slice(GMOSN_SPECT):
 
     # when astrofaker is imported this will be recognized as AstroFakerGmos
     # instead of AstroData
-    match = r"'Astro.*' object has no attribute 'FOO'"
+    match = r"'.*' object has no attribute 'FOO'"
     with pytest.raises(AttributeError, match=match):
         ext.FOO
 

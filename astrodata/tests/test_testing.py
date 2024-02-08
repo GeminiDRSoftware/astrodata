@@ -1,18 +1,20 @@
+"""Tests for the `astrodata.testing` module.
 """
-Tests for the `astrodata.testing` module.
-"""
-import importlib
+import io
 import os
 
 import numpy as np
 import pytest
 
 import astrodata
+import astrodata.testing as testing
 from astrodata.testing import (
     assert_same_class,
     download_from_archive,
     skip_if_download_none,
 )
+
+from astropy.io import fits
 
 
 def test_download_from_archive(monkeypatch, tmpdir):
@@ -115,3 +117,22 @@ def test_assert_same_class():
 
     with pytest.raises(AssertionError):
         assert_same_class(ad, np.array([1]))
+
+
+# Test fake_fits_bytes function.
+def test_fake_fits_bytes():
+    fake_fits_bytes = testing.fake_fits_bytes
+
+    # Create a fake fits BytesIO stream.
+    fake_fits = fake_fits_bytes()
+
+    # Check that the fake fits is a BytesIO object.
+    assert isinstance(fake_fits, io.BytesIO)
+
+    # Check that the fake fits is a valid fits file.
+    fake_fits.seek(0)
+
+    # Creating a new bytes stream from the fake fits.
+    str_data = io.BytesIO(fake_fits.read())
+    str_data.seek(0)
+    assert fits.getheader(str_data, 0)

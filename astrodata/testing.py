@@ -751,12 +751,72 @@ def ad_compare(ad1, ad2, **kwargs):
     return not compare
 
 
-__HDUL_LIKE_TYPE = fits.HDUList | list[fits.hdu.FitsHDU]
+_HDUL_LIKE_TYPE = fits.HDUList | list[fits.hdu.FitsHDU]
+
+
+def fake_fits_bytes(
+    hdus: _HDUL_LIKE_TYPE | None = None,
+    n_extensions: int = 0,
+    image_shape: tuple[int, int] | None = None,
+    include_header_keys: Iterable[str] | None = None,
+) -> io.BytesIO:
+    """Create a fake FITS file in memory and return a BytesIO object that can
+    access it.
+
+    Arguments
+    ---------
+    hdus : HDUList | list[HDUBase] | None
+        The HDUList or list of HDUBase objects to be written to the file.  If
+        None, a file with a primary HDU and n_extension extension HDUs are
+        generated.
+
+    n_extensions : int
+        The number of extension HDUs to be created if hdus is None.
+        Default is 0 (primary HDU alone)
+
+    image_shape : tuple[int, int] | None
+        The shape of the image to be created in the primary HDU. If None, no
+        image is created.
+
+    include_header_keys : Iterable[str] | None
+        A list of header keywords to be included in the primary HDU. If None,
+        no header keywords are included.
+    """
+    # If HDUs are provided, other arguments (other than n_extensions) should
+    # raise an error.
+    if hdus is not None and any((image_shape, include_header_keys)):
+        warnings.warn(
+            "Arguments image_shape and include_header_keys are ignored when "
+            "hdus is provided."
+        )
+
+    # Only one file type (fits) is supported at the moment. Eventually this
+    # will be factored out into its own function.
+    if hdus is None:
+        image_shape = image_shape or (100, 100)
+
+        primary_hdu = fits.PrimaryHDU(data=np.zeros(image_shape))
+
+        if include_header_keys is not None:
+            for key in include_header_keys:
+                primary_hdu.header[key] = "TEST_VALUE"
+
+        hdus = [primary_hdu]
+
+        for i in range(n_extensions):
+            hdus.append(fits.ImageHDU(np.zeros(image_shape), name=f"EXT{i+1}"))
+
+    file_data = io.BytesIO()
+    fits.HDUList(hdus).writeto(file_data)
+
+    file_data.flush()
+
+    return file_data
 
 
 def create_test_file(
     path: os.PathLike | None = None,
-    hdus: __HDUL_LIKE_TYPE | None = None,
+    hdus: _HDUL_LIKE_TYPE | None = None,
     n_extensions: int = 1,
     image_shape: tuple[int, int] | None = None,
     include_header_keys: Iterable[str] | None = None,
@@ -790,40 +850,13 @@ def create_test_file(
     file_type : str
         The type of file to be created. Default is 'fits'.
     """
-    # Supported types for generating fake data.
-    supported_types = {"fits"}
-    if file_type not in supported_types:
-        raise NotImplementedError(f"File type {file_type} not supported.")
-
-    # If HDUs are provided, other arguments (other than n_extensions) should
-    # raise an error.
-    if hdus is not None and any((image_shape, include_header_keys)):
-        warnings.warn(
-            "Arguments image_shape and include_header_keys are ignored when "
-            "hdus is provided."
+    if file_type.casefold() == "fits":
+        file_data = fake_fits_bytes(
+            hdus=hdus,
+            n_extensions=n_extensions,
+            image_shape=image_shape,
+            include_header_keys=include_header_keys,
         )
-
-    # Only one file type (fits) is supported at the moment. Eventually this
-    # will be factored out into its own function.
-    if hdus is None:
-        hdus = []
-
-        image_shape = image_shape or (100, 100)
-
-        primary_hdu = fits.PrimaryHDU(np.zeros(image_shape))
-
-        if include_header_keys is not None:
-            for key in include_header_keys:
-                primary_hdu.header[key] = "TEST_VALUE"
-
-        hdus.append(primary_hdu)
-
-        for i in range(n_extensions):
-            hdus.append(fits.ImageHDU(np.zeros(image_shape), name=f"EXT{i+1}"))
-
-    if file_type == "fits":
-        file_data = io.BytesIO()
-        fits.HDUList(hdus).writeto(file_data)
 
     else:
         raise NotImplementedError(f"File type {file_type} not supported.")
@@ -844,8 +877,99 @@ def create_test_file(
 
     file = os.fdopen(temp_file, "w+b")
 
-    file.write(file_data.getvalue())
+    for chunk in iter(lambda: file_data.read(10000), b""):
+        file.write(chunk)
 
     file.flush()
 
     return path
+
+
+class ProgramTempFile:
+    """This is a temporary file that lasts the lifetime of the object (until it
+    is garbage collected).
+
+    Note: this does *not* mean the file will be deleted when the object is no
+    longer referenced. It will be deleted when the object is garbage collected,
+    which may not be until the end of the program.
+    """
+
+    path: str
+    _is_open: bool
+    _file_obj: io.IOBase | None
+
+    def __init__(self, path: str = ""):
+        self.path = path
+
+        if not self.path:
+            self.path = tempfile.mkstemp()[1]
+
+        self._is_open = False
+        self._file_obj = None
+
+    def __del__(self):
+        self.close()
+
+    def open(
+        self,
+        mode: str = "r",
+        encoding="utf-8",
+        **kwargs,
+    ) -> io.IOBase:
+        """Open the temporary file and return an opened File object.
+
+        It takes the same arguments as the built in open() function, except for
+        the file name (which is provided by the ProgramTempFile object).
+        """
+        try:
+            # pylint: disable=consider-using-with
+            file = open(self.path, mode, encoding=encoding, **kwargs)
+
+        except FileNotFoundError as fnf_err:
+            msg = "Temporary file could not be opened."
+            raise FileNotFoundError(msg) from fnf_err
+
+        self._is_open = True
+        self._file_obj = file
+        return file
+
+    def close(self, delete: bool = True):
+        """If the file is open, close it and delete it from disk."""
+        if delete and os.path.exists(self.path):
+            os.remove(self.path)
+
+        if not getattr(self._file_obj, "closed", True):
+            self._file_obj.close()
+
+        self._is_open = False
+
+    @property
+    def is_open(self) -> bool:
+        """True if the temporary file is 'open' for reading, writing, or both.
+        False otherwise.
+        """
+        return self._is_open
+
+
+class FITSTempFile(ProgramTempFile):
+    """A temporary FITS file that lasts the lifetime of the object (until it
+    is garbage collected), and is initialized with FITS-like data.
+    """
+
+    path: str
+    _raw_test_file: str
+
+    def __init__(
+        self,
+        path: os.PathLike | None = None,
+        hdus: _HDUL_LIKE_TYPE | None = None,
+        n_extensions: int = 1,
+        image_shape: tuple[int, int] | None = None,
+        include_header_keys: Iterable[str] | None = None,
+        file_type: str = "fits",
+    ):
+        """Initializes the FITSTempFile. See
+        :func:`~astropy.testing.create_test_file()` for details on the
+        arguments passed.
+        """
+        super().__init__(path)
