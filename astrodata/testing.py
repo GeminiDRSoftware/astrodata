@@ -40,6 +40,9 @@ except ImportError:
 
 URL = "https://archive.gemini.edu/file/"
 
+# numpy random number generator for consistency.
+_RANDOM_NUMBER_GEN = np.random.default_rng(42)
+
 
 def skip_if_download_none(func):
     """Skip test if download_from_archive is returning None. Otherwise,
@@ -752,13 +755,17 @@ def ad_compare(ad1, ad2, **kwargs):
 
 
 _HDUL_LIKE_TYPE = fits.HDUList | list[fits.hdu.FitsHDU]
+_mask_cobos: set | None = None
 
 
 def fake_fits_bytes(
     hdus: _HDUL_LIKE_TYPE | None = None,
     n_extensions: int = 0,
     image_shape: tuple[int, int] | None = None,
-    include_header_keys: Iterable[str] | None = None,
+    include_header_keys: Iterable[str] | dict[str, str] | None = None,
+    include_header_values: dict[str, str] | None = None,
+    masks: bool = False,
+    single_hdu: bool = False,
 ) -> io.BytesIO:
     """Create a fake FITS file in memory and return a BytesIO object that can
     access it.
@@ -778,38 +785,116 @@ def fake_fits_bytes(
         The shape of the image to be created in the primary HDU. If None, no
         image is created.
 
-    include_header_keys : Iterable[str] | None
+    include_header_keys : Iterable[str] | dict[str, str] None
         A list of header keywords to be included in the primary HDU. If None,
         no header keywords are included.
+
+    include_header_values : dict[str, str] | None
+        A dictionary of header keywords and values to be included in the primary
+        HDU. If None, no header keywords are included.
+
+    masks : bool
+        If True, a mask is created for the primary HDU or the image extensions.
+
+    single_hdu : bool
+        If True, only the primary HDU is created. If False, the primary HDU and
+        n_extensions are created.
     """
     # If HDUs are provided, other arguments (other than n_extensions) should
     # raise an error.
-    if hdus is not None and any((image_shape, include_header_keys)):
+    if hdus is not None and any(
+        (image_shape, include_header_keys, single_hdu)
+    ):
         warnings.warn(
             "Arguments image_shape and include_header_keys are ignored when "
             "hdus is provided."
         )
 
+    image_shape = image_shape or (100, 100)
+
+    # If mask is True, a mask is created for the primary HDU or the image
+    # extensions. Creating a generic mask with some non-zero values.
+    if masks:
+        min_choice, max_choice = 0, 64
+
+        mask = _RANDOM_NUMBER_GEN.integers(
+            min_choice,
+            max_choice,
+            size=image_shape,
+            dtype=np.uint16,
+        )
+
+        # Setting some random pixels to zero on the mask
+        good_values = _RANDOM_NUMBER_GEN.random(mask.shape) > 0.25
+        mask[good_values] = 0
+
     # Only one file type (fits) is supported at the moment. Eventually this
     # will be factored out into its own function.
     if hdus is None:
-        image_shape = image_shape or (100, 100)
-
         primary_hdu = fits.PrimaryHDU(data=np.zeros(image_shape))
 
-        if include_header_keys is not None:
+        if include_header_keys is not None and not isinstance(
+            include_header_keys, dict
+        ):
             for key in include_header_keys:
+                if key in include_header_values:
+                    primary_hdu.header[key] = include_header_values[key]
+                    continue
+
                 primary_hdu.header[key] = "TEST_VALUE"
 
-        hdus = [primary_hdu]
+        elif (
+            not isinstance(include_header_keys, dict)
+            and include_header_values is not None
+        ):
+            for key, value in zip(include_header_keys, include_header_values):
+                primary_hdu.header[key] = value
 
-        for i in range(n_extensions):
-            hdus.append(fits.ImageHDU(np.zeros(image_shape), name=f"EXT{i+1}"))
+        elif (
+            isinstance(include_header_keys, dict) and not include_header_values
+        ):
+            for key, value in include_header_keys.items():
+                primary_hdu.header[key] = value
+
+        else:
+            raise ValueError(
+                f"Could not create header from include_header_keys: "
+                f"{include_header_keys} and include_header_values: "
+                f"{include_header_values}. NOTE: include_header_keys "
+                f"should be None if include_header_values is a dictionary."
+            )
+
+        if single_hdu:
+            if n_extensions:
+                raise ValueError(
+                    "n_extensions must be 0 (default) if single_hdu is "
+                    "True and hdus is None."
+                )
+
+            hdus = primary_hdu
+
+            if masks:
+                hdus = fits.HDUList([hdus, fits.ImageHDU(mask, name="MASK")])
+
+        else:
+            hdus = [primary_hdu]
+
+            for i in range(n_extensions):
+                hdus.append(fits.ImageHDU(np.ones(image_shape), name="SCI"))
+
+                if masks:
+                    hdus.append(fits.ImageHDU(mask, name="MASK"))
 
     file_data = io.BytesIO()
-    fits.HDUList(hdus).writeto(file_data)
 
-    file_data.flush()
+    if single_hdu:
+        hdus.writeto(file_data)
+
+    else:
+        hdus = fits.HDUList(hdus)
+        hdus.writeto(file_data)
+
+    file_data.seek(0)
 
     return file_data
 
