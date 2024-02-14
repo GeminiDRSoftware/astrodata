@@ -26,38 +26,35 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 test = [
-    "pytest",
-    "pytest-doctestplus",
-    "pytest-cov",
-    "coverage"
-]
-
-dev = [
-    "black",
-    "flake8",
-    "isort",
-    "pre-commit",
-    "sphinx",
-    "sphinx-automodapi",
     "coverage",
     "pytest",
     "pytest-cov",
     "pytest-doctestplus",
 ]
 
-docs = [
+dev = [
+    "black",
+    "coverage",
+    "flake8",
+    "isort",
+    "pre-commit",
+    "pytest",
+    "pytest-cov",
+    "pytest-doctestplus",
+    "scalene",
     "sphinx",
     "sphinx-automodapi",
-    "sphinx-autoapi",
-    "tomli; python_version <\"3.11\"",
-    "myst_parser",
-    "sphinx-rtd-theme",
-    "sphinx-rtd-dark-mode",
 ]
 
-
-
-
+docs = [
+    "myst_parser",
+    "sphinx",
+    "sphinx-autoapi",
+    "sphinx-automodapi",
+    "sphinx-rtd-dark-mode",
+    "sphinx-rtd-theme",
+    "tomli; python_version <\"3.11\"",
+]
 
 [tool.setuptools]
 zip-safe = false
@@ -69,12 +66,10 @@ include-package-data = true
 
 write_to = "astrodata/version.py"
 
-
-
 [tool.pytest.ini_options]
 testpaths = [
   "astrodata",
-  "docs",
+  # "docs/examples", # TODO: placeholder for example testing
 ]
 
 markers = [
