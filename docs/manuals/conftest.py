@@ -140,7 +140,7 @@ def some_fits_file(tmp_path, doctest_namespace):
     image_shape = (2048, 2048)
     header_keys = {
         "INSTRUME": "DOCTEST_INSTRUMENT",
-        "IMAGE_TYPE": "TEST_IMAGE",
+        "IMG_TYPE": "TEST_IMAGE",
         "EXPTIME": 1,
     }
 
@@ -165,6 +165,7 @@ def some_files_file_with_extensions(tmp_path, doctest_namespace):
     """Return the path to the primary testing FITS file."""
     # Fixture constants
     n_extensions = 5
+    image_shape = (2048, 2048)
 
     # Create a temporary file
     filename = os.path.join(tmp_path, "some_file_with_extensions.fits")
@@ -173,10 +174,9 @@ def some_files_file_with_extensions(tmp_path, doctest_namespace):
         os.remove(filename)
 
     # Create a test file with a PHU and single image in it.
-    image_shape = (2048, 2048)
     header_keys = {
         "INSTRUME": "DOCTEST_INSTRUMENT",
-        "IMAGE_TYPE": "TEST_IMAGE",
+        "IMG_TYPE": "TEST_IMAGE",
         "EXPTIME": 1,
     }
 
@@ -216,7 +216,7 @@ def some_fits_file_with_mask(
     image_shape = (100, 100)
     header_keys = {
         "INSTRUME": "DOCTEST_INSTRUMENT",
-        "IMAGE_TYPE": "TEST_IMAGE",
+        "IMG_TYPE": "TEST_IMAGE",
         "EXPTIME": 1,
     }
 
@@ -224,6 +224,7 @@ def some_fits_file_with_mask(
         image_shape=image_shape,
         include_header_keys=header_keys,
         n_extensions=n_extensions,
+        masks=True,
     )
 
     fits_bytes.seek(0)

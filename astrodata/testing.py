@@ -25,20 +25,7 @@ from typing import Iterable
 # from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
 # from gempy.library import astrotools as at
 
-# TODO: This is only here to handle specific dragons tests. It should be
-# removed once the tests are updated.
-try:
-    from geminidr.gemini.lookups.timestamp_keywords import timestamp_keys
-
-except ImportError:
-    timestamp_keys = {}
-    DRAGONS_REPOSITORY = "https://github.com/GeminiDRSoftware/DRAGONS"
-    warnings.warn(
-        f"Could not import gemini timestamp keys, install DRAGONS"
-        f" to use them. See: {DRAGONS_REPOSITORY}"
-    )
-
-URL = "https://archive.gemini.edu/file/"
+GEMINI_ARCHIVE_URL = "https://archive.gemini.edu/file/"
 
 # numpy random number generator for consistency.
 _RANDOM_NUMBER_GEN = np.random.default_rng(42)
@@ -318,7 +305,7 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
 
 
 def download_from_archive(
-    filename, sub_path="raw_files", env_var="ASTRODATA_TEST"
+    filename, path=None, sub_path="raw_files", env_var="ASTRODATA_TEST"
 ):
     """Download file from the archive and store it in the local cache.
 
@@ -326,6 +313,11 @@ def download_from_archive(
     ----------
     filename : str
         The filename, e.g. N20160524S0119.fits
+
+    path : str or os.PathLike or None
+        Path to the cache directory. If None, the environment variable
+        ASTRODATA_TEST is used. otherwise, the file is saved to:
+        os.path.join(path, sub_path, filename)
 
     sub_path : str
         By default the file is stored at the root of the cache directory, but
@@ -350,7 +342,9 @@ def download_from_archive(
         root_cache_path = os.path.join(os.getcwd(), "_test_cache")
         warnings.warn(
             f"Environment variable not set: {env_var}, writing "
-            f"to {root_cache_path}"
+            f"to {root_cache_path}. To suppress this warning, set "
+            f"the environment variable {env_var} to the desired path "
+            f"for the testing cache."
         )
 
         # This is cleaned up once the program finishes.
@@ -361,13 +355,17 @@ def download_from_archive(
     if sub_path is not None:
         cache_path = os.path.join(root_cache_path, sub_path)
 
+    if path is not None:
+        path = os.path.expanduser(path)
+        cache_path = os.path.join(path, sub_path)
+
     if not os.path.exists(cache_path):
         os.makedirs(cache_path)
 
     # Now check if the local file exists and download if not
     local_path = os.path.join(cache_path, filename)
     if not os.path.exists(local_path):
-        tmp_path = download_file(URL + filename, cache=False)
+        tmp_path = download_file(GEMINI_ARCHIVE_URL + filename, cache=False)
         shutil.move(tmp_path, local_path)
 
         # `download_file` ignores Access Control List - fixing it
@@ -566,6 +564,16 @@ class ADCompare:
                 errorlist.append(f"Header 1 contains keywords {s1 - s2}")
             if s2 - s1:
                 errorlist.append(f"Header 2 contains keywords {s2 - s1}")
+
+        # If present, import timestamp_keys from geminidr.gemini.lookups
+        # to compare the timestamps in the headers.
+        try:
+            from geminidr.gemini.lookups.timestamp_keywords import (
+                timestamp_keys,
+            )
+
+        except ImportError:
+            timestamp_keys = {}
 
         for kw in hdr1:
             # GEM-TLM is "time last modified"
@@ -856,6 +864,12 @@ def fake_fits_bytes(
             for key, value in include_header_keys.items():
                 primary_hdu.header[key] = value
 
+        elif all(
+            x is None for x in (include_header_keys, include_header_values)
+        ):
+            # Just a primary HDU with no header keywords
+            pass
+
         else:
             raise ValueError(
                 f"Could not create header from include_header_keys: "
@@ -864,7 +878,7 @@ def fake_fits_bytes(
                 f"should be None if include_header_values is a dictionary."
             )
 
-        if single_hdu:
+        if single_hdu or not n_extensions:
             if n_extensions:
                 raise ValueError(
                     "n_extensions must be 0 (default) if single_hdu is "
@@ -874,16 +888,24 @@ def fake_fits_bytes(
             hdus = primary_hdu
 
             if masks:
-                hdus = fits.HDUList([hdus, fits.ImageHDU(mask, name="MASK")])
+                raise NotImplementedError
 
         else:
             hdus = [primary_hdu]
 
             for i in range(n_extensions):
-                hdus.append(fits.ImageHDU(np.ones(image_shape), name="SCI"))
+                image = fits.ImageHDU(np.ones(image_shape))
+                image.header["EXTNAME"] = "SCI"
+                image.header["EXTVER"] = i + 1
+
+                hdus.append(image)
 
                 if masks:
-                    hdus.append(fits.ImageHDU(mask, name="MASK"))
+                    mask_image = fits.ImageHDU(np.copy(mask), name="mask")
+                    mask_image.header["EXTNAME"] = "MASK"
+                    mask_image.header["EXTVER"] = i + 1
+
+                    hdus.append(mask_image)
 
     file_data = io.BytesIO()
 

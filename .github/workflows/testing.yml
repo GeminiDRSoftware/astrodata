@@ -28,8 +28,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install .[dev]
-        pip install -r requirements.txt
+        pip install ".[dev, docs, test]"
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -38,4 +37,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=80 --statistics
     - name: Test with pytest
       run: |
+        export ASTRODATA_TEST=test_data
         pytest
+    - name: Test docs
+      run: |
+        pytest docs
