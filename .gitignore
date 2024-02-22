@@ -174,3 +174,7 @@ _build
 
 # Test data (sometimes pops up when tests fail very badly)
 test.fits
+
+# Editor things
+.*.swp
+.editorconfig
