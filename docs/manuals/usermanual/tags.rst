@@ -34,10 +34,6 @@ For example, the following function defines a tag called "RAW"
 Now, if we call |open| on a file that has a PROCTYPE keyword set to "RAW", the
 |AstroData| object will have the "`RAW`" tag
 
-.. testsetup::
-    >>> from astrodata import testing
-
-
 
 .. doctest::
     >>> ad = astrodata.open('somefile.fits')
