@@ -3,7 +3,8 @@ import os
 
 import astrodata
 from astrodata import astro_data_tag, astro_data_descriptor
-from astrodata.testing import fake_fits_bytes
+
+import astrodata.testing
 
 import numpy
 
@@ -144,7 +145,7 @@ def some_fits_file(tmp_path, doctest_namespace):
         "EXPTIME": 1,
     }
 
-    fits_bytes = fake_fits_bytes(
+    fits_bytes = astrodata.testing.fake_fits_bytes(
         image_shape=image_shape,
         include_header_keys=header_keys,
         single_hdu=True,
@@ -180,7 +181,7 @@ def some_files_file_with_extensions(tmp_path, doctest_namespace):
         "EXPTIME": 1,
     }
 
-    fits_bytes = fake_fits_bytes(
+    fits_bytes = astrodata.testing.fake_fits_bytes(
         image_shape=image_shape,
         include_header_keys=header_keys,
         n_extensions=n_extensions,
@@ -220,7 +221,7 @@ def some_fits_file_with_mask(
         "EXPTIME": 1,
     }
 
-    fits_bytes = fake_fits_bytes(
+    fits_bytes = astrodata.testing.fake_fits_bytes(
         image_shape=image_shape,
         include_header_keys=header_keys,
         n_extensions=n_extensions,

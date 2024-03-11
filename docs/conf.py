@@ -8,6 +8,7 @@
 
 # The full version, including alpha/beta/rc tags
 from astrodata import __version__
+import os
 
 release = __version__
 
@@ -38,6 +39,25 @@ extensions = [
     "sphinx_automodapi.smart_resolver",
     "sphinx_rtd_dark_mode",
 ]
+
+# doctest global setup .. stored in doctest_setup.py in this directory.
+# Check if any of the following variables are already set by pytest or something
+# else. If they are, then we don't want to overwrite them.
+__doctest_setup_file = "doctest_setup.py"
+
+__directory = os.path.dirname(__file__)
+
+with open(os.path.join(__directory, __doctest_setup_file), "r") as infile:
+    __setup_lines = infile.read()
+
+doctest_global_setup = __setup_lines
+
+# Run doctest when building the docs
+doctest_test_doctest_blocks = "True"
+doctest_show_successes = False
+
+# Raise warnings to errors.
+warningiserror = True
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ["_templates"]
@@ -87,6 +107,9 @@ html_theme_options = {
 # TODO: Need to move this file into the directory above it (./_static)
 html_css_files = ["manuals/_static/color_styles.css"]
 
+# Render TODOs; should only be True for the development version.
+todo_include_todos = False
+
 # By default, when rendering docstrings for classes, sphinx.ext.autodoc will
 # make docs with the class-level docstring and the class-method docstrings,
 # but not the __init__ docstring, which often contains the parameters to
@@ -133,6 +156,7 @@ rst_prolog = """
 .. |astrodata| replace:: :mod:`~astrodata`
 .. |Mapper| replace:: :class:`~recipe_system.mappers.baseMapper.Mapper`
 .. |NDData| replace:: :class:`~astropy.nddata.NDData`
+.. |NDArray| replace:: :class:`~numpy.ndarray`
 .. |NDWindowing| replace:: :class:`~astropy.nddata.NDWindowing`
 .. |NDWindowingAstroData| replace:: :class:`~astrodata.nddata.NDWindowingAstroData`
 .. |PrimitiveMapper| replace:: :class:`~recipe_system.mappers.primitiveMapper.PrimitiveMapper`
@@ -167,6 +191,8 @@ rst_prolog = """
 
 .. |Index| replace:: `Index`
 .. |Examples| replace:: `Examples`
+
+.. |DS9| replace:: `DS9 <https://sites.google.com/cfa.harvard.edu/saoimageds9>`__
 
 .. Definitions for colors, special notes, etc.
 
