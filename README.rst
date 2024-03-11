@@ -1,5 +1,77 @@
+.. |DRAGONS| replace:: `DRAGONS <https://https://github.com/GeminiDRSoftware/DRAGONS/>`_
+
+``astrodata``
+=============
+
 A package for managing astronomical data through a uniform interface.
 ---------------------------------------------------------------------
+
+``astrodata`` is a package for managing astronomical data through a uniform
+interface. It is designed to be used with the
+`Astropy <https://www.astropy.org>`_ package. ``astrodata`` was designed by and
+for use as part of the |DRAGONS| data reduction pipeline, but it is now
+implemented to be useful for any astronomical data reduction or analysis
+project.
+
+Unlike managing files using the ``astropy.io.fits`` package alone, ``astrodata``
+is designed to be extendible to any data format, and to parse, respond to, and
+store metadata in a consistent, intentional way. This makes it especially
+useful for managing data from multiple instruments, telescopes, and data
+generation utilities.
+
+Installation
+------------
+
+``astrodata`` is available on `PyPI <https://pypi.org/project/astrodata>`_ and
+can be installed using ``pip``:
+
+.. code-block:: bash
+
+    pip install astrodata
+
+If you are installing from source, you can also use pip and may include
+optional dependencies suitable for your use case:
+
+.. code-block:: bash
+
+    pip install .[all]  # Install all optional dependencies
+    pip install .[dev]  # Install all development dependencies
+    pip install .[test] # Install all testing dependencies
+    pip install .[docs] # Install all documentation dependencies
+    pip install .       # Install only the required dependencies
+
+Documentation
+-------------
+
+Documentation for ``astrodata`` is available at
+`https://teald.github.io/astrodata`_. This documentation includes a
+user and programmer's guide, as well as a full API reference.
+
+Usage
+-----
+
+The most basic usage of ``astrodata`` is to extend the ``astrodata.AstroData``
+class, which includes some basic FITS file handling methods by default:
+
+.. code-block:: python
+
+    from astrodata import AstroData
+
+    class MyData(AstroData):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+        def my_method(self):
+            print('This is my method, and it tells me about my data.')
+            print(self.info())
+
+    data = MyData.read('my_file.fits')
+    data.my_method()
+
+This will print out the header of the FITS file, as well as the filename and
+path of the file (as it does for ``astropy.io.fits`` objects).
+
+``astrodata`` is designed to be extendible, so you can add your own methods to
 
 ..
     To-do
@@ -9,17 +81,20 @@ A package for managing astronomical data through a uniform interface.
 
     - [x] Set up coverage and testing workflows
     - [x] Set up pre commmit hooks
-    - [ ] Set up documentation workflow
-    - [ ] Update testing
-        - [ ] Find/generate fake data for testing
-            - [ ] Could use `astrofaker`_?
-            - [ ] Does astropy have a fake data generator?
-            - [ ] Do we need to generate more than edge cases?
-            - [ ] Does astrodata outside of dragons even need to test on data? Is
+    - [x] Set up documentation workflow
+    - [x] Update testing
+        - [x] Find/generate fake data for testing
+            - [x] Could use `astrofaker`_?
+            - [x] Does astropy have a fake data generator?
+            - [x] Do we need to generate more than edge cases?
+            - [x] Does astrodata outside of dragons even need to test on data? Is
                   it reducing anything?
-        - [ ] Update tests requiring local data to use fake data
-        - [ ] Update tests requiring remote data to use fake data
-        - [ ]
+                  - Yes, it does need some real WCS in fits data to test on
+                    for, e.g., slicing. But this can be downloaded from the
+                    archive and skipped if the archive is inacessible.
+        - [x] Update tests requiring local data to use fake data
+        - [x] Update tests requiring remote data to use fake data
+            - Ended up using the remote data alongside fake data
 
 License
 -------

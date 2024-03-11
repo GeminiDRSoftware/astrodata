@@ -43,7 +43,7 @@ The file on disk is loaded into the |AstroData| class associated with the
 instrument the data is from. This association is done automatically based on
 header content.
 
-.. todo:: replace EXAMPLE FILE with the actul example
+.. todo:: replace EXAMPLE FILE with the actual example
 
 .. doctest::
     >>> import astrodata

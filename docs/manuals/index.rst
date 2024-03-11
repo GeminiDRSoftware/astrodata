@@ -13,7 +13,6 @@ Astrodata Manual
 
 .. toctree::
    :hidden:
-   :numbered:
 
    cheatsheet
    usermanual/index

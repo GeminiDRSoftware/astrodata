@@ -11,25 +11,12 @@ Manipulating and interacting with pixel data is a common task in astronomy, and
 |astrodata| provides a number of tools, as well as many familiar operations, to
 make working with such data efficient and straightforward.
 
-..
-    **Try it yourself**
-
-    Download the data package (:ref:`datapkg`) if you wish to follow along and run the
-    examples.  Then ::
-
-        $ cd <path>/ad_usermanual/playground
-        $ python
-
-    Then import core astrodata and the Gemini astrodata configurations. ::
-
-        >>> import astrodata
-        >>> import gemini_instruments
-
 
 Operate on Pixel Data
 =====================
 
-.. todo:: Check that NDData is correctly linked to the Astropy documentation.
+.. todo::
+    Check that NDData is correctly linked to the Astropy documentation.
 
 The pixel data are stored in the |AstroData| object as a list of
 |NDAstroData| objects.  The |NDAstroData| is a subclass of Astropy's
@@ -41,27 +28,23 @@ Accessing pixel data can be done with the ``.data`` attribute.  The
 ``.data`` attribute is a NumPy |NDArray|.  The ``.data`` attribute is
 a property of the |NDAstroData| object, and it is the pixel data itself.
 
-.. testsetup::
-    import astrodata
-
-.. todo:: Replace example
-
 .. doctest::
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
-
+    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
     >>> the_data = ad[1].data
     >>> type(the_data)
     <class 'numpy.ndarray'>
 
-    >>> # Loop through the extensions
+    >>> # Loop through the extensions.
     >>> for ext in ad:
     ...     the_data = ext.data
     ...     print(the_data.sum())
-    333071030
-    335104458
-    333170484
-    333055206
+    4194304.0
+    4194304.0
+    4194304.0
+    4194304.0
+    4194304.0
+
 
 .. note::
     Remember that extensions can be accessed by index, with index ``0`` being
@@ -94,7 +77,8 @@ Arithmetic on AstroData Objects
 | division       | |divide|    |
 +----------------+-------------+
 
-.. todo:: Check if this is proper implemented in the code.
+.. todo::
+    Check if this is proper implemented in the code.
 
 In-place operations are also supported with the standard in-place assignment
 operators ``+=``, ``-=``, ``*=``, and ``/=``.  Normal, not in-place,
@@ -112,27 +96,39 @@ Here are a few examples of arithmetics on |AstroData| objects.
 
 .. doctest::
 
-    >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
+    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
 
     >>> # Addition
     >>> ad.add(50.)
+    <...DocTestAstroData object at ...>
     >>> ad = ad + 50.
     >>> ad += 50.
+    >>> print(ad[0].data[50,50])
+    151.0
 
     >>> # Subtraction
     >>> ad.subtract(50.)
+    <...DocTestAstroData object at ...>
     >>> ad = ad - 50.
     >>> ad -= 50.
+    >>> print(ad[0].data[50,50])
+    1.0
 
     >>> # Multiplication (Using a descriptor)
     >>> ad.multiply(ad.exposure_time())
+    <...DocTestAstroData object at ...>
     >>> ad = ad * ad.exposure_time()
     >>> ad *= ad.exposure_time()
+    >>> print(ad[0].data[50,50])
+    1.0
 
     >>> # Division (Using a descriptor)
     >>> ad.divide(ad.exposure_time())
+    <...DocTestAstroData object at ...>
     >>> ad = ad / ad.exposure_time()
     >>> ad /= ad.exposure_time()
+    >>> print(ad[0].data[50,50])
+    1.0
 
 When the syntax ``adout = adin + 1`` is used, the output variable is a *copy*
 of the original.  In the examples above we reassign the result back onto the
@@ -142,21 +138,43 @@ operations.
 When a descriptor returns a list because the value changes for each
 extension, a for-loop is needed
 
+.. todo::
+        Figure out how to remove the "..." from the output of the doctest.
+
 .. doctest::
 
-    >>> for (ext, gain) in zip(ad, ad.gain()):
+    >>> for i, (ext, gain) in enumerate(zip(ad, ad.gain())):
     ...     ext.multiply(gain)
-
+    ...     print(f"Extension {i} has been multiplied by {gain}")
+    <...>
+    Extension 0 has been multiplied by 1.5
+    <...>
+    Extension 1 has been multiplied by 1.5
+    <...>
+    Extension 2 has been multiplied by 1.5
+    <...>
+    Extension 3 has been multiplied by 1.5
+    <...>
+    Extension 4 has been multiplied by 1.5
 
 If you want to do the above but on a new object, leaving the original unchanged,
 use ``deepcopy`` first.
+
+.. todo::
+        Figure out how to remove the "..." from the output of the doctest.
 
 .. doctest::
 
     >>> from copy import deepcopy
     >>> adcopy = deepcopy(ad)
-    >>> for (ext, gain) in zip(adcopy, adcopy.gain()):
+    >>> for i, (ext, gain) in enumerate(zip(adcopy, adcopy.gain())):
     ...     ext.multiply(gain)
+    ...     assert ext.data is not ad[i].data
+    <...>
+    <...>
+    <...>
+    <...>
+    <...>
 
 .. warning::
     The ``deepcopy`` function is a powerful tool but it can be slow,
@@ -175,10 +193,13 @@ Python operator syntax.  Here is a little example to illustrate the difference.
 
 .. doctest::
 
-    >>> ad.add(5).multiply(10).subtract(5)
-
+    >>> ad_copy = deepcopy(ad)
+    >>> ad_copy.add(5).multiply(10).subtract(5)
+    <...>
     >>> # means:  ad = ((ad + 5) * 10) - 5
     >>> # NOT: ad = ad + (5 * 10) - 5
+    >>> print(ad_copy[0].data[50, 50])
+    60.0
 
 This is because the methods modify the object in-place, one operation after
 the other from left to right.  This also means that the original is modified.
@@ -187,8 +208,12 @@ This example applies the expected operator precedence
 
 .. doctest::
 
-    >>> ad = ad + ad * 3 - 40.
-    >>> # means: ad = ad + (ad * 3) - 40.
+    >>> ad_copy = deepcopy(ad)
+    >>> ad_copy = ad_copy + ad_copy * 3 - 40.
+    >>> # means: ad_copy = ad_copy + (ad_copy * 3) - 40.
+    >>> print(ad_copy[0].data[50, 50])
+    -34.0
+
 
 If you need a copy, leaving the original untouched, which is sometimes useful
 you can use ``deepcopy`` or just use the normal operator and assign to a new
@@ -197,7 +222,10 @@ variable.
 .. doctest::
 
     >>> adnew = ad + ad * 3 - 40.
-
+    >>> print(adnew[0].data[50, 50], ad[0].data[50, 50])
+    -34.0 1.5
+    >>> adnew[0] is not ad[0]
+    True
 
 Variance
 ========
@@ -215,8 +243,7 @@ extensions.
 
 .. doctest::
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
-
+    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
     >>> for (extension, gain) in zip(ad, ad.gain()):
     ...    extension.variance = extension.data / gain
 
@@ -229,7 +256,8 @@ Automatic Variance Propagation
 If present, any variance plane will be propagated to the resulting |AstroData|
 object when doing arithmetics.
 
-.. todo:: Is there a way to add correlated noise handling? e.g., a way to say
+.. todo::
+    Is there a way to add correlated noise handling? e.g., a way to say
     "turn off variance propogation"
 
 .. note::
@@ -240,23 +268,34 @@ object when doing arithmetics.
 
 Let's look into an example.
 
-.. todo:: Update this example
+.. todo::
+    Update this example
 
 .. doctest::
 
     >>> #     output = x * x
     >>> # var_output = var * x^2 + var * x^2
-    >>> ad = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
-
+    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
+    >>> ad *= 1.5
     >>> ad[1].data[50,50]
-    56.160931
+    1.5
     >>> ad[1].variance[50,50]
-    96.356529
+    0.471
     >>> adout = ad * ad
     >>> adout[1].data[50,50]
-    3154.05
+    2.25
     >>> adout[1].variance[50,50]
-    607826.62
+    0.7065
+
+.. todo::
+    make an exmaple for the below warning
+
+.. warning::
+    Variance must be implemented, either by setting it (above) or by including
+    it in the data ingestion. If variance is not present, the variance
+    propagation will not be done.
+
+    For examples of how to set the variance, see :needs_replacement:`EXAMPLE`.
 
 Data Quality Plane
 ==================
@@ -286,7 +325,8 @@ masked.  For example, Gemini bit masks use the following for bad pixels:
 | Unilluminated | 64    | 1000000 |
 +---------------+-------+---------+
 
-.. todo:: link to this in the DRAGONS docs
+.. todo::
+    link to this in the DRAGONS docs
 
 .. _DQ_def_link: https://github.com/GeminiDRSoftware/DRAGONS/blob/f7cbfe8a7ecf575eeabc32ca6fc9da9a3ec0f3e8/geminidr/gemini/lookups/DQ_definitions.py
 
@@ -299,7 +339,7 @@ So a pixel marked 10 (binary 0001010) in the mask, would be a "non-linear"
 "cosmic ray".  The |AstroData| masks are propagated with bitwise-OR operation.
 For example, let's say that we are stacking frames. A pixel is set as bad
 (value 1 (0000001)) in one frame, saturated in another (value 4 (0000100)), and
-fine in all the other the frames (value 0 (000000)).  The mask of the resulting
+fine in all the other the frames (value 0 (0000000)).  The mask of the resulting
 stack will be assigned a value of 5 (0000101) for that pixel.
 
 These bitmasks will work like any other NumPy True/False mask.  There is a
@@ -307,13 +347,21 @@ usage example below using the mask.
 
 The mask can be accessed as follows:
 
+.. todo::
+    Need to figure out a non-DRAGONS example here that makes sense.
+
 .. doctest::
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
-    >>> ad.info()
+    # >>> ad = astrodata.open(some_fits_file_with_mask)
+    # >>> ad.info() # DOCTEST: +NORMALIZE_WHITESPACE
+    # Filename: /.../some_file.fits
+    # Tags: _DOCTEST_DATA
+    # <BLANKLINE>
+    # Pixels Extensions
+    # Index  Content  Type         Dimensions   Format
+    # [ 0]   science  NDAstroData  (2048, 2048) float64
 
-    >>> ad[2].mask
-
+    # >>> ad[2].mask
 
 Display
 =======
@@ -328,7 +376,8 @@ what else it has to offer (.
     The ``numdisplay`` package is still available for now but it is no longer
     supported by STScI.
 
-.. todo:: need to revamp this section
+.. todo::
+    need to revamp this section
 
 Displaying with ``imexam``
 --------------------------
@@ -336,25 +385,26 @@ Displaying with ``imexam``
 Here is an example how to display pixel data to DS9 with ``imexam``.  You must
 start |DS9| before running this example.
 
-.. todo:: Replace example and need to check that this doesn't blcok the tests...
+.. todo::
+    Replace example and need to check that this doesn't blcok the tests...
 
 .. code::python
 
-    >>> import imexam
-    >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
+    # >>> import imexam
+    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
 
-    # Connect to the DS9 window (should already be opened.)
-    >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
+    # # Connect to the DS9 window (should already be opened.)
+    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
 
-    >>> ds9.view(ad[0].data)
+    # >>> ds9.view(ad[0].data)
 
-    # To scale "a la IRAF"
-    >>> ds9.view(ad[0].data)
-    >>> ds9.scale('zscale')
+    # # To scale "a la IRAF"
+    # >>> ds9.view(ad[0].data)
+    # >>> ds9.scale('zscale')
 
-    # To set the mininum and maximum scale values
-    >>> ds9.view(ad[0].data)
-    >>> ds9.scale('limits 0 2000')
+    # # To set the mininum and maximum scale values
+    # >>> ds9.view(ad[0].data)
+    # >>> ds9.scale('limits 0 2000')
 
 
 Retrieving cursor position with imexam
@@ -370,30 +420,34 @@ tuple with three values will be returned:  the x and
 y coordinates **in 0-based system**, and the value of the key the user
 hit.
 
+.. todo::
+    Need to check this example.
+
 .. code::python
 
-    >>> import imexam
-    >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
+    # >>> import imexam
+    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
 
-    # Connect to the DS9 window (should already be opened.)
-    # and display
-    >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
-    >>> ds9.view(ad[0].data)
-    >>> ds9.scale('zscale')
+    # # Connect to the DS9 window (should already be opened.)
+    # # and display
+    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
+    # >>> ds9.view(ad[0].data)
+    # >>> ds9.scale('zscale')
 
 
-    >>> cursor_coo = ds9.readcursor()
-    >>> print(cursor_coo)
+    # >>> cursor_coo = ds9.readcursor()
+    # >>> print(cursor_coo)
 
-    # To extract only the x,y coordinates
-    >>> (xcoo, ycoo) = cursor_coo[:2]
-    >>> print(xcoo, ycoo)
+    # # To extract only the x,y coordinates
+    # >>> (xcoo, ycoo) = cursor_coo[:2]
+    # >>> print(xcoo, ycoo)
 
-    # If you are also interested in the keystroke
-    >>> keystroke = cursor_coo[2]
-    >>> print('You pressed this key: %s' % keystroke)
+    # # If you are also interested in the keystroke
+    # >>> keystroke = cursor_coo[2]
+    # >>> print('You pressed this key: %s' % keystroke)
 
-.. todo:: This should be its own page, probably
+.. todo::
+    This should be its own page, probably
 
 Useful tools from the NumPy, SciPy, and Astropy Packages
 ========================================================
@@ -416,21 +470,21 @@ on an |NDArray| can be used with Astrodata.
 
 .. doctest::
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
+    >>> ad = astrodata.open(some_fits_file_with_extensions)
 
     >>> data = ad[0].data
 
     >>> # Shape of the array.  (equivalent to NAXIS2, NAXIS1)
     >>> data.shape
-    (2112, 288)
+    (2048, 2048)
 
     >>> # Value of a pixel at "IRAF" or DS9 coordinates (100, 50)
     >>> data[49,99]
-    455
+    1.0
 
     >>> # Data type
     >>> data.dtype
-    dtype('uint16')
+    dtype('float64')
 
 The two most important things to remember for users coming from the IRAF world
 or the Fortran world are that the array has the y-axis in the first index, the
@@ -442,7 +496,8 @@ Here, the file is a raw dataset, fresh off the telescope.  No operations has
 been done on the pixels yet.  The data type of Gemini raw datasets is always
 "Unsigned integer (0 to 65535)", ``uint16``.
 
-.. todo:: What's the proper way of doing this in numpy without an operation?
+.. todo::
+    What's the proper way of doing this in numpy without an operation?
 
 .. warning::
     Beware that doing arithmetic on ``uint16`` can lead to unexpected
@@ -458,7 +513,7 @@ been done on the pixels yet.  The data type of Gemini raw datasets is always
         >>> a + a
         array([65534], dtype=uint16)
         >>> 1.0*a + a
-        array([ 131070.])
+        array([131070.])
 
 
 
@@ -472,12 +527,19 @@ too many to cover here, but here are a couple examples.
 
     >>> import numpy as np
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
+    >>> ad = astrodata.open(some_fits_file)
     >>> data = ad[0].data
 
+    # Add some data to it to make it more interesting
+    >>> data += 10 * (random_number.random(data.shape) - 1.0)
+
+    # Calculate the mean, average, and median, using methods/functions.
     >>> data.mean()
+        -5.00117...
     >>> np.average(data)
+        -5.00117...
     >>> np.median(data)
+        -5.00271...
 
 As shown, both array methods like ``.mean()`` as well as numpy ``ufunc``
 functions like  ``np.average()`` can be used.
@@ -500,11 +562,6 @@ tools, like in this example
 
 .. doctest::
 
-    >>> import numpy as np
-
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
-    >>> data = ad[0].data
-
     >>> stddev = data.std()
     >>> mean = data.mean()
 
@@ -513,6 +570,19 @@ tools, like in this example
     ...     mean-3*stddev,
     ...     mean+3*stddev
     ... ).mean()
+
+    >>> print(
+    ...     f"standard deviation = {stddev:10.3e}",
+    ...     f"mean               = {mean:10.3e}",
+    ...     f"clipped mean       = {clipped_mean:10.3e}",
+    ...     sep='\n',
+    ... ) # DOCTEST: +NORMALIZE_WHITESPACE
+    standard deviation =  2.887e+00
+    mean               = -5.001e+00
+    clipped mean       = -5.001e+00
+
+
+
 
 There is no iteration in that example. It is a one-time clipping of the data
 specifically for this calculation.
@@ -523,14 +593,11 @@ how it is done
 
 .. doctest::
 
-    >>> import numpy as np
     >>> from astropy.stats import sigma_clip
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
-    >>> data = ad[0].data
-
     >>> clipped_mean = np.ma.mean(sigma_clip(data, sigma=3))
-
+    >>> print(f"clipped mean = {clipped_mean:10.3e}")
+    clipped mean = -5.001e+00
 
 Filters with SciPy
 ------------------
@@ -542,34 +609,38 @@ information.
 
 The example below applies a gaussian filter to the pixel array.
 
+.. todo::
+    Need to revisit this example
+
 .. doctest::
 
-    >>> from scipy.ndimage import filters
-    >>> import imexam
+    # >>> from scipy.ndimage import filters
+    # >>> import imexam
 
-    >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
-    >>> data = ad[0].data
+    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
+    # >>> data = ad[0].data
 
-    >>> # We need to prepare an array of the same size and shape as
-    >>> # the data array.  The result will be put in there.
-    >>> convolved_data = np.zeros(data.size).reshape(data.shape)
+    # >>> # We need to prepare an array of the same size and shape as
+    # >>> # the data array.  The result will be put in there.
+    # >>> convolved_data = np.zeros(data.size).reshape(data.shape)
 
-    >>> # We now apply the convolution filter.
-    >>> sigma = 10.
-    >>> filters.gaussian_filter(data, sigma, output=convolved_data)
+    # >>> # We now apply the convolution filter.
+    # >>> sigma = 10.
+    # >>> filters.gaussian_filter(data, sigma, output=convolved_data)
 
-    >>> # Let's visually compare the convolved image with the original
-    >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
-    >>> ds9.view(data)
-    >>> ds9.scale('zscale')
-    >>> ds9.frame(2)
-    >>> ds9.view(convolved_data)
-    >>> ds9.scale('zscale')
-    >>> ds9.blink()
-    >>> # When you are convinced it's been convolved, stop the blinking.
-    >>> ds9.blink(blink=False)
+    # >>> # Let's visually compare the convolved image with the original
+    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
+    # >>> ds9.view(data)
+    # >>> ds9.scale('zscale')
+    # >>> ds9.frame(2)
+    # >>> ds9.view(convolved_data)
+    # >>> ds9.scale('zscale')
+    # >>> ds9.blink()
+    # >>> # When you are convinced it's been convolved, stop the blinking.
+    # >>> ds9.blink(blink=False)
 
-.. todo:: what is meant by "this particular kernel"? leaving this unedited on
+.. todo::
+    what is meant by "this particular kernel"? leaving this unedited on
     the first pass for clarity later.
 
 Note that there is an Astropy way to do this convolution, with tools in
@@ -594,7 +665,8 @@ the three big projects we have featured in this section.
 * SciPy: `www.scipy.org <http://www.scipy.org>`_
 * Astropy:  `www.astropy.org <http://www.astropy.org>`_
 
-.. todo:: This should be its own page, probably
+.. todo::
+    This should be its own page, probably
 
 Using the Astrodata Data Quality Plane
 ======================================
@@ -606,16 +678,20 @@ bands between the three CCDs that represent the physical gap between the
 CCDs.  Let us have a look at the pixels to have a better sense of the
 data
 
+.. todo::
+    Need to revisit this example
+
 .. doctest::
 
-    >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
-    >>> import imexam
-    >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
+    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
+    # >>> import imexam
+    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
 
-    >>> ds9.view(ad[0].data)
-    >>> ds9.scale('zscale')
+    # >>> ds9.view(ad[0].data)
+    # >>> ds9.scale('zscale')
 
-.. todo:: Was this suuposed to have an associated image in the documentation?
+.. todo::
+    Was this suuposed to have an associated image in the documentation?
     does it exist in the docs? (Nope, need to generate it probably)
 
 See how the right and left portions of the frame are not exposed to the sky,
@@ -625,10 +701,13 @@ include those unilluminated areas.  We would want to mask them out.
 
 Let us have a look at the mask associated with that image
 
+.. todo::
+    Need to revisit this example
+
 .. doctest::
 
-    >>> ds9.view(ad[0].mask)
-    >>> ds9.scale('zscale')
+    # >>> ds9.view(ad[0].mask)
+    # >>> ds9.scale('zscale')
 
 The bad sections are all white (pixel value > 0).  There are even some
 illuminated pixels that have been marked as bad for a reason or another.
@@ -641,14 +720,15 @@ find most readable.
 
 .. doctest::
 
-    >>> import numpy as np
-
     >>> # For clarity...
+    >>> ad = astrodata.from_file(some_fits_file_with_mask)
     >>> data = ad[0].data
     >>> mask = ad[0].mask
 
+    >>> breakpoint()
     >>> # Reject all flagged pixels and calculate the mean
     >>> np.mean(data[mask == 0])
+
     >>> np.ma.masked_array(data, mask).mean()
 
     >>> # Reject only the pixels flagged "no_data" (bit 16)
@@ -657,7 +737,9 @@ find most readable.
     >>> np.ma.masked_where(mask & 16, data).mean()
 
 The "long" form with ``np.ma.masked_*`` is useful if you are planning to do
-more than one operation on the masked array.  For example::
+more than one operation on the masked array.  For example
+
+.. doctest::
 
     >>> clean_data = np.ma.masked_array(data, mask)
     >>> clean_data.mean()
@@ -718,12 +800,14 @@ In this example, we do simple statistics on a section of the image.
     ... %.2f  %.2f   %.2f    %.2f  %.2f' % \
     ... (mean, median, stddev, minimum, maximum))
 
-.. todo:: implement a median method if it's that important
+.. todo::
+    implement a median method if it's that important
     Have you noticed that the median is calculated with a function rather
     than a method?  This is simply because the |NDArray| object does not
     have a method to calculate the median.
 
-.. todo:: turn below example into a full example file
+.. todo::
+    turn below example into a full example file
 
 Example - Overscan Subtraction with Trimming
 --------------------------------------------
