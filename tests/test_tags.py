@@ -78,7 +78,7 @@ def setup_function():
     factory.add_class(AstroDataMyInstrument)
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def testfile(tmp_path):
     hdr = fits.Header(
         {
@@ -99,7 +99,6 @@ def testfile(tmp_path):
     filename = os.path.join(tmp_path, "fakebias.fits")
     ad.write(filename)
     yield filename
-    os.remove(filename)
 
 
 def test_tags(testfile):
