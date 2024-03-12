@@ -4,7 +4,6 @@ import astropy.units as u
 
 import numpy as np
 
-import pytest
 
 from astrodata import Section
 from astrodata.fits import header_for_table, card_filter, update_header
