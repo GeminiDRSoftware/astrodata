@@ -201,7 +201,7 @@ def test_operate():
     assert_array_equal(ad[0].mask, [1, 1])
 
 
-def test_write_and_read(tmpdir, capsys):
+def test_write_and_read(tmp_path, capsys):
     ad = astrodata.create({})
     nd = NDData(
         data=[[1, 2], [3, 4]],
@@ -233,7 +233,7 @@ def test_write_and_read(tmpdir, capsys):
     with pytest.raises(TypeError, match=match):
         ad[0].MYNDD = NDData(data=np.ones(10), meta={"header": fits.Header()})
 
-    testfile = str(tmpdir.join("testfile.fits"))
+    testfile = str(os.path.join(tmp_path, "testfile.fits"))
     ad.write(testfile)
 
     ad = astrodata.from_file(testfile)
@@ -410,17 +410,17 @@ def test_process_tags_is_present():
     assert ad.tags == {"A", "B", "C", "D", "blah", "bing", "bong"}
 
 
-def test_absolute_path_filename(tmpdir, ad1):
+def test_absolute_path_filename(tmp_path, ad1):
     # Make a temporary directory and set the filename to be an absolute path.
-    path = os.path.abspath(str(tmpdir))
+    path = os.path.abspath(str(tmp_path))
     filename = os.path.join(path, "test.fits")
 
     with pytest.raises(ValueError):
         ad1.filename = filename
 
 
-def test_setter_orig_filename(tmpdir, ad1):
-    ad1.orig_filename = os.path.join(tmpdir, "test.fits")
+def test_setter_orig_filename(tmp_path, ad1):
+    ad1.orig_filename = os.path.join(tmp_path, "test.fits")
 
 
 def test_multi_slice_wcs(ad1):

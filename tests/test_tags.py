@@ -79,7 +79,7 @@ def setup_function():
 
 
 @pytest.fixture(scope="function")
-def testfile(tmpdir):
+def testfile(tmp_path):
     hdr = fits.Header(
         {
             "INSTRUME": "MYINSTRUMENT",
@@ -95,7 +95,8 @@ def testfile(tmpdir):
     ad = astrodata.create(phu, [hdu, hdu2])
     tbl = Table([np.zeros(10), np.ones(10)], names=["col1", "col2"])
     ad.MYCAT = tbl
-    filename = str(tmpdir.join("fakebias.fits"))
+    # Generate unique filename for each test
+    filename = os.path.join(tmp_path, "fakebias.fits")
     ad.write(filename)
     yield filename
     os.remove(filename)

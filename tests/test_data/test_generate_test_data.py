@@ -55,11 +55,11 @@ def test_generate_random_file_name():
     assert filename.endswith(".fits")
 
 
-def test_write_fits_file(tmpdir):
+def test_write_fits_file(tmp_path):
     RandomFitsFile.set_seed(123)
     data = RandomFitsFile.generate_random_data((10, 10))
     filename = "test.fits"
-    path = str(tmpdir)
+    path = str(tmp_path)
     RandomFitsFile.write_fits_file(data, filename, path)
     assert os.path.exists(os.path.join(path, filename))
     hdul = fits.open(os.path.join(path, filename))
@@ -68,15 +68,15 @@ def test_write_fits_file(tmpdir):
     hdul.close()
 
 
-def test_create_random_files(tmpdir):
+def test_create_random_files(tmp_path):
     RandomFitsFile.set_seed(123)
-    files = RandomFitsFile.create_random_files(10, path=str(tmpdir))
-    assert len(os.listdir(str(tmpdir))) == 10
+    files = RandomFitsFile.create_random_files(10, path=str(tmp_path))
+    assert len(os.listdir(str(tmp_path))) == 10
     assert len(files) == 10
 
     for file in files:
         assert file.endswith(".fits")
-        assert os.path.exists(os.path.join(tmpdir, file))
+        assert os.path.exists(os.path.join(tmp_path, file))
 
 
 def test_create_random_header():

@@ -373,7 +373,7 @@ def test_phu(NIFS_DARK):
 
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
-def test_paths(tmpdir, NIFS_DARK):
+def test_paths(tmp_path, NIFS_DARK):
     ad = astrodata.from_file(NIFS_DARK)
     assert ad.orig_filename == "N20160727S0077.fits"
 
@@ -385,7 +385,7 @@ def test_paths(tmpdir, NIFS_DARK):
     assert ad.filename == "newfile.fits"
     assert ad.path == os.path.join(srcdir, "newfile.fits")
 
-    testfile = os.path.join(str(tmpdir), "temp.fits")
+    testfile = os.path.join(str(tmp_path), "temp.fits")
     ad.path = testfile
     assert ad.filename == "temp.fits"
     assert ad.path == testfile
@@ -394,7 +394,7 @@ def test_paths(tmpdir, NIFS_DARK):
     assert os.path.exists(testfile)
     os.remove(testfile)
 
-    testfile = os.path.join(str(tmpdir), "temp2.fits")
+    testfile = os.path.join(str(tmp_path), "temp2.fits")
     ad.write(testfile)
     assert os.path.exists(testfile)
 
@@ -483,7 +483,7 @@ def test_from_hdulist3():
     assert len(ad.ASCIITAB) == 2
 
 
-def test_can_make_and_write_ad_object(tmpdir):
+def test_can_make_and_write_ad_object(tmp_path):
     # Creates data and ad object
     phu = fits.PrimaryHDU()
     hdu = fits.ImageHDU(data=np.arange(10))
@@ -495,7 +495,7 @@ def test_can_make_and_write_ad_object(tmpdir):
     assert ad[1].hdr["FOO"] == "BAR"
 
     # Write file and test it exists properly
-    testfile = str(tmpdir.join("created_fits_file.fits"))
+    testfile = str(os.path.join(tmp_path, "created_fits_file.fits"))
     ad.write(testfile)
 
     # Opens file again and tests data is same as above
@@ -503,7 +503,7 @@ def test_can_make_and_write_ad_object(tmpdir):
     assert np.array_equal(adnew[0].data, np.arange(10))
 
 
-def test_can_append_table_and_access_data(capsys, tmpdir):
+def test_can_append_table_and_access_data(capsys, tmp_path):
     tbl = Table([np.zeros(10), np.ones(10)], names=["col1", "col2"])
     phu = fits.PrimaryHDU()
     ad = astrodata.create(phu)
@@ -524,7 +524,7 @@ def test_can_append_table_and_access_data(capsys, tmpdir):
     assert ".BOB           Table       (10, 2)" in captured.out
 
     # Write file and test it exists properly
-    testfile = str(tmpdir.join("created_fits_file.fits"))
+    testfile = str(os.path.join(tmp_path, "created_fits_file.fits"))
     ad.write(testfile)
     adnew = astrodata.from_file(testfile)
     assert adnew.exposed == {"BOB"}
@@ -669,8 +669,8 @@ def test_read_a_keyword_from_phu_deprecated():
         ad.ABC
 
 
-def test_read_invalid_file(tmpdir, caplog):
-    testfile = str(tmpdir.join("test.fits"))
+def test_read_invalid_file(tmp_path, caplog):
+    testfile = str(os.path.join(tmp_path, "test.fits"))
     with open(testfile, "w"):
         # create empty file
         pass
@@ -681,8 +681,8 @@ def test_read_invalid_file(tmpdir, caplog):
     assert caplog.records[0].message.endswith("is zero size")
 
 
-def test_read_empty_file(tmpdir):
-    testfile = str(tmpdir.join("test.fits"))
+def test_read_empty_file(tmp_path):
+    testfile = str(os.path.join(tmp_path, "test.fits"))
     hdr = fits.Header({"INSTRUME": "darkimager", "OBJECT": "M42"})
     fits.PrimaryHDU(header=hdr).writeto(testfile)
     ad = astrodata.from_file(testfile)
@@ -691,8 +691,8 @@ def test_read_empty_file(tmpdir):
     assert ad.instrument() == "darkimager"
 
 
-def test_read_file(tmpdir):
-    testfile = str(tmpdir.join("test.fits"))
+def test_read_file(tmp_path):
+    testfile = str(os.path.join(tmp_path, "test.fits"))
     hdr = fits.Header({"INSTRUME": "darkimager", "OBJECT": "M42"})
     fits.PrimaryHDU(header=hdr).writeto(testfile)
     ad = astrodata.from_file(testfile)
@@ -940,7 +940,7 @@ def test_crop_ext(GSAOI_DARK):
     not astropy.utils.minversion(astropy, "4.0.1"),
     reason="requires astropy >=4.0.1 for correct serialization",
 )
-def test_round_trip_gwcs(tmpdir):
+def test_round_trip_gwcs(tmp_path):
     """
     Add a 2-step gWCS instance to NDAstroData, save to disk, reload & compare.
     """
@@ -1029,7 +1029,7 @@ def test_round_trip_gwcs(tmpdir):
     )
 
     # Save & re-load the AstroData instance with its new WCS attribute:
-    testfile = str(tmpdir.join("round_trip_gwcs.fits"))
+    testfile = str(os.path.join(tmp_path, "round_trip_gwcs.fits"))
     ad1.write(testfile)
     ad2 = astrodata.from_file(testfile)
 
