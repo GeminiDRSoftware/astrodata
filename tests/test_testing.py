@@ -17,18 +17,21 @@ from astrodata.testing import (
 from astropy.io import fits
 
 
-def test_download_from_archive(monkeypatch, tmpdir):
+def test_download_from_archive(monkeypatch, tmp_path):
     ncall = 0
 
     def mock_download(remote_url, **kwargs):
         nonlocal ncall
         ncall += 1
         fname = remote_url.split("/")[-1]
-        tmpdir.join(fname).write("")  # create fake file
-        return str(tmpdir.join(fname))
+        # Create a fake file
+        with open(os.path.join(tmp_path, fname), "w+") as _:
+            pass
+
+        return str(os.path.join(tmp_path, fname))
 
     env_var = "TEST_NEW_CACHE"
-    monkeypatch.setenv(env_var, str(tmpdir))
+    monkeypatch.setenv(env_var, str(tmp_path))
     monkeypatch.setattr("astrodata.testing.download_file", mock_download)
 
     archive_filename = "THIS_IS_A_TEST.fits"

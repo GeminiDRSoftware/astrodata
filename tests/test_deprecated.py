@@ -5,14 +5,15 @@ is covered by the functions that are replacing them, anyways).
 import astrodata
 import astropy.io.fits as fits
 import pytest
+import os
 
 from astrodata.utils import AstroDataDeprecationWarning
 
 
 @pytest.fixture
-def example_fits_file(tmpdir) -> str:
+def example_fits_file(tmp_path) -> str:
     """Create an empty fits file, and return the path."""
-    filename = tmpdir.join("example.fits")
+    filename = os.path.join(tmp_path, "example.fits")
     hdu = fits.PrimaryHDU()
     hdu.writeto(filename)
     return filename

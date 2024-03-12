@@ -18,9 +18,9 @@ adfactory = factory.AstroDataFactory
 
 
 @pytest.fixture
-def example_fits_file(tmpdir) -> str:
+def example_fits_file(tmp_path) -> str:
     """Create an empty fits file, and return the path."""
-    filename = tmpdir.join("example.fits")
+    filename = os.path.join(tmp_path, "example.fits")
     hdu = fits.PrimaryHDU(data=[1, 2, 3])
     hdu.writeto(filename)
     return filename
@@ -43,8 +43,8 @@ def ad(example_fits_file) -> astrodata.AstroData:
 
 
 @pytest.fixture
-def nonexistent_file(tmpdir) -> str:
-    filename = tmpdir.join("nonexistent.fits")
+def nonexistent_file(tmp_path) -> str:
+    filename = os.path.join(tmp_path, "nonexistent.fits")
 
     if os.path.isfile(filename):
         os.remove(filename)
@@ -53,9 +53,9 @@ def nonexistent_file(tmpdir) -> str:
 
 
 @pytest.fixture
-def example_dir(tmpdir) -> str:
+def example_dir(tmp_path) -> str:
     # Make an empty directory.
-    dirname = os.path.join(tmpdir, "example_directory")
+    dirname = os.path.join(tmp_path, "example_directory")
 
     if os.path.exists(dirname):
         os.remove(dirname)

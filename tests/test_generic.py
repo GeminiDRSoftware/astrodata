@@ -7,6 +7,7 @@ overlaps with other tests, they are meant to ensure the basic API behaves as
 expected under changes.
 """
 import copy
+import os
 
 import pytest
 
@@ -19,9 +20,9 @@ from astrodata import astro_data_tag, astro_data_descriptor, TagSet
 
 
 @pytest.fixture
-def temporary_fits_file(tmpdir):
+def temporary_fits_file(tmp_path):
     """Create a temporary FITS file with a single extension."""
-    filename = tmpdir.join("test.fits")
+    filename = os.path.join(tmp_path, "test.fits")
     header = fits.Header({"INSTRUME": "TEST_INSTRUMENT"})
     hdu = fits.PrimaryHDU(
         data=np.ones((10, 10)),

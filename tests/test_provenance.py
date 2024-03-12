@@ -159,7 +159,7 @@ def BPM_PROVHISTORY():
 
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
-def test_convert_provhistory(tmpdir, BPM_PROVHISTORY):
+def test_convert_provhistory(tmp_path, BPM_PROVHISTORY):
     ad = astrodata.from_file(BPM_PROVHISTORY)
 
     # This file (should) use the old PROVHISTORY extname
@@ -173,7 +173,7 @@ def test_convert_provhistory(tmpdir, BPM_PROVHISTORY):
 
     # and if we write the file, it should have a HISTORY extname
     # and not a PROVHISTORY extname
-    testfile = os.path.join(str(tmpdir), "temp.fits")
+    testfile = os.path.join(str(tmp_path), "temp.fits")
     ad.path = testfile
     ad.write()
     assert os.path.exists(testfile)

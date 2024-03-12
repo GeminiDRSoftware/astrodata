@@ -65,14 +65,14 @@ def test_calculate_affine_matrices(angle, scale, xoffset, yoffset):
 @pytest.mark.skip(reason="WCS unused axes problem")
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
-def test_reading_and_writing_sliced_image(F2_IMAGE, tmpdir):
+def test_reading_and_writing_sliced_image(F2_IMAGE, tmp_path):
     ad = astrodata.from_file(F2_IMAGE)
     result = ad[0].wcs(100, 100, 0)
 
     ad[0].reset(ad[0].nddata[0])
     assert_allclose(ad[0].wcs(100, 100), result)
 
-    test_file_loc = os.path.join(tmpdir, "test.fits")
+    test_file_loc = os.path.join(tmp_path, "test.fits")
 
     ad.write(test_file_loc, overwrite=True)
     ad2 = astrodata.from_file(test_file_loc)
