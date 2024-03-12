@@ -110,7 +110,7 @@ class AstroData:
             )
 
         # If nddata is a single NDAstroData object, make it a list.
-        if not isinstance(nddata, (list, tuple)):
+        if not is_nddata_iterable:
             nddata = [nddata]
 
         # _all_nddatas contains all the extensions from the original file or
@@ -122,8 +122,6 @@ class AstroData:
         # passing an arg?
         self.is_single = is_single
 
-        # If this data provider represents a single slice out of a whole
-        # dataset, return True. Otherwise, return False.
         if tables is not None and not isinstance(tables, dict):
             raise ValueError("tables must be a dict")
 
@@ -355,6 +353,7 @@ class AstroData:
         """Return True if the attribute is meant to be modified."""
         if self.is_sliced and attr in {"path", "filename"}:
             return False
+
         return attr in self._fixed_settable or attr.isupper()
 
     @property
@@ -494,7 +493,8 @@ class AstroData:
     @assign_only_single_slice
     def variance(self, value):
         if value is None:
-            self.nddata.uncertainty = None
+            self.nddata.uncertainty = value
+
         else:
             self.nddata.uncertainty = ADVarianceUncertainty(value)
 
@@ -599,7 +599,7 @@ class AstroData:
         AttributeError
             If the attribute could not be found/computed.
         """
-        # I we're working with single slices, let's look some things up
+        # If we're working with single slices, let's look some things up
         # in the ND object
         if self.is_single and attribute.isupper():
             with suppress(KeyError):
@@ -708,6 +708,9 @@ class AstroData:
         if self._indices is not None:
             return len(self._indices)
 
+        if self.is_single:
+            return 1
+
         return len(self._all_nddatas)
 
     @property
@@ -795,16 +798,17 @@ class AstroData:
 
     def info(self):
         """Prints out information about the contents of this instance."""
+        unknown_file = "Unknown"
+        print(f"Filename: {self.path if self.path else unknown_file}")
 
-        print(f"Filename: {self.path if self.path else 'Unknown'}")
-        # This is fixed. We don't support opening for update
-        # print("Mode: readonly")
-
+        # Tags with proper indent and wrapping.
         text = "Tags: " + " ".join(sorted(self.tags))
         textwrapper = textwrap.TextWrapper(width=80, subsequent_indent="    ")
+
         for line in textwrapper.wrap(text):
             print(line)
 
+        # Data information
         if len(self) > 0:
             main_fmt = "{:6} {:24} {:17} {:14} {}"
             other_fmt = "          .{:20} {:17} {:14} {}"
@@ -825,6 +829,7 @@ class AstroData:
                         main_obj["data_type"],
                     )
                 )
+
                 for other in pi["other"]:
                     print(
                         other_fmt.format(
@@ -855,6 +860,7 @@ class AstroData:
         if isinstance(operand, AstroData):
             if len(operand) != len(self):
                 raise ValueError("Operands are not the same size")
+
             for n in range(len(self)):
                 try:
                     data = (
@@ -862,11 +868,14 @@ class AstroData:
                         if operand.is_single
                         else operand.nddata[n]
                     )
+
                     ndd[ind[n]] = operator(ndd[ind[n]], data)
+
                 except TypeError:
                     # This may happen if operand is a sliced, single
                     # AstroData object
                     ndd[ind[n]] = operator(ndd[ind[n]], operand.nddata)
+
             op_table = operand.table()
             ltab, rtab = set(self._tables), set(op_table)
             for tab in rtab - ltab:
