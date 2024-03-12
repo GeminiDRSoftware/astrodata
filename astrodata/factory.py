@@ -1,4 +1,5 @@
 """Factory for AstroData objects."""
+import copy
 import logging
 import os
 from contextlib import contextmanager
@@ -22,6 +23,13 @@ class AstroDataFactory:
 
     def __init__(self):
         self._registry = set()
+
+    @property
+    def registry(self):
+        """Return the registry of classes."""
+        # Shallow copy -- just don't want the set to be modified, but the
+        # classes don't need to be copied.
+        return copy.copy(self._registry)
 
     @staticmethod
     @deprecated(
@@ -168,6 +176,7 @@ class AstroDataFactory:
         # classes for other candidates. That way we keep only the more
         # specific ones.
         final_candidates = []
+
         for cnd in candidates:
             if any(cnd in x.mro() for x in candidates if x != cnd):
                 continue
@@ -176,7 +185,8 @@ class AstroDataFactory:
 
         if len(final_candidates) > 1:
             raise AstroDataError(
-                "More than one class is candidate for this dataset"
+                f"More than one class is candidate for this dataset: "
+                f"{', '.join((str(s) for s in final_candidates))}"
             )
 
         if not final_candidates:
