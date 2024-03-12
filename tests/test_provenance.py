@@ -188,5 +188,3 @@ def test_convert_provhistory(tmp_path, BPM_PROVHISTORY):
     assert hist["timestamp_stop"] == now
     assert hist["primitive"] == "primitive"
     assert hist["args"] == "args"
-
-    os.remove(testfile)

@@ -21,10 +21,12 @@ def test_header_for_table():
     )
     tbl["b"].unit = u.arcsec
     hdr = header_for_table(tbl)
-    assert hdr["TFORM1"] == "8K"
-    assert hdr["TDIM1"] == "(4,2)"
-    assert hdr["TFORM4"] == "2L"
-    assert hdr["TUNIT2"] == "arcsec"
+    assert (
+        hdr["TFORM1"] == "8K"
+        and hdr["TDIM1"] == "(4,2)"
+        and hdr["TFORM4"] == "2L"
+        and hdr["TUNIT2"] == "arcsec"
+    )
 
 
 def test_card_filter():
