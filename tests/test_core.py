@@ -239,19 +239,33 @@ def test_write_and_read(tmp_path, capsys):
     ad = astrodata.from_file(testfile)
     ad.info()
     captured = capsys.readouterr()
+
+    # Windows uses int32, linux/OSX uses int64
+    if os.name == "nt":
+        scifmt = "int32"
+        valfmt = "int32"
+
+    elif os.name == "posix":
+        scifmt = "int64"
+        valfmt = "int64"
+
+    else:
+        raise ValueError(f"Unsupported OS: {os.name}")
+
     assert captured.out.splitlines()[3:] == [
         "Pixels Extensions",
         "Index  Content                  Type              Dimensions     Format",
-        "[ 0]   science                  NDAstroData       (2, 2)         int64",
+        f"[ 0]   science                  NDAstroData       (2, 2)         {scifmt}",
         "          .variance             ADVarianceUncerta (2, 2)         float64",
         "          .mask                 ndarray           (2, 2)         uint16",
         "          .BOB2                 Table             (5, 2)         n/a",
-        "          .MYVAL_WITH_A_VERY_LO ndarray           (10,)          int64",
+        f"          .MYVAL_WITH_A_VERY_LO ndarray           (10,)          {valfmt}",
         "",
         "Other Extensions",
         "               Type        Dimensions",
         ".BOB           Table       (10, 2)",
     ]
+
     assert_array_equal(ad[0].nddata.data[0], nd.data[0])
     assert_array_equal(ad[0].nddata.variance[0], nd.uncertainty.array[0])
     assert_array_equal(ad[0].nddata.mask[0], nd.mask[0])
