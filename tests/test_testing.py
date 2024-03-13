@@ -63,7 +63,6 @@ def test_download_from_archive_raises_IOError_if_path_is_not_accessible():
     env_var = "MY_FAKE_ENV_VAR"
     os.environ["MY_FAKE_ENV_VAR"] = "/not/accessible/path"
 
-    # Windows throws an OSError, which should be fine
     with pytest.raises(IOError):
         download_from_archive("N20180304S0126.fits", env_var=env_var)
 
