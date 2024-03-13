@@ -374,8 +374,10 @@ def download_from_archive(
             # `download_file` ignores Access Control List - fixing it
             os.chmod(local_path, 0o664)
 
-        # Ensure the path exists now
-        assert os.path.exists(local_path)
+        # Ensure the file exists now and is not empty
+        assert (
+            os.path.exists(local_path) and not os.path.getsize(local_path) == 0
+        )
 
     except Exception as err:
         raise IOError(
