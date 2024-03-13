@@ -365,7 +365,16 @@ def download_from_archive(
     # Now check if the local file exists and download if not
     local_path = os.path.join(cache_path, filename)
     if not os.path.exists(local_path):
-        tmp_path = download_file(GEMINI_ARCHIVE_URL + filename, cache=False)
+        try:
+            tmp_path = download_file(
+                GEMINI_ARCHIVE_URL + filename, cache=False
+            )
+
+        except Exception as err:
+            raise IOError(
+                f"Failed to download {filename} from the archive"
+            ) from err
+
         shutil.move(tmp_path, local_path)
 
         # `download_file` ignores Access Control List - fixing it
@@ -763,7 +772,6 @@ def ad_compare(ad1, ad2, **kwargs):
 
 
 _HDUL_LIKE_TYPE = fits.HDUList | list[fits.hdu.FitsHDU]
-_mask_cobos: set | None = None
 
 
 def fake_fits_bytes(
@@ -808,6 +816,10 @@ def fake_fits_bytes(
         If True, only the primary HDU is created. If False, the primary HDU and
         n_extensions are created.
     """
+    # Because of peculiarities with pytest, fits imports are done inside the
+    # function.
+    from astropy.io import fits
+
     # If HDUs are provided, other arguments (other than n_extensions) should
     # raise an error.
     if hdus is not None and any(
@@ -902,7 +914,7 @@ def fake_fits_bytes(
 
                 if masks:
                     mask_image = fits.ImageHDU(np.copy(mask), name="mask")
-                    mask_image.header["EXTNAME"] = "MASK"
+                    mask_image.header["EXTNAME"] = "mask"
                     mask_image.header["EXTVER"] = i + 1
 
                     hdus.append(mask_image)
