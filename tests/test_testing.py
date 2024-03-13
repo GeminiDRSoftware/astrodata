@@ -62,7 +62,15 @@ def test_download_from_archive(monkeypatch, tmp_path):
 def test_download_from_archive_raises_IOError_if_path_is_not_accessible():
     env_var = "MY_FAKE_ENV_VAR"
     os.environ["MY_FAKE_ENV_VAR"] = "/not/accessible/path"
-    with pytest.raises(IOError):
+
+    # Windows throws an OSError, which should be fine.abs
+    if os.name == "nt":
+        errtype = OSError
+
+    else:
+        errtype = IOError
+
+    with pytest.raises(errtype):
         download_from_archive("N20180304S0126.fits", env_var=env_var)
 
 
