@@ -57,6 +57,7 @@ def test_download_from_archive(monkeypatch, tmp_path):
             os.remove(fname)
 
 
+@pytest.mark.skipif(os.name == "nt", reason="Test only works on unix/osx")
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_download_from_archive_raises_IOError_if_path_is_not_accessible():
