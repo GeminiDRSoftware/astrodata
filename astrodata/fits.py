@@ -263,9 +263,11 @@ def header_for_table(table):
     """Return a FITS header for a table."""
     table_header = table.meta.pop("header", None)
     fits_header = fits.table_to_hdu(table).header
+
     if table_header:
         table.meta["header"] = table_header  # restore original meta
         fits_header = update_header(table_header, fits_header)
+
     return fits_header
 
 
@@ -365,6 +367,7 @@ def update_header(headera, headerb):
     # Updated keywords that should be unique
     difference = set(cardsb) - set(cardsa)
     headera.update(card_filter(difference, exclude={"HISTORY", "COMMENT", ""}))
+
     # Check the HISTORY and COMMENT cards, just in case
     for key in ("HISTORY", "COMMENT"):
         fltcardsa = card_filter(cardsa, include={key})
@@ -431,9 +434,6 @@ class FitsLazyLoadable:
 
     def _scale(self, data):
         """Scale the data, if necessary."""
-        # TODO: It would be goot to access these differently. Is this always an
-        # object we control? Even if so, should access through a property, not
-        # a protected member. No friends in python...
         # pylint: disable=protected-access
         bscale = self._obj._orig_bscale
         bzero = self._obj._orig_bzero
@@ -448,8 +448,6 @@ class FitsLazyLoadable:
         return (bscale * data + bzero).astype(self.dtype)
 
     def __getitem__(self, arr_slice):
-        # TODO: We may want (read: should) create an empty result array before
-        # scaling
         return self._scale(self._obj.section[arr_slice])
 
     @property
@@ -474,14 +472,12 @@ class FitsLazyLoadable:
         """Need to to some overriding of astropy.io.fits since it doesn't
         know about BITPIX=8
         """
-        # TODO: It would be goot to access these differently. Is this always an
-        # object we control? Even if so, should access through a property, not
-        # a protected member. No friends in python... These are scattered
-        # throughout the function.
         # pylint: disable=protected-access
         bitpix = self._obj._orig_bitpix
+
         if self._obj._orig_bscale == 1 and self._obj._orig_bzero == 0:
             dtype = fits.BITPIX2DTYPE[bitpix]
+
         else:
             # this method from astropy will return the dtype if the data
             # needs to be converted to unsigned int or scaled to float
@@ -564,7 +560,6 @@ def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
         new_list.append(PrimaryHDU(header=hdulist[0].header))
         image = ImageHDU(header=hdulist[0].header, data=hdulist[0].data)
         # Fudge due to apparent issues with assigning ImageHDU from data
-        # TODO: protected members
         # pylint: disable=protected-access
         image._orig_bscale = hdulist[0]._orig_bscale
         image._orig_bzero = hdulist[0]._orig_bzero
@@ -623,9 +618,9 @@ def read_fits(cls, source, extname_parser=None):
             logging.info("Attribute error in read_fits: %s", err)
             ad.path = None
 
-    # TODO: This is a hack to get around the fact that we don't have a
-    # proper way to pass the original filename to the object. This is
-    # needed for the writer to be able to write the ORIGNAME keyword.
+    # This is a hack to get around the fact that we don't have a proper way to
+    # pass the original filename to the object. This is needed for the writer
+    # to be able to write the ORIGNAME keyword.
     # pylint: disable=protected-access
     _file = hdulist._file
 
@@ -715,6 +710,7 @@ def read_fits(cls, source, extname_parser=None):
                     #  Hopefully astropy will handle this better in future.
                     if hdulist._file is not None:  # probably compressed
                         parts[part_name] = FitsLazyLoadable(parts[part_name])
+
                     else:  # for astrodata.create() files
                         parts[part_name] = parts[part_name].data
 
@@ -757,9 +753,12 @@ def read_fits(cls, source, extname_parser=None):
     for other in hdulist:
         if other in seen:
             continue
+
         name = other.header.get("EXTNAME")
+
         try:
             ad.append(other, name=name)
+
         except ValueError as e:
             warnings.warn(f"Discarding {name} :\n {e}")
 
@@ -773,8 +772,6 @@ def ad_to_hdulist(ad):
 
     # Find the maximum EXTVER for extensions that belonged with this
     # object if it was read from a FITS file
-    # TODO: Is there a way to access _nddata without using the protected
-    # variable? Should it be a protected variable?
     # pylint: disable=protected-access
     maxver = max(
         (
@@ -1019,12 +1016,15 @@ def windowed_operation(
             for (name, coords), obj in list(other.items()):
                 if not isinstance(obj, NDData):
                     raise ValueError("only NDData objects are handled here")
+
                 if name not in other:
                     other[name] = NDDataObject(
                         np.empty(shape, dtype=obj.data.dtype)
                     )
+
                 section = tuple(slice(start, end) for (start, end) in coords)
                 other[name].set_section(section, obj)
+
                 del other[name, coords]
 
         for name in other:
