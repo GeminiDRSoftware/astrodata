@@ -363,22 +363,21 @@ def download_from_archive(
         os.makedirs(cache_path)
 
     # Now check if the local file exists and download if not
-    local_path = os.path.join(cache_path, filename)
-    if not os.path.exists(local_path):
-        try:
-            tmp_path = download_file(
-                GEMINI_ARCHIVE_URL + filename, cache=False
-            )
+    try:
+        local_path = os.path.join(cache_path, filename)
+        url = GEMINI_ARCHIVE_URL + filename
+        if not os.path.exists(local_path):
+            tmp_path = download_file(url, cache=False)
 
-        except Exception as err:
-            raise IOError(
-                f"Failed to download {filename} from the archive"
-            ) from err
+            shutil.move(tmp_path, local_path)
 
-        shutil.move(tmp_path, local_path)
+            # `download_file` ignores Access Control List - fixing it
+            os.chmod(local_path, 0o664)
 
-        # `download_file` ignores Access Control List - fixing it
-        os.chmod(local_path, 0o664)
+    except Exception as err:
+        raise IOError(
+            f"Failed to download {filename} from the archive ({url})"
+        ) from err
 
     return local_path
 
