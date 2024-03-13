@@ -3,11 +3,14 @@ Tests for the `RandomFitsFile` class in generate_test_data.py.
 """
 
 import os
+import sys
 
 import astropy.io.fits as fits
 import numpy as np
 from astropy.nddata import NDData
 from astropy.units import Quantity
+
+import pytest
 
 from generate_test_data import RandomFitsFile
 
@@ -80,6 +83,9 @@ def test_create_random_files(tmp_path):
 
 
 def test_create_random_header():
+    if sys.platform.startswith("win"):
+        pytest.skip("Skip test on Windows due to a bug with headers.")
+
     RandomFitsFile.set_seed(123)
     header = RandomFitsFile.create_random_header()
     assert isinstance(header, fits.Header)
