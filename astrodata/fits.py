@@ -43,7 +43,7 @@ import numpy as np
 
 from gwcs.wcs import WCS as gWCS
 
-from .nddata import ADVarianceUncertainty, NDAstroData as NDDataObject
+from .nddata import ADVarianceUncertainty, NDAstroData
 from .utils import deprecated
 from .wcs import fitswcs_to_gwcs, gwcs_to_fits
 
@@ -721,7 +721,7 @@ def read_fits(cls, source, extname_parser=None):
             parts["uncertainty"] = ADVarianceUncertainty(parts["uncertainty"])
 
         # Create the NDData object
-        nd = NDDataObject(
+        nd = NDAstroData(
             data=parts["data"],
             uncertainty=parts["uncertainty"],
             mask=parts["mask"],
@@ -773,16 +773,21 @@ def ad_to_hdulist(ad):
     # Find the maximum EXTVER for extensions that belonged with this
     # object if it was read from a FITS file
     # pylint: disable=protected-access
+    ad_nddata = ad.nddata
+
+    if isinstance(ad_nddata, NDAstroData):
+        ad_nddata = [ad_nddata]
+
     maxver = max(
         (
             nd.meta["header"].get("EXTVER", 0)
-            for nd in ad._nddata
+            for nd in ad_nddata
             if nd.meta.get("parent_ad") == id(ad)
         ),
         default=0,
     )
 
-    for ext in ad._nddata:
+    for ext in ad_nddata:
         header = ext.meta["header"].copy()
 
         if not isinstance(header, fits.Header):
@@ -865,7 +870,7 @@ def ad_to_hdulist(ad):
             elif isinstance(other, np.ndarray):
                 hdu = new_imagehdu(other, header, name=name)
 
-            elif isinstance(other, NDDataObject):
+            elif isinstance(other, NDAstroData):
                 hdu = new_imagehdu(other.data, ext.meta["header"])
 
             else:
@@ -969,7 +974,7 @@ def windowed_operation(
     if dtype is None:
         dtype = sequence[0].window[:1, :1].data.dtype
 
-    result = NDDataObject(
+    result = NDAstroData(
         np.empty(shape, dtype=dtype),
         variance=np.zeros(shape, dtype=dtype) if with_uncertainty else None,
         mask=np.empty(shape, dtype=np.uint16) if with_mask else None,
@@ -1018,7 +1023,7 @@ def windowed_operation(
                     raise ValueError("only NDData objects are handled here")
 
                 if name not in other:
-                    other[name] = NDDataObject(
+                    other[name] = NDAstroData(
                         np.empty(shape, dtype=obj.data.dtype)
                     )
 
