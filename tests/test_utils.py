@@ -1,3 +1,5 @@
+import os
+
 from astropy.io import fits
 from astropy.table import Table
 import astropy.units as u
@@ -19,10 +21,20 @@ def test_header_for_table():
         ],
         names="abcd",
     )
+
     tbl["b"].unit = u.arcsec
+
     hdr = header_for_table(tbl)
+
+    # Windows uses int32 (J), unix uses int64 (K)
+    if os.name == "nt":
+        tform_value = "8J"
+
+    else:
+        tform_value = "8K"
+
     assert (
-        hdr["TFORM1"] == "8K"
+        hdr["TFORM1"] == tform_value
         and hdr["TDIM1"] == "(4,2)"
         and hdr["TFORM4"] == "2L"
         and hdr["TUNIT2"] == "arcsec"
