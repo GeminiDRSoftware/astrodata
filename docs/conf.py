@@ -8,6 +8,7 @@
 
 # The full version, including alpha/beta/rc tags
 from astrodata import __version__
+import logging
 import os
 
 release = __version__
@@ -43,14 +44,22 @@ extensions = [
 # doctest global setup .. stored in doctest_setup.py in this directory.
 # Check if any of the following variables are already set by pytest or something
 # else. If they are, then we don't want to overwrite them.
-__doctest_setup_file = "doctest_setup.py"
+try:
+    __doctest_setup_file = "doctest_setup.py"
 
-__directory = os.path.dirname(__file__)
+    __directory = os.path.dirname(__file__)
 
-with open(os.path.join(__directory, __doctest_setup_file), "r") as infile:
-    __setup_lines = infile.read()
+    with open(os.path.join(__directory, __doctest_setup_file), "r") as infile:
+        __setup_lines = infile.read()
 
-doctest_global_setup = __setup_lines
+    doctest_global_setup = __setup_lines
+
+except FileNotFoundError:
+    logging.warning(
+        f"Could not find file {__doctest_setup_file} in {__directory}"
+    )
+
+    __setup_lines = ""
 
 # Run doctest when building the docs
 doctest_test_doctest_blocks = "True"
