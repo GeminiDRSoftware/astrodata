@@ -118,8 +118,6 @@ class AstroData:
         self._all_nddatas = nddata
         self._indices = indices
 
-        # TODO: Is there no way to know if this is a single frame without
-        # passing an arg?
         self.is_single = is_single
 
         if tables is not None and not isinstance(tables, dict):
@@ -1471,6 +1469,15 @@ class AstroData:
         self.filename = (prefix or "") + root + (suffix or "") + filetype
 
     def _crop_nd(self, nd, x1, y1, x2, y2):
+        """Crop the input nd array and its associated attributes.
+
+        Args:
+            nd: The input nd array.
+            x1: The starting x-coordinate of the crop region.
+            y1: The starting y-coordinate of the crop region.
+            x2: The ending x-coordinate of the crop region.
+            y2: The ending y-coordinate of the crop region.
+        """
         y_start, y_end = y1, y2 + 1
         x_start, x_end = x1, x2 + 1
 
@@ -1495,10 +1502,12 @@ class AstroData:
         for nd in self._nddata:
             orig_shape = nd.data.shape
             self._crop_nd(nd, x1, y1, x2, y2)
+
             for o in nd.meta["other"].values():
                 try:
                     if o.shape == orig_shape:
                         self._crop_nd(o, x1, y1, x2, y2)
+
                 except AttributeError:
                     # No 'shape' attribute in the object. It's probably
                     # not array-like
