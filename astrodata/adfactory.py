@@ -76,10 +76,11 @@ class AstroDataFactory:
                     fp = func(source)
                     yield fp
 
+                # Catch keyboard interrupts and re-raise them.
+                except KeyboardInterrupt:
+                    raise
+
                 except Exception as err:  # pylint: disable=broad-except
-                    # TODO: Should be more specific than this.
-                    # Log the exception, if it's a serious error then
-                    # re-raise it, e.g., user exits with Ctrl-C.
                     LOGGER.error(
                         "Failed to open %s with %s, got error: %s",
                         source,
