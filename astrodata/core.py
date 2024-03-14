@@ -28,7 +28,7 @@ from .fits import (
     write_fits,
 )
 from .nddata import ADVarianceUncertainty
-from .nddata import NDAstroData as NDDataObject
+from .nddata import NDAstroData
 from .utils import (
     assign_only_single_slice,
     astro_data_descriptor,
@@ -94,10 +94,10 @@ class AstroData:
 
         # Check that nddata is either a single or iterable of NDAstroData
         # objects
-        is_nddata = isinstance(nddata, NDDataObject)
+        is_nddata = isinstance(nddata, NDAstroData)
 
         try:
-            is_nddata_iterable = isinstance(nddata[0], NDDataObject)
+            is_nddata_iterable = isinstance(nddata[0], NDAstroData)
 
         except IndexError:
             # Fall back on checking if it's a list or tuple---could be empty.
@@ -917,22 +917,22 @@ class AstroData:
 
     @format_doc(_ARIT_DOC, name="inplace addition", op="+=")
     def __iadd__(self, oper):
-        self._standard_nddata_op(NDDataObject.add, oper)
+        self._standard_nddata_op(NDAstroData.add, oper)
         return self
 
     @format_doc(_ARIT_DOC, name="inplace subtraction", op="-=")
     def __isub__(self, oper):
-        self._standard_nddata_op(NDDataObject.subtract, oper)
+        self._standard_nddata_op(NDAstroData.subtract, oper)
         return self
 
     @format_doc(_ARIT_DOC, name="inplace multiplication", op="*=")
     def __imul__(self, oper):
-        self._standard_nddata_op(NDDataObject.multiply, oper)
+        self._standard_nddata_op(NDAstroData.multiply, oper)
         return self
 
     @format_doc(_ARIT_DOC, name="inplace division", op="/=")
     def __itruediv__(self, oper):
-        self._standard_nddata_op(NDDataObject.divide, oper)
+        self._standard_nddata_op(NDAstroData.divide, oper)
         return self
 
     add = __iadd__
@@ -949,7 +949,7 @@ class AstroData:
 
     def _rdiv(self, ndd, operand):
         # Divide method works with the operand first
-        return NDDataObject.divide(operand, ndd)
+        return NDAstroData.divide(operand, ndd)
 
     def __rtruediv__(self, oper):
         obj = deepcopy(self)
@@ -962,11 +962,11 @@ class AstroData:
         # Assume that we get an ImageHDU or something that can be
         # turned into one
         if isinstance(pixim, fits.ImageHDU):
-            nd = NDDataObject(pixim.data, meta={"header": pixim.header})
-        elif isinstance(pixim, NDDataObject):
+            nd = NDAstroData(pixim.data, meta={"header": pixim.header})
+        elif isinstance(pixim, NDAstroData):
             nd = pixim
         else:
-            nd = NDDataObject(pixim)
+            nd = NDAstroData(pixim)
 
         if custom_header is not None:
             nd.meta["header"] = custom_header
@@ -1024,8 +1024,8 @@ class AstroData:
         # as NDDataObject, instead of the random one that the user may pass
         top_level = add_to is None
 
-        if not isinstance(raw_nddata, NDDataObject):
-            raw_nddata = NDDataObject(raw_nddata)
+        if not isinstance(raw_nddata, NDAstroData):
+            raw_nddata = NDAstroData(raw_nddata)
 
         processed_nddata = self._process_pixel_plane(
             raw_nddata, top_level=top_level, custom_header=header
