@@ -1498,7 +1498,6 @@ class AstroData:
             Minimum and maximum indices for the x and y axis.
 
         """
-        # TODO: Consider cropping of objects in the meta section
         for nd in self._nddata:
             orig_shape = nd.data.shape
             self._crop_nd(nd, x1, y1, x2, y2)
@@ -1508,9 +1507,11 @@ class AstroData:
                     if o.shape == orig_shape:
                         self._crop_nd(o, x1, y1, x2, y2)
 
-                except AttributeError:
+                except AttributeError as err:
                     # No 'shape' attribute in the object. It's probably
                     # not array-like
+                    err_str = f"{err.__class__.__name__}: {err}"
+                    logging.info(f"Could not crop object {o}: {err_str}")
                     pass
 
     @astro_data_descriptor
