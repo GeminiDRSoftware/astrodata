@@ -3,6 +3,9 @@
 ``astrodata``
 =============
 
+.. image:: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teald/d2f3af2a279efc1f6e90d457a3c50e47/raw/covbadge.json
+    :alt: A badge displaying the coverage level of this repository.
+
 A package for managing astronomical data through a uniform interface.
 ---------------------------------------------------------------------
 
