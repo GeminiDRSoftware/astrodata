@@ -73,7 +73,7 @@ class AstroDataMyInstrument(AstroData):
 
 def setup_function():
     """Add the new class to the factory."""
-    import astrodata.factory as factory
+    from astrodata import factory
 
     factory.add_class(AstroDataMyInstrument)
 
