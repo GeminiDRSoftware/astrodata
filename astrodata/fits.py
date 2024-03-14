@@ -699,9 +699,7 @@ def read_fits(cls, source, extname_parser=None):
                     # Use FitsLazyLoadable to delay loading of the data
                     parts[part_name] = FitsLazyLoadable(parts[part_name])
                 else:
-                    # Otherwise use the data array
-                    # parts[part_name] = parts[part_name].data
-                    # TODO: we open the file with do_not_scale_data=True, so
+                    #  We open the file with do_not_scale_data=True, so
                     #  the data array does not have the correct data values.
                     #  AstroData handles scaling internally, and we can ensure
                     #  it does that by making the data a FitsLazyLoadable; the
@@ -908,7 +906,76 @@ def windowedOp(*args, **kwargs):  # pylint: disable=invalid-name
     return windowed_operation(*args, **kwargs)
 
 
-# TODO: Need to refactor this function
+def _generate_boxes(shape, kernel):
+    """Break the input into chunks."""
+    if len(shape) != len(kernel):
+        raise AssertionError(
+            f"Incompatible shape ({shape}) and kernel ({kernel})"
+        )
+
+    ticks = [
+        [(x, x + step) for x in range(0, axis, step)]
+        for axis, step in zip(shape, kernel)
+    ]
+
+    return list(cart_product(*ticks))
+
+
+def _get_shape(sequence):
+    """Get the shape of the input."""
+    if len({x.shape for x in sequence}) > 1:
+        shapes = tuple(x.shape for x in sequence)
+        raise ValueError(
+            f"Can't calculate final shape: sequence elements "
+            f"mismatch on shape, and none was provided."
+            f" (shapes: {shapes}, found "
+            f" {len(set(shapes))} unique shapes: {tuple(set(shapes))}"
+        )
+
+    return sequence[0].shape
+
+
+def _apply_func(func, sequence, boxes, result, **kwargs):
+    """
+    Apply a given function to a sequence of elements within specified boxes and store the result in the result object.
+
+    Parameters
+    ----------
+    func : function
+        The function to apply to the elements.
+    sequence : list
+        The sequence of elements to apply the function to.
+    boxes : list
+        The list of boxes specifying the sections of the elements to apply the function to.
+    result : object
+        The object to store the result in.
+
+    Returns
+    -------
+    None
+
+    Note
+    ----
+    This function applies the function to the elements in the sequence within
+    the specified boxes and stores the result in the result object. There is no
+    data returned by this function.
+    """
+    for coords in boxes:
+        section = tuple(slice(start, end) for (start, end) in coords)
+        out = func([element.window[section] for element in sequence], **kwargs)
+        result.set_section(section, out)
+
+        # propagate additional attributes
+        if out.meta.get("other"):
+            for k, v in out.meta["other"].items():
+                if len(boxes) > 1:
+                    result.meta["other"][k, coords] = v
+                else:
+                    result.meta["other"][k] = v
+
+        gc.collect()
+
+
 def windowed_operation(
     func,
     sequence,
@@ -948,28 +1015,8 @@ def windowed_operation(
     **kwargs
         Additional args are passed to ``func``.
     """
-
-    def generate_boxes(shape, kernel):
-        if len(shape) != len(kernel):
-            raise AssertionError(
-                f"Incompatible shape ({shape}) and kernel ({kernel})"
-            )
-
-        ticks = [
-            [(x, x + step) for x in range(0, axis, step)]
-            for axis, step in zip(shape, kernel)
-        ]
-
-        return list(cart_product(*ticks))
-
     if shape is None:
-        if len({x.shape for x in sequence}) > 1:
-            raise ValueError(
-                "Can't calculate final shape: sequence elements "
-                "disagree on shape, and none was provided"
-            )
-
-        shape = sequence[0].shape
+        shape = _get_shape(sequence)
 
     if dtype is None:
         dtype = sequence[0].window[:1, :1].data.dtype
@@ -990,25 +1037,10 @@ def windowed_operation(
     log_level = astropy.logger.conf.log_level
     astropy.log.setLevel(astropy.logger.WARNING)
 
-    boxes = generate_boxes(shape, kernel)
+    boxes = _generate_boxes(shape, kernel)
 
     try:
-        for coords in boxes:
-            section = tuple(slice(start, end) for (start, end) in coords)
-            out = func(
-                [element.window[section] for element in sequence], **kwargs
-            )
-            result.set_section(section, out)
-
-            # propagate additional attributes
-            if out.meta.get("other"):
-                for k, v in out.meta["other"].items():
-                    if len(boxes) > 1:
-                        result.meta["other"][k, coords] = v
-                    else:
-                        result.meta["other"][k] = v
-
-            gc.collect()
+        _apply_func(func, sequence, boxes, result, **kwargs)
 
     finally:
         astropy.log.setLevel(log_level)  # and reset
