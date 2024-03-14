@@ -128,14 +128,17 @@ def fitswcs_to_gwcs(input_data):
         axes_names = None
         try:
             ref_frame = getattr(coord, frame_name)()
-            # TODO? Work out how to stuff EQUINOX and OBS-TIME into the frame
+            # TODO: Work out how to stuff EQUINOX and OBS-TIME into the frame
+
         except (AttributeError, TypeError):
             # TODO: Replace quick fix as gWCS doesn't recognize GAPPT
             if frame_name == "GAPPT":
                 ref_frame = coord.FK5()
+
             else:
                 ref_frame = None
                 axes_names = ("lon", "lat")
+
         axes_order = (outputs.index("alpha_C"), outputs.index("delta_C"))
 
         # Call it 'world' if there are no other axes, otherwise 'sky'
@@ -217,6 +220,7 @@ def gwcs_to_fits(ndd, hdr=None):
     if {"lon", "lat"}.issubset(world_axes):
         if isinstance(wcs.output_frame, cf.CelestialFrame):
             cel_frame = wcs.output_frame
+
         elif isinstance(wcs.output_frame, cf.CompositeFrame):
             for frame in wcs.output_frame.frames:
                 if isinstance(frame, cf.CelestialFrame):
@@ -226,11 +230,13 @@ def gwcs_to_fits(ndd, hdr=None):
         cel_ref_frame = cel_frame.reference_frame
         if not isinstance(cel_ref_frame, coord.builtin_frames.BaseRADecFrame):
             raise NotImplementedError("Cannot write non-ecliptic frames yet")
+
         wcs_dict["RADESYS"] = cel_ref_frame.name.upper()
 
         for m in transform:
             if isinstance(m, models.RotateNative2Celestial):
                 nat2cel = m
+
             if isinstance(m, models.Pix2SkyProjection):
                 m.name = "pix2sky"
                 # Determine which sort of projection this is
@@ -304,32 +310,37 @@ def gwcs_to_fits(ndd, hdr=None):
     for i, axis_type in enumerate(wcs.output_frame.axes_type, start=1):
         if f"CRVAL{i}" in wcs_dict:
             continue
+
         if axis_type == "SPECTRAL":
             try:
                 wave_tab = tabular_axes["WAVE"]
+
             except KeyError:
                 wcs_dict[f"CRVAL{i}"] = hdr.get("CENTWAVE", wcs_center[i - 1])
                 wcs_dict[f"CTYPE{i}"] = wcs.output_frame.axes_names[
                     i - 1
                 ]  # AWAV/WAVE
+
             else:
                 wcs_dict[f"CRVAL{i}"] = 0
                 wcs_dict[f"CTYPE{i}"] = (
                     wcs.output_frame.axes_names[i - 1][:4] + "-TAB"
                 )
+
                 if wave_tab.ndim == 1:  # Greisen et al. (2006)
                     wcs_dict[f"PS{i}_0"] = wcs.output_frame.axes_names[i - 1]
                     wcs_dict[f"PS{i}_1"] = ("WAVELENGTH", "Name of column")
-                    wcs_dict["extensions"] = {
-                        wcs.output_frame.axes_names[i - 1]: Table(
-                            [wave_tab], names=("WAVELENGTH",)
-                        )
-                    }
+
+                    wname = wcs.output_frame.axes_names[i - 1]
+                    wtab = Table([wave_tab], names=("WAVELENGTH",))
+                    wcs_dict["extensions"] = {wname: wtab}
+
                 else:  # make something up here
                     wcs_dict[f"PS{i}_0"] = wcs.output_frame.axes_names[i - 1]
-                    wcs_dict["extensions"] = {
-                        wcs.output_frame.axes_names[i - 1]: wave_tab.T
-                    }
+                    wname = wcs.output_frame.axes_names[i - 1]
+                    wtab = wave_tab.T
+                    wcs_dict["extensions"] = {wname: wtab}
+
         else:  # Just something
             wcs_dict[f"CRVAL{i}"] = wcs_center[i - 1]
 
