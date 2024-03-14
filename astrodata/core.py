@@ -233,6 +233,38 @@ class AstroData:
 
         return tags
 
+    @classmethod
+    def matches_data(cls, source) -> bool:
+        """Returns True if the class can handle the data in the source.
+
+        Parameters
+        ----------
+        source : list of `astropy.io.fits.HDUList`
+            The FITS file to be read.
+
+        Returns
+        -------
+        bool
+            True if the class can handle the data in the source.
+
+        Note
+        ----
+        Typically, this method is implemented by the static method
+        `Astrodata._matches_data` or by a class method with the same signature
+        for subclasses.
+
+        If you are implementing a subclass, you should override _matches_data
+        instead, which is a static method that takes a single argument, the
+        source data, and returns a boolean.
+
+        If that method is not overridden, this method will call it with the
+        source data as argument.
+
+        For more information, see the documentation for the
+        :py:meth:`~AstroData._matches_data` and the |DeveloperGuide|.
+        """
+        return cls._matches_data(source)
+
     @staticmethod
     def _matches_data(source):
         # This one is trivial. Will be more specific for subclasses.
