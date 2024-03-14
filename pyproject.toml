@@ -99,7 +99,7 @@ omit = [
  "*/astrodata/extern/*",
  "*/astrodata/version*",
  "*/*/astrodata/testing.py",
- "*/_*.py",
+ "_*.py",
 ]
 
 [tool.coverage.report]
