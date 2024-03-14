@@ -1128,10 +1128,10 @@ def remove_axis_from_model(model, axis):
                 model.right, axis - nl_inputs
             )
 
-            # TODO: Need to factor into variables
-            return (model.left & new_right_model), (
-                None if input_axis is None else input_axis + nl_inputs
-            )
+            model_result = model.left & new_right_model
+            input_axis = None if input_axis is None else input_axis + nl_inputs
+
+            return model_result, input_axis
 
         if op in ("+", "-", "*", "/", "**"):
             new_left_model, input_axis = remove_axis_from_model(
@@ -1146,12 +1146,11 @@ def remove_axis_from_model(model, axis):
                     "arithmetic operator"
                 )
 
-            return (
-                functools.reduce(
-                    core._model_oper(op), [new_left_model, new_right_model]
-                ),
-                input_axis,
+            result = functools.reduce(
+                core._model_oper(op), [new_left_model, new_right_model]
             )
+
+            return result, input_axis
 
         if op == "fix_inputs":
             new_left_model, input_axis = remove_axis_from_model(
@@ -1169,10 +1168,9 @@ def remove_axis_from_model(model, axis):
                         for ax, value in fixed_inputs.items()
                     }
 
-                return (
-                    core.fix_inputs(new_left_model, fixed_inputs),
-                    input_axis,
-                )
+                result = core.fix_inputs(new_left_model, fixed_inputs)
+
+                return result, input_axis
 
             return new_left_model, input_axis
 
