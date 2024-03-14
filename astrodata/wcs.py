@@ -578,18 +578,25 @@ def read_wcs_from_header(header):
 
     except KeyError:
         wcsaxes = 0
+
         for kw in header["CTYPE*"]:
-            if re_ctype.match(kw):
-                wcsaxes = max(wcsaxes, int(re_ctype.match(kw).group(1)), naxis)
+            match = re_ctype.match(kw)
+
+            if match:
+                wcsaxes = max(wcsaxes, int(match.group(1)), naxis)
 
         for kw in header["CD*_*"]:
-            if re_cd.match(kw):
-                wcsaxes = max(wcsaxes, int(re_cd.match(kw).group(1)), naxis)
+            match = re_cd.match(kw)
+
+            if match:
+                wcsaxes = max(wcsaxes, int(match.group(1)), naxis)
 
     wcs_info["WCSAXES"] = wcsaxes
+
     # if not present call get_csystem
     wcs_info["RADESYS"] = header.get("RADESYS", header.get("RADECSYS", "FK5"))
     wcs_info["VAFACTOR"] = header.get("VAFACTOR", 1)
+
     # date keyword?
     # wcs_info['DATEOBS'] = header.get('DATE-OBS', 'DATEOBS')
     wcs_info["EQUINOX"] = header.get("EQUINOX", None)
@@ -601,6 +608,7 @@ def read_wcs_from_header(header):
     crpix = []
     crval = []
     cdelt = []
+
     for i in range(1, wcsaxes + 1):
         ctype.append(header.get(f"CTYPE{i}", "LINEAR"))
         cunit.append(header.get(f"CUNIT{i}", None))
@@ -610,6 +618,7 @@ def read_wcs_from_header(header):
 
     has_cd = len(header["CD?_?"]) > 0
     cd = np.zeros((wcsaxes, naxis))
+
     for i in range(1, wcsaxes + 1):
         for j in range(1, naxis + 1):
             if has_cd:
@@ -646,6 +655,7 @@ def read_wcs_from_header(header):
     wcs_info["CRVAL"] = crval
     wcs_info["CD"] = cd
     wcs_info.update({k: v for k, v in header.items() if k.startswith("PS")})
+
     return wcs_info
 
 
