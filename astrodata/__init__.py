@@ -5,7 +5,7 @@ information contained in the headers as attributes. To do so, one must subclass
 
 """
 from .core import AstroData
-from .factory import AstroDataFactory, AstroDataError
+from .adfactory import AstroDataFactory, AstroDataError
 from .fits import add_header_to_table
 from .nddata import NDAstroData, AstroDataMixin
 from .utils import (

@@ -52,7 +52,7 @@ class AstroDataMyInstrument(AstroData):
 
 def setup_function():
     """Add a test instrument class to the registry."""
-    import astrodata.factory as factory
+    from astrodata import factory
 
     factory.add_class(AstroDataMyInstrument)
 
