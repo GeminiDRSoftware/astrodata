@@ -226,7 +226,7 @@ class RandomFitsFile:
 
         for _ in range(cards):
             key = ""
-            while not key and key not in header:
+            while not key or key in header:
                 key = cls.create_random_header_key(max_key_length)
                 value = cls.create_random_header_value()
 
