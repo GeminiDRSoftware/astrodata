@@ -84,7 +84,6 @@ class AstroDataMixin:
         """Override the NDData method so that "bitwise_or" becomes the default
         operation to combine masks, rather than "logical_or"
         """
-        # TODO: What is this doing, and where?
         return super()._arithmetic(
             operation,
             operand,
@@ -261,9 +260,6 @@ class NDWindowingAstroData(
         self._target = target
         self._window = window
 
-        # TODO: __init__ exists in parent classes, but we don't call it.
-        #       Is this a problem?
-
     def __getattr__(self, attribute):
         """Allow access to attributes stored in self.meta['other'], as we do
         with AstroData objects.
@@ -286,19 +282,16 @@ class NDWindowingAstroData(
 
     @property
     def wcs(self):
-        # TODO: Accessing protected member from _target
         # pylint: disable=protected-access
         return self._target._slice_wcs(self._window)
 
     @property
     def data(self):
-        # TODO: Accessing protected member from _target
         # pylint: disable=protected-access
         return self._target._get_simple("_data", section=self._window)
 
     @property
     def uncertainty(self):
-        # TODO: Accessing protected member from _target
         # pylint: disable=protected-access
         return self._target._get_uncertainty(section=self._window)
 
@@ -311,7 +304,6 @@ class NDWindowingAstroData(
 
     @property
     def mask(self):
-        # TODO: Accessing protected member from _target
         # pylint: disable=protected-access
         return self._target._get_simple("_mask", section=self._window)
 
@@ -583,7 +575,6 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         """A convenience property to access the contents of ``uncertainty``,
         squared (as the uncertainty data is stored as standard deviation).
         """
-        # TODO: Is this supposed to be squared?
         arr = self._get_uncertainty()
 
         if arr is not None:
