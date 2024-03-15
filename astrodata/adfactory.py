@@ -159,13 +159,13 @@ class AstroDataFactory:
         with self._open_file(source) as opened:
             for adclass in self._registry:
                 try:
-                    # TODO: accessing protected member
-                    # pylint: disable=protected-access
-                    if adclass._matches_data(opened):
+                    if adclass.matches_data(opened):
                         candidates.append(adclass)
 
-                except Exception as err:  # pylint: disable=broad-except
-                    # TODO: Should be more specific than this.
+                except KeyboardInterrupt:
+                    raise
+
+                except Exception as err:
                     LOGGER.error(
                         "Failed to open %s with %s, got error: %s",
                         source,
@@ -247,7 +247,6 @@ class AstroDataFactory:
                     "phu must be a PrimaryHDU or a valid header object"
                 )
 
-        # TODO: Verify the contents of extensions...
         if extensions is not None:
             for ext in extensions:
                 lst.append(ext)
