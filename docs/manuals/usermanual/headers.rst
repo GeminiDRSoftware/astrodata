@@ -120,10 +120,6 @@ file and all the descriptors are ready to be used.
         >>> help(ad.airmass)
         >>> help(ad.filter_name)
 
-.. todo:: Migrate to DRAGONS docs.
-    The full list of standard descriptors is available in the Appendix
-    |Descriptors|.
-
 Accessing Metadata
 ==================
 
@@ -224,11 +220,6 @@ Some descriptors accept arguments.  For example::
 
     >>> ad.filter_name(pretty=True)
     'g'
-
-.. todo:: MOVE TO DRAGONS DOCS
-    A full list of standard descriptors is available in the Appendix
-    |Descriptors|.
-
 
 Accessing Metadata Directly
 ---------------------------
@@ -376,59 +367,3 @@ Adding Descriptors [Advanced Topic]
 ===================================
 
 To learn how to add descriptors to |AstroData|, see the |progmanual|.
-
-.. todo:: I don't know if this is really useful, since it's entirely duplicated
-    information in the progmanual. could be useful to have a brief overview of
-    how to define a descriptor.
-
-    For proper and complete instructions on how to create Astrodata Descriptors,
-    the reader is invited to refer to the Astrodata Programmer Manual.  Here we
-    provide a simple introduction that might help some readers better understand
-    Astrodata Descriptors, or serve as a quick reference for those who have
-    written Astrodata Descriptors in the past but need a little refresher.
-
-    The Astrodata Descriptors are defined in an |AstroData| class.  The
-    |AstroData| class specific to an instrument is located in a separate
-    package, not in |astrodata|.  For example, for Gemini instruments, all the
-    various |AstroData| classes are contained in the ``gemini_instruments``
-    package.
-
-    An Astrodata Descriptor is a function within the instrument's |AstroData|
-    class.  The descriptor function is distinguished from normal functions by
-    applying the ``@astro_data_descriptor`` decorator to it.  The descriptor
-    function returns the value(s) using a Python type, ``int``, ``float``,
-    ``string``, ``list``; it depends on the value being returned.  There is no
-    special "descriptor" type.
-
-    Here is an example of code defining a descriptor::
-
-        class AstroDataGmos(AstroDataGemini):
-            ...
-            @astro_data_descriptor
-            def detector_x_bin(self):
-                def _get_xbin(b):
-                    try:
-                        return int(b.split()[0])
-                    except (AttributeError, ValueError):
-                        return None
-
-                binning = self.hdr.get('CCDSUM')
-                if self.is_single:
-                    return _get_xbin(binning)
-                else:
-                    xbin_list = [_get_xbin(b) for b in binning]
-                    # Check list is single-valued
-                    return xbin_list[0] if xbin_list == xbin_list[::-1] else None
-
-    This descriptor returns the X-axis binning as a integer when called on a
-    single extension, or an object with only one extension, for example after the
-    GMOS CCDs have been mosaiced.   If there are more than one extensions, it
-    will return a Python list or an integer if the binning is the same for all
-    the extensions.
-
-    Gemini has defined a standard list of descriptors that should be defined
-    one way or another for each instrument to ensure the re-usability of our
-    algorithms.  That list is provided in the Appendix |Descriptors|.
-
-    Any further information about the Astrodata Descriptors can be found in the
-    |progmanual|.

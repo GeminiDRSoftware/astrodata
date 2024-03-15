@@ -52,9 +52,6 @@ use a descriptor to build a simple class on top of the |AstroData| base class:
   would be specific to an instrument/file format that would be resolved using
   tags.
 
-.. todo:: What logic? vvv And is it always a list? need to check
-   gemini_instruments
-
 Descriptors **can** be decorated with :func:`~astrodata.core.returns_list` to
 eliminate the need to code some logic. Some descriptors return single values,
 while some return lists, one per extension. Typically, the former
@@ -71,9 +68,6 @@ The `~astrodata.core.returns_list` decorator ensures that the descriptor
 returns an appropriate object (value or list), using the following rules
 to avoid unexpected behavior/confusing errors:
 
-.. todo:: Need to check if the error messages use "raise ... from ..."
-   appropriately and if the message being used is appropriately descriptive.
-
 * If the |AstroData| object is not a single slice:
 
   * If the undecorated descriptor returns a list, an exception is raised
@@ -84,9 +78,8 @@ to avoid unexpected behavior/confusing errors:
 * If the |AstroData| object is a single slice and the undecorated
   descriptor returns a list, only the first element is returned.
 
-.. todo:: Provide a concrete example here
-  An example of the use of this decorator is the NIRI
-  `~gemini_instruments.niri.AstroDataNiri.gain` descriptor, which reads the
-  value from a lookup table and simply returns it.  A single value is only
-  appropriate if the |AstroData| object is singly-sliced and the decorator ensures
-  that a list is returned otherwise.
+An example of the use of this decorator is the NIRI
+`~gemini_instruments.niri.AstroDataNiri.gain` descriptor, which reads the
+value from a lookup table and simply returns it.  A single value is only
+appropriate if the |AstroData| object is singly-sliced and the decorator ensures
+that a list is returned otherwise.

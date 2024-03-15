@@ -15,9 +15,6 @@ make working with such data efficient and straightforward.
 Operate on Pixel Data
 =====================
 
-.. todo::
-    Check that NDData is correctly linked to the Astropy documentation.
-
 The pixel data are stored in the |AstroData| object as a list of
 |NDAstroData| objects.  The |NDAstroData| is a subclass of Astropy's
 |NDData| class which combines in one "package" the pixel values, the
@@ -77,9 +74,6 @@ Arithmetic on AstroData Objects
 | division       | |divide|    |
 +----------------+-------------+
 
-.. todo::
-    Check if this is proper implemented in the code.
-
 In-place operations are also supported with the standard in-place assignment
 operators ``+=``, ``-=``, ``*=``, and ``/=``.  Normal, not in-place,
 arithmetics is also possible using the standard operators, ``+``, ``-``, ``*``,
@@ -138,9 +132,6 @@ operations.
 When a descriptor returns a list because the value changes for each
 extension, a for-loop is needed
 
-.. todo::
-        Figure out how to remove the "..." from the output of the doctest.
-
 .. doctest::
 
     >>> for i, (ext, gain) in enumerate(zip(ad, ad.gain())):
@@ -159,9 +150,6 @@ extension, a for-loop is needed
 
 If you want to do the above but on a new object, leaving the original unchanged,
 use ``deepcopy`` first.
-
-.. todo::
-        Figure out how to remove the "..." from the output of the doctest.
 
 .. doctest::
 
@@ -256,10 +244,6 @@ Automatic Variance Propagation
 If present, any variance plane will be propagated to the resulting |AstroData|
 object when doing arithmetics.
 
-.. todo::
-    Is there a way to add correlated noise handling? e.g., a way to say
-    "turn off variance propogation"
-
 .. note::
 
     The variance propagation assumes the data are not correlated. If the data
@@ -288,7 +272,7 @@ Let's look into an example.
     0.7065
 
 .. todo::
-    make an exmaple for the below warning
+    make an example for the below warning
 
 .. warning::
     Variance must be implemented, either by setting it (above) or by including
@@ -324,9 +308,6 @@ masked.  For example, Gemini bit masks use the following for bad pixels:
 +---------------+-------+---------+
 | Unilluminated | 64    | 1000000 |
 +---------------+-------+---------+
-
-.. todo::
-    link to this in the DRAGONS docs
 
 .. _DQ_def_link: https://github.com/GeminiDRSoftware/DRAGONS/blob/f7cbfe8a7ecf575eeabc32ca6fc9da9a3ec0f3e8/geminidr/gemini/lookups/DQ_definitions.py
 
@@ -375,79 +356,6 @@ what else it has to offer (.
 .. warning::
     The ``numdisplay`` package is still available for now but it is no longer
     supported by STScI.
-
-.. todo::
-    need to revamp this section
-
-Displaying with ``imexam``
---------------------------
-
-Here is an example how to display pixel data to DS9 with ``imexam``.  You must
-start |DS9| before running this example.
-
-.. todo::
-    Replace example and need to check that this doesn't blcok the tests...
-
-.. code::python
-
-    # >>> import imexam
-    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
-
-    # # Connect to the DS9 window (should already be opened.)
-    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
-
-    # >>> ds9.view(ad[0].data)
-
-    # # To scale "a la IRAF"
-    # >>> ds9.view(ad[0].data)
-    # >>> ds9.scale('zscale')
-
-    # # To set the mininum and maximum scale values
-    # >>> ds9.view(ad[0].data)
-    # >>> ds9.scale('limits 0 2000')
-
-
-Retrieving cursor position with imexam
---------------------------------------
-
-The function ``readcursor()`` can be used to retrieve cursor
-position in pixel coordinates.  Note that it will **not** respond to
-mouse clicks, **only** keyboard entries are acknowledged.
-
-When invoked, ``readcursor()`` will stop the flow of the program and wait
-for the user to put the cursor on top of the image and type a key.  A
-tuple with three values will be returned:  the x and
-y coordinates **in 0-based system**, and the value of the key the user
-hit.
-
-.. todo::
-    Need to check this example.
-
-.. code::python
-
-    # >>> import imexam
-    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
-
-    # # Connect to the DS9 window (should already be opened.)
-    # # and display
-    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
-    # >>> ds9.view(ad[0].data)
-    # >>> ds9.scale('zscale')
-
-
-    # >>> cursor_coo = ds9.readcursor()
-    # >>> print(cursor_coo)
-
-    # # To extract only the x,y coordinates
-    # >>> (xcoo, ycoo) = cursor_coo[:2]
-    # >>> print(xcoo, ycoo)
-
-    # # If you are also interested in the keystroke
-    # >>> keystroke = cursor_coo[2]
-    # >>> print('You pressed this key: %s' % keystroke)
-
-.. todo::
-    This should be its own page, probably
 
 Useful tools from the NumPy, SciPy, and Astropy Packages
 ========================================================
@@ -691,7 +599,7 @@ data
     # >>> ds9.scale('zscale')
 
 .. todo::
-    Was this suuposed to have an associated image in the documentation?
+    Was this supposed to have an associated image in the documentation?
     does it exist in the docs? (Nope, need to generate it probably)
 
 See how the right and left portions of the frame are not exposed to the sky,
@@ -1046,53 +954,3 @@ quality plots.  Here we just scratch the surface of Matplotlib.
     >>> plt.clf()
     >>> plt.plot(wlen, ad_spectrum[0].data)
     >>> plt.show()
-
-
-imexam
-------
-For those who have used IRAF, ``imexam`` is a well-known tool.  The Python
-``imexam`` reproduces many of of the features of its IRAF predecesor, the interactive mode of
-course, but it also offers programmatic tools.  One can even control DS9
-from Python.  As for Matplotlib, here we really just scratch the surface of
-what ``imexam`` has to offer.
-
-::
-
-    >>> import imexam
-    >>> from imexam.imexamine import Imexamine
-
-    >>> ad_image = astrodata.open('../playdata/N20170521S0925_forStack.fits')
-
-    # Display the image
-    >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
-    >>> ds9.view(ad_image[0].data)
-    >>> ds9.scale('zscale')
-
-    # Run in interactive mode.  Try the various commands.
-   >>> ds9.imexam()
-
-    # Use the programmatic interface
-    # First initialize an Imexamine object.
-    >>> plot = Imexamine()
-
-    # Line plot from image.  Row #1044 (y-coordinate)
-    >>> line_index = 1043
-    >>> plot.plot_line(0, line_index, ad_image[0].data)
-
-    # Column plot from image, averaging across 11 pixels around colum #327
-    # There is no setting for this, so we have to do something similar
-    # to what we did with matplotlib.
-    >>> col_index = 326
-    >>> width = 5
-    >>> xlow = col_index - width
-    >>> xhigh = col_index + width + 1
-    >>> thick_column = ad_image[0].data[:, xlow:xhigh]
-    >>> mean_column = thick_column.mean(axis=1)
-    >>> plot.plot_column(0, 0, np.expand_dims(mean_column, 1))
-
-    >>> # Contour plot for a section of an image.
-    >>> center = (1646, 2355)  # in python coordinates
-    >>> width = 15
-    >>> plot.contour_pars['ncolumns'][0] = width
-    >>> plot.contour_pars['nlines'][0] = width
-    >>> plot.contour(center[1], center[0], ad_image[0].data)

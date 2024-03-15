@@ -24,8 +24,6 @@ which uses AstroData to support data from all of Gemini's instruments.
 As a developer, AstroData consists of several concepts used to automatically
 resolve data based on the instrument and observation type:
 
-.. todo:: Link the below broken replacements
-
 1. |AstroData| - This is the primary class from which all other data classes
    are derived. It is a container for the data and metadata associated with a
    single astronomical observation. It is also an iterable object, with each
