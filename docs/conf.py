@@ -153,6 +153,7 @@ rst_prolog = """
 .. |UserManual| replace:: |UserGuide|
 .. |ProgManual| replace:: |DeveloperGuide|
 .. |ProgrammerManual| replace:: |DeveloperGuide|
+.. |Examples| replace:: :doc:`Examples </examples/index>`
 
 
 .. _`Anaconda`: https://www.anaconda.com/
@@ -199,7 +200,6 @@ rst_prolog = """
 .. TODO: below are broken links
 
 .. |Index| replace:: `Index`
-.. |Examples| replace:: `Examples`
 
 .. |DS9| replace:: `DS9 <https://sites.google.com/cfa.harvard.edu/saoimageds9>`__
 
