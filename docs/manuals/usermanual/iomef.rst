@@ -193,9 +193,6 @@ The tables are stored internally as :class:`astropy.table.Table` objects.
     >>> type(refcat)
     <class 'astropy.table.table.Table'>
 
-.. todo:: I *think* I've implemented the note below, but if not then I need to
-    do it (very straightforward)
-
 .. note::
     Tables are accessed through attribute notation. However, if a conflicting
     attribute exists for a given |AstroData| or |NDData| object, a
@@ -578,8 +575,6 @@ information.
 
 These pixel arrays are added to specific slice of the astrodata object they are
 associated with.
-
-.. todo:: Make sure this flows with the previous example.
 
 Building on the |AstroData| object we created in the previously, we can add a
 new pixel array directly to the slice(s) of the |AstroData| object it should be

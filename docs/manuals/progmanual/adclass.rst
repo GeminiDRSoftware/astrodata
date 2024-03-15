@@ -41,10 +41,6 @@ Python methods:
   only allows to append new data blocks, not to replace them in one sweeping
   move.
 
-.. todo:: Previously this said that it was their not-in-place equivalents based
-   on these, but that doesn't make a lot of sense to me. Need to check the
-   implementation.
-
 * Implements ``__add__``, ``__sub__``, ``__mul__``, ``__truediv__``, and
   their in-place equivalents, based on them.
 
@@ -66,8 +62,6 @@ The implementation for the tags property is just a call to
 calculating the tag set (described :ref:`below <ad_tags>`). A derivative class
 could override this to provide a different logic, but this is not recommended
 unless there is a very good reason to do so.
-
-.. todo:: Need to add this example to the tags page.
 
 For an example of how tags are resolved, seet :ref:`ad_tags`.
 

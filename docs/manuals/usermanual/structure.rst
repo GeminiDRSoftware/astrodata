@@ -16,16 +16,6 @@ The internal structure of the |AstroData| object makes uses of astropy's
 :class:`~astropy.io.fits.Header`, the latter simply because it is a convenient
 ordered dictionary.
 
-.. todo:: delete when covered in examples
-    **Try it yourself**
-
-    Download the data package (:ref:`datapkg`) if you wish to follow along and run the
-    examples.  Then ::
-
-        $ cd <path>/ad_usermanual/playground
-        $ python
-
-
 Example location
 ----------------
 

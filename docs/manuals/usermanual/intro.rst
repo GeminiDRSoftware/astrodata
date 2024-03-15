@@ -75,11 +75,6 @@ Or you can install it from the source code::
         $ cd astrodata # Or the directory where you cloned the repository
         $ pip install -e .
 
-.. todo:: Need to link to gemini_instruments specifically. Would like to use
-    intersphinx but it's struggling with readthedocs it seems.
-
-    Is there an option that isn't turned on in the dragons readthedocs?
-
 If you're interested in using |astrodata| out-of-the-box with a specific
 type of data, you may want to install the astrodata package together with
 their extensions. |astrodata| alone defines a base class, |AstroData|, which

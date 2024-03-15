@@ -45,7 +45,7 @@ functionality::
     class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         ...
 
-With these mixings, |NDAstroData| is extended to allow for ease and efficiency
+With these mixins, |NDAstroData| is extended to allow for ease and efficiency
 of use, as if a common array, with extra features such as uncertainty
 propogation and efficient slicing with typically array syntax.
 
@@ -61,41 +61,19 @@ Much of |NDAstrodata| acts to mimic the behavior of |NDData| and
 formats and means of storing, accessing, and manipulating data.
 
 ..
-  Our first customization is ``NDAstroData.__init__``. It relies mostly on the
-  upstream initialization, but customizes it because our class is initialized
-  with lazy-loaded data wrapped around a custom class
-  (`astrodata.fits.FitsLazyLoadable`) that mimics a `astropy.io.fits` HDU
-  instance just enough to play along with |NDData|'s initialization code.
+    Our first customization is ``NDAstroData.__init__``. It relies mostly on the
+    upstream initialization, but customizes it because our class is initialized
+    with lazy-loaded data wrapped around a custom class
+    (`astrodata.fits.FitsLazyLoadable`) that mimics a `astropy.io.fits` HDU
+    instance just enough to play along with |NDData|'s initialization code.
 
-.. todo::
-   Frankly still not convinced this works at all
-    ``FitsLazyLoadable`` is an integral part of our memory-mapping scheme, and
-    among other things it will scale data on the fly, as memory-mapped FITS data
-    can only be read unscaled. Our NDAstroData redefines the properties ``data``,
-    ``uncertainty``, and ``mask``, in two ways:
-
-    * To deal with the fact that our class is storing ``FitsLazyLoadable``
-      instances, not arrays, as |NDData| would expect. This is to keep data out
-      of memory as long as possible.
-
-    * To replace lazy-loaded data with a real in-memory array, under certain
-      conditions (e.g., if the data is modified, as we won't apply the changes to the
-      original file!)
-
-    Our obsession with lazy-loading and discarding data is directed to reduce
-    memory fragmentation as much as possible. This is a real problem that can hit
-    applications dealing with large arrays, particularly when using Python. Given
-    the choice to optimize for speed or for memory consumption, we've chosen the
-    latter, which is the more pressing issue.
+    NOTE: This needs to be better described, the way it works is not like the
+    way it was originally described, and the caveats need to be made apparent.
 
 .. _ad_slices:
 
 Slicing
 -------
-
-.. todo::
-    Again... not sure this is really happenning. I need to write a test
-    that actually checks if the data is being lazily loaded or not.
 
 One can already slice |NDAstroData| objects as with |NDData|, as normal Python arrays
 
@@ -173,13 +151,6 @@ are exposed as attributes of the ``NDAstroData`` object, and any image planes
 that have the same shape as the parent ``NDAstroData`` object will be handled
 by ``NDWindowingAstroData``. Sections will be ignored when accessing image
 planes with a different shape, as well as tables.
-
-.. todo::
-   Need a new "Planned Features" environment that can be parsed and built
-   as a standalone page for future reference.
-
-.. todo::
-   This might be something to have a stretch goal for affiliation.
 
 .. note::
 

@@ -71,7 +71,11 @@ Note that Python's sort algorithm is stable. This means, that if two elements
 are indistinguishable from the point of view of the sorting algorithm, they are
 guaranteed to stay in the same relative position. To better understand how this
 affects our tags, and the algorithm itself, let's follow up with an example taken
-from real code (the Gemini-generic and GMOS modules)::
+from real code (the Gemini-generic and GMOS modules)
+
+.. todo:: need to add a more generic example here
+
+::
 
   # Simple tagset, with only a constant, additive content
   @astro_data_tag
