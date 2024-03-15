@@ -6,15 +6,12 @@ import pytest
 import os
 
 import astrodata
-from astrodata import factory
+from astrodata import adfactory
 
 from astropy.io import fits
 
 
-pytest.skip("Not yet functional.", allow_module_level=True)
-
-# TODO: using aliases here...
-adfactory = factory.AstroDataFactory
+factory = adfactory.AstroDataFactory
 
 
 @pytest.fixture
@@ -67,17 +64,16 @@ def example_dir(tmp_path) -> str:
 
 def test__open_file(example_fits_file):
     # str/pathlike both have the same outcome
-    adfactory._open_file(example_fits_file)
+    factory._open_file(example_fits_file)
 
 
 def test__open_file_file_not_found(nonexistent_file, example_dir):
-    # TODO: Add hypothesis testing here for edge cases and such.
     # Check that correct error is raised if the file doesn't exist
     with pytest.raises(FileNotFoundError):
-        with adfactory._open_file(nonexistent_file) as _:
+        with factory._open_file(nonexistent_file) as _:
             pass
 
     # Check passing a directory.
     with pytest.raises(FileNotFoundError):
-        with adfactory._open_file(example_dir) as _:
+        with factory._open_file(example_dir) as _:
             pass
