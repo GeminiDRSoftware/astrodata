@@ -271,8 +271,7 @@ def test_variance_uncertainty_AstroDataMixin(testnd):
 
 
 def test_FakeArray():
-    # TODO: This is for completeness, but it's not really used correctly from
-    # what I can tell.
+    # This is for completeness
     data = np.empty(100)
     fake = FakeArray(data)
 
