@@ -44,10 +44,6 @@ if len(__all__) != len(set(__all__)):
 
 __version__ = version()
 
-# TODO: This is pretty unacceptable, this makes it impossible to access the
-# factory classes, errors, and methods through any normal means. Which means
-# they are very difficult to write tests for, or to have users work on
-# themselves.
 factory = AstroDataFactory()
 
 # Let's make sure that there's at least one class that matches the data
@@ -73,10 +69,6 @@ def create(*args, **kwargs):
     return factory.create_from_scratch(*args, **kwargs)
 
 
-# TODO: Need to replace this with a name that doesn't override the builtin.
-# This makes it so that the following will cause unexpected behavior:
-#     from astrodata import *
-#     file_stream = open("some_file.fits")
 # Without raising a warning or error.
 @deprecated(
     "Use 'astrodata.from_file'. astrodata.open is deprecated, "
