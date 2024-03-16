@@ -1,75 +1,46 @@
-[build-system]
-requires = [
-  "setuptools>=61.2",
-  "setuptools_scm[toml]>=6.2",
-  "wheel",
-]
-
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "astrodata"
-description = "A package for managing astronomical data through a uniform interface."
+version = "2.9.0"
+description = "A package for managing astronomical data through a uniform interface"
+authors = ["D. J. Teal <dillon.teal@noirlab.com>", "DRAGONS development team"]
+license = "BSD3"
 readme = "README.rst"
-requires-python = ">=3.10"
-license = { file = "licenses/LICENSE.rst", content-type = "text/plain" }
 
-dependencies = [
-    "asdf",
-    "astropy",
-    "gwcs",
-    "jsonschema",
-    "numpy",
-]
+[tool.poetry.dependencies]
+python = "^3.10"
+astropy = "^6.0.0"
+asdf = "^3.1.0"
+gwcs = "^0.21.0"
+jsonschema = "^4.21.1"
+numpy = "^1.26.4"
 
-dynamic = ["version"]
+[tool.poetry.group.dev]
 
-[project.optional-dependencies]
-test = [
-    "coverage",
-    "pytest",
-    "pytest-cov",
-    "pytest-doctestplus",
-]
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.3"
+coverage = "^7.4.4"
+isort = "^5.13.2"
+poetry = "^1.8.2"
+pre-commit = "^3.6.2"
 
-dev = [
-    "black",
-    "coverage",
-    "flake8",
-    "isort",
-    "poetry",
-    "pre-commit",
-    "pytest",
-    "pytest-cov",
-    "pytest-doctestplus",
-    "scalene",
-    "sphinx",
-    "sphinx-automodapi",
-]
+[tool.poetry.group.docs.dependencies]
+sphinx = "^7.2.6"
+sphinx-automodapi = "^0.17.0"
+sphinx-autoapi = "^3.0.0"
+sphinx-rtd-dark-mode = "^1.3.0"
+sphinx-rtd-theme = "^2.0.0"
 
-docs = [
-    "myst_parser",
-    "sphinx",
-    "sphinx-autoapi",
-    "sphinx-automodapi",
-    "sphinx-rtd-dark-mode",
-    "sphinx-rtd-theme",
-    "tomli; python_version <\"3.11\"",
-]
 
-all = [
-  "astrodata[dev,docs,test]",
-]
+[tool.poetry.group.test.dependencies]
+pytest = "^8.1.1"
+coverage = "^7.4.4"
+pytest-cov = "^4.1.0"
+pytest-doctestplus = "^1.2.1"
+tox = "^4.14.1"
 
-[tool.setuptools]
-zip-safe = false
-include-package-data = true
-
-[tool.setuptools.packages.find]
-
-[tool.setuptools_scm]
-
-write_to = "astrodata/version.py"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 testpaths = [
