@@ -127,11 +127,12 @@ And
     ...   print('I am a GMOS Image.')
 
 .. todo::
+
     Below needs to be ported back to DRAGONS documentation since it is a
     part of gempy (I think, definitely a part of DRAGONS no matter what)
 
     Using typewalk
-    ==============
+
     In DRAGONS, there is a convenience tool that will list the Astrodata tags
     for all the FITS file in a directory.
 
