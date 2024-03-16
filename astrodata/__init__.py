@@ -16,7 +16,8 @@ from .utils import (
     returns_list,
     deprecated,
 )
-from ._version import version
+
+__version__ = "2.9.0"
 
 __all__ = [
     "AstroData",
@@ -41,8 +42,6 @@ __all__ = [
 if len(__all__) != len(set(__all__)):
     duplicates = [x for i, x in enumerate(__all__) if x in __all__[:i]]
     raise ValueError(f"Duplicate entries in __all__: {', '.join(duplicates)}")
-
-__version__ = version()
 
 factory = AstroDataFactory()
 
