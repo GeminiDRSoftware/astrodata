@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 name = "astrodata"
 description = "A package for managing astronomical data through a uniform interface."
 readme = "README.rst"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = { file = "licenses/LICENSE.rst", content-type = "text/plain" }
 
 dependencies = [
@@ -37,6 +37,7 @@ dev = [
     "coverage",
     "flake8",
     "isort",
+    "poetry",
     "pre-commit",
     "pytest",
     "pytest-cov",
@@ -54,6 +55,10 @@ docs = [
     "sphinx-rtd-dark-mode",
     "sphinx-rtd-theme",
     "tomli; python_version <\"3.11\"",
+]
+
+all = [
+  "astrodata[dev,docs,test]",
 ]
 
 [tool.setuptools]
