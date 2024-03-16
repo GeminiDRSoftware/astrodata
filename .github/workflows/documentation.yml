@@ -14,10 +14,11 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install ".[docs]"
+          pip install poetry
+          poetry install --without dev,test
       - name: Sphinx build
         run: |
-          sphinx-build docs _build
+          poetry run sphinx-build docs _build
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}

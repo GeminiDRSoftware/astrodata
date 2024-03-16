@@ -19,6 +19,12 @@ from .utils import (
 
 __version__ = "2.9.0"
 
+
+def version():
+    """Return the version of astrodata."""
+    return __version__
+
+
 __all__ = [
     "AstroData",
     "AstroDataError",
