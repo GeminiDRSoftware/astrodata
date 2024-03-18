@@ -1,4 +1,11 @@
-.. |DRAGONS| replace:: `DRAGONS <https://https://github.com/GeminiDRSoftware/DRAGONS/>`_
+.. |DRAGONS| replace:: `DRAGONS`
+..  _DRAGONS: https://https://github.com/GeminiDRSoftware/DRAGONS/
+
+.. |astrodatadocs| replace:: `astrodata documentation`
+..  _astrodatadocs: https://geminidrsoftware.github.io/astrodata/
+
+.. |astrodatarepo| replace:: `astrodata repository`
+.. _astrodatarepo: https://github.com/GeminiDRSoftware/astrodata
 
 ``astrodata``
 =============
@@ -62,7 +69,7 @@ Documentation
 -------------
 
 Documentation for ``astrodata`` is available at
-`https://teald.github.io/astrodata`_. This documentation includes a
+|astrodatadocs|_. This documentation includes a
 user and programmer's guide, as well as a full API reference.
 
 
