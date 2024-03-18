@@ -178,3 +178,6 @@ test.fits
 # Editor things
 .*.swp
 .editorconfig
+
+# Ruff cache
+.ruff_cache/
