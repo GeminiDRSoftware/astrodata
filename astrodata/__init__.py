@@ -17,7 +17,10 @@ from .utils import (
     deprecated,
 )
 
-__version__ = "2.9.0"
+import importlib.metadata
+
+
+__version__ = importlib.metadata.version("astrodata")
 
 
 def version():
