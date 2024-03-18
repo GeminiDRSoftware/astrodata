@@ -32,29 +32,6 @@ can be installed using ``pip``:
 
     pip install astrodata
 
-Installing development dependencies
------------------------------------
-
-``astrodata`` uses `Poetry <https://github.com/python-poetry/poetry>`_ for build
-and package management. To install development dependencies, you must clone this
-repository. Once you have, at the top level directory of the ``astrodata``
-repository run
-
-.. code-block:: terminal
-
-    pip -m install poetry
-    poetry install
-
-    # To install without specific development groups
-    poetry install --without [test,docs,dev]
-
-Documentation
--------------
-
-Documentation for ``astrodata`` is available at
-`https://teald.github.io/astrodata`_. This documentation includes a
-user and programmer's guide, as well as a full API reference.
-
 Usage
 -----
 
@@ -81,28 +58,29 @@ path of the file (as it does for ``astropy.io.fits`` objects).
 
 ``astrodata`` is designed to be extendible, so you can add your own methods to
 
-..
-    To-do
-    -----
+Documentation
+-------------
 
-    .. _astrofaker: https://github.com/GeminiDRSoftware/AstroFaker
+Documentation for ``astrodata`` is available at
+`https://teald.github.io/astrodata`_. This documentation includes a
+user and programmer's guide, as well as a full API reference.
 
-    - [x] Set up coverage and testing workflows
-    - [x] Set up pre commmit hooks
-    - [x] Set up documentation workflow
-    - [x] Update testing
-        - [x] Find/generate fake data for testing
-            - [x] Could use `astrofaker`_?
-            - [x] Does astropy have a fake data generator?
-            - [x] Do we need to generate more than edge cases?
-            - [x] Does astrodata outside of dragons even need to test on data? Is
-                  it reducing anything?
-                  - Yes, it does need some real WCS in fits data to test on
-                    for, e.g., slicing. But this can be downloaded from the
-                    archive and skipped if the archive is inacessible.
-        - [x] Update tests requiring local data to use fake data
-        - [x] Update tests requiring remote data to use fake data
-            - Ended up using the remote data alongside fake data
+
+Installing development dependencies
+-----------------------------------
+
+``astrodata`` uses `Poetry <https://github.com/python-poetry/poetry>`_ for build
+and package management. To install development dependencies, you must clone this
+repository. Once you have, at the top level directory of the ``astrodata``
+repository run
+
+.. code-block:: terminal
+
+    pip -m install poetry
+    poetry install
+
+    # To install without specific development groups
+    poetry install --without [test,docs,dev]
 
 License
 -------
