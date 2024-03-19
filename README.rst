@@ -1,4 +1,4 @@
-.. |DRAGONS| replace:: `DRAGONS`
+.. |DRAGONS| replace:: ``DRAGONS``
 ..  _DRAGONS: https://https://github.com/GeminiDRSoftware/DRAGONS/
 
 .. |astrodatadocs| replace:: `astrodata documentation`
@@ -19,7 +19,7 @@ A package for managing astronomical data through a uniform interface
 ``astrodata`` is a package for managing astronomical data through a uniform
 interface. It is designed to be used with the
 `Astropy <https://www.astropy.org>`_ package. ``astrodata`` was designed by and
-for use as part of the |DRAGONS| data reduction pipeline, but it is now
+for use as part of the |DRAGONS|_ data reduction pipeline, but it is now
 implemented to be useful for any astronomical data reduction or analysis
 project.
 
@@ -28,6 +28,11 @@ is designed to be extendible to any data format, and to parse, respond to, and
 store metadata in a consistent, intentional way. This makes it especially
 useful for managing data from multiple instruments, telescopes, and data
 generation utilities.
+
+**Note:** If you are trying to reduce Gemini data, please use |DRAGONS|_.
+Interaction with this package directly is primarily suited for developers, and 
+does not come with any tools for data reduction on any specific instrument or
+data.
 
 Installation
 ------------
@@ -87,15 +92,15 @@ repository run
     poetry install
 
     # To install without specific development groups
-    poetry install --without [test,docs,dev]
+    poetry install --without test,docs,dev
 
 License
 -------
 
-This project is Copyright (c)  and licensed under
-the terms of the Other license. This package is based upon
+This project is Copyright 2024 (c)  and licensed under
+the terms of the BSD 3-clause license. This package is based upon
 the `Openastronomy packaging guide <https://github.com/OpenAstronomy/packaging-guide>`_
-which is licensed under the BSD 3-clause licence. See the licenses folder for
+which is licensed under the BSD 3-clause licence. See the LICENSE folder for
 more information.
 
 Contributing
