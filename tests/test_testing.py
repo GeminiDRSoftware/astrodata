@@ -1,5 +1,5 @@
-"""Tests for the `astrodata.testing` module.
-"""
+"""Tests for the `astrodata.testing` module."""
+
 import io
 import os
 
@@ -141,3 +141,65 @@ def test_fake_fits_bytes():
     str_data = io.BytesIO(fake_fits.read())
     str_data.seek(0)
     assert fits.getheader(str_data, 0)
+
+
+def test_test_script_file(tmp_path):
+    # Create a no-op test script file.
+    noop_filename = os.path.join(tmp_path, "noop_test_script.py")
+    ProcessError = testing.subprocess.CalledProcessError
+
+    with open(noop_filename, "w+") as f:
+        f.write("pass\n")
+
+    # Check that the test script file is valid.
+    assert testing.test_script_file(noop_filename, stdout_result="")
+
+    # Create a failing test script file.
+    failing_filename = os.path.join(tmp_path, "failing_test_script.py")
+
+    with open(failing_filename, "w+") as f:
+        f.write("assert False\n")
+
+    # Check that the test script file is invalid.
+    with pytest.raises(ProcessError):
+        re_str = r"Traceback \((\w+\s*)*\w+\):.*AssertionError.*"
+
+        testing.test_script_file(
+            failing_filename,
+            stdout_result="",
+            stderr_result=re_str,
+            fail_on_error=True,
+        )
+
+    # non-existing file
+    non_existing_filename = os.path.join(tmp_path, "non_existing_file.py")
+    with pytest.raises(FileNotFoundError):
+        testing.test_script_file(non_existing_filename, stdout_result="")
+
+    # Pass python options using argparse.
+    python_script = r"""
+    # This is a testing script that was originally a string literal.
+    import argparse
+
+    def cmdline():
+        parser = argparse.ArgumentParser(description="Test script.")
+        parser.add_argument("--option", type=str, default="default")
+        args = parser.parse_args()
+        print(args.option)
+
+    if __name__ == "__main__":
+        cmdline()
+    """
+
+    python_script = testing.process_string_to_python_script(python_script)
+
+    python_script_filename = os.path.join(tmp_path, "python_script.py")
+
+    with open(python_script_filename, "w+") as f:
+        f.write(python_script)
+
+    # Check that the test script file is valid.
+    assert testing.test_script_file(
+        python_script_filename,
+        stdout_result="default",
+    )

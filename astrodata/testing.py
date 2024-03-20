@@ -1,10 +1,13 @@
 # pragma: no cover
-"""Fixtures to be used in tests in DRAGONS
-"""
+"""Fixtures to be used in tests in DRAGONS"""
+
 import functools
 import io
+import itertools
 import os
+import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 import urllib
@@ -1091,3 +1094,148 @@ class FITSTempFile(ProgramTempFile):
         arguments passed.
         """
         super().__init__(path)
+
+
+def test_script_file(
+    script_path: os.PathLike | str,
+    stdout_result: str | None = None,
+    stderr_result: str | None = None,
+    python_options: str | list[str] = "",
+    script_options: str | list[str] = "",
+    fail_on_error: bool = True,
+    break_after_run: bool = False,
+    regex_options: re.RegexFlag = re.MULTILINE | re.DOTALL,
+) -> bool:
+    """Run a script file and check the output.
+
+    All matches (i.e., stdout_result and stderr_result) can use regular
+    expressions.
+
+    Parameters
+    ----------
+    script_path : str
+        The path to the script to be run.
+
+    stdout_result : str | None
+        The expected result from the standard output. If None, the standard
+        output is not checked.
+
+    stderr_result : str | None
+        The expected result from the standard error. If None, the standard
+        error is not checked.
+
+    python_options : str | list[str]
+        Options to be passed to the python interpreter when running the script.
+
+    script_options : str | list[str]
+        Options to be passed to the script when running it.
+
+    fail_on_error : bool
+        If True, an AssertionError is raised if the output does not match the
+        expected results.
+
+    break_after_run : bool
+        If True, the script will pause at the end before closing, and escape
+        using the built-in `breakpoint()` function.
+
+    regex_options : re.RegexFlag
+        The regular expression flags to be used when matching the output.
+        The default is re.MULTILINE | re.DOTALL.
+
+    Returns
+    -------
+    bool
+        True if the output matches the expected results.
+
+    Raises
+    ------
+    FileNotFoundError
+        If the script file is not found.
+
+    subprocess.CalledProcessError
+        If the script returns a non-zero exit code.
+
+    AssertionError
+        If the output does not match the expected results.
+
+    Notes
+    -----
+    The script is run using the python interpreter, so the script file should
+    have a shebang line at the top to specify the interpreter to be used. This
+    isn't an issue for most scripts, but it is something to be aware of if you
+    are expecting to use/test with a sepcific interpreter.
+    """
+    if not os.path.exists(script_path):
+        raise FileNotFoundError(f"Script file {script_path} not found.")
+
+    if isinstance(python_options, str):
+        python_options = python_options.split()
+
+    command_components = [
+        ["python"],
+        python_options,
+        [script_path],
+        script_options,
+    ]
+
+    command = [x for x in itertools.chain(*command_components)]
+
+    process = subprocess.run(
+        command,
+        capture_output=True,
+    )
+
+    stdout = process.stdout
+    stderr = process.stderr
+
+    # Easy escape point for the test function, since this is a common need for
+    # hand-checking initial tests/testing test definitions.
+    if break_after_run:
+        breakpoint()
+
+    # Helper function to check the output against the expected results using
+    # regex.
+    def _reg_assert(result, expected):
+        match = re.match(expected, result, flags=regex_options)
+
+        if not match:
+            raise AssertionError(
+                f"Expected pattern {expected!r} but got:\n{result!r}"
+            )
+
+    if stdout_result is not None:
+        _reg_assert(stdout.decode("utf-8"), stdout_result)
+
+    if stderr_result is not None:
+        _reg_assert(stderr.decode("utf-8"), stderr_result)
+
+    if fail_on_error and process.returncode:
+        raise subprocess.CalledProcessError(
+            process.returncode, command, stdout, stderr
+        )
+
+    return True
+
+
+def process_string_to_python_script(string: str) -> str:
+    """Takes an input string and performs tasks to make it properly python-formatted.
+
+    Parameters
+    ----------
+    string : str
+        The string to be processed.
+    """
+    # For multiline strings, need to get rid of possible hanging indents
+    # The first line may be unindented.
+    lines = string.split("\n")
+    first_line = lines[0].strip()
+
+    # Determine the minimum indentation of the other lines.
+    min_indent = min(
+        len(line) - len(line.lstrip()) for line in lines[1:] if line.strip()
+    )
+
+    # Remove the minimum indentation from all lines.
+    lines = [first_line] + [line[min_indent:] for line in lines[1:]]
+
+    return "\n".join(lines)
