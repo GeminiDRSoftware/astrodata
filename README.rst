@@ -30,7 +30,7 @@ useful for managing data from multiple instruments, telescopes, and data
 generation utilities.
 
 **Note:** If you are trying to reduce Gemini data, please use |DRAGONS|_.
-Interaction with this package directly is primarily suited for developers, and 
+Interaction with this package directly is primarily suited for developers, and
 does not come with any tools for data reduction on any specific instrument or
 data.
 
@@ -97,11 +97,11 @@ repository run
 License
 -------
 
-This project is Copyright 2024 (c)  and licensed under
-the terms of the BSD 3-clause license. This package is based upon
-the `Openastronomy packaging guide <https://github.com/OpenAstronomy/packaging-guide>`_
-which is licensed under the BSD 3-clause licence. See the LICENSE folder for
-more information.
+This project is Copyright 2024 (c)  and licensed under the terms of a modified
+BSD 3-clause license. This package is based upon the `Openastronomy packaging
+guide <https://github.com/OpenAstronomy/packaging-guide>`_ which is licensed
+under the standard BSD 3-clause licence. See the LICENSE file for more
+information.
 
 Contributing
 ------------
