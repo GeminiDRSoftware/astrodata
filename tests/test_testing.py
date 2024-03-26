@@ -1,6 +1,7 @@
 """Tests for the `astrodata.testing` module."""
 
 import io
+import itertools
 import os
 
 import numpy as np
@@ -203,3 +204,83 @@ def test_test_script_file(tmp_path):
         python_script_filename,
         stdout_result="default",
     )
+
+
+def _generate_permutations_with_strict_placement(
+    shape: tuple[int]
+) -> list[tuple[int]]:
+    """Generate all permutations of a given shape with strict placement.
+
+    This function generates all permutations of a given shape with strict placement.
+    For example, if the shape is (2, 2), the function will return the following list:
+
+    [
+        (0, 0), (0, 1),
+        (1, 0), (1, 1),
+    ]
+
+    Args:
+        shape (tuple[int]): The shape to generate permutations for.
+
+    Returns:
+        list[tuple[int]]: A list of all permutations of the given shape with strict placement.
+    """
+    # Consumes the shape tuple to make sure it is a tuple.
+    shape = tuple(x for x in shape)
+
+    if not shape:
+        return
+
+    # This is by the function definition.
+    if len(shape) == 1:
+        return [(i,) for i in (0, shape[0] - 1)]
+
+    # Generate all permutations of the shape with strict placement.
+    def _get_other_perms(shape):
+        if len(shape) == 1:
+            return [(i,) for i in (0, shape[0] - 1)]
+
+        perms = _get_other_perms(shape[1:])
+        return [(i,) + p for i in (0, shape[0] - 1) for p in perms]
+
+    return _get_other_perms(shape)
+
+
+@pytest.mark.parametrize(
+    "shape,corners_expected",
+    (
+        [
+            tuple(x for x in shape),
+            _generate_permutations_with_strict_placement(shape),
+        ]
+        for shape in itertools.chain(
+            *[itertools.product(range(1, 6), repeat=i) for i in range(1, 5)]
+        )
+    ),
+)
+def test_get_corners(shape, corners_expected):
+    corners = testing.get_corners(shape)
+
+    assert len(corners) == 2 ** len(shape)
+    assert sorted(corners_expected) == sorted(corners)
+
+
+@pytest.mark.parametrize(
+    "bad_input",
+    (
+        None,
+        123,
+        "string",
+        [1, 2, 3],
+        {},
+        {"a": 1, "b": 2},
+    ),
+)
+def test_get_corners_bad_input(bad_input):
+    with pytest.raises(TypeError):
+        testing.get_corners(bad_input)
+
+
+def test_get_corners_empty_input():
+    with pytest.raises(ValueError):
+        testing.get_corners(())
