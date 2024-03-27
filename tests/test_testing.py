@@ -6,6 +6,7 @@ import os
 
 import numpy as np
 import pytest
+import unittest
 from hypothesis import given, strategies as st
 
 import astrodata
@@ -18,6 +19,14 @@ from astrodata.testing import (
 
 from astropy.io import fits
 from astropy.modeling import models, Model, Parameter
+
+
+@pytest.fixture
+def no_outside_connections(monkeypatch):
+    # Automaticlaly return None for all requests to download_file
+    monkeypatch.setattr(
+        "astrodata.testing.download_file", lambda *args, **kwargs: None
+    )
 
 
 def test_download_from_archive(monkeypatch, tmp_path):
@@ -376,3 +385,26 @@ _non_func_strategies = [
 def test_skip_if_download_none_bad_input(bad_input):
     with pytest.raises(TypeError):
         skip_if_download_none(bad_input)
+
+
+def test_skip_if_download_none_download_failure(no_outside_connections):
+    # Variable to check if the test function was called.
+    _test_called = False
+
+    @skip_if_download_none
+    def test_func():
+        nonlocal _test_called
+        _test_called = True
+
+    with pytest.raises(unittest.SkipTest):
+        test_func()
+
+    # Check that the test function was skipped.
+    assert not _test_called
+
+    # Run the function again.
+    with pytest.raises(unittest.SkipTest):
+        test_func()
+
+    # Check that the test function was skipped.
+    assert not _test_called
