@@ -358,3 +358,21 @@ def test_compare_models_bad_input(a, b):
 def test_compare_models_bad_input_empty():
     with pytest.raises(TypeError):
         testing.compare_models((), ())
+
+
+_non_func_strategies = [
+    st.integers(),
+    st.floats(),
+    st.lists(st.floats(), min_size=1, max_size=100),
+    st.tuples(st.floats()),
+    st.tuples(st.floats(), st.floats(), st.floats()),
+    st.dictionaries(st.text(), st.floats()),
+    st.dictionaries(st.integers(), st.floats()),
+    st.text(),
+]
+
+
+@given(bad_input=st.one_of(_non_func_strategies))
+def test_skip_if_download_none_bad_input(bad_input):
+    with pytest.raises(TypeError):
+        skip_if_download_none(bad_input)
