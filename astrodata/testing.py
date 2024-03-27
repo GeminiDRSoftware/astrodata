@@ -322,18 +322,10 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
     except NotImplementedError:
         inverse1 = None
 
-    except AttributeError:
-        assert not hasattr(model1, "inverse")
-        inverse1 = None
-
     try:
         inverse2 = model2.inverse
 
     except NotImplementedError:
-        inverse2 = None
-
-    except AttributeError:
-        assert not hasattr(model1, "inverse")
         inverse2 = None
 
     assert type(inverse1) is type(inverse2)

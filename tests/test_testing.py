@@ -209,7 +209,7 @@ def test_test_script_file(tmp_path):
 
 
 def _generate_permutations_with_strict_placement(
-    shape: tuple[int]
+    shape: tuple[int],
 ) -> list[tuple[int]]:
     """Generate all permutations of a given shape with strict placement.
 
@@ -353,3 +353,8 @@ _compare_model_bad_inputs = [
 def test_compare_models_bad_input(a, b):
     with pytest.raises(TypeError):
         testing.compare_models(a, b)
+
+
+def test_compare_models_bad_input_empty():
+    with pytest.raises(TypeError):
+        testing.compare_models((), ())
