@@ -2,7 +2,6 @@
 implementing windowing and on-the-fly data scaling.
 """
 
-
 import warnings
 from copy import deepcopy
 from functools import reduce

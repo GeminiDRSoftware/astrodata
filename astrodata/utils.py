@@ -1,4 +1,5 @@
 """Utility functions and classes for AstroData objects."""
+
 import inspect
 import logging
 import warnings

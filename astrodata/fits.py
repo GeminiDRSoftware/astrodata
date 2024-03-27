@@ -7,6 +7,7 @@
 .. |NDAstroData| replace:: :class:`~astrodata.nddata.NDAstroData`
 .. |NDAstroDataRef| replace:: :class:`~astrodata.nddata.NDAstroDataRef`
 """
+
 from collections import OrderedDict
 from copy import deepcopy
 from io import BytesIO

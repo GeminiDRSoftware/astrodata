@@ -1,4 +1,5 @@
 """pytest configuration for the documentation tests."""
+
 import os
 
 import astrodata

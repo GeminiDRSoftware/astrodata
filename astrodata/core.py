@@ -2,6 +2,7 @@
 `AstroData` class, which is the main interface to manipulate astronomical
 data sets.
 """
+
 import inspect
 import logging
 import os
