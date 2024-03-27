@@ -1,5 +1,6 @@
 # pragma: no cover
 """Fixtures to be used in tests in DRAGONS"""
+
 import enum
 import functools
 import io
@@ -288,17 +289,27 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
     for m1, m2 in zip(model1, model2):
         assert type(m1) is type(m2)
         assert len(m1.parameters) == len(m2.parameters)
+
         # NB. For 1D models the degrees match if the numbers of parameters do
         if hasattr(m1, "x_degree"):
             assert m1.x_degree == m2.x_degree
+
         if hasattr(m1, "y_degree"):
             assert m1.y_degree == m2.y_degree
+
         if hasattr(m1, "domain"):
             assert m1.domain == m2.domain
+
         if hasattr(m1, "x_domain"):
             assert m1.x_domain == m2.x_domain
+
         if hasattr(m1, "y_domain"):
             assert m1.y_domain == m2.y_domain
+
+    # Return from lists if need be.
+    if model1[0].n_submodels == 1 and len(model1) == 1:
+        model1 = model1[0]
+        model2 = model2[0]
 
     # Compare the model parameters (coefficients):
     assert_allclose(model1.parameters, model2.parameters, rtol=rtol, atol=atol)
@@ -307,11 +318,22 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
     # type or be undefined:
     try:
         inverse1 = model1.inverse
+
     except NotImplementedError:
         inverse1 = None
+
+    except AttributeError:
+        assert not hasattr(model1, "inverse")
+        inverse1 = None
+
     try:
         inverse2 = model2.inverse
+
     except NotImplementedError:
+        inverse2 = None
+
+    except AttributeError:
+        assert not hasattr(model1, "inverse")
         inverse2 = None
 
     assert type(inverse1) is type(inverse2)

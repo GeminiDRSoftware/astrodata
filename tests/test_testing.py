@@ -6,6 +6,7 @@ import os
 
 import numpy as np
 import pytest
+from hypothesis import given, strategies as st
 
 import astrodata
 import astrodata.testing as testing
@@ -16,6 +17,7 @@ from astrodata.testing import (
 )
 
 from astropy.io import fits
+from astropy.modeling import models, Model, Parameter
 
 
 def test_download_from_archive(monkeypatch, tmp_path):
@@ -284,3 +286,70 @@ def test_get_corners_bad_input(bad_input):
 def test_get_corners_empty_input():
     with pytest.raises(ValueError):
         testing.get_corners(())
+
+
+class ExampleModel(Model):
+    inputs = ("x",)
+    outputs = ("y",)
+
+    a = Parameter(default=0)
+    b = Parameter(default=0)
+
+    def evaluate(self, x):
+        return self.a * x + self.b
+
+    @property
+    def n_inputs(self):
+        return 1
+
+    @property
+    def n_outputs(self):
+        return 1
+
+
+_generic_example_model = ExampleModel(a=1, b=2)
+
+
+@pytest.mark.parametrize(
+    "model1,model2,expected",
+    [
+        (models.Gaussian1D(), models.Gaussian1D(), True),
+        (models.Gaussian1D(), models.Gaussian2D(), False),
+        (models.Gaussian1D(), models.Lorentz1D(), False),
+        (models.Gaussian2D(), models.Lorentz1D(), False),
+        (models.Gaussian1D(), models.Polynomial1D(1), False),
+        (models.Gaussian1D(), models.Polynomial2D(1), False),
+        (models.Gaussian1D(), models.Shift(), False),
+        (ExampleModel(), ExampleModel(), True),
+        (ExampleModel(), ExampleModel(a=1), False),
+        (_generic_example_model, _generic_example_model, True),
+        (_generic_example_model, ExampleModel(), False),
+    ],
+)
+def test_compare_models(model1, model2, expected):
+    if expected:
+        testing.compare_models(model1, model2)
+        return
+
+    with pytest.raises(AssertionError):
+        testing.compare_models(model1, model2)
+
+
+_compare_model_bad_inputs = [
+    st.integers(),
+    st.floats(),
+    st.lists(st.floats(), min_size=1, max_size=100),
+    st.tuples(st.floats()),
+    st.tuples(st.floats(), st.floats(), st.floats()),
+    st.dictionaries(st.text(), st.floats()),
+    st.dictionaries(st.integers(), st.floats()),
+]
+
+
+@given(
+    a=st.one_of(_compare_model_bad_inputs),
+    b=st.one_of(_compare_model_bad_inputs),
+)
+def test_compare_models_bad_input(a, b):
+    with pytest.raises(TypeError):
+        testing.compare_models(a, b)
