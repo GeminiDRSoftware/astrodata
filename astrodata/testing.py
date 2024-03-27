@@ -47,6 +47,9 @@ def skip_if_download_none(func):
     Used as a wrapper for testing functions. Works with nose, pynose, and
     pytest.
     """
+    if not callable(func):
+        raise TypeError("Argument must be a callable")
+
     # Cache variable for the download result
     download_success = DownloadResult.NONE
 
