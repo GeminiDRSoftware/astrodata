@@ -1,4 +1,5 @@
 """World Coordinate System (WCS) support for AstroData objects."""
+
 import functools
 import logging
 import re

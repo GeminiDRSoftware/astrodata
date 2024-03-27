@@ -2,6 +2,7 @@
 appropriate warning or error. It does not check for their functionality (which
 is covered by the functions that are replacing them, anyways).
 """
+
 import astrodata
 import astropy.io.fits as fits
 import pytest

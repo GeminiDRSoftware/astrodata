@@ -1,6 +1,7 @@
 """Provides functions for adding provenance information to
 `~astrodata.core.AstroData` objects.
 """
+
 from datetime import datetime
 import json
 

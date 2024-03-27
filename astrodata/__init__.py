@@ -4,6 +4,7 @@ information contained in the headers as attributes. To do so, one must subclass
 :class:`~astrodata.TagSet` received.
 
 """
+
 from .core import AstroData
 from .adfactory import AstroDataFactory, AstroDataError
 from .fits import add_header_to_table

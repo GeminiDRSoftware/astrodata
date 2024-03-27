@@ -1,4 +1,5 @@
 """Configuration for astrodata tests (using pytest)."""
+
 import importlib
 
 import pytest
