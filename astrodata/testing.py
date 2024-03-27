@@ -5,6 +5,7 @@ import enum
 import functools
 import io
 import itertools
+import logging
 import os
 import re
 import shutil
@@ -33,6 +34,8 @@ GEMINI_ARCHIVE_URL = "https://archive.gemini.edu/file/"
 # numpy random number generator for consistency.
 _RANDOM_NUMBER_GEN = np.random.default_rng(42)
 
+log = logging.getLogger(__name__)
+
 
 class DownloadResult(enum.Enum):
     SUCCESS = 0
@@ -59,16 +62,18 @@ def skip_if_download_none(func):
 
         if download_success == DownloadResult.NOT_FOUND or (
             download_success == DownloadResult.NONE
-            and download_from_archive("N20160727S0077.fits") is None
+            and download_from_archive(
+                "N20160727S0077.fits", cache=False, fail_on_error=False
+            )
+            is None
         ):
             download_success = DownloadResult.NOT_FOUND
 
-            # pragma: no cover
             raise unittest.SkipTest(
                 "Skipping test because download_from_archive returned None"
             )
 
-        download_success = True
+        download_success = DownloadResult.SUCCESS
 
         return func(*args, **kwargs)
 
@@ -345,7 +350,12 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
 
 
 def download_from_archive(
-    filename, path=None, sub_path="raw_files", env_var="ASTRODATA_TEST"
+    filename,
+    path=None,
+    sub_path="raw_files",
+    env_var="ASTRODATA_TEST",
+    cache=True,
+    fail_on_error=True,
 ):
     """Download file from the archive and store it in the local cache.
 
@@ -365,6 +375,12 @@ def download_from_archive(
 
     env_var: str
         Environment variable containing the path to the cache directory.
+
+    cache : bool
+        If False, the file is downloaded and replaced in the cache directory.
+
+    fail_on_error : bool
+        If True, raise an error if the download fails. If False, return None.
 
     Returns
     -------
@@ -406,7 +422,7 @@ def download_from_archive(
     try:
         local_path = os.path.join(cache_path, filename)
         url = GEMINI_ARCHIVE_URL + filename
-        if not os.path.exists(local_path):
+        if not os.path.exists(local_path) or not cache:
             tmp_path = download_file(url, cache=False)
 
             shutil.move(tmp_path, local_path)
@@ -415,6 +431,11 @@ def download_from_archive(
             os.chmod(local_path, 0o664)
 
     except Exception as err:
+        if not fail_on_error:
+            log.debug(f"Failed to download {filename} from the archive")
+            log.debug(f" - Error: {err}")
+            return None
+
         raise IOError(
             f"Failed to download {filename} from the archive ({url})"
         ) from err
