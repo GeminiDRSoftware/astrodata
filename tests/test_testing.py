@@ -3,6 +3,7 @@
 import io
 import itertools
 import os
+import warnings
 
 import numpy as np
 import pytest
@@ -27,6 +28,11 @@ def no_outside_connections(monkeypatch):
     monkeypatch.setattr(
         "astrodata.testing.download_file", lambda *args, **kwargs: None
     )
+
+
+@pytest.fixture
+def test_file_archive():
+    return "N20180304S0126.fits"
 
 
 def test_download_from_archive(monkeypatch, tmp_path):
@@ -408,3 +414,63 @@ def test_skip_if_download_none_download_failure(no_outside_connections):
 
     # Check that the test function was skipped.
     assert not _test_called
+
+
+def test_warning_if_no_cache_path(monkeypatch):
+    monkeypatch.delenv("ASTRODATA_TEST")
+
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        testing.download_from_archive(
+            "N20180304S0126.fits", env_var="ASTRODATA_TEST"
+        )
+
+        assert len(w) == 1
+        assert issubclass(w[-1].category, UserWarning)
+        assert "ASTRODATA_TEST" in str(w[-1].message)
+
+
+@pytest.mark.parametrize(
+    "path,sub_path,expected_path",
+    [
+        ("test", "sub", "test/sub"),
+        ("test", None, "test/raw_files"),
+        (None, "sub", "cache_placeholder/sub"),
+        (None, None, "cache_placeholder/raw_files"),
+    ],
+)
+def test_download_file_path_subpath(
+    monkeypatch,
+    tmpdir,
+    test_file_archive,
+    path,
+    sub_path,
+    expected_path,
+):
+    cache_path = os.path.join(str(tmpdir), "cache_placeholder")
+    monkeypatch.setenv("ASTRODATA_TEST", cache_path)
+
+    if path is not None:
+        path = os.path.join(tmpdir, path)
+
+    else:
+        path = tmpdir
+
+    if path == tmpdir:
+        path = None
+
+    if sub_path is not None:
+        file_path = download_from_archive(
+            test_file_archive, path=path, sub_path=sub_path, cache=False
+        )
+
+    else:
+        file_path = download_from_archive(
+            test_file_archive, path=path, cache=False
+        )
+
+    assert file_path == os.path.join(tmpdir, expected_path, test_file_archive)
+
+    if path is not None:
+        assert not os.path.exists(cache_path) or not os.listdir(cache_path)
