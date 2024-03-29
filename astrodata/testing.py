@@ -387,6 +387,15 @@ def download_from_archive(
     str
         Name of the cached file with the path added to it.
     """
+    # Handle None sub_path
+    if sub_path is None:
+        sub_path = ""
+        warnings.warn(
+            "sub_path is None, so the file will be saved to the root of the "
+            "cache directory. To suppress this warning, set sub_path to a "
+            "valid path (e.g., empty string)."
+        )
+
     # Check that the environment variable is a valid name.
     if not isinstance(env_var, str) or not env_var.isidentifier():
         raise ValueError(f"Environment variable name is not valid: {env_var}")
@@ -1136,3 +1145,7 @@ def process_string_to_python_script(string: str) -> str:
     lines = [first_line] + [line[min_indent:] for line in lines[1:]]
 
     return "\n".join(lines)
+
+
+def get_program_observations():
+    raise NotImplementedError
