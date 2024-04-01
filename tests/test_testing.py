@@ -862,3 +862,48 @@ def test_ADCompare_header_matching_flip(ad1, ad2):
     compare.ignore_kw = list(all_keys)
 
     assert not compare.hdr()
+
+    # Try the reverse order
+    all_keys = get_all_keys(ad1) | get_all_keys(ad2)
+    assert all_keys
+
+    compare = testing.ADCompare(ad2, ad1)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison(ignore_kw=list(all_keys))
+
+    compare.ignore_kw = list(all_keys)
+
+    assert not compare.hdr()
+
+
+def test_ADCompare_missing_refcat(ad1):
+    """Test that ADCompare raises an error if a reference catalog is missing."""
+    ad2 = copy.deepcopy(ad1)
+
+    ad1.phu.REFCAT = ["test"]
+
+    # Setting equal to None in this case is functionally equivalent to removing
+    # the keyword.
+    ad2.phu.REFCAT = None
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    ad1.phu.REFCAT = None
+
+    compare.run_comparison()
+
+    ad1.phu.REFCAT = ["test"]
+    ad2.phu.REFCAT = ["test"]
+
+    compare.run_comparison()
+
+    ad1.phu.REFCAT = ["test", "snudder thing"]
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
