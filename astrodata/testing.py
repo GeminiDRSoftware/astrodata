@@ -699,9 +699,11 @@ class ADCompare:
             # Check that they are the same
             assert refcat2 == refcat2_ad, "REFCAT in PHU and AD are different"
 
+        # Check if only one is missing
         if (refcat1 is None) ^ (refcat2 is None):
             return [f"presence: {refcat1 is not None} v {refcat2 is not None}"]
 
+        # Match the lengths
         if refcat1 is not None:  # and refcat2 must also exist
             len1, len2 = len(refcat1), len(refcat2)
             if len1 != len2:
