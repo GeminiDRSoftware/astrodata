@@ -678,8 +678,27 @@ class ADCompare:
 
     def refcat(self):
         """Check both ADs have REFCATs (or not) and that the lengths agree"""
-        refcat1 = getattr(self.ad1, "REFCAT", None)
-        refcat2 = getattr(self.ad2, "REFCAT", None)
+        # REFCAT can be in the PHU or the AD itself, depending on if REFCAT is
+        # implemented as a property/attr or not in the parent class.
+        refcat1 = getattr(self.ad1.phu, "REFCAT", None)
+        refcat1_ad = getattr(self.ad1, "REFCAT", None)
+        refcat2 = getattr(self.ad2.phu, "REFCAT", None)
+        refcat2_ad = getattr(self.ad2, "REFCAT", None)
+
+        if refcat1 is None and refcat1_ad is not None:
+            refcat1 = refcat1_ad
+
+        elif refcat1 is not None and refcat1_ad is not None:
+            # Check that they are the same
+            assert refcat1 == refcat1_ad, "REFCAT in PHU and AD are different"
+
+        if refcat2 is None and refcat2_ad is not None:
+            refcat2 = refcat2_ad
+
+        elif refcat2 is not None and refcat2_ad is not None:
+            # Check that they are the same
+            assert refcat2 == refcat2_ad, "REFCAT in PHU and AD are different"
+
         if (refcat1 is None) ^ (refcat2 is None):
             return [f"presence: {refcat1 is not None} v {refcat2 is not None}"]
 
