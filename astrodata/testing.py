@@ -38,9 +38,62 @@ log = logging.getLogger(__name__)
 
 
 class DownloadResult(enum.Enum):
-    SUCCESS = 0
+    SUCCESS = 2
     NOT_FOUND = 1
-    NONE = 2
+    NONE = 0
+
+
+class DownloadState:
+    """Singleton class to hold the state of the download_from_archive function.
+    A bit of an annoying workaround because of conflicts with how ``pytest``'s
+    fixtures work.
+
+    The class is meant to be used as a singleton, so it should not be
+    instantiated directly. Instead, the instance should be accessed via the
+    ``_self`` variable. Instantiation using ``_DownloadState()`` will do this
+    automatically.
+    """
+
+    __slots__ = ["_state", "_valid_state", "test_result"]
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._state = None
+            cls._instance._valid_state = False
+            cls._instance.test_result = None
+
+        return cls._instance
+
+    def check_state(self) -> DownloadResult:
+        """Check the state of the download_from_archive function."""
+        SUCCESS = DownloadResult.SUCCESS
+        NOT_FOUND = DownloadResult.NOT_FOUND
+        NONE = DownloadResult.NONE
+
+        if self._state is not NONE and self._valid_state:
+            return self._state
+
+        # Test if downloads are possible
+        try:
+            self.test_result = download_from_archive(
+                "test.fits", cache=False, fail_on_error=True
+            )
+
+        except IOError:
+            self._state = NOT_FOUND
+
+        else:
+            self._state = SUCCESS if self.test_result else NOT_FOUND
+
+        self._valid_state = True
+        return self._state
+
+    def invalidate_cache(self):
+        """Invalidate the cache of the download state."""
+        self._valid_state = False
 
 
 def skip_if_download_none(func):
@@ -53,27 +106,12 @@ def skip_if_download_none(func):
     if not callable(func):
         raise TypeError("Argument must be a callable")
 
-    # Cache variable for the download result
-    download_success = DownloadResult.NONE
-
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        nonlocal download_success
-
-        if download_success == DownloadResult.NOT_FOUND or (
-            download_success == DownloadResult.NONE
-            and download_from_archive(
-                "N20160727S0077.fits", cache=False, fail_on_error=False
-            )
-            is None
-        ):
-            download_success = DownloadResult.NOT_FOUND
-
+        if DownloadState().check_state() is DownloadResult.NOT_FOUND:
             raise unittest.SkipTest(
                 "Skipping test because download_from_archive returned None"
             )
-
-        download_success = DownloadResult.SUCCESS
 
         return func(*args, **kwargs)
 
@@ -431,7 +469,11 @@ def download_from_archive(
     try:
         local_path = os.path.join(cache_path, filename)
         url = GEMINI_ARCHIVE_URL + filename
-        if not os.path.exists(local_path) or not cache:
+        if cache and os.path.exists(local_path):
+            # Use the cached file
+            return local_path
+
+        if not os.path.exists(local_path):
             tmp_path = download_file(url, cache=False)
 
             shutil.move(tmp_path, local_path)
@@ -708,6 +750,9 @@ class ADCompare:
             len1, len2 = len(refcat1), len(refcat2)
             if len1 != len2:
                 return [f"lengths: {len1} v {len2}"]
+
+        # TODO: Should we check the contents of the REFCATs? Or is that checked
+        # elsewhere/by some other method/equality impl?
 
         return []
 
