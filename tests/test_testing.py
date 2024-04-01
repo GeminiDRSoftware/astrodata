@@ -25,14 +25,6 @@ from astropy.modeling import models, Model, Parameter
 
 
 @pytest.fixture
-def no_outside_connections(monkeypatch):
-    # Automaticlaly return None for all requests to download_file
-    monkeypatch.setattr(
-        "astrodata.testing.download_file", lambda *args, **kwargs: None
-    )
-
-
-@pytest.fixture
 def test_file_archive():
     return "N20180304S0126.fits"
 
@@ -405,9 +397,18 @@ def test_skip_if_download_none_bad_input(bad_input):
         skip_if_download_none(bad_input)
 
 
-def test_skip_if_download_none_download_failure(no_outside_connections):
+def test_skip_if_download_none_download_failure(monkeypatch):
+    # Patch the download function to return None.
+    monkeypatch.setattr(
+        "astrodata.testing.download_from_archive",
+        lambda *args, **kwargs: None,
+    )
+
     # Variable to check if the test function was called.
     _test_called = False
+
+    # Invalidate the testing cache for this.
+    testing.DownloadState().invalidate_cache()
 
     @skip_if_download_none
     def test_func():
