@@ -1,8 +1,10 @@
 """Tests for the `astrodata.testing` module."""
 
+import copy
 import io
 import itertools
 import os
+import pathlib
 import warnings
 
 import numpy as np
@@ -33,6 +35,16 @@ def no_outside_connections(monkeypatch):
 @pytest.fixture
 def test_file_archive():
     return "N20180304S0126.fits"
+
+
+@pytest.fixture
+def ad1():
+    return astrodata.from_file(download_from_archive("N20180304S0126.fits"))
+
+
+@pytest.fixture
+def ad2():
+    return astrodata.from_file(download_from_archive("N20180304S0123.fits"))
 
 
 def test_download_from_archive(monkeypatch, tmp_path):
@@ -448,6 +460,11 @@ def test_download_file_path_subpath(
     sub_path,
     expected_path,
 ):
+    # Change all paths to be pathlib.Path objects.
+    tmpdir = pathlib.Path(tmpdir)
+    path = pathlib.Path(path) if path is not None else None
+    sub_path = pathlib.Path(sub_path) if sub_path is not None else None
+    expected_path = pathlib.Path(expected_path)
     cache_path = os.path.join(str(tmpdir), "cache_placeholder")
     monkeypatch.setenv("ASTRODATA_TEST", cache_path)
 
@@ -474,3 +491,374 @@ def test_download_file_path_subpath(
 
     if path is not None:
         assert not os.path.exists(cache_path) or not os.listdir(cache_path)
+
+
+def test_download_from_archive_None_sub_path(tmpdir, test_file_archive):
+    # Test that the function works when sub_path is None.
+    with pytest.warns(UserWarning) as record:
+        file_path = download_from_archive(
+            test_file_archive, path=tmpdir, sub_path=None, cache=False
+        )
+
+        assert file_path == os.path.join(tmpdir, test_file_archive)
+
+    assert len(record) == 1, "Multiple warnings were raised."
+    assert "sub_path" in str(
+        record[0].message
+    ), "Warning message does not contain sub_path."
+
+
+@pytest.mark.parametrize(
+    "bad_filename",
+    [
+        None,
+        123,
+        123.456,
+        [1, 2, 3],
+        {"a": 1, "b": 2},
+        {"a", "b", "c"},
+    ],
+)
+def test_download_bad_filename_type(tmpdir, bad_filename):
+    # TODO: This is a generic exception, ideally it'd be a type error
+    # explicitly.
+    with pytest.raises(Exception):
+        download_from_archive(bad_filename, path=tmpdir, cache=False)
+
+
+@pytest.mark.parametrize(
+    "bad_filename",
+    [
+        "file.fits",
+        "file.txt",
+        "not_never_ever_a_file.csv",
+        "not_a_file.jpg",
+        "not_a_file.png",
+        "not_a_file.gif",
+        "never_ever_not_never_existent_file.fits",
+        "file/with/other/stuff.fits",
+    ],
+)
+def test_download_raise_error_on_fail(tmpdir, bad_filename):
+    with pytest.raises(IOError):
+        download_from_archive(
+            bad_filename,
+            path=tmpdir,
+            cache=False,
+        )
+
+
+def test_get_associated_calibrations(tmpdir, test_file_archive):
+    associated_calibrations = testing.get_associated_calibrations(
+        test_file_archive
+    )
+
+    results = associated_calibrations
+
+    # TODO: Hardcoded expected values. Would be better to have a few cases to
+    # test.
+    assert len(results) == 13
+
+    expected_filenames = [
+        "N20180113S0131.fits",
+        "N20180228S0213.fits",
+        "N20180228S0214.fits",
+        "N20180228S0215.fits",
+        "N20180228S0216.fits",
+        "N20180228S0217.fits",
+        "N20180304S0121.fits",
+        "N20180304S0124.fits",
+        "N20180304S0125.fits",
+        "N20180304S0126.fits",
+        "N20180305S0099_bias.fits",
+        "N20180525S0353.fits",
+        "N20180820S0103.fits",
+    ]
+
+    result_filenames = [x["filename"] for x in associated_calibrations]
+
+    assert sorted(result_filenames) == expected_filenames
+
+    cal_types = {
+        "N20180113S0131.fits": "specphot",
+        "N20180228S0213.fits": "bias",
+        "N20180228S0214.fits": "bias",
+        "N20180228S0215.fits": "bias",
+        "N20180228S0216.fits": "bias",
+        "N20180228S0217.fits": "bias",
+        "N20180304S0121.fits": "specphot",
+        "N20180304S0124.fits": "specphot",
+        "N20180304S0125.fits": "specphot",
+        "N20180304S0126.fits": "flat",
+        "N20180305S0099_bias.fits": "processed_bias",
+        "N20180525S0353.fits": "arc",
+        "N20180820S0103.fits": "spectwilight",
+    }
+
+    for cal in associated_calibrations:
+        assert cal["caltype"] == cal_types[cal["filename"]]
+
+
+def test_ADCompare_init(ad1, ad2):
+    # Test that the ADCompare class is correctly initialized.
+    compare = testing.ADCompare(ad1, ad2)
+
+    assert compare.ad1 == ad1
+    assert compare.ad2 == ad2
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    ad1_copy = copy.deepcopy(ad1)
+
+    compare = testing.ADCompare(ad1, ad1_copy)
+
+    assert compare.ad1 == ad1
+    assert compare.ad2 == ad1_copy
+
+    compare.run_comparison()
+
+
+def test_ADCompare_run_comparison(ad1, ad2):
+    ad3 = copy.deepcopy(ad1)
+    ad3.phu.set("KEY", "VALUE")
+
+    # Test ignoring keywords.abs
+    compare = testing.ADCompare(ad1, ad3)
+
+    # Check that ad1 and ad3 are not equal.
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    # Check that ad1 and ad3 are equal when ignoring keywords.
+    keywords = {key for key in ad1.phu.keys()} | {
+        key for key in ad3.phu.keys()
+    }
+    compare.run_comparison(ignore_kw=list(keywords))
+
+    # Check that ad1 and ad2 are not equal.
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    # Check that ad1 and ad2 are also not equal when ignoring keywords.
+    with pytest.raises(AssertionError):
+        compare.run_comparison(ignore_kw=["KEY"])
+
+    # Ignore a comparison
+    ignore = ["filename"]
+
+    ad3 = copy.deepcopy(ad1)
+    ad3.filename = "[NOT THE SAME]"
+
+    assert ad1.filename != ad3.filename
+
+    with pytest.raises(AssertionError):
+        compare = testing.ADCompare(ad1, ad3)
+        compare.run_comparison()
+
+    compare.run_comparison(ignore=set(ignore))
+
+    # Ignore all comparisons
+    # TODO: This should be more accessible/configurable.
+    compare.run_comparison(
+        ignore=[
+            "filename",
+            "tags",
+            "numext",
+            "refcat",
+            "phu",
+            "hdr",
+            "attributes",
+            "wcs",
+        ]
+    )
+
+
+def test_ADCompare_numext(ad1, ad2):
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    # Check that the number of extensions is the same.
+    ad2.append(ad2[0])
+
+    assert compare.numext()
+
+    def resize_ext(ad, n):
+        while len(ad) < n:
+            ad.append(ad[0])
+
+        while len(ad) > n:
+            ad = ad[:-1]
+
+        return ad
+
+    ad1, ad2 = (resize_ext(ad, 10) for ad in (ad1, ad2))
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    assert not compare.numext()
+
+
+def test_ADCompare_unequal_tags(ad1, tmp_path):
+    # Get a file of a different type
+    all_cals = testing.get_associated_calibrations("N20180304S0126.fits")
+
+    # TODO this could just be a bias fixture and used elsewhere.
+    all_cals = [cal for cal in all_cals if cal["caltype"] == "bias"]
+
+    # Create two test classes that have different astrodata tags
+    class TestAD1(astrodata.AstroData):
+        @astrodata.astro_data_tag
+        def tag1(self):
+            return astrodata.TagSet(["TAG1"])
+
+        @staticmethod
+        def _matches_data(source):
+            source = source.filename()
+            source = os.path.basename(source)
+
+            if source == all_cals[0]["filename"]:
+                return True
+
+            return False
+
+    class TestAD2(astrodata.AstroData):
+        @astrodata.astro_data_tag
+        def tag2(self):
+            return astrodata.TagSet(["TAG2"])
+
+        @staticmethod
+        def _matches_data(source):
+            source = source.filename()
+            source = os.path.basename(source)
+
+            if source == all_cals[1]["filename"]:
+                return True
+
+            return False
+
+    # Register our test classes
+    astrodata.factory.add_class(TestAD1)
+    astrodata.factory.add_class(TestAD2)
+
+    # Downlaod the files
+    file1 = download_from_archive(
+        all_cals[0]["filename"],
+        path=tmp_path,
+        sub_path="",
+        cache=False,
+    )
+
+    file2 = download_from_archive(
+        all_cals[1]["filename"],
+        path=tmp_path,
+        sub_path="",
+        cache=False,
+    )
+
+    # Load the two files
+    ad1 = astrodata.from_file(file1)
+    ad2 = astrodata.from_file(file2)
+
+    assert all(isinstance(ad, astrodata.AstroData) for ad in (ad1, ad2))
+    assert isinstance(ad1, TestAD1)
+    assert isinstance(ad2, TestAD2)
+
+    assert ad1.tags == {"TAG1"}
+    assert ad2.tags == {"TAG2"}
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    assert compare.tags()
+
+    # Create a third class that has the same tags as the first class, but
+    # accepts the second file
+    class TestAD3(astrodata.AstroData):
+        @astrodata.astro_data_tag
+        def tag2(self):
+            return astrodata.TagSet(["TAG1"])
+
+    astrodata.factory.remove_class(TestAD2)
+    astrodata.factory.add_class(TestAD3)
+
+    ad2 = astrodata.from_file(file2)
+
+    assert isinstance(ad2, TestAD3)
+    assert ad2.tags == {"TAG1"}
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    assert not compare.tags()
+
+
+def test_ADCompare_header_matching(ad1, ad2):
+    ad2.hdr.remove("GAIN")
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    # Check that the headers are not the same.
+    assert compare.hdr()
+
+    # Check that the headers are the same when ignoring keywords.
+    def get_all_keys(ad):
+        headers = ad.hdr
+
+        all_keys = set()
+
+        for header in headers:
+            all_keys |= set(header.keys())
+
+        return all_keys
+
+    all_keys = get_all_keys(ad1) | get_all_keys(ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison(ignore_kw=list(all_keys))
+
+    compare.ignore_kw = list(all_keys)
+
+    assert not compare.hdr()
+
+
+def test_ADCompare_header_matching_flip(ad1, ad2):
+    ad2.hdr.remove("GAIN")
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    # Check that the headers are not the same.
+    compare.ignore_kw = []
+    assert compare.hdr()
+
+    # Check that the headers are the same when ignoring keywords.
+    def get_all_keys(ad):
+        headers = ad.hdr
+
+        all_keys = set()
+
+        for header in headers:
+            all_keys |= set(header.keys())
+
+        return all_keys
+
+    all_keys = get_all_keys(ad1) | get_all_keys(ad2)
+    assert all_keys
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison(ignore_kw=list(all_keys))
+
+    compare.ignore_kw = list(all_keys)
+
+    assert not compare.hdr()
