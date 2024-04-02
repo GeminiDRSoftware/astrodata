@@ -757,7 +757,7 @@ class ADCompare:
             if all(attr is None for attr in [attr1, attr2]):
                 continue
 
-            if not np.all(attr1 == attr2):
+            if not np.array_equal(attr1, attr2):
                 errorlist.append(f"{attr} mismatch: {attr1} v {attr2}")
                 continue
 

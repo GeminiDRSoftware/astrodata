@@ -31,12 +31,18 @@ def test_file_archive():
 
 @pytest.fixture
 def ad1():
-    return astrodata.from_file(download_from_archive("N20180304S0126.fits"))
+    file = astrodata.from_file(download_from_archive("N20180304S0126.fits"))
+
+    assert file
+    return file
 
 
 @pytest.fixture
 def ad2():
-    return astrodata.from_file(download_from_archive("N20180304S0123.fits"))
+    file = astrodata.from_file(download_from_archive("N20180305S0001.fits"))
+
+    assert file
+    return file
 
 
 def test_download_from_archive(monkeypatch, tmp_path):
@@ -105,6 +111,28 @@ def test_download_from_archive_raises_ValueError_if_envvar_does_not_exists():
 
     with pytest.raises(ValueError):
         download_from_archive("N20180304S0126.fits", env_var="bing bong")
+
+
+def test_download_from_archive_cannot_download_file(monkeypatch):
+    def mock_download(remote_url, **kwargs):
+        raise IOError("This is a test error.")
+
+    monkeypatch.setattr("astrodata.testing.download_file", mock_download)
+
+    testing.DownloadState().invalidate_cache()
+
+    result = download_from_archive(
+        "N20180304S0126.fits", cache=False, fail_on_error=False
+    )
+
+    assert result is None
+
+    with pytest.raises(IOError):
+        download_from_archive(
+            "N20180304S0126.fits", cache=False, fail_on_error=True
+        )
+
+    testing.DownloadState().invalidate_cache()
 
 
 def test_assert_most_close():
@@ -397,11 +425,22 @@ def test_skip_if_download_none_bad_input(bad_input):
         skip_if_download_none(bad_input)
 
 
-def test_skip_if_download_none_download_failure(monkeypatch):
-    # Patch the download function to return None.
+def raise_io_error(*args, **kwargs):
+    raise IOError("This is a test error.")
+
+
+@pytest.mark.parametrize(
+    "download_func",
+    [
+        lambda *args, **kwargs: None,
+        raise_io_error,
+    ],
+)
+def test_skip_if_download_none_download_failure(monkeypatch, download_func):
+    # Patch the download function.
     monkeypatch.setattr(
         "astrodata.testing.download_from_archive",
-        lambda *args, **kwargs: None,
+        download_func,
     )
 
     # Variable to check if the test function was called.
@@ -427,6 +466,9 @@ def test_skip_if_download_none_download_failure(monkeypatch):
 
     # Check that the test function was skipped.
     assert not _test_called
+
+    # Reset the DownloadState
+    testing.DownloadState().invalidate_cache()
 
 
 def test_warning_if_no_cache_path(monkeypatch):
@@ -893,14 +935,18 @@ def test_ADCompare_missing_refcat(ad1):
     with pytest.raises(AssertionError):
         compare.run_comparison()
 
+    assert compare.refcat()
+
     ad1.phu.REFCAT = None
 
     compare.run_comparison()
+    assert not compare.refcat()
 
     ad1.phu.REFCAT = ["test"]
     ad2.phu.REFCAT = ["test"]
 
     compare.run_comparison()
+    assert not compare.refcat()
 
     ad1.phu.REFCAT = ["test", "snudder thing"]
 
@@ -908,3 +954,20 @@ def test_ADCompare_missing_refcat(ad1):
 
     with pytest.raises(AssertionError):
         compare.run_comparison()
+
+    assert compare.refcat()
+
+
+def test_ADCompare_wcs(ad1, ad2):
+    ad1_copy = copy.deepcopy(ad1)
+    ad2_copy = copy.deepcopy(ad2)
+
+    compare = testing.ADCompare(ad1, ad2)
+
+    with pytest.raises(AssertionError):
+        compare.run_comparison()
+
+    assert compare.wcs()
+
+    ad1 = copy.deepcopy(ad1_copy)
+    ad2 = copy.deepcopy(ad2_copy)
