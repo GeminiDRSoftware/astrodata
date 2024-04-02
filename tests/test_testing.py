@@ -971,3 +971,8 @@ def test_ADCompare_wcs(ad1, ad2):
 
     ad1 = copy.deepcopy(ad1_copy)
     ad2 = copy.deepcopy(ad2_copy)
+
+
+def test_ad_compare(ad1, ad2):
+    assert testing.ad_compare(ad1, ad1)
+    assert not testing.ad_compare(ad1, ad2)
