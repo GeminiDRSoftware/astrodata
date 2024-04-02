@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import json
 import os
 
 import numpy as np
@@ -188,3 +189,43 @@ def test_convert_provhistory(tmp_path, BPM_PROVHISTORY):
     assert hist["timestamp_stop"] == now
     assert hist["primitive"] == "primitive"
     assert hist["args"] == "args"
+
+
+def test_provenance_summary(ad):
+    summary = astrodata.provenance.provenance_summary(ad).casefold()
+    assert "no provenance" in summary
+
+    timestamp = datetime.utcnow().isoformat()
+    filename = "filename"
+    md5 = "md5"
+    primitive = "primitive_name"
+
+    add_provenance(ad, filename, md5, primitive, timestamp=timestamp)
+
+    timestamp_end = datetime.utcnow().isoformat()
+    args = json.dumps({"arg1": 1, "arg2": 3})
+
+    add_history(ad, timestamp, timestamp_end, primitive, args)
+
+    timestamp = datetime.utcnow().isoformat()
+    filename = "filename"
+    md5 = "md5"
+    primitive = "snudder_primitive_name"
+
+    add_provenance(ad, filename, md5, primitive, timestamp=timestamp)
+
+    timestamp_end = datetime.utcnow().isoformat()
+    args = json.dumps({"arg1": 1, "arg2": 2})
+
+    add_history(ad, timestamp, timestamp_end, primitive, args)
+
+    summary = astrodata.provenance.provenance_summary(ad)
+
+    assert "no provenance" not in summary.casefold()
+
+    # Check that there is a warning about the older provenance extension.
+    ad.PROVHISTORY = ad.HISTORY
+
+    summary = astrodata.provenance.provenance_summary(ad)
+
+    assert "PROVHISTORY" in summary
