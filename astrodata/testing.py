@@ -455,12 +455,10 @@ def download_from_archive(
 
     root_cache_path = os.path.expanduser(root_cache_path)
 
-    if sub_path is not None:
-        cache_path = os.path.join(root_cache_path, sub_path)
+    if path is None:
+        path = root_cache_path
 
-    if path is not None:
-        path = os.path.expanduser(path)
-        cache_path = os.path.join(path, sub_path)
+    cache_path = os.path.join(os.path.expanduser(path), sub_path)
 
     if not os.path.exists(cache_path):
         os.makedirs(cache_path)
@@ -469,17 +467,17 @@ def download_from_archive(
     try:
         local_path = os.path.join(cache_path, filename)
         url = GEMINI_ARCHIVE_URL + filename
+
         if cache and os.path.exists(local_path):
             # Use the cached file
             return local_path
 
-        if not os.path.exists(local_path):
-            tmp_path = download_file(url, cache=False)
+        tmp_path = download_file(url, cache=False)
 
-            shutil.move(tmp_path, local_path)
+        shutil.move(tmp_path, local_path)
 
-            # `download_file` ignores Access Control List - fixing it
-            os.chmod(local_path, 0o664)
+        # `download_file` ignores Access Control List - fixing it
+        os.chmod(local_path, 0o664)
 
     except Exception as err:
         if not fail_on_error:
@@ -723,23 +721,7 @@ class ADCompare:
         # REFCAT can be in the PHU or the AD itself, depending on if REFCAT is
         # implemented as a property/attr or not in the parent class.
         refcat1 = getattr(self.ad1.phu, "REFCAT", None)
-        refcat1_ad = getattr(self.ad1, "REFCAT", None)
         refcat2 = getattr(self.ad2.phu, "REFCAT", None)
-        refcat2_ad = getattr(self.ad2, "REFCAT", None)
-
-        if refcat1 is None and refcat1_ad is not None:
-            refcat1 = refcat1_ad
-
-        elif refcat1 is not None and refcat1_ad is not None:
-            # Check that they are the same
-            assert refcat1 == refcat1_ad, "REFCAT in PHU and AD are different"
-
-        if refcat2 is None and refcat2_ad is not None:
-            refcat2 = refcat2_ad
-
-        elif refcat2 is not None and refcat2_ad is not None:
-            # Check that they are the same
-            assert refcat2 == refcat2_ad, "REFCAT in PHU and AD are different"
 
         # Check if only one is missing
         if (refcat1 is None) ^ (refcat2 is None):
@@ -771,49 +753,14 @@ class ADCompare:
         for attr in ["data", "mask", "variance", "OBJMASK", "OBJCAT"]:
             attr1 = getattr(ext1, attr, None)
             attr2 = getattr(ext2, attr, None)
-            if (attr1 is None) ^ (attr2 is None):
-                errorlist.append(
-                    f"Attribute error for {attr}: "
-                    f"{attr1 is not None} v {attr2 is not None}"
-                )
-            elif attr1 is not None:
-                if isinstance(attr1, Table):
-                    if len(attr1) != len(attr2):
-                        errorlist.append(
-                            f"attr lengths differ: "
-                            f"{len(attr1)} v {len(attr2)}"
-                        )
-                else:  # everything else is pixel-like
-                    if attr1.dtype.name != attr2.dtype.name:
-                        errorlist.append(
-                            f"Datatype mismatch for {attr}: "
-                            f"{attr1.dtype} v {attr2.dtype}"
-                        )
-                    if attr1.shape != attr2.shape:
-                        errorlist.append(
-                            f"Shape mismatch for {attr}: "
-                            f"{attr1.shape} v {attr2.shape}"
-                        )
-                    if "int" in attr1.dtype.name:
-                        try:
-                            assert_most_equal(
-                                attr1, attr2, max_miss=self.max_miss
-                            )
-                        except AssertionError as e:
-                            errorlist.append(
-                                f"Inequality for {attr}: " + str(e)
-                            )
-                    else:
-                        try:
-                            assert_most_close(
-                                attr1,
-                                attr2,
-                                max_miss=self.max_miss,
-                                rtol=self.rtol,
-                                atol=self.atol,
-                            )
-                        except AssertionError as e:
-                            errorlist.append(f"Mismatch for {attr}: " + str(e))
+
+            if all(attr is None for attr in [attr1, attr2]):
+                continue
+
+            if not np.all(attr1 == attr2):
+                errorlist.append(f"{attr} mismatch: {attr1} v {attr2}")
+                continue
+
         return errorlist
 
     def wcs(self):
