@@ -29,23 +29,24 @@ jobs:
 
     steps:
       - name: "Check out the repo"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v4"
 
       - name: "Set up Python"
-        uses: "actions/setup-python@v2"
+        uses: "actions/setup-python@v5"
         with:
           python-version: "${{ matrix.python-version }}"
 
       - name: "Install dependencies"
         run: |
+          python -m pip install --upgrade pip
           python -m pip install tox tox-gh-actions
 
       - name: "Run tox for ${{ matrix.python-version }}"
         run: |
-          python -m tox
+          python -m tox -r -- -svv
 
       - name: "Upload coverage data"
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: covdata
           path: .coverage.*
@@ -56,10 +57,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out the repo"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v4"
 
       - name: "Set up Python"
-        uses: "actions/setup-python@v2"
+        uses: "actions/setup-python@v5"
         with:
           python-version: "3.10"
 
@@ -68,7 +69,7 @@ jobs:
           python -m pip install tox tox-gh-actions
 
       - name: "Download coverage data"
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: covdata
 
@@ -80,7 +81,7 @@ jobs:
           echo "### Total coverage: ${TOTAL}%" >> $GITHUB_STEP_SUMMARY
 
       - name: "Make badge"
-        uses: schneegans/dynamic-badges-action@v1.4.0
+        uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           # GIST_TOKEN is a GitHub personal access token with scope "gist".
           auth: ${{ secrets.GIST_TOKEN }}
