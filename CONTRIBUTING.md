@@ -47,6 +47,16 @@ contributing code.
 
 Otherwise, the process is basically the same; contributers weight in, the situation is discussed as needed, and at the end of the discussion the code is improved. There's no "finality" to a PR. There is always time to dicuss the changes as carefully as with an issue.
 
-If this still feels too complicated or intimidating,
+If this still feels too complicated or intimidating, feel free to raise an
+issue or contact a maintainer directly.
 
 **See [GitHub's guide to contributing through PRs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)** for more information about how to start a PR.
+
+## Contacts
+
+While it is preferred you contribute using one of the above methods, if
+discretion is required or you are having trouble please do not hesitate to
+reach out to one of the core maintainers directly:
+
+### Maintainers
++ Teal (dillon.teal@noirlab.edu)
