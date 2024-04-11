@@ -3,13 +3,13 @@ Contributing to the project
 ===========================
 
 Thank you so much for considering to contribute to the project! We welcome all
-contributions, and we are grateful even for the smallest fixes. 🛠️
+contributions, and we are grateful even for the smallest fixes. 🛠️🔎👷
 
 The following is a set of guidelines for contributing to the project. These are
 mostly guidelines, not rules. Use your best judgment, and feel free to propose
 changes to this document in a pull request.
 
-If you're worried you may be doing something wrong, ✨don't✨. If you're still
+If you're worried you may be doing something wrong, ✨don't worry✨. If you're still
 worried, though, know that everyone makes mistakes and we are here to help you
 fix them. Our [Code of Conduct](/CODE_OF_CONDUCT.md) outlines the commitment of
 all who work on and contribute to `astrodata` to fostering a comfortable and
