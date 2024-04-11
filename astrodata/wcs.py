@@ -58,9 +58,30 @@ def pixel_frame(naxes, name="pixels"):
     )
 
 
-def fitswcs_to_gwcs(input_data):
+def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
     """Create and return a gWCS object from a FITS header or NDData object.  If
     it can't construct one, it should quietly return None.
+
+    Parameters
+    ----------
+    input_data : `astropy.io.fits.Header` or `astropy.nddata.NDData`
+        FITS Header or NDData object with basic FITS WCS keywords.
+
+    raise_errors : bool
+        If True, raise an exception if the gWCS cannot be created.
+
+    Returns
+    -------
+    gWCS or None
+        A gWCS object or None if it can't be created.
+
+    Raises
+    ------
+    TypeError
+        If the input is not a FITS Header or a NDData object.
+
+    ValueError
+        If the WCS cannot be constructed and raise_errors is True.
     """
     # coordinate names for CelestialFrame
     coordinate_outputs = {"alpha_C", "delta_C"}
@@ -70,12 +91,16 @@ def fitswcs_to_gwcs(input_data):
         transform = make_fitswcs_transform(input_data)
 
     except (TypeError, ValueError) as err:
-        logging.warning(
-            "Could not create gWCS: %s: %s",
-            err.__class__.__name__,
-            err,
-        )
-        return None
+        if not raise_errors:
+            logging.warning(
+                "Could not create gWCS: %s: %s",
+                err.__class__.__name__,
+                err,
+            )
+
+            return None
+
+        raise
 
     outputs = transform.outputs
 
@@ -157,6 +182,7 @@ def fitswcs_to_gwcs(input_data):
         if len(out_frames) == 1
         else cf.CompositeFrame(out_frames, name="world")
     )
+
     return gWCS([(in_frame, transform), (out_frame, None)])
 
 
@@ -165,6 +191,8 @@ def fitswcs_to_gwcs(input_data):
 # -----------------------------------------------------------------------------
 
 
+# TODO: Rename this and deprecate this function. The name implies it is a
+# gwcs object being passed, but it requires an NDData object.
 def gwcs_to_fits(ndd, hdr=None):
     """Convert a gWCS object to a collection of FITS WCS keyword/value pairs,
     if possible. If the FITS WCS is only approximate, this should be indicated
@@ -194,17 +222,25 @@ def gwcs_to_fits(ndd, hdr=None):
     world_axes = list(wcs.output_frame.axes_names)
     nworld_axes = len(world_axes)
     tabular_axes = {}
+
+    # Depending on how NDData is generated, it may not have a shape attr.
+    try:
+        shape = ndd.shape
+
+    except AttributeError:
+        # Try to get the shape from the contained data
+        shape = ndd.data.shape
+
     wcs_dict = {
-        "NAXIS": len(ndd.shape),  # in case it's not written to a file
+        "NAXIS": len(shape),  # in case it's not written to a file
         "WCSAXES": nworld_axes,
         "WCSDIM": nworld_axes,
     }
+
     wcs_dict.update(
-        {
-            f"NAXIS{i}": length
-            for i, length in enumerate(ndd.shape[::-1], start=1)
-        }
+        {f"NAXIS{i}": length for i, length in enumerate(shape[::-1], start=1)}
     )
+
     wcs_dict.update(
         {
             f"CD{i+1}_{j+1}": 0.0
@@ -212,7 +248,8 @@ def gwcs_to_fits(ndd, hdr=None):
             for i in range(nworld_axes)
         }
     )
-    pix_center = [0.5 * (length - 1) for length in ndd.shape[::-1]]
+
+    pix_center = [0.5 * (length - 1) for length in shape[::-1]]
     wcs_center = transform(*pix_center)
     if nworld_axes == 1:
         wcs_center = (wcs_center,)
@@ -349,7 +386,7 @@ def gwcs_to_fits(ndd, hdr=None):
     if not model_is_affine(transform):
         wcs_dict["FITS-WCS"] = ("APPROXIMATE", "FITS WCS is approximate")
 
-    affine = calculate_affine_matrices(transform, ndd.shape)
+    affine = calculate_affine_matrices(transform, shape)
 
     # Convert to x-first order
     affine_matrix = np.flip(affine.matrix)
@@ -358,7 +395,7 @@ def gwcs_to_fits(ndd, hdr=None):
     wcs_dict.update(
         {
             f"CD{i+1}_{j+1}": affine_matrix[i, j]
-            for j, _ in enumerate(ndd.shape)
+            for j, _ in enumerate(shape)
             for i, _ in enumerate(world_axes)
         }
     )
@@ -390,7 +427,7 @@ def gwcs_to_fits(ndd, hdr=None):
     wcs_gen = enumerate(zip(wcs_center, modified_wcs_center), start=1)
     for world_axis, (wcs_val, modified_wcs_val) in wcs_gen:
         if wcs_val > 0 and np.isclose(modified_wcs_val, np.log(wcs_val)):
-            for j, _ in enumerate(ndd.shape, start=1):
+            for j, _ in enumerate(shape, start=1):
                 wcs_dict[f"CD{world_axis}_{j}"] *= crval[world_axis - 1]
                 wcs_dict[f"CTYPE{world_axis}"] = (
                     wcs_dict[f"CTYPE{world_axis}"][:4] + "-LOG"
@@ -404,7 +441,7 @@ def gwcs_to_fits(ndd, hdr=None):
 
     # Cope with a situation where the sky projection center is not in the slit
     # We may be able to fix this in future, but FITS doesn't handle it well.
-    if len(ndd.shape) > 1:
+    if len(shape) > 1:
         crval2 = wcs(*(crpix - 1))
         try:
             sky_center = coord.SkyCoord(
@@ -429,7 +466,7 @@ def gwcs_to_fits(ndd, hdr=None):
                     "FITS WCS is approximate",
                 )
 
-    if len(ndd.shape) == 1:
+    if len(shape) == 1:
         wcs_dict["CRPIX1"] = crpix
 
     else:
@@ -438,9 +475,7 @@ def gwcs_to_fits(ndd, hdr=None):
             {
                 f"CRPIX{j}": cpix
                 for j, cpix in enumerate(
-                    np.concatenate(
-                        [crpix, [1] * (nworld_axes - len(ndd.shape))]
-                    ),
+                    np.concatenate([crpix, [1] * (nworld_axes - len(shape))]),
                     start=1,
                 )
             }
@@ -455,7 +490,7 @@ def gwcs_to_fits(ndd, hdr=None):
 
     # To ensure an invertable CD matrix, we need to get nonexistent pixel axes
     # "involved".
-    for j in range(len(ndd.shape), nworld_axes):
+    for j in range(len(shape), nworld_axes):
         wcs_dict[f"CD{nworld_axes}_{j+1}"] = 1
 
     return wcs_dict
