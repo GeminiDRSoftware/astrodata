@@ -13,12 +13,13 @@ to provide the core functionality of these containers, and added a number of
 mixins to provide additional functionality.
 
 Specifically, we extend |NDData| with the following:
-* `astrodata.NDAstroData` - the main data container class
-* `astrodata.NDAstroDataMixin` - a mixin class that adds additional functionality
-to |NDData|, such as the ability to access image planes and tables stored in
-the ``meta`` dict as attributes of the object
-* `astrodata.NDArithmeticMixin` - a mixin class that adds arithmetic functionality
-* `astrodata.NDSlicingMixin` - a mixin class that adds slicing functionality
+
+* :py:class:`astrodata.NDAstroData` - the main data container class
+* :py:class:`astrodata.NDAstroDataMixin` - a mixin class that adds additional functionality
+  to |NDData|, such as the ability to access image planes and tables stored in
+  the ``meta`` dict as attributes of the object
+* :py:class:`astrodata.NDArithmeticMixin` - a mixin class that adds arithmetic functionality
+* :py:class:`astrodata.NDSlicingMixin` - a mixin class that adds slicing functionality
 
 ..
   A third, and very important part of the AstroData core package is the data
@@ -49,15 +50,15 @@ With these mixins, |NDAstroData| is extended to allow for ease and efficiency
 of use, as if a common array, with extra features such as uncertainty
 propogation and efficient slicing with typically array syntax.
 
-Upon initialization (see :meth:`astrodata.AstroData.__init__`), the
-``AstroData`` class will attempt to open the file in memory-mapping mode, which
-is the default mode for opening FITS files in Astropy. This means that the data
-is not loaded into memory until it is accessed, and is discarded from memory
-when it is no longer needed. This is particularly important for large data
-sets common in astronomy.
+Upon initialization (see |AstroData|'s :py:meth:`~astrodata.core.AstroData.__init__`
+method), the |AstroData| class will attempt to open the file in memory-mapping
+mode, which is the default mode for opening FITS files in Astropy. This means
+that the data is not loaded into memory until it is accessed, and is discarded
+from memory when it is no longer needed. This is particularly important for
+large data sets common in astronomy.
 
 Much of |NDAstrodata| acts to mimic the behavior of |NDData| and
-:mod:`astropy.io.fits` objects, but is designed to be extensible to other
+:py:mod:`astropy.io.fits` objects, but is designed to be extensible to other
 formats and means of storing, accessing, and manipulating data.
 
 ..
