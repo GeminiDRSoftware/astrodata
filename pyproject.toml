@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "A package for managing astronomical data through a uniform interface"
 authors = ["D. J. Teal <dillon.teal@noirlab.com>", "DRAGONS development team"]
 license = "BSD3"
-readme = "README.rst"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
