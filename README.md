@@ -65,6 +65,7 @@ class MyData(AstroData):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+    @astro_data_descriptor
     def my_method(self):
         print('This is my method, and it tells me about my data.')
         print(self.info())
