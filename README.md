@@ -116,7 +116,8 @@ License
 -------
 
 This project is Copyright 2024 (c)  and licensed under the terms of a modified
-BSD 3-clause license. This package is based upon the [Openastronomy packaging
+BSD 3-clause license through AURA astronomy. This package is based upon the
+[Openastronomy packaging
 guide](https://github.com/OpenAstronomy/packaging-guide) which is licensed
 under the standard BSD 3-clause licence. See the LICENSE file for more
 information.
