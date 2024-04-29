@@ -1,85 +1,31 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
-    # Black formattting
-# -   repo: https://github.com/psf/black
-    # rev: 23.10.1
-    # hooks:
-    # -   id: black
-        # args:
-            # - --line-length=79
-            # # these folders wont be formatted by black
-            # - --exclude="""\.git |
-              # \.__pycache__|
-              # \.hg|
-              # \.mypy_cache|
-              # \.tox|
-              # \.venv|
-              # _build|
-              # buck-out|
-              # build|
-              # dist|
-              # docs"""
-
-        # # black depends on click
-        # additional_dependencies: ["click>=8"]
-
-# flake8
--   repo: https://github.com/pycqa/flake8
-    rev: '6.1.0'  # pick a git hash / tag to point to
-    hooks:
-    # Hook for specific errors that should stop the commit
-    -   id: flake8
-        args:
-            - --select=E9,F63,F7,F82
-            - --count
-            - --show-source
-            - --statistics
-            - --exclude="""\.git|
-              \.__pycache__|
-              \.hg|
-              \.mypy_cache|
-              \.tox|
-              \.venv|
-              _build|
-              buck-out|
-              build|
-              dist|
-              docs|
-              tests|
-              testing"""
-
-    -   id: flake8
-        args:
-            - --max-line-length=79
-            - --count
-            - --exit-zero
-            - --statistics
-            - --show-source
-            - --exclude="""\.git |
-              \.__pycache__|
-              \.hg|
-              \.mypy_cache|
-              \.tox|
-              \.venv|
-              _build|
-              buck-out|
-              build|
-              dist|
-              docs|
-              tests"""
-
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v4.6.0
     hooks:
+    -   id: check-yaml
+    -   id: check-json
+    -   id: check-toml
+    -   id: check-docstring-first
+    -   id: check-case-conflict
     -   id: trailing-whitespace
     -   id: end-of-file-fixer
-    -   id: check-yaml
-    -   id: check-added-large-files
+    -   id: check-symlinks
+    -   id: check-merge-conflict
+        args: [ --assume-in-merge ]
+    -   id: check-vcs-permalinks
+    -   id: debug-statements
+    -   id: forbid-submodules
+    -   id: name-tests-test
+    -   id: no-commit-to-branch
+        args:
+        - --branch=master
+        - --pattern="release/*"
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
-  rev: v0.1.5
+  rev: v0.4.2
   hooks:
     # Run the linter.
     - id: ruff
