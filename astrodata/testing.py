@@ -1112,11 +1112,6 @@ def test_script_file(
     stdout = process.stdout
     stderr = process.stderr
 
-    # Easy escape point for the test function, since this is a common need for
-    # hand-checking initial tests/testing test definitions.
-    if break_after_run:
-        breakpoint()
-
     # Helper function to check the output against the expected results using
     # regex.
     def _reg_assert(result, expected):
