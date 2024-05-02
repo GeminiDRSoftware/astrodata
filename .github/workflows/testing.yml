@@ -48,7 +48,7 @@ jobs:
       - name: "Upload coverage data"
         uses: actions/upload-artifact@v4
         with:
-          name: covdata-${{ matrix.os }}-${{ matrix.python-version }}
+          name: covdata
           path: .coverage.*
 
   coverage:
