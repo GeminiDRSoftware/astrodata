@@ -13,7 +13,6 @@ defaults:
 jobs:
   tests:
     name: "Python ${{ matrix.python-version }} on ${{ matrix.os }}"
-    id: test
     runs-on: "${{ matrix.os }}"
 
     strategy:
@@ -21,8 +20,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
-          - windows-latest
+          - macos-latest - windows-latest
         python-version:
           - "3.10"
           - "3.11"
