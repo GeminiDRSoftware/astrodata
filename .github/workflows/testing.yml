@@ -4,6 +4,8 @@ name: "Test Suite"
 
 on:
   push:
+    branches:
+      - main
   pull_request:
 
 defaults:
@@ -13,7 +15,6 @@ defaults:
 jobs:
   tests:
     name: "Python ${{ matrix.python-version }} on ${{ matrix.os }}"
-    id: test
     runs-on: "${{ matrix.os }}"
 
     strategy:
@@ -47,9 +48,9 @@ jobs:
           python -m tox -r -- -svv
 
       - name: "Upload coverage data"
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: covdata-${{ matrix.os }}-${{ matrix.python-version }}
+          name: covdata
           path: .coverage.*
 
   coverage:
@@ -58,7 +59,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out the repo"
-        if: steps.build.outcome == "success"
         uses: "actions/checkout@v4"
 
       - name: "Set up Python"
@@ -71,7 +71,7 @@ jobs:
           python -m pip install tox tox-gh-actions
 
       - name: "Download coverage data"
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: covdata
 
