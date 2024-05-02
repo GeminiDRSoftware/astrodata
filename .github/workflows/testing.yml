@@ -56,7 +56,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Check out the repo"
-        if: steps.build.outcome == "success"
         uses: "actions/checkout@v4"
 
       - name: "Set up Python"
