@@ -1,4 +1,3 @@
-import itertools
 import math
 import os
 
@@ -7,14 +6,12 @@ import pytest
 import numpy as np
 from numpy.testing import assert_allclose
 
-import astropy.coordinates as coord
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.modeling import models
 from astropy.wcs import WCS
-from astropy.io import fits
 
-from gwcs import coordinate_frames as cf, wcs
+from gwcs import coordinate_frames as cf
 from gwcs.wcs import WCS as gWCS
 
 from astrodata import wcs as adwcs
@@ -65,7 +62,6 @@ def test_calculate_affine_matrices(angle, scale, xoffset, yoffset):
 
 
 # TODO
-@pytest.mark.skip(reason="WCS unused axes problem")
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_reading_and_writing_sliced_image(F2_IMAGE, tmp_path):
@@ -267,140 +263,3 @@ def test_loglinear_axis(NIRI_IMAGE):
     ad.write("test.fits", overwrite=True)
     ad2 = astrodata.from_file("test.fits")
     assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
-
-
-@pytest.fixture
-def random_wcs_and_header():
-    # Construct a gwcs object with random parameters
-    # This follows the guide in the gwcs documentation
-    # http://gg.gg/docs-gwcs-obj-ex
-    pixelshift = models.Shift(-500) & models.Shift(-500)
-
-    # Scale by 0.1 arcsec/pixel
-    pixelscale = models.Scale(0.1 / 3600.0) & models.Scale(0.1 / 3600.0)
-    tangent_projection = models.Pix2Sky_TAN()
-    celestial_rotation = models.RotateNative2Celestial(30.0, 45.0, 180.0)
-
-    det2sky = pixelshift | pixelscale | tangent_projection | celestial_rotation
-
-    detector_frame = cf.Frame2D(
-        name="detector",
-        axes_names=("x", "y"),
-        unit=(u.pix, u.pix),
-    )
-
-    sky_frame = cf.CelestialFrame(
-        reference_frame=coord.ICRS(),
-        name="icrs",
-        unit=(u.deg, u.deg),
-    )
-
-    wcsobj = wcs.WCS([(detector_frame, det2sky), (sky_frame, None)])
-    wcsobj.bounding_box = ((-2048, 2047), (-2048, 2047))
-
-    # Create a FITS header from the WCS object
-    header = wcsobj.to_fits()[0]
-
-    # Create astrodata-specific header entries
-    for i in range(1, wcsobj.pixel_n_dim + 1):
-        for j in range(1, wcsobj.world_n_dim + 1):
-            header[f"CD{i}_{j}"] = 0.0
-
-    header["WCSDIM"] = len(wcsobj.output_frame.axes_names)
-
-    return wcsobj, header
-
-
-@pytest.mark.skip(reason="Not working")
-def test_fitswcs_to_gwcs(random_wcs_and_header):
-    gwcs_obj, header = random_wcs_and_header
-    new_gwcs = adwcs.fitswcs_to_gwcs(header, raise_errors=True)
-
-    assert new_gwcs.input_frame.name == "pixels"
-    assert new_gwcs.output_frame.name == "world"
-
-    # Check that the two gWCS objects are equivalent
-    sample = list(itertools.product(range(-1000, 1001), repeat=2))
-    rng = np.random.default_rng(0)
-    rng.shuffle(sample)
-    sample = sample[:1000] + [(0, 0)]
-    for x, y in sample:
-        assert_allclose(
-            gwcs_obj(x, y),
-            new_gwcs(x, y),
-            atol=1e-9,
-        )
-
-        # Round-trip test
-        assert_allclose(
-            new_gwcs.numerical_inverse(*new_gwcs(x, y)),
-            (x, y),
-            atol=1e-9,
-        )
-
-
-def test_fitswcs_to_gwcs_raise_errors():
-    err_msg = "Expected a FITS Header, dict, or NDData object"
-
-    with pytest.raises(TypeError, match=err_msg):
-        adwcs.fitswcs_to_gwcs("blah", raise_errors=True)
-
-
-@pytest.mark.skip(reason="Not working")
-def test_gwcs_to_fits(random_wcs_and_header):
-    gwcs_obj, header = random_wcs_and_header
-
-    # Need to attach the gwcs to a dummy primary header unit to use the
-    # gWCS to FITS conversion
-    phu = fits.PrimaryHDU()
-    phu.data = np.zeros((2048, 2048))
-    # Add a few features to the data
-    phu.data += np.zeros((2048, 2048)) + np.arange(2048)[:, np.newaxis]
-
-    ndd = astrodata.create(phu)
-    ndd.is_single = True
-    ndd.wcs = gwcs_obj
-
-    new_header = adwcs.gwcs_to_fits(ndd)
-
-    # Check that the two FITS headers are equivalent
-    header_dict = dict(header)
-
-    different_keys = {k for k in new_header if k not in header_dict}
-    assert not different_keys, f"Different keys: {different_keys}"
-
-    different_vals = {
-        k: (v1, header_dict[k])
-        for (k, v1) in new_header.items()
-        if v1 != header_dict[k]
-    }
-
-    # TODO: Ignoring some values calculated by astrodata (e.g., from the affine
-    # matrices) for now. Those are tested elsewhere, but it would be good to
-    # consolidate it here too.
-    ignore_keys = {"CRVAL1", "CRVAL2", "CD1_1", "CD1_2", "CD2_1", "CD2_2"}
-    different_vals = {
-        k: v for k, v in different_vals.items() if k not in ignore_keys
-    }
-
-    assert not different_vals, f"Different values: {different_vals}"
-
-    # Check that the WCS object can be reconstructed from the FITS header
-    new_gwcs = adwcs.fitswcs_to_gwcs(new_header)
-    sample = list(itertools.product(range(-1000, 1001), repeat=2))
-    rng = np.random.default_rng(0)
-    rng.shuffle(sample)
-    sample = sample[:1000] + [(0, 0)]
-    for x, y in sample:
-        assert_allclose(
-            gwcs_obj(x, y),
-            new_gwcs(x, y),
-            atol=1e-9,
-        )
-
-        # Round-trip test
-        assert_allclose(
-            new_gwcs.numerical_inverse(*new_gwcs(x, y)),
-            (x, y),
-            atol=1e-9,
-        )

@@ -90,7 +90,7 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
     try:
         transform = make_fitswcs_transform(input_data)
 
-    except (TypeError, ValueError) as err:
+    except (IndexError, TypeError, ValueError) as err:
         if not raise_errors:
             logging.warning(
                 "Could not create gWCS: %s: %s",
@@ -677,19 +677,17 @@ def read_wcs_from_header(header):
 
     # Hack to deal with non-FITS-compliant data where one axis is ignored
     unspecified_pixel_axes = [
-        axis for axis, unused in enumerate(np.all(cd == 0, axis=1)) if unused
+        axis for axis, unused in enumerate(np.all(cd == 0, axis=0)) if unused
     ]
 
     if unspecified_pixel_axes:
         unused_world_axes = [
             axis
-            for axis, unused in enumerate(np.all(cd == 0, axis=0))
+            for axis, unused in enumerate(np.all(cd == 0, axis=1))
             if unused
         ]
 
-        unused_world_axes += list(
-            range(wcsaxes, wcsaxes + len(unspecified_pixel_axes))
-        )
+        unused_world_axes += [wcsaxes - 1] * len(unspecified_pixel_axes)
 
         for pixel_axis, world_axis in zip(
             unspecified_pixel_axes, unused_world_axes
@@ -733,8 +731,7 @@ def get_axes(header):
     spec_inmap = []
     unknown = []
     skysystems = np.array(list(sky_pairs.values())).flatten()
-    for ax in ctype:
-        ind = ctype.index(ax)
+    for ind, ax in enumerate(ctype):
         if ax in specsystems:
             spec_inmap.append(ind)
         elif ax in skysystems:
