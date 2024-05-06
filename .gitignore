@@ -181,3 +181,6 @@ test.fits
 
 # Ruff cache
 .ruff_cache/
+
+# scratch directory
+.scratch/
