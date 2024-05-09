@@ -17,7 +17,7 @@ repos:
     -   id: forbid-submodules
     -   id: no-commit-to-branch
         args:
-        - --branch=master
+        - --branch=main
         - --pattern="release/*"
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
