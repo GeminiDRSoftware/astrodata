@@ -442,16 +442,20 @@ def download_from_archive(
     root_cache_path = os.getenv(env_var)
 
     if root_cache_path is None:
-        root_cache_path = os.path.join(os.getcwd(), "_test_cache")
-        warnings.warn(
-            f"Environment variable not set: {env_var}, writing "
-            f"to {root_cache_path}. To suppress this warning, set "
-            f"the environment variable {env_var} to the desired path "
-            f"for the testing cache."
-        )
+        if path is not None:
+            root_cache_path = os.path.expanduser(path)
 
-        # This is cleaned up once the program finishes.
-        os.environ[env_var] = str(root_cache_path)
+        else:
+            root_cache_path = os.path.join(os.getcwd(), "_test_cache")
+            warnings.warn(
+                f"Environment variable not set: {env_var}, writing "
+                f"to {root_cache_path}. To suppress this warning, set "
+                f"the environment variable {env_var} to the desired path "
+                f"for the testing cache."
+            )
+
+            # This is cleaned up once the program finishes.
+            os.environ[env_var] = str(root_cache_path)
 
     root_cache_path = os.path.expanduser(root_cache_path)
 
