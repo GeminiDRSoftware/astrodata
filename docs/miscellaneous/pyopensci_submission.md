@@ -1,17 +1,29 @@
 # Draft PyOpenScience submission (astropy affiliation)
 
 Submitting Author: D.J. Teal (@teald)
+
 All current maintainers: @teald
+
 Package Name: astrodata
+
 One-Line Description of Package: Common interface for astronomical data products.
+
 Repository Link: [https://github.com/GeminiDRSoftware/astrodata](https://github.com/GeminiDRSoftware/astrodata)
+
 Version submitted: 2.9.2
+
 Editor: TBD
+
 Reviewer 1: TBD
+
 Reviewer 2: TBD
+
 Archive: TBD
+
 JOSS DOI: TBD
+
 Version accepted: TBD
+
 Date accepted (month/day/year): TBD
 
 ---
