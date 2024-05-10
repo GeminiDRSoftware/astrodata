@@ -52,6 +52,13 @@ can be installed using `pip`:
 pip install astrodata
 ```
 
+Documentation
+-------------
+
+Documentation for ``astrodata`` is available on our [GitHub pages site][astrodata docs]. This documentation includes a
+user and programmer's guide, as well as a full API reference.
+
+
 Usage
 -----
 
@@ -79,13 +86,6 @@ path of the file (as it does for `astropy.io.fits` objects).
 
 `astrodata` is designed to be extensible, so you can add your own methods to
 analyze and process data based on your specific needs and use cases.
-
-Documentation
--------------
-
-Documentation for ``astrodata`` is available on our [GitHub pages site][astrodata docs]. This documentation includes a
-user and programmer's guide, as well as a full API reference.
-
 
 Installing development dependencies
 -----------------------------------
