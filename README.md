@@ -19,6 +19,8 @@
 
 ![Documentation build status badge][docs build badge]
 
+[![PyPI version](https://badge.fury.io/py/astrodata.svg)](https://badge.fury.io/py/astrodata)
+
 ![pypi packaging status badge][pypi packaging badge]
 
 Making astronomical data consistent and approachable
