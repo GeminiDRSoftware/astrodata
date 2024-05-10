@@ -22,7 +22,7 @@ For example, the following function defines a tag called "RAW"
 
     from astrodata import TagSet, astro_data_tag
 
-.. doctest::
+.. code-block:: python
 
     class RawAstroData(AstroData):
         @astro_data_tag
@@ -35,7 +35,8 @@ Now, if we call |open| on a file that has a PROCTYPE keyword set to "RAW", the
 |AstroData| object will have the "`RAW`" tag
 
 
-.. doctest::
+.. code-block:: python
+
     >>> ad = astrodata.open('somefile.fits')
     >>> ad.tags
     {'RAW'}
@@ -112,7 +113,7 @@ calibrations.
 
 The tags can be used when coding.  For example
 
-.. doctest::
+.. code-block:: python
 
     >>> if 'GMOS' in ad.tags:
     ...    print('I am GMOS')
@@ -121,14 +122,12 @@ The tags can be used when coding.  For example
 
 And
 
-.. doctest::
+.. code-block:: python
 
     >>> if {'IMAGE', 'GMOS'}.issubset(ad.tags):
     ...   print('I am a GMOS Image.')
 
-.. todo::
-
-    Below needs to be ported back to DRAGONS documentation since it is a
+.. todo:: Below needs to be ported back to DRAGONS documentation since it is a
     part of gempy (I think, definitely a part of DRAGONS no matter what)
 
     Using typewalk
@@ -195,7 +194,7 @@ The content of this section is based on the example file
 
     >>> from astrodata import AstroData, TagSet, astro_data_tag
 
-.. doctest::
+.. code-block:: python
 
     >>> class MyAstroData(AstroData):
     ...     @astro_data_tag
@@ -216,7 +215,8 @@ all known |AstroData| types to construct the appropriate instance.
 |AstroData| only knows of *registered* |AstroData| class types. To register our
 class, we use |factory|:
 
-.. doctest::
+.. code-block:: python
+
     >>> import astrodata.factory as factory
     >>> factory.addClass(MyAstroData)
     >>> print(factory.getClasses())
@@ -225,12 +225,12 @@ class, we use |factory|:
 We now see our class is registered, and can use |open| to open a file that has
 the identifying tag:
 
-.. doctest::
+.. code-block:: python
 
     # Fake FITS file with a MYTAG keyword
     >>> ad = astrodata.open('mytag.fits')
     >>> ad.tags
-    {'MYTAG'}
+    # {'MYTAG'}
 
     # Create one from scratch with the MYTAG keyword
     >>> from astrodata import create_from_scratch
@@ -238,9 +238,9 @@ the identifying tag:
     >>> phu = fits.PrimaryHDU(header={'MYTAG': True}).header
     >>> ad = create_from_scratch(phu)
     >>> print(ad.tags)
-    {'MYTAG'}
+    # {'MYTAG'}
     >>> type(ad)
-    <class 'astrodata.ad_tag_example_user.MyAstroData'>
+    # <class 'astrodata.ad_tag_example_user.MyAstroData'>
 
 
 The tag function looks at the provided headers and if the keyword "OBSTYPE" is

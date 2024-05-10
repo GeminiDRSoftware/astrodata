@@ -25,7 +25,7 @@ Accessing pixel data can be done with the ``.data`` attribute.  The
 ``.data`` attribute is a NumPy |NDArray|.  The ``.data`` attribute is
 a property of the |NDAstroData| object, and it is the pixel data itself.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.from_file(some_fits_file_with_extensions)
     >>> the_data = ad[1].data
@@ -88,7 +88,7 @@ Simple operations
 -----------------
 Here are a few examples of arithmetics on |AstroData| objects.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.from_file(some_fits_file_with_extensions)
 
@@ -132,7 +132,7 @@ operations.
 When a descriptor returns a list because the value changes for each
 extension, a for-loop is needed
 
-.. doctest::
+.. code-block:: python
 
     >>> for i, (ext, gain) in enumerate(zip(ad, ad.gain())):
     ...     ext.multiply(gain)
@@ -151,7 +151,7 @@ extension, a for-loop is needed
 If you want to do the above but on a new object, leaving the original unchanged,
 use ``deepcopy`` first.
 
-.. doctest::
+.. code-block:: python
 
     >>> from copy import deepcopy
     >>> adcopy = deepcopy(ad)
@@ -179,7 +179,7 @@ there is no operator precedence when that is done.  For arithmetics that
 involve more than one operation, it is probably safer to use the normal
 Python operator syntax.  Here is a little example to illustrate the difference.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad_copy = deepcopy(ad)
     >>> ad_copy.add(5).multiply(10).subtract(5)
@@ -194,7 +194,7 @@ the other from left to right.  This also means that the original is modified.
 
 This example applies the expected operator precedence
 
-.. doctest::
+.. code-block:: python
 
     >>> ad_copy = deepcopy(ad)
     >>> ad_copy = ad_copy + ad_copy * 3 - 40.
@@ -207,7 +207,7 @@ If you need a copy, leaving the original untouched, which is sometimes useful
 you can use ``deepcopy`` or just use the normal operator and assign to a new
 variable.
 
-.. doctest::
+.. code-block:: python
 
     >>> adnew = ad + ad * 3 - 40.
     >>> print(adnew[0].data[50, 50], ad[0].data[50, 50])
@@ -229,7 +229,7 @@ The data is still in ADU, therefore the poisson noise as variance is
 ``signal / gain``.   We want to set the variance for each of the pixel
 extensions.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.from_file(some_fits_file_with_extensions)
     >>> for (extension, gain) in zip(ad, ad.gain()):
@@ -252,10 +252,9 @@ object when doing arithmetics.
 
 Let's look into an example.
 
-.. todo::
-    Update this example
+.. todo:: [TESTING]
 
-.. doctest::
+.. code-block:: python
 
     >>> #     output = x * x
     >>> # var_output = var * x^2 + var * x^2
@@ -271,8 +270,7 @@ Let's look into an example.
     >>> adout[1].variance[50,50]
     0.7065
 
-.. todo::
-    make an example for the below warning
+.. todo:: make an example for the below warning
 
 .. warning::
     Variance must be implemented, either by setting it (above) or by including
@@ -326,23 +324,20 @@ stack will be assigned a value of 5 (0000101) for that pixel.
 These bitmasks will work like any other NumPy True/False mask.  There is a
 usage example below using the mask.
 
-The mask can be accessed as follows:
+The mask can be accessed as follows (using a |DRAGONS| example):
 
-.. todo::
-    Need to figure out a non-DRAGONS example here that makes sense.
+.. code-block:: python
 
-.. doctest::
+    >>> ad = astrodata.open(some_fits_file_with_mask)
+    >>> ad.info() # DOCTEST: +NORMALIZE_WHITESPACE
+    Filename: /.../some_file.fits
+    Tags: _DOCTEST_DATA
+    <BLANKLINE>
+    Pixels Extensions
+    Index  Content  Type         Dimensions   Format
+    [ 0]   science  NDAstroData  (2048, 2048) float64
 
-    # >>> ad = astrodata.open(some_fits_file_with_mask)
-    # >>> ad.info() # DOCTEST: +NORMALIZE_WHITESPACE
-    # Filename: /.../some_file.fits
-    # Tags: _DOCTEST_DATA
-    # <BLANKLINE>
-    # Pixels Extensions
-    # Index  Content  Type         Dimensions   Format
-    # [ 0]   science  NDAstroData  (2048, 2048) float64
-
-    # >>> ad[2].mask
+    >>> ad[2].mask
 
 Display
 =======
@@ -376,7 +371,7 @@ ndarray
 The data are contained in NumPy |NDArray| objects.  Any tools that works
 on an |NDArray| can be used with Astrodata.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open(some_fits_file_with_extensions)
 
@@ -404,8 +399,7 @@ Here, the file is a raw dataset, fresh off the telescope.  No operations has
 been done on the pixels yet.  The data type of Gemini raw datasets is always
 "Unsigned integer (0 to 65535)", ``uint16``.
 
-.. todo::
-    What's the proper way of doing this in numpy without an operation?
+.. todo:: What's the proper way of doing this in numpy without an operation?
 
 .. warning::
     Beware that doing arithmetic on ``uint16`` can lead to unexpected
@@ -415,7 +409,9 @@ been done on the pixels yet.  The data type of Gemini raw datasets is always
     value.  A workaround, and a safety net, is to multiply the array by
     ``1.0`` to force the conversion to a ``float64``.
 
-    .. doctest::
+    .. todo:: [TESTING]
+
+    .. code-block:: python
 
         >>> a = np.array([65535], dtype='uint16')
         >>> a + a
@@ -431,7 +427,7 @@ Simple Numpy Statistics
 A lot of functions and methods are available in NumPy to probe the array,
 too many to cover here, but here are a couple examples.
 
-.. doctest::
+.. code-block:: python
 
     >>> import numpy as np
 
@@ -468,7 +464,7 @@ standard deviation.
 Before Astropy, it was possible to do something like that with only NumPy
 tools, like in this example
 
-.. doctest::
+.. code-block:: python
 
     >>> stddev = data.std()
     >>> mean = data.mean()
@@ -499,7 +495,7 @@ For something more robust, there is an Astropy function that can help, in
 particular by adding an iterative process to the calculation.  Here is
 how it is done
 
-.. doctest::
+.. code-block:: python
 
     >>> from astropy.stats import sigma_clip
 
@@ -517,38 +513,36 @@ information.
 
 The example below applies a gaussian filter to the pixel array.
 
-.. todo::
-    Need to revisit this example
+.. todo:: [TESTING]
 
-.. doctest::
+.. code-block:: python
 
-    # >>> from scipy.ndimage import filters
-    # >>> import imexam
+    >>> from scipy.ndimage import filters
+    >>> import imexam
 
-    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
-    # >>> data = ad[0].data
+    >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
+    >>> data = ad[0].data
 
-    # >>> # We need to prepare an array of the same size and shape as
-    # >>> # the data array.  The result will be put in there.
-    # >>> convolved_data = np.zeros(data.size).reshape(data.shape)
+    >>> # We need to prepare an array of the same size and shape as
+    >>> # the data array.  The result will be put in there.
+    >>> convolved_data = np.zeros(data.size).reshape(data.shape)
 
-    # >>> # We now apply the convolution filter.
-    # >>> sigma = 10.
-    # >>> filters.gaussian_filter(data, sigma, output=convolved_data)
+    >>> # We now apply the convolution filter.
+    >>> sigma = 10.
+    >>> filters.gaussian_filter(data, sigma, output=convolved_data)
 
-    # >>> # Let's visually compare the convolved image with the original
-    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
-    # >>> ds9.view(data)
-    # >>> ds9.scale('zscale')
-    # >>> ds9.frame(2)
-    # >>> ds9.view(convolved_data)
-    # >>> ds9.scale('zscale')
-    # >>> ds9.blink()
-    # >>> # When you are convinced it's been convolved, stop the blinking.
-    # >>> ds9.blink(blink=False)
+    >>> # Let's visually compare the convolved image with the original
+    >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
+    >>> ds9.view(data)
+    >>> ds9.scale('zscale')
+    >>> ds9.frame(2)
+    >>> ds9.view(convolved_data)
+    >>> ds9.scale('zscale')
+    >>> ds9.blink()
+    >>> # When you are convinced it's been convolved, stop the blinking.
+    >>> ds9.blink(blink=False)
 
-.. todo::
-    what is meant by "this particular kernel"? leaving this unedited on
+.. todo:: What is meant by "this particular kernel"? leaving this unedited on
     the first pass for clarity later.
 
 Note that there is an Astropy way to do this convolution, with tools in
@@ -573,8 +567,7 @@ the three big projects we have featured in this section.
 * SciPy: `www.scipy.org <http://www.scipy.org>`_
 * Astropy:  `www.astropy.org <http://www.astropy.org>`_
 
-.. todo::
-    This should be its own page, probably
+.. todo:: This should be its own page, probably
 
 Using the Astrodata Data Quality Plane
 ======================================
@@ -586,21 +579,16 @@ bands between the three CCDs that represent the physical gap between the
 CCDs.  Let us have a look at the pixels to have a better sense of the
 data
 
-.. todo::
-    Need to revisit this example
+.. todo:: Need to revisit this example, remove imexam
 
-.. doctest::
+.. code-block:: python
 
-    # >>> ad = astrodata.open('../playdata/N20170521S0925_forStack.fits')
-    # >>> import imexam
-    # >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
+    >>> ad = astrodata.open(path_to_data)
+    >>> import imexam
+    >>> ds9 = imexam.connect(list(imexam.list_active_ds9())[0])
 
-    # >>> ds9.view(ad[0].data)
-    # >>> ds9.scale('zscale')
-
-.. todo::
-    Was this supposed to have an associated image in the documentation?
-    does it exist in the docs? (Nope, need to generate it probably)
+    >>> ds9.view(ad[0].data)
+    >>> ds9.scale('zscale')
 
 See how the right and left portions of the frame are not exposed to the sky,
 and the 45 degree angle cuts of the four corners.  The chip gaps too.  If we
@@ -609,13 +597,12 @@ include those unilluminated areas.  We would want to mask them out.
 
 Let us have a look at the mask associated with that image
 
-.. todo::
-    Need to revisit this example
+.. todo:: Need to revisit this example
 
-.. doctest::
+.. code-block:: python
 
-    # >>> ds9.view(ad[0].mask)
-    # >>> ds9.scale('zscale')
+    >>> ds9.view(ad[0].mask)
+    >>> ds9.scale('zscale')
 
 The bad sections are all white (pixel value > 0).  There are even some
 illuminated pixels that have been marked as bad for a reason or another.
@@ -626,7 +613,7 @@ just do an average.  This is just illustrative.  We show various ways to
 accomplish the task; choose the one that best suits your need or that you
 find most readable.
 
-.. doctest::
+.. code-block:: python
 
     >>> # For clarity...
     >>> ad = astrodata.from_file(some_fits_file_with_mask)
@@ -647,7 +634,7 @@ find most readable.
 The "long" form with ``np.ma.masked_*`` is useful if you are planning to do
 more than one operation on the masked array.  For example
 
-.. doctest::
+.. code-block:: python
 
     >>> clean_data = np.ma.masked_array(data, mask)
     >>> clean_data.mean()
@@ -681,7 +668,7 @@ Basic Statistics on Section
 
 In this example, we do simple statistics on a section of the image.
 
-.. doctest::
+.. code-block:: python
 
     >>> import numpy as np
 
@@ -708,14 +695,13 @@ In this example, we do simple statistics on a section of the image.
     ... %.2f  %.2f   %.2f    %.2f  %.2f' % \
     ... (mean, median, stddev, minimum, maximum))
 
-.. todo::
-    implement a median method if it's that important
+.. todo:: implement a median method if it's that important
+
     Have you noticed that the median is calculated with a function rather
     than a method?  This is simply because the |NDArray| object does not
     have a method to calculate the median.
 
-.. todo::
-    turn below example into a full example file
+.. todo:: turn below example into a full example file
 
 Example - Overscan Subtraction with Trimming
 --------------------------------------------
@@ -732,7 +718,7 @@ To make the example more complete, and to show that when the pixel data
 array is trimmed, the variance (and mask) arrays are also trimmed, let us
 add a variance plane to our raw data frame.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
 

@@ -96,7 +96,8 @@ A quick example
 Here is a quick example of how to use |astrodata| to open a file and access
 its metadata using an |AstroData| object
 
-.. doctest::
+.. code-block:: python
+
     >>> import astrodata
     # Create a fake file to use.
     >>> from astrodata.testing import create_test_file

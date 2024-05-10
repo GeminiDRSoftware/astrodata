@@ -82,7 +82,8 @@ One can already slice |NDAstroData| objects as with |NDData|, as normal Python a
 
   import astrodata
 
-.. doctest::
+.. code-block:: python
+
       >>> ad = astrodata.from_file(some_fits_file)
       >>> ad.shape
       [(2048, 2048)]
@@ -131,20 +132,11 @@ whenever the array is accessed.
 attributes during arithmetic operations from ``logical_or`` to ``bitwise_or``,
 since the individual bits in the mask have separate meanings.
 
-.. todo::
-   This section may shine light on the WCS issues I've encountered
-   writing slicing tests, so I'm leaving it intact for now.
-
 The way slicing affects the ``wcs`` is also changed since DRAGONS regularly
 uses the callable nature of ``gWCS`` objects and this is broken by the standard
 slicing method.
 
-
-.. Is this tested? I don't remember seeing any tests that check if these
-   attributes are automatically sliced in teh same way/properly.
-
-.. todo::
-   Check source for where this feature is implemented and write a test
+.. todo:: Check source for where this feature is implemented and write a test
    for it.
 
 Finally, the additional image planes and tables stored in the ``meta`` dict
