@@ -45,7 +45,8 @@ header content.
 
 .. todo:: replace EXAMPLE FILE with the actual example
 
-.. doctest::
+.. code-block:: python
+
     >>> import astrodata
     >>> ad = astrodata.open(EXAMPLE_FILE)
     >>> type(ad)
@@ -54,7 +55,8 @@ header content.
 ``ad`` has loaded in the file's header and parsed the keys present. Header access is done
 through the ``.hdr`` attribute.
 
-.. doctest::
+.. code-block:: python
+
     >>> ad.hdr['CCDSEC']
     ['[1:512,1:4224]', '[513:1024,1:4224]', '[1025:1536,1:4224]', '[1537:2048,1:4224]']
 
@@ -68,7 +70,8 @@ file name would be set to ``None``.
 
 .. todo:: Update when updating the example
 
-.. doctest::
+.. code-block:: python
+
     >>> ad.path
     '../playdata/N20170609S0154.fits'
     >>> ad.filename
@@ -93,7 +96,8 @@ To access pixel data, the list index and the ``.data`` attribute are used. That
 returns a :class:`numpy.ndarray`. The list of |NDAstroData| is zero-indexed.
 *Extension number 1 in a MEF is index 0 in an |AstroData| object*.
 
-.. doctest::
+.. code-block:: python
+
     >>> ad = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
     >>> data = ad[0].data
     >>> type(data)
@@ -122,7 +126,8 @@ index in the list, unlike in a MEF. They are attached to the pixel data,
 packaged together by the |NDAstroData| object. They are represented as
 :class:`numpy.ndarray` just like the pixel data
 
-.. doctest::
+.. code-block:: python
+
     >>> var = ad[0].variance
     >>> dq = ad[0].mask
 
@@ -140,7 +145,7 @@ addition. No indexing will be required to access it.  In the example below, one
 ``OBJCAT`` is associated with each extension, while the ``REFCAT`` has a global
 scope
 
-.. doctest::
+.. code-block:: python
 
     >>> ad.info()
     Filename: ../playdata/N20170609S0154_varAdded.fits
@@ -177,7 +182,7 @@ scope
 
 The tables are stored internally as :class:`astropy.table.Table` objects.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad[0].OBJCAT
     <Table length=6>
@@ -214,7 +219,7 @@ preferred.  More detailed information on Headers is covered in  the section
 
 Using Descriptors
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
     >>> ad.filter_name()
@@ -224,7 +229,7 @@ Using Descriptors
 
 Using direct header access
 
-.. doctest::
+.. code-block:: python
 
     >>> ad.phu['FILTER1']
     'open1-6'
@@ -233,7 +238,7 @@ Using direct header access
 
 Accessing the extension headers
 
-.. doctest::
+.. code-block:: python
 
     >>> ad.hdr['CCDSEC']
     ['[1:512,1:4224]', '[513:1024,1:4224]', '[1025:1536,1:4224]', '[1537:2048,1:4224]']
@@ -258,7 +263,7 @@ Here is an example appending a whole AstroData extension, with pixel data,
 variance, mask and tables. While these are treated as separate extensions in
 the MEF file, they are all packaged together in the |AstroData| object.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
     >>> advar = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
@@ -304,7 +309,7 @@ only when the file is written to disk.
 In this next example, we are appending only the pixel data, leaving behind the other
 associated data. One can attach the headers too, like we do here.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
     >>> advar = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
@@ -333,7 +338,7 @@ Removing an extension or a part of an extension is straightforward. The
 Python command :func:`del` is used on the item to remove. Below are a few
 examples, but first let us load a file
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open('../playdata/N20170609S0154_varAdded.fits')
     >>> ad.info()
@@ -343,23 +348,26 @@ after every removal to see how the structure has changed.
 
 Deleting a whole |AstroData| extension, the fourth one
 
-.. doctest::
+.. code-block:: python
 
     >>> del ad[3]
 
 Deleting only the variance array from the second extension
 
-.. doctest::
+.. code-block:: python
+
     >>> ad[1].variance = None
 
 Deleting a table associated with the first extension
 
-.. doctest::
+.. code-block:: python
+
     >>> del ad[0].OBJCAT
 
 Deleting a global table, not attached to a specific extension
 
-.. doctest::
+.. code-block:: python
+
     >>> del ad.REFCAT
 
 
@@ -375,7 +383,7 @@ Writing to a new file
 There are various ways to define the destination for the new FITS file.
 The most common and natural way is
 
-.. doctest::
+.. code-block:: python
 
     >>> ad.write('new154.fits')
     # If the file already exists, an error will be raised unless overwrite=True
@@ -391,7 +399,7 @@ Note that ``ad.filename`` and ``ad.path`` have not changed, we have just
 written to the new file, the |AstroData| object is in no way associated with
 that new file.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad.path
     '../playdata/N20170609S0154.fits'
@@ -401,7 +409,7 @@ that new file.
 If you want to create that association, the ``ad.filename`` and ``ad.path``
 needs to be modified first.  For example
 
-.. doctest::
+.. code-block:: python
 
     >>> ad.filename = 'new154.fits'
     >>> ad.write(overwrite=True)
@@ -443,14 +451,14 @@ Updating an existing file on disk requires explicitly allowing overwrite.
 
 If you have not written 'new154.fits' to disk yet (from previous section)
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
     >>> ad.write('new154.fits', overwrite=True)
 
 Now let's open 'new154.fits', and write to it
 
-.. doctest::
+.. code-block:: python
 
     >>> adnew = astrodata.open('new154.fits')
     >>> adnew.write(overwrite=True)
@@ -496,7 +504,7 @@ As seen above, a MEF file can be opened with |astrodata|, the |AstroData|
 object can be modified (or not), and then written back to disk under a
 new name.
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
     ... optional modifications here ...
@@ -514,7 +522,7 @@ block of memory.
 
 To create a true independent copy, the ``deepcopy`` utility needs to be used. ::
 
-.. doctest::
+.. code-block:: python
 
     >>> from copy import deepcopy
     >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
@@ -543,7 +551,7 @@ done.
 Create a MEF with basic header and data array set to zeros
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. doctest::
+.. code-block:: python
 
     >>> import numpy as np
     >>> from astropy.io import fits
@@ -580,7 +588,7 @@ Building on the |AstroData| object we created in the previously, we can add a
 new pixel array directly to the slice(s) of the |AstroData| object it should be
 associated with by assigning it as an attribute of the object.
 
-.. doctest::
+.. code-block:: python
 
     >>> extra_data = np.ones((100, 100))
     >>> ad[0].EXTRADATA = extra_data
@@ -604,7 +612,7 @@ a :class:`~astropy.table.Table` ready to be attached to an |AstroData|
 object.  (Warning: we have not created ``my_astropy_table`` therefore the
 example below will not run, though this is how it would be done.)
 
-.. doctest::
+.. code-block:: python
 
     >>> phu = fits.PrimaryHDU()
     >>> ad = astrodata.create(phu)

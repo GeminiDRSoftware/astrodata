@@ -68,18 +68,6 @@ keywords to look at for that instrument.  However, once the concept of "filter"
 is coded as a Descriptor (which happens in |gemini_instruments|), the user only
 needs to call the ``filter_name()`` descriptor to retrieve the information.
 
-.. todo:: I don't know what this is trying to explain. This may be more
-    confusing in the long run, since it's conflating method-like descriptors
-    and attribute-like tags.
-
-    The Descriptors are closely associated with the Astrodata Tags.  In fact,
-    they are implemented in the same |AstroData| class as the tags.  Once
-    the specific |AstroData| class is selected (upon opening the file), all
-    the tags and descriptors for that class are defined.  For example, all the
-    descriptor functions of GMOS data, ie. the functions that map a descriptor
-    concept to the actual header content, are defined in the ``AstroDataGmos``
-    class.
-
 This is all completely transparent to the user.  One simply opens the data
 file and all the descriptors are ready to be used.
 
@@ -90,7 +78,8 @@ file and all the descriptors are ready to be used.
 
     from astrodata import astro_data_descriptor
 
-.. doctest::
+.. code-block:: python
+
     >>> class MyAstroData(astrodata.AstroData):
     ...     @astro_data_descriptor
     ...     def my_descriptor(self):
@@ -112,13 +101,6 @@ file and all the descriptors are ready to be used.
     another class that has descriptors, the new class will have those
     descriptors as well unless they are explicitly overridden.
 
-.. todo:: Need to test this...
-    Most Descriptor names are readily understood, but one can get a short
-    description of what the Descriptor refers to by calling the Python help
-    function.  For example::
-
-        >>> help(ad.airmass)
-        >>> help(ad.filter_name)
 
 Accessing Metadata
 ==================
@@ -132,10 +114,11 @@ to any datasets with an |AstroData| class.
 
 Here are a few examples using Descriptors
 
-.. todo:: REPLACE BELOW EXAMPLE
+.. todo:: [TESTING]
 
-.. doctest::
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
+.. code-block:: python
+
+    >>> ad = astrodata.open(path_to_data)
 
     >>> #--- print a value
     >>> print('The airmass is : ', ad.airmass())
@@ -165,7 +148,7 @@ most useful to observers on their respective telescopes. To avoid confusion,
 check the return value of the descriptor explicitly when you are experimenting with
 new data:
 
-.. testsetup::
+..
     class TestAstroData(astrodata.AstroData):
         @astro_data_descriptor
         def unknown_descriptor(self):
@@ -181,7 +164,7 @@ new data:
 
             return string.split()
 
-.. doctest::
+.. code-block:: python
 
     >>> ad = TestAstroData()
     >>> ad.unknown_descriptor()
@@ -201,13 +184,14 @@ new data:
 Descriptors across multiple extensions
 --------------------------------------
 
-.. todo:: Rewrite this example and accompanying section
 
 The dataset used in this section has 4 extensions.  When the descriptor
 value can be different for each extension, the descriptor will return a
 Python list.
 
-::
+.. todo:: [TESTING]
+
+.. code-block:: python
 
     >>> ad.airmass()
     1.089
@@ -216,7 +200,9 @@ Python list.
     >>> ad.filter_name()
     'open1-6&g_G0301'
 
-Some descriptors accept arguments.  For example::
+Some descriptors accept arguments.  For example
+
+.. code-block:: python
 
     >>> ad.filter_name(pretty=True)
     'g'
@@ -241,10 +227,11 @@ the extension headers are accessed slightly differently.  The attribute
 
 Here are some examples of direct header access
 
-.. todo:: replace example
+.. todo:: [TESTING]
 
-.. doctest::
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
+.. code-block:: python
+
+    >>> ad = astrodata.open(path_to_data)
 
     >>> #--- Get keyword value from the PHU
     >>> ad.phu['AOFOLD']
@@ -264,11 +251,11 @@ Whole Headers
 
 Entire headers can be retrieved as ``fits`` ``Header`` objects
 
-.. todo:: replace example
+.. todo:: [TESTING]
 
-.. doctest::
+.. code-block:: python
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
+    >>> ad = astrodata.open(path_to_data)
     >>> type(ad.phu)
     <class 'astropy.io.fits.header.Header'>
     >>> type(ad[0].hdr)
@@ -277,7 +264,9 @@ Entire headers can be retrieved as ``fits`` ``Header`` objects
 In interactive mode, it is possible to print the headers on the screen as
 follows
 
-.. doctest::
+.. todo:: [TESTING]
+
+.. code-block:: python
 
     >>> ad.phu
     SIMPLE  =                    T / file does conform to FITS standard
@@ -300,13 +289,15 @@ Header cards can be updated, added to, or deleted from the headers.  The PHU
 and the extensions headers are again accessed in a mostly identical way
 with ``phu`` and ``hdr``, respectively.
 
-.. doctest::
+.. todo:: [TESTING]
 
-    >>> ad = astrodata.open('../playdata/N20170609S0154.fits')
+.. code-block:: python
+
+    >>> ad = astrodata.open(path_to_data)
 
 Add and update a keyword, without and with comment
 
-.. doctest::
+.. code-block:: python
 
     >>> ad.phu['NEWKEY'] = 50.
     >>> ad.phu['NEWKEY'] = (30., 'Updated PHU keyword')
@@ -316,7 +307,7 @@ Add and update a keyword, without and with comment
 
 Delete a keyword
 
-.. doctest::
+.. code-block:: python
 
     >>> del ad.phu['NEWKEY']
     >>> del ad[0].hdr['NEWKEY']

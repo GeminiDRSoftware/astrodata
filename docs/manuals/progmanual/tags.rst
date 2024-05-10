@@ -74,8 +74,9 @@ affects our tags, and the algorithm itself, let's follow up with an example take
 from real code (the Gemini-generic and GMOS modules)
 
 .. todo:: need to add a more generic example here
+.. todo:: [TESTING]
 
-::
+.. code-block:: python
 
   # Simple tagset, with only a constant, additive content
   @astro_data_tag
