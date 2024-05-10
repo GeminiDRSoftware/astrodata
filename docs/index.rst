@@ -7,6 +7,7 @@ This is the documentation for astrodata.
    :maxdepth: 1
    :caption: Contents:
 
+   quickstart.rst
    manuals/index
    examples/index
    api_short

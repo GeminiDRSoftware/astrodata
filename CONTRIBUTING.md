@@ -59,4 +59,5 @@ discretion is required or you are having trouble please do not hesitate to
 reach out to one of the core maintainers directly:
 
 ### Maintainers
+
 + Teal (dillon.teal@noirlab.edu)

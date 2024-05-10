@@ -13,3 +13,4 @@ programming with |astrodata|, please visit our |DeveloperGuide|.
 
     generic_examples/index.rst
     gemini_examples/index.rst
+    quickstart/index.rst
