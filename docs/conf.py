@@ -181,10 +181,12 @@ rst_prolog = """
 .. |reduce| replace:: ``reduce``
 .. |astrodata_descriptor| replace:: :func:`~astrodata.astro_data_descriptor`
 .. |factory| replace:: :class:`~astrodata.factory.AstroDataFactory`
+.. |AstroDataFactory| replace:: :class:`~astrodata.factory.AstroDataFactory`
 
 .. role:: raw-html(raw)
    :format: html
 
+.. |Poetry| replace:: `Poetry <https://python-poetry.org/>`__
 .. |DRAGONS| replace:: `DRAGONS <https://dragons.readthedocs.io/>`__
 .. |RSProgManual| replace:: `Recipe System Programmer Manual <http://dragons-recipe-system-programmers-manual.readthedocs.io/en/{v}/>`__
 .. |RSUserManual| replace:: `Recipe System User Manual <http://dragons-recipe-system-users-manual.readthedocs.io/en/{v}/>`__

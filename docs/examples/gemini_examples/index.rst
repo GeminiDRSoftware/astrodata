@@ -3,7 +3,7 @@
 Gemini Examples
 ===============
 
-These examples use the |Gemini|'s |DRAGONS| data reduction pipeline. They use
+These examples use the |Gemini| |DRAGONS| data reduction pipeline. They use
 external code to perform operations outside of |astrodata|'s capabilities.
 
 Specifically, |DRAGONS| extends |AstroData| in its |gemini_instruments|
