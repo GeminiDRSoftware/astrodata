@@ -31,7 +31,8 @@ and to register the new class with the :func:`~astrodata.from_file` function.
 Several examples may be found throughout the documentation (see |Examples|). A
 simple example is shown below as a complete, executable introduction.
 
-.. doctest::
+.. code-block:: python
+
     >>> # Defining an AstroData subclass
     >>> from astrodata import (
     ...     AstroData,
