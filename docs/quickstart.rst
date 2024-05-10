@@ -339,6 +339,14 @@ You'll see that our ``airmass`` descriptor is available for the
 Advanced Usage
 ==============
 
+This is a very basic introduction to |astrodata|, and there are many more
+features available. For examples of usage in practice, check out |DRAGONS|'s
+|gemini_instruments| package.
+
+If you plan on developing |astrodata|, or you'd like to use the same
+development environment |astrodata| uses, you can install |astrodata| from
+with development dependencies.
+
 Installing |astrodata| with developer dependencies
 ++++++++++++++++++++++++++++++++++++++++++++++++++
 
