@@ -7,21 +7,26 @@
 [coverage badge]: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teald/d2f3af2a279efc1f6e90d457a3c50e47/raw/covbadge.json
 [docs build badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/documentation.yml/badge.svg
 [pypi packaging badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/publish_pypi.yml/badge.svg
+[pypi package version badge]: https://badge.fury.io/py/astrodata.svg
 [test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/testing.yml/badge.svg
 
 
 `astrodata`
 =============
 
-![A badge displaying the coverage level of this repository.][coverage badge]
+<img align="left" src="docs/logo.png" height=200>
 
-![Tests status][test status badge]
+### Tests
+![A badge displaying the testing coverage percentage of this repository.][coverage badge]
+![Testing status badge][test status badge]
 
+### Building & Publishing
 ![Documentation build status badge][docs build badge]
-
-[![PyPI version](https://badge.fury.io/py/astrodata.svg)](https://badge.fury.io/py/astrodata)
-
+[![PyPI version badge](https://badge.fury.io/py/astrodata.svg)](https://badge.fury.io/py/astrodata)
 ![pypi packaging status badge][pypi packaging badge]
+
+<!-- Clearing the logo for the next header -->
+<br clear="left">
 
 Making astronomical data consistent and approachable
 --------------------------------------------------------------------
