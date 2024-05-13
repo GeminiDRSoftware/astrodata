@@ -14,7 +14,7 @@
 `astrodata`
 =============
 
-<img align="left" src="docs/static/logo.png" height=200
+<img align="left" src="https://github.com/GeminiDRSoftware/astrodata/blob/main/docs/static/logo.png" height=200
 style="padding-right: 10; padding-bottom: 10; border: none;">
 
 ### Tests
