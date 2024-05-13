@@ -1,5 +1,8 @@
 # Purges the camo cache for update purposes, once a day.
+name: Purge caches
+
 on:
+  workflow_dispatch:
   schedule:
     - cron: "1 0 * * *"
 
