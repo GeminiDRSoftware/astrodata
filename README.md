@@ -14,7 +14,7 @@
 `astrodata`
 =============
 
-<img align="left" src="docs/logo.png" height=200>
+<img align="left" src="docs/static/logo.png" height=200>
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
