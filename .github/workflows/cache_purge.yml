@@ -2,10 +2,11 @@
 on:
   schedule:
     - cron: "1 0 * * *"
-    
-  
+
+
 jobs:
-  name: Purge caches
-  steps:
-    - name: Purge camo cache
-    uses: kevincobain2000/action-camo-purge@v1
+  purge-camo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge camo cache
+        uses: kevincobain2000/action-camo-purge@v1
