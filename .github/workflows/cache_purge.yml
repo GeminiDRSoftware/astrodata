@@ -1,0 +1,11 @@
+# Purges the camo cache for update purposes, once a day.
+on:
+  schedule:
+    - cron: "1 0 * * *"
+    
+  
+jobs:
+  name: Purge caches
+  steps:
+    - name: Purge camo cache
+    uses: kevincobain2000/action-camo-purge@v1
