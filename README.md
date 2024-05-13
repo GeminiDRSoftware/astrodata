@@ -78,9 +78,6 @@ from astrodata import AstroData, astro_data_descriptor, factory, from_file
 
 
 class MyData(AstroData):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     @astro_data_descriptor
     def color(self):
         # The color filter used for our image is stored in a few different
