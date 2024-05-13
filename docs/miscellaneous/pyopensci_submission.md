@@ -2,7 +2,7 @@
 
 Submitting Author: D.J. Teal (@teald)
 
-All current maintainers: @teald
+All current maintainers: @teald, @chris-simpson, @jehturner
 
 Package Name: astrodata
 
@@ -35,10 +35,9 @@ Date accepted (month/day/year): TBD
 
 ## Description
 
-- Include a brief paragraph describing what your package does:
-
 `astrodata` is a package meant to facilitate developing common interfaces for astronomical data formats. Often, specific instruments and models will have different ways of storing their data, including metadata. `astrodata` offers a single interface that uses metadata to resolve these disparate file formats, while enabling common operations and values to share the same interface.
 
+`astrodata` was previously a core module within the [DRAGONS](https://github.com/GeminiDRSoftware/DRAGONS) package, and has been used for the various instruments that exists at the Gemini Observatory for some time. It's proved useful in consolidating differences in metadata and data formatting between instruments that produce FITS files, which is a common pattern in astronomical data handling. Alongside automating interface selection based on these differences, it also comes with helpful operators and methods out-of-the-box, based on `astropy`'s `NDData` class.
 
 ## Scope
 
@@ -80,6 +79,7 @@ existing community please check below:
   - Are there other Python packages that accomplish the same thing? If so, how does yours differ?
 
     There are no specific packages we are aware of. There is some overlap with the [`gwcs`](https://github.com/spacetelescope/gwcs) package and our `wcs` module, but we are planning to collaborate with that package for future development and to reconsolidate those overlaps.
+
 
   - If you made a pre-submission enquiry, please paste the link to the corresponding issue, forum post, or other discussion, or `@tag` the editor you contacted:
 
