@@ -78,7 +78,7 @@ existing community please check below:
 
   - Are there other Python packages that accomplish the same thing? If so, how does yours differ?
 
-    There are no specific packages we are aware of. There is some overlap with the [`gwcs`](https://github.com/spacetelescope/gwcs) package and our `wcs` module, but we are planning to collaborate with that package for future development and to reconsolidate those overlaps. Astrodata offers an interface based on NDData, but allowing more than one instance to be mapped to the same file (eg. to multiple sets of FITS extensions).
+    There are no specific packages we are aware of. There is some overlap with the [`gwcs`](https://github.com/spacetelescope/gwcs) package and our `wcs` module, but we are planning to collaborate with that package for future development and to reconsolidate those overlaps. Astrodata offers an interface based on `astropy.nddata.NDData`, but allowing more than one instance to be mapped to the same file (eg. to multiple sets of FITS extensions).
 
 
   - If you made a pre-submission enquiry, please paste the link to the corresponding issue, forum post, or other discussion, or `@tag` the editor you contacted:
