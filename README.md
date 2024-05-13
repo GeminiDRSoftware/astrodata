@@ -74,7 +74,8 @@ The most basic usage of ``astrodata`` is to extend the ``astrodata.AstroData``
 class, which includes some basic FITS file handling methods by default:
 
 ```python
-from astrodata import AstroData, astro_data_descriptor
+from astrodata import AstroData, astro_data_descriptor, factory, from_file
+
 
 class MyData(AstroData):
     def __init__(self, *args, **kwargs):
@@ -84,20 +85,20 @@ class MyData(AstroData):
     def color(self):
         # The color filter used for our image is stored in a few different
         # ways, let's unify them.
-        blue_labels = {'blue', 'bl', 'b'}
-        green_labels = {'green', 'gr', 'g'}
-        red_labels = {'red', 're', 'r'}
+        blue_labels = {"blue", "bl", "b"}
+        green_labels = {"green", "gr", "g"}
+        red_labels = {"red", "re", "r"}
 
-        header_value = self.phu.get('COLOR', None).casefold()
+        header_value = self.phu.get("COLOR", None).casefold()
 
         if header_value in blue_labels:
-            return 'BLUE'
+            return "BLUE"
 
         if header_value in green_labels:
-            return 'GREEN'
+            return "GREEN"
 
         if header_value in red_labels:
-            return 'RED'
+            return "RED"
 
         if header_value is None:
             raise ValueError("No color found")
@@ -105,24 +106,37 @@ class MyData(AstroData):
         # Unrecognized color
         raise ValueError(f"Did not recognize COLOR value: {header_value}")
 
+
 # Now, define our instruments with nuanced, individual data formats
 class MyInstrument1(MyData):
     # These use a special method to resolve the metadata and apply the correct
     # class.
     @staticmethod
     def _matches_data(source):
-        return source[0].header.get('INSTRUME', "").upper() == "MYINSTRUMENT1"
+        return source[0].header.get("INSTRUME", "").upper() == "MYINSTRUMENT1"
 
 
 class MyInstrument2(MyData):
-    ...
+    @staticmethod
+    def _matches_data(source):
+        return source[0].header.get("INSTRUME", "").upper() == "MYINSTRUMENT2"
+
 
 class MyInstrument3(MyData):
-    ...
+    @staticmethod
+    def _matches_data(source):
+        return source[0].header.get("INSTRUME", "").upper() == "MYINSTRUMENT3"
+
+
+for cls in [MyInstrument1, MyInstrument2, MyInstrument3]:
+    factory.add_class(cls)
 
 # my_file.fits has some color data depending on the instrument it comes from,
 # but now we can access it and handle a single value.
-data = MyData.read("README_example.fits")
+data = from_file("README_example.fits")
+
+# the astrodata factory has already resolved the correct class for us.
+print(f"File used to create class: {data.__class__.__name__}")
 if data.color() == "BLUE":
     print("I used the blue filter!")
 
@@ -131,6 +145,7 @@ else:
 
 # Get all the info about the astrodata object.
 data.info()
+
 ```
 
 This will print out the filter used as extracted from the header of the FITS
