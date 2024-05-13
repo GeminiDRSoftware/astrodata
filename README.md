@@ -14,7 +14,8 @@
 `astrodata`
 =============
 
-<img align="left" src="docs/static/logo.png" height=200>
+<img align="left" src="docs/static/logo.png" height=200
+style="padding-right: 10; padding-bottom: 10; border: none;">
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
@@ -73,7 +74,7 @@ The most basic usage of ``astrodata`` is to extend the ``astrodata.AstroData``
 class, which includes some basic FITS file handling methods by default:
 
 ```python
-from astrodata import AstroData
+from astrodata import AstroData, astro_data_descriptor
 
 class MyData(AstroData):
     def __init__(self, *args, **kwargs):
@@ -87,7 +88,7 @@ class MyData(AstroData):
         green_labels = {'green', 'gr', 'g'}
         red_labels = {'red', 're', 'r'}
 
-        header_value = self.phu.get('COLOR', None)
+        header_value = self.phu.get('COLOR', None).casefold()
 
         if header_value in blue_labels:
             return 'BLUE'
@@ -104,15 +105,44 @@ class MyData(AstroData):
         # Unrecognized color
         raise ValueError(f"Did not recognize COLOR value: {header_value}")
 
-data = MyData.read('my_file.fits')
-data.my_method()
+# Now, define our instruments with nuanced, individual data formats
+class MyInstrument1(MyData):
+    # These use a special method to resolve the metadata and apply the correct
+    # class.
+    @staticmethod
+    def _matches_data(source):
+        return source[0].header.get('INSTRUME', "").upper() == "MYINSTRUMENT1"
+
+
+class MyInstrument2(MyData):
+    ...
+
+class MyInstrument3(MyData):
+    ...
+
+# my_file.fits has some color data depending on the instrument it comes from,
+# but now we can access it and handle a single value.
+data = MyData.read("README_example.fits")
+if data.color() == "BLUE":
+    print("I used the blue filter!")
+
+else:
+    print("I used a red or green filter!")
+
+# Get all the info about the astrodata object.
+data.info()
 ```
 
-This will print out the header of the FITS file, as well as the filename and
-path of the file (as it does for `astropy.io.fits` objects).
+This will print out the filter used as extracted from the header of the FITS
+file. `data.info()` offers a more complete look at the file's data including
+the filename and path of the file (as it does for `astropy.io.fits` objects).
 
 `astrodata` is designed to be extensible, so you can add your own methods to
 analyze and process data based on your specific needs and use cases.
+
+For a complete example, see the
+[Quickstart](https://geminidrsoftware.github.io/astrodata/quickstart.html) in
+our documentation.
 
 Installing development dependencies
 -----------------------------------
