@@ -23,7 +23,7 @@ style="padding-right: 10; padding-bottom: 10; border: none;">
 
 ### Building & Publishing
 ![Documentation build status badge][docs build badge]
-[![PyPI version badge](https://badge.fury.io/py/astrodata.svg)](https://badge.fury.io/py/astrodata)
+[![PyPI version badge][pypi package version badge]](https://badge.fury.io/py/astrodata)
 ![pypi packaging status badge][pypi packaging badge]
 
 <!-- Clearing the logo for the next header -->
