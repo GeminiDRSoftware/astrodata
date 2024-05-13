@@ -80,9 +80,29 @@ class MyData(AstroData):
         super().__init__(*args, **kwargs)
 
     @astro_data_descriptor
-    def my_method(self):
-        print('This is my method, and it tells me about my data.')
-        print(self.info())
+    def color(self):
+        # The color filter used for our image is stored in a few different
+        # ways, let's unify them.
+        blue_labels = {'blue', 'bl', 'b'}
+        green_labels = {'green', 'gr', 'g'}
+        red_labels = {'red', 're', 'r'}
+
+        header_value = self.phu.get('COLOR', None)
+
+        if header_value in blue_labels:
+            return 'BLUE'
+
+        if header_value in green_labels:
+            return 'GREEN'
+
+        if header_value in red_labels:
+            return 'RED'
+
+        if header_value is None:
+            raise ValueError("No color found")
+
+        # Unrecognized color
+        raise ValueError(f"Did not recognize COLOR value: {header_value}")
 
 data = MyData.read('my_file.fits')
 data.my_method()
