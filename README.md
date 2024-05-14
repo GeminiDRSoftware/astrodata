@@ -10,25 +10,11 @@
 [pypi package version badge]: https://badge.fury.io/py/astrodata.svg
 [test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/testing.yml/badge.svg
 
-<!-- Check if the theme is light or dark and adjust logo appropriately -->
-<style>
-    html[data-theme="light"] .logo {
-        /* Logo is designed for dark mode, this needs to
-        be consistent with docs/static/logo_variables.css
-        */
-        filter: brightness(65%) saturate(200%) contrast(200%);
-    }
-
-    html[data-theme="dark"] .logo {
-        filter: none;
-    }
-</style>
-
 `astrodata`
 =============
 
 <img class="logo" align="left" src="docs/static/logo.svg" height=200
-style="padding-right: 10; padding-bottom: 10; border: none;">
+style=". { padding-right: 10; padding-bottom: 10; border: none; } html[data-color-mode=&quot;light&quot;] { filter: brightness(65%) saturate(200%) contrast(200%); } html[data-color-mode=&quot;dark&quot;] { filter: none; }">
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
