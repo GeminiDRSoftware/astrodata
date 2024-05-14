@@ -13,8 +13,19 @@
 `astrodata`
 =============
 
-<img class="logo" align="left" src="docs/static/logo.svg" height=200
-style=". { padding-right: 10; padding-bottom: 10; border: none; } html[data-color-mode=&quot;light&quot;] { filter: brightness(65%) saturate(200%) contrast(200%); } html[data-color-mode=&quot;dark&quot;] { filter: none; }">
+<!--
+KEEPING HERE FOR REFERENCE
+<img class="logo" align="left" src="docs/static/logo.svg#gh-dark-mode-only" height=200
+style="padding-right: 10; padding-bottom: 10; border: none;">
+
+<img class="logo" align="left" src="docs/static/logo.svg#gh-light-mode-only" height=200
+style="padding-right: 10; padding-bottom: 10; border: none;">
+-->
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/static/logo.svg">
+  <img alt="A logo of a stylized blue dragon inside a similarly blue shell. A yellow star lies at the center, together with the dragon shape forming a stylized letter A." src="docs/static/logo_dark.svg">
+</picture>
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
