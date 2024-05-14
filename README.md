@@ -10,12 +10,19 @@
 [pypi package version badge]: https://badge.fury.io/py/astrodata.svg
 [test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/testing.yml/badge.svg
 
-
 `astrodata`
 =============
 
-<img align="left" src="https://github.com/GeminiDRSoftware/astrodata/blob/main/docs/static/logo.png" height=200
-style="padding-right: 10; padding-bottom: 10; border: none;">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/static/logo.svg">
+  <img
+  alt="A logo of a stylized blue dragon inside a similarly blue shell. A yellow star lies at the center, together with the dragon shape forming a stylized letter A."
+  src="docs/static/logo_dark.svg"
+  align="left"
+  height=200
+  style="padding-right: 10; padding-bottom: 10; border: none;"
+  >
+</picture>
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]

@@ -1,0 +1,16 @@
+/* Variable styles for light/dark mode */
+/* Logos */
+/* This is a hack to get around RTDtheme logo handling
+
+We use the same logo, but use some CSS magic to make it stand out
+on light and dark backgrounds.
+*/
+.logo {
+    content: url("../logo.svg") !important;
+    filter: brightness(65%) saturate(200%) contrast(200%);
+}
+
+html[data-theme="dark"] .logo {
+    content: url("../logo.svg") !important;
+    filter: none;
+}
