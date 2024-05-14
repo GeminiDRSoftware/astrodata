@@ -7,7 +7,7 @@ on light and dark backgrounds.
 */
 .logo {
     content: url("../logo.svg") !important;
-    filter: brightness(65%) saturate(200%);
+    filter: brightness(65%) saturate(200%) contrast(200%);
 }
 
 html[data-theme="dark"] .logo {
