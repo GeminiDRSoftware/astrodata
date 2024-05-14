@@ -107,6 +107,9 @@ html_theme_options = {
     "body_max_width": "none",
 }
 
+# This logo is not the logo used after rendering; see docs/static and
+# specifically docs/static/css/logo_variables.css for more information and the
+# actual implementation.
 html_logo = "static/logo.svg"
 
 # Add any paths that contain custom static files (such as style sheets) here,
