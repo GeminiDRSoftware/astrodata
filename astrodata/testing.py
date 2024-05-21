@@ -2,6 +2,7 @@
 """Fixtures to be used in tests in DRAGONS"""
 
 import enum
+from concurrent.futures import ThreadPoolExecutor
 import functools
 import io
 import itertools
@@ -385,6 +386,44 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
         compare_models(
             inverse1, inverse2, rtol=rtol, atol=atol, check_inverse=False
         )
+
+
+def download_multiple_files(
+    files,
+    path=None,
+    sub_path="",
+    env_var="ASTRODATA_TEST",
+    **kwargs,
+):
+    """Download multiple files from the archive and store them at a given path."""
+    # Ensure the directory exists and is a directory
+    if path is None:
+        path = os.getenv(env_var)
+
+    if not os.path.isdir(path) and os.path.exists(path):
+        raise NotADirectoryError(f"{path} is not a directory")
+
+    os.makedirs(path, exist_ok=True)
+
+    # Download the files
+    downloaded_files = {}
+
+    with ThreadPoolExecutor() as executor:
+        for file in files:
+            downloaded_files[file] = executor.submit(
+                download_from_archive,
+                file,
+                path=path,
+                sub_path=sub_path,
+                env_var=env_var,
+                **kwargs,
+            )
+
+    downloaded_files = {
+        file: future.result() for file, future in downloaded_files.items()
+    }
+
+    return downloaded_files
 
 
 def download_from_archive(

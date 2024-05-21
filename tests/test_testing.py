@@ -135,6 +135,33 @@ def test_download_from_archive_cannot_download_file(monkeypatch):
     testing.DownloadState().invalidate_cache()
 
 
+def test_download_multiple_files(tmp_path, monkeypatch):
+    # Create a fake download function that just creates a file.
+    def mock_download(remote_url, **kwargs):
+        fname = remote_url.split("/")[-1]
+        with open(os.path.join(tmp_path, fname), "w+") as _:
+            pass
+
+        return str(os.path.join(tmp_path, fname))
+
+    # Create a list of files to download.
+    files = ["N20180304S0126.fits", "N20180305S0001.fits"]
+
+    # Patch the download function.
+    monkeypatch.setattr("astrodata.testing.download_file", mock_download)
+
+    # Download the files.
+    result = testing.download_multiple_files(files, path=tmp_path)
+
+    # Check that the files were downloaded.
+    for file in files:
+        assert os.path.exists(result[file])
+
+    # Check that the files were downloaded to the correct location.
+    for file in files:
+        assert result[file] == os.path.join(tmp_path, file)
+
+
 def test_assert_most_close():
     from astrodata.testing import assert_most_close
 
@@ -976,3 +1003,67 @@ def test_ADCompare_wcs(ad1, ad2):
 def test_ad_compare(ad1, ad2):
     assert testing.ad_compare(ad1, ad1)
     assert not testing.ad_compare(ad1, ad2)
+
+
+@pytest.fixture
+def file_ranges():
+    """File ranges have the form "N3948493-503", for example."""
+    range_expected = [
+        (
+            "N20170614S0201-205",
+            [
+                "N20170614S0201",
+                "N20170614S0202",
+                "N20170614S0203",
+                "N20170614S0204",
+                "N20170614S0205",
+            ],
+        ),
+        (
+            "N20170615S0534-538",
+            [
+                "N20170615S0534",
+                "N20170615S0535",
+                "N20170615S0536",
+                "N20170615S0537",
+                "N20170615S0538",
+            ],
+        ),
+        (
+            "N20170702S0178-182",
+            [
+                "N20170702S0178",
+                "N20170702S0179",
+                "N20170702S0180",
+                "N20170702S0181",
+                "N20170702S0182",
+            ],
+        ),
+        (
+            "N2093-2095",
+            ["N2093", "N2094", "N2095"],
+        ),
+        (
+            "N1-3",
+            ["N1", "N2", "N3"],
+        ),
+        (
+            "N1",
+            ["N1"],
+        ),
+        (
+            "N130987584759874984",
+            ["N130987584759874984"],
+        ),
+        (
+            "",
+            [""],
+        ),
+    ]
+
+    return range_expected
+
+
+def test_expand_file_range(file_ranges):
+    for file_range, expected in file_ranges:
+        assert testing.expand_file_range(file_range) == expected
