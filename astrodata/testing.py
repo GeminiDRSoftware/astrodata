@@ -1166,3 +1166,32 @@ def process_string_to_python_script(string: str) -> str:
 
 def get_program_observations():
     raise NotImplementedError
+
+
+def expand_file_range(files: str) -> list[str]:
+    """Expand a range of files into a list of file names.
+
+    Parameters
+    ----------
+    files : str
+        A range of files, e.g., "N20170614S0201-205". This would produce:
+
+        ["N20170614S0201", "N20170614S0202", ..., "N20170614S0205"]
+
+    Returns
+    -------
+    list[str]
+        A list of file names.
+    """
+    if "-" in files:
+        file_prep, end = files.split("-")
+        file_prep, start = file_prep[: -len(end)], file_prep[-len(end) :]
+        start, end = int(start), int(end)
+        files = [
+            f"{file_prep}{str(i).zfill(len(str(end)))}"
+            for i in range(start, end + 1)
+        ]
+
+        return files
+
+    return [files]
