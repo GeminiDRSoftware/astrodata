@@ -50,8 +50,8 @@ class DownloadState:
 
     The class is meant to be used as a singleton, so it should not be
     instantiated directly. Instead, the instance should be accessed via the
-    ``_self`` variable. Instantiation using ``_DownloadState()`` will do this
-    automatically.
+    ``_instance`` class attribute. Instantiation using ``DownloadState()`` will
+    do this automatically.
     """
 
     __slots__ = ["_state", "_valid_state", "test_result"]
