@@ -2,7 +2,7 @@
 """Fixtures to be used in tests in DRAGONS"""
 
 import enum
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import functools
 import io
 import itertools
@@ -392,13 +392,61 @@ def download_multiple_files(
     files,
     path=None,
     sub_path="",
-    env_var="ASTRODATA_TEST",
+    use_threads=True,
+    sequential=False,
     **kwargs,
 ):
-    """Download multiple files from the archive and store them at a given path."""
+    """Download multiple files from the archive and store them at a given path.
+
+    Parameters
+    ----------
+    files : list of str
+        List of filenames to download.
+
+    path : str or os.PathLike or None
+        Path to the cache directory. If None, the environment variable
+
+    sub_path : str
+        Sub-path to store the files. Default is "", which means the files are
+        stored at the root of the cache directory (path kwarg).
+
+    use_threads : bool
+        If True, use threads to download the files in parallel. If False, use
+        processes.
+
+    sequential : bool
+        If True, download the files sequentially. If False, download the files
+        in parallel. This overrides the use_threads argument.
+
+    kwargs : dict
+        Additional keyword arguments to pass to
+        :py:meth:`download_from_archive`.
+
+    Returns
+    -------
+    dict
+        Dictionary containing the downloaded files.
+    """
+    # Check if there are files to download
+    if not files:
+        return {}
+
     # Ensure the directory exists and is a directory
     if path is None:
-        path = os.getenv(env_var)
+        if env_var := kwargs.get("env_var", None) is not None:
+            path = os.getenv(env_var)
+
+        else:
+            path = os.path.join(os.getcwd(), "_test_cache")
+            warnings.warn(
+                "Environment variable not set and no path provided, writing to "
+                f"{path}. To suppress this warning, set the "
+                "environment variable to the desired path for the "
+                "testing cache."
+            )
+
+            # This is cleaned up once the program finishes.
+            os.environ[env_var] = str(path)
 
     if not os.path.isdir(path) and os.path.exists(path):
         raise NotADirectoryError(f"{path} is not a directory")
@@ -408,14 +456,25 @@ def download_multiple_files(
     # Download the files
     downloaded_files = {}
 
-    with ThreadPoolExecutor() as executor:
+    if sequential:
+        downloaded_files = {
+            file: download_from_archive(
+                file, path=path, sub_path=sub_path, **kwargs
+            )
+            for file in files
+        }
+
+        return downloaded_files
+
+    executor_type = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
+
+    with executor_type() as executor:
         for file in files:
             downloaded_files[file] = executor.submit(
                 download_from_archive,
                 file,
                 path=path,
                 sub_path=sub_path,
-                env_var=env_var,
                 **kwargs,
             )
 

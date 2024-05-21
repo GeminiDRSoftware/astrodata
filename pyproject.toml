@@ -58,6 +58,7 @@ testpaths = [
 
 markers = [
     "dragons_remote_data: data used by DRAGONS tests",
+    "dragons: tests that require a DRAGONS environment",
 ]
 
 doctest_plus = "enabled"
