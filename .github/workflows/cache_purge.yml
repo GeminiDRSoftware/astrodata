@@ -3,8 +3,6 @@ name: Purge caches
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "1 0 * * *"
 
 
 jobs:
