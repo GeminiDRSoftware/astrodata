@@ -18,8 +18,9 @@ mutually supportive development environment.
 
 ## Contribution flowchart
 
-[Here, there will be a flowchart image with a decision flow for whether to
-submit an issue or pull request.]
+[![](https://mermaid.ink/img/pako:eNpNktFu2jAUhl_lYKkqk5oX4KLTCoVxEVptk9BGenFIDolFYqfHDh2ivPsc22HJhRWf_P79ny_nInJdkJiJQ60_8grZwq9FpsA933ZrqPBEgNCy3tfUTN4gSR4_VxqsBjSWdYEW703mDqyk_d7t4RVL-oSnyxwVrMHo-kT9V1tJM7h8vQb_J2cGv8lMelN4HhVTPO8plNNReaNDbRNqYb27g9euroHpvSNjYVpIptxCrpVlue-s1OpLkD7vDjg7YGLeO2RKTNWvyrVvYKn5CD-o1UZazee3eMBft5ymeCRwcFRJJnot_afVdM6E1iMahYialde8DGlveUN7YZteFhoiZyubAMvx5bPzdPh8_oFYGomNgaWBzADmdsnamI7CbhP7ziXnNSX0N6-xwd4YYnwvjk1vQurpXDOTabUq4EPaqg-2oBPVuiUeKLx47Xa67fFZKslWxOB8_2efROnWS__s_M-KLEEq1yuPsYsH0RA3KAs3k5f-aCacqQMjZu61QD5mIlNXp8PO6p9nlYuZ5Y4eBOuurIRrtDZu17VuNmkhsWRsblUq-ovSMPJ-8q__ADtN7-4?type=png)](https://mermaid.live/edit#pako:eNpNktFu2jAUhl_lYKkqk5oX4KLTCoVxEVptk9BGenFIDolFYqfHDh2ivPsc22HJhRWf_P79ny_nInJdkJiJQ60_8grZwq9FpsA933ZrqPBEgNCy3tfUTN4gSR4_VxqsBjSWdYEW703mDqyk_d7t4RVL-oSnyxwVrMHo-kT9V1tJM7h8vQb_J2cGv8lMelN4HhVTPO8plNNReaNDbRNqYb27g9euroHpvSNjYVpIptxCrpVlue-s1OpLkD7vDjg7YGLeO2RKTNWvyrVvYKn5CD-o1UZazee3eMBft5ymeCRwcFRJJnot_afVdM6E1iMahYialde8DGlveUN7YZteFhoiZyubAMvx5bPzdPh8_oFYGomNgaWBzADmdsnamI7CbhP7ziXnNSX0N6-xwd4YYnwvjk1vQurpXDOTabUq4EPaqg-2oBPVuiUeKLx47Xa67fFZKslWxOB8_2efROnWS__s_M-KLEEq1yuPsYsH0RA3KAs3k5f-aCacqQMjZu61QD5mIlNXp8PO6p9nlYuZ5Y4eBOuurIRrtDZu17VuNmkhsWRsblUq-ovSMPJ-8q__ADtN7-4)
+
+<sub>_Note_: The image above links to an editable version of this chart.</sub>
 
 ## Submitting an issue
 
@@ -45,7 +46,10 @@ documentation, or anything else _you've_ written! These may seem more
 intimidating than an issue, but the only real difference is that you are
 contributing code.
 
-Otherwise, the process is basically the same; contributers weight in, the situation is discussed as needed, and at the end of the discussion the code is improved. There's no "finality" to a PR. There is always time to dicuss the changes as carefully as with an issue.
+Otherwise, the process is basically the same; contributers weigh in, the
+situation is discussed as needed, and at the end of the discussion the code
+is improved. There's no "finality" to a PR. There is always time to dicuss
+the changes as carefully as with an issue.
 
 If this still feels too complicated or intimidating, feel free to raise an
 issue or contact a maintainer directly.
