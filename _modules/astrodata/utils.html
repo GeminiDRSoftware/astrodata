@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>astrodata.utils &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../astrodata.html">astrodata</a></li>
+      <li class="breadcrumb-item active">astrodata.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for astrodata.utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Utility functions and classes for AstroData objects.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">traceback</span> <span class="kn">import</span> <span class="n">format_stack</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">INTEGER_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;assign_only_single_slice&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;astro_data_descriptor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AstroDataDeprecationWarning&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;astro_data_tag&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;deprecated&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;normalize_indices&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;returns_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TagSet&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Section&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">AstroDataDeprecationWarning</span><span class="p">(</span><span class="ne">DeprecationWarning</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Warning class for deprecated AstroData methods.&quot;&quot;&quot;</span>
+
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;always&quot;</span><span class="p">,</span> <span class="n">AstroDataDeprecationWarning</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">deprecated</span><span class="p">(</span><span class="n">reason</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Marks a function as deprecated.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    reason : str</span>
+<span class="sd">        The reason why the function is deprecated</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    function</span>
+<span class="sd">        The decorated function</span>
+
+<span class="sd">    Usage</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    &gt;&gt;&gt; @deprecated(&quot;Use another function instead&quot;)</span>
+<span class="sd">    ... def my_function():</span>
+<span class="sd">    ...     pass</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">decorator_wrapper</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+            <span class="n">current_source</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">format_stack</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="n">current_source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">wrapper</span><span class="o">.</span><span class="n">seen</span><span class="p">:</span>
+                <span class="n">wrapper</span><span class="o">.</span><span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">current_source</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">AstroDataDeprecationWarning</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+        <span class="n">wrapper</span><span class="o">.</span><span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator_wrapper</span>
+
+
+<span class="k">def</span> <span class="nf">normalize_indices</span><span class="p">(</span><span class="n">slc</span><span class="p">,</span> <span class="n">nitems</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize a slice or index to a list of indices.&quot;&quot;&quot;</span>
+    <span class="n">multiple</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slc</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span> <span class="o">=</span> <span class="n">slc</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="n">nitems</span><span class="p">)</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">step</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slc</span><span class="p">,</span> <span class="n">INTEGER_TYPES</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">slc</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">INTEGER_TYPES</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">slc</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slc</span><span class="p">,</span> <span class="n">INTEGER_TYPES</span><span class="p">):</span>
+            <span class="n">slc</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">slc</span><span class="p">),)</span>  <span class="c1"># slc&#39;s type m</span>
+            <span class="n">multiple</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">multiple</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Normalize negative indices...</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">nitems</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">slc</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid index: </span><span class="si">{</span><span class="n">slc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">i</span> <span class="o">&gt;=</span> <span class="n">nitems</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Index out of range&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">indices</span><span class="p">,</span> <span class="n">multiple</span>
+
+
+<div class="viewcode-block" id="TagSet">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.TagSet">[docs]</a>
+<span class="k">class</span> <span class="nc">TagSet</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;TagSet&quot;</span><span class="p">,</span> <span class="s2">&quot;add remove blocked_by blocks if_present&quot;</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Named tuple that is used by tag methods to return which actions should</span>
+<span class="sd">    be performed on a tag set.</span>
+
+<span class="sd">    All the attributes are optional, and any combination of them can be used,</span>
+<span class="sd">    allowing to create complex tag structures.  Read the documentation on the</span>
+<span class="sd">    tag-generating algorithm if you want to better understand the interactions.</span>
+
+<span class="sd">    The simplest TagSet, though, tends to just add tags to the global set.</span>
+
+<span class="sd">    It can be initialized by position, like any other tuple (the order of the</span>
+<span class="sd">    arguments is the one in which the attributes are listed below). It can</span>
+<span class="sd">    also be initialized by name.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    add : set of str, optional</span>
+<span class="sd">        Tags to be added to the global set</span>
+
+<span class="sd">    remove : set of str, optional</span>
+<span class="sd">        Tags to be removed from the global set</span>
+
+<span class="sd">    blocked_by : set of str, optional</span>
+<span class="sd">        Tags that will prevent this TagSet from being applied</span>
+
+<span class="sd">    blocks : set of str, optional</span>
+<span class="sd">        Other TagSets containing these won&#39;t be applied</span>
+
+<span class="sd">    if_present : set of str, optional</span>
+<span class="sd">        This TagSet will be applied only *all* of these tags are present</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ---------</span>
+<span class="sd">    &gt;&gt;&gt; TagSet()  # doctest: +SKIP</span>
+<span class="sd">    TagSet(</span>
+<span class="sd">        add=set(),</span>
+<span class="sd">        remove=set(),</span>
+<span class="sd">        blocked_by=set(),</span>
+<span class="sd">        blocks=set(),</span>
+<span class="sd">        if_present=set()</span>
+<span class="sd">    )</span>
+<span class="sd">    &gt;&gt;&gt; TagSet({&#39;BIAS&#39;, &#39;CAL&#39;})  # doctest: +SKIP</span>
+<span class="sd">    TagSet(</span>
+<span class="sd">        add={&#39;BIAS&#39;, &#39;CAL&#39;},</span>
+<span class="sd">        remove=set(),</span>
+<span class="sd">        blocked_by=set(),</span>
+<span class="sd">        blocks=set(),</span>
+<span class="sd">        if_present=set()</span>
+<span class="sd">    )</span>
+<span class="sd">    &gt;&gt;&gt; TagSet(remove={&#39;BIAS&#39;, &#39;CAL&#39;}) # doctest: +SKIP</span>
+<span class="sd">    TagSet(</span>
+<span class="sd">        add=set(),</span>
+<span class="sd">        remove={&#39;BIAS&#39;, &#39;CAL&#39;},</span>
+<span class="sd">        blocked_by=set(),</span>
+<span class="sd">        blocks=set(),</span>
+<span class="sd">        if_present=set()</span>
+<span class="sd">    )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TagSet.__new__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.TagSet.__new__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">add</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">remove</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocked_by</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">blocks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">if_present</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span>
+            <span class="bp">cls</span><span class="p">,</span>
+            <span class="n">add</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(),</span>
+            <span class="n">remove</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(),</span>
+            <span class="n">blocked_by</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(),</span>
+            <span class="n">blocks</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(),</span>
+            <span class="n">if_present</span> <span class="ow">or</span> <span class="nb">set</span><span class="p">(),</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="astro_data_descriptor">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.astro_data_descriptor">[docs]</a>
+<span class="k">def</span> <span class="nf">astro_data_descriptor</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that will mark a class method as an AstroData descriptor.</span>
+<span class="sd">    Useful to produce list of descriptors, for example.</span>
+
+<span class="sd">    If used in combination with other decorators, this one *must* be the</span>
+<span class="sd">    one on the top (ie. the last one applying). It doesn&#39;t modify the</span>
+<span class="sd">    method in any other way.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    -----</span>
+<span class="sd">    fn : method</span>
+<span class="sd">        The method to be decorated</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    The tagged method (not a wrapper)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fn</span><span class="o">.</span><span class="n">descriptor_method</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">fn</span></div>
+
+
+
+<div class="viewcode-block" id="returns_list">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.returns_list">[docs]</a>
+<span class="k">def</span> <span class="nf">returns_list</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to ensure that descriptors that should return a list (of one</span>
+<span class="sd">    value per extension) only returns single values when operating on single</span>
+<span class="sd">    slices; and vice versa.</span>
+
+<span class="sd">    This is a common case, and you can use the decorator to simplify the</span>
+<span class="sd">    logic of your descriptors.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    -----</span>
+<span class="sd">    fn : method</span>
+<span class="sd">        The method to be decorated</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    A function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Descriptor </span><span class="si">%s</span><span class="s2"> returned a list &quot;</span>
+                        <span class="s2">&quot;of </span><span class="si">%s</span><span class="s2"> elements when operating on &quot;</span>
+                        <span class="s2">&quot;a single slice&quot;</span><span class="p">,</span>
+                        <span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">),</span>
+                    <span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">ret</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ret</span>
+
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Incompatible numbers of extensions and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;elements in </span><span class="si">{</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">ret</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">assign_only_single_slice</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise `ValueError` if assigning to a non-single slice.&quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Trying to assign to an AstroData object that &quot;</span>
+                <span class="s2">&quot;is not a single slice&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<div class="viewcode-block" id="astro_data_tag">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.astro_data_tag">[docs]</a>
+<span class="k">def</span> <span class="nf">astro_data_tag</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator that marks methods of an `AstroData` derived class as part of</span>
+<span class="sd">    the tag-producing system.</span>
+
+<span class="sd">    It wraps the method around a function that will ensure a consistent return</span>
+<span class="sd">    value: the wrapped method can return any sequence of sequences of strings,</span>
+<span class="sd">    and they will be converted to a TagSet. If the wrapped method</span>
+<span class="sd">    returns None, it will be turned into an empty TagSet.</span>
+
+<span class="sd">    Args</span>
+<span class="sd">    -----</span>
+<span class="sd">    fn : method</span>
+<span class="sd">        The method to be decorated</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    A wrapper function</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">TagSet</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Tag function </span><span class="si">{</span><span class="n">fn</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> didn&#39;t return a TagSet&quot;</span>
+                    <span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">TagSet</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ret</span><span class="p">))</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Return empty TagSet for the &quot;doesn&#39;t apply&quot; case</span>
+        <span class="k">return</span> <span class="n">TagSet</span><span class="p">()</span>
+
+    <span class="n">wrapper</span><span class="o">.</span><span class="n">tag_method</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="Section">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section">[docs]</a>
+<span class="k">class</span> <span class="nc">Section</span><span class="p">(</span><span class="nb">tuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A class to handle n-dimensional sections&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Section.__new__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.__new__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Ensure that the order of keys is what we want</span>
+        <span class="n">axis_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="s2">&quot;xyzuvw&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">1&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">2&quot;</span><span class="p">)]</span>
+
+        <span class="n">_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">axis_names</span><span class="p">,</span> <span class="n">args</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,)</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)))</span>
+
+        <span class="n">_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">list</span><span class="p">(</span><span class="n">_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_dict</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot initialize &#39;Section&#39; object&quot;</span><span class="p">)</span>
+
+        <span class="n">instance</span> <span class="o">=</span> <span class="nb">tuple</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_axis_names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">instance</span><span class="p">)[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Not all &#39;Section&#39; end coordinates exceed the &quot;</span>
+                <span class="s2">&quot;start coordinates&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">axis_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_axis_names</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Section.__getnewargs__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.__getnewargs__">[docs]</a>
+    <span class="k">def</span> <span class="nf">__getnewargs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.__getattr__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.__getattr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis_names</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis_dict</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span>
+
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No such attribute &#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.__repr__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.__repr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">&quot;Section(&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">axis_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis_names</span><span class="p">])</span>
+            <span class="o">+</span> <span class="s2">&quot;)&quot;</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The number of dimensions in the section.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+
+<div class="viewcode-block" id="Section.from_shape">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.from_shape">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_shape</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Produce a Section object defining a given shape.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Section</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">y</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="p">)])</span></div>
+
+
+<div class="viewcode-block" id="Section.from_string">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.from_string">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The inverse of __str__, produce a Section object from a string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Section</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">[</span>
+                <span class="n">y</span>
+                <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;[]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)]</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="kc">None</span> <span class="k">if</span> <span class="n">start</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">start</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="kc">None</span> <span class="k">if</span> <span class="n">end</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">end</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.asIRAFsection">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.asIRAFsection">[docs]</a>
+    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="s2">&quot;Renamed to &#39;as_iraf_section&#39;, this is just an alias for now &quot;</span>
+        <span class="s2">&quot;and will be removed in a future version.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">asIRAFsection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pylint: disable=invalid-name</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated, see as_iraf_section&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_iraf_section</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Section.as_iraf_section">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.as_iraf_section">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_iraf_section</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Produce string of style &#39;[x1:x2,y1:y2]&#39; that is 1-indexed</span>
+<span class="sd">        and end-inclusive</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">&quot;[&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;:&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis_dict</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis_dict</span><span class="p">[</span><span class="n">axis</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)]),</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axis_names</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.asslice">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.asslice">[docs]</a>
+    <span class="k">def</span> <span class="nf">asslice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">add_dims</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the Section object as a slice/list of slices.  Higher</span>
+<span class="sd">        dimensionality can be achieved with the add_dims parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">),)</span> <span class="o">*</span> <span class="n">add_dims</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axis_dict</span><span class="p">[</span><span class="n">axis</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">axis_dict</span><span class="p">[</span><span class="n">axis</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">)])</span>
+            <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_axis_names</span><span class="p">[::</span><span class="mi">2</span><span class="p">])</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Section.contains">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.contains">[docs]</a>
+    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if the supplied section is entirely within self&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="n">section</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sections have different dimensionality&quot;</span><span class="p">)</span>
+
+        <span class="n">con1</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">s2</span> <span class="o">&gt;=</span> <span class="n">s1</span> <span class="k">for</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">section</span><span class="p">[::</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">con1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">con2</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">s2</span> <span class="o">&lt;=</span> <span class="n">s1</span> <span class="k">for</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span> <span class="n">section</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="n">con1</span> <span class="ow">and</span> <span class="n">con2</span></div>
+
+
+<div class="viewcode-block" id="Section.is_same_size">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.is_same_size">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_same_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if the Sections are the same size&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="bp">self</span><span class="p">)[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">section</span><span class="p">)[::</span><span class="mi">2</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="Section.overlap">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.overlap">[docs]</a>
+    <span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine whether the two sections overlap. If so, the Section</span>
+<span class="sd">        common to both is returned, otherwise None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="n">section</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Sections have different dimensionality&quot;</span><span class="p">)</span>
+
+        <span class="n">mins</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span> <span class="k">for</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">section</span><span class="p">[::</span><span class="mi">2</span><span class="p">])]</span>
+        <span class="n">maxs</span> <span class="o">=</span> <span class="p">[</span><span class="nb">min</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span> <span class="k">for</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span> <span class="n">section</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+                <span class="o">*</span><span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">pair</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mins</span><span class="p">,</span> <span class="n">maxs</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">pair</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Sections do not overlap, recieved </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">err</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">err</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Section.shift">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.Section.shift">[docs]</a>
+    <span class="k">def</span> <span class="nf">shift</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">shifts</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shift a section in each direction by the specified amount&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shifts</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Number of shifts </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shifts</span><span class="p">)</span><span class="si">}</span><span class="s2"> incompatible &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;with dimensionality </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">[</span>
+                <span class="n">x</span> <span class="o">+</span> <span class="n">s</span>
+                <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="p">[</span><span class="n">ss</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">shifts</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">])</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Astrodata Tag &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Metadata and Headers" href="headers.html" />
+    <link rel="prev" title="Input and Output Operations and Extension Manipulation - MEF" href="iomef.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="structure.html">The AstroData Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iomef.html">Input and Output Operations and Extension Manipulation - MEF</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#what-is-an-astrodata-tag">What is an Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code>?</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-the-astrodata-tags">Using the Astrodata Tags</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#creating-new-astrodata-tags-advanced-topic">Creating New Astrodata Tags [Advanced Topic]</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="headers.html">Metadata and Headers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html">Pixel Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tables.html">Table Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../progmanual/index.html">Programmer’s Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">User Manual</a></li>
+      <li class="breadcrumb-item active">Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/usermanual/tags.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="astrodata-tag">
+<span id="tags"></span><h1>Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code><a class="headerlink" href="#astrodata-tag" title="Link to this heading"></a></h1>
+<section id="what-is-an-astrodata-tag">
+<h2>What is an Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code>?<a class="headerlink" href="#what-is-an-astrodata-tag" title="Link to this heading"></a></h2>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code> is a way to describe the data in an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. Tags are used to
+idenfity the type of <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object to be created when <a class="reference internal" href="../../api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a> is called.</p>
+<p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code> is added to an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object by defining a function wrapped with
+the <a class="reference internal" href="../../api/astrodata.astro_data_tag.html#astrodata.astro_data_tag" title="astrodata.astro_data_tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">astro_data_tag()</span></code></a> decorator.  The function must return a
+<a class="reference internal" href="../../api/astrodata.TagSet.html#astrodata.TagSet" title="astrodata.TagSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">TagSet</span></code></a> object, which describes the behavior of a tag.</p>
+<p>For example, the following function defines a tag called “RAW”</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">RawAstroData</span><span class="p">(</span><span class="n">AstroData</span><span class="p">):</span>
+    <span class="nd">@astro_data_tag</span>
+    <span class="k">def</span> <span class="nf">_tag_raw</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify if this is raw data&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PROCTYPE&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;RAW&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">TagSet</span><span class="p">([</span><span class="s1">&#39;RAW&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Now, if we call <a class="reference internal" href="../../api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a> on a file that has a PROCTYPE keyword set to “RAW”, the
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object will have the “<cite>RAW</cite>” tag</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;somefile.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">tags</span>
+<span class="go">{&#39;RAW&#39;}</span>
+</pre></div>
+</div>
+<p>From here, these tag sets can be used to understand what the data is describing
+and how best to process it. It can also contain information about the state of
+processing (e.g., <code class="docutils literal notranslate"><span class="pre">RAW</span></code> vs <code class="docutils literal notranslate"><span class="pre">PROCESSED</span></code>), or any important flags.</p>
+<p>These tags are meant to work well with FITS data, using the headers to
+determine what the data is.  However, they can be used with any data type that
+can be described by a set of tags, as long as they are properly defined by the
+developer (see <a class="reference external" href=":ref:`../progmanual/tags.rst`">ad_tags</a> for more information about developing with <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code>).</p>
+<p>For some examples of tags in production code, see the <code class="xref py py-mod docutils literal notranslate"><span class="pre">DRAGONS:gemini_instruments</span></code>
+package, which defined a number of <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> derivatives used as part of the
+<a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a> data reduction library for reading as well as processing data.</p>
+</section>
+<section id="using-the-astrodata-tags">
+<h2>Using the Astrodata Tags<a class="headerlink" href="#using-the-astrodata-tags" title="Link to this heading"></a></h2>
+<p><strong>Try it yourself</strong></p>
+<p>Download the data package (<a class="reference internal" href="intro.html#datapkg"><span class="std std-ref">A quick example</span></a>) if you wish to follow along and run the
+examples.  Then</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;path&gt;/ad_usermanual/playground
+$ python
+</pre></div>
+</div>
+<p>Before doing anything, you need to import <a class="reference internal" href="../../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> and the Gemini instrument
+configuration package (<code class="xref py py-mod docutils literal notranslate"><span class="pre">DRAGONS:gemini_instruments</span></code>).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">astrodata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gemini_instruments</span>
+</pre></div>
+</div>
+<p>Let us open a Gemini dataset and see what tags we get:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">tags</span>
+<span class="go">{&#39;RAW&#39;, &#39;GMOS&#39;, &#39;GEMINI&#39;, &#39;NORTH&#39;, &#39;SIDEREAL&#39;, &#39;UNPREPARED&#39;, &#39;IMAGE&#39;, &#39;ACQUISITION&#39;}</span>
+</pre></div>
+</div>
+<p>The file we loaded is raw, GMOS North data. It is a 2D image and it is an
+acquisition image, not a science observation. The “UNPREPARED” tag indicates
+that the file has never been touched by the Recipe System which runs a
+“prepare” primitive as the first step of each recipe.</p>
+<p>Let’s try another</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170521S0925_forStack.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">tags</span>
+<span class="go">{&#39;GMOS&#39;, &#39;GEMINI&#39;, &#39;NORTH&#39;, &#39;SIDEREAL&#39;, &#39;OVERSCAN_TRIMMED&#39;, &#39;IMAGE&#39;,</span>
+<span class="go">&#39;OVERSCAN_SUBTRACTED&#39;, &#39;PREPARED&#39;}</span>
+</pre></div>
+</div>
+<p>This file is a science GMOS North image.  It has been processed by the
+Recipe System.  The overscan level has been subtracted and the overscan section
+has been trimmed away.  The tags do NOT include all the processing steps. Rather,
+at least from the time being, it focuses on steps that matter when associating
+calibrations.</p>
+<p>The tags can be used when coding.  For example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="s1">&#39;GMOS&#39;</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;I am GMOS&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;I am these instead:&#39;</span><span class="p">,</span> <span class="n">ad</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="p">{</span><span class="s1">&#39;IMAGE&#39;</span><span class="p">,</span> <span class="s1">&#39;GMOS&#39;</span><span class="p">}</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">tags</span><span class="p">):</span>
+<span class="gp">... </span>  <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;I am a GMOS Image.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-new-astrodata-tags-advanced-topic">
+<h2>Creating New Astrodata Tags [Advanced Topic]<a class="headerlink" href="#creating-new-astrodata-tags-advanced-topic" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../progmanual/index.html"><span class="doc">Developer Guide</span></a> describes how to create new <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> classes for new
+instruments (specifically, see <a class="reference external" href=":ref:`../progmanual/tags.rst`">ad_tags</a>). This section describes the very basic
+steps for a new user to create self-defined tags.</p>
+<p>The content of this section is based on the example file
+<span class="needs-replacement">EXAMPLE FILE</span>. That file can be used as a full reference.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyAstroData</span><span class="p">(</span><span class="n">AstroData</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@astro_data_tag</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">_tag_mytag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">TagSet</span><span class="p">([</span><span class="s1">&#39;MYTAG&#39;</span><span class="p">])</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../../api/astrodata.astro_data_tag.html#astrodata.astro_data_tag" title="astrodata.astro_data_tag"><code class="xref py py-func docutils literal notranslate"><span class="pre">astro_data_tag()</span></code></a> decorator is used to identify the function as a tag
+function. While not strictly necessary, it is recommended to use the
+<code class="docutils literal notranslate"><span class="pre">_tag</span></code> prefix in the function name to make it clear that it is a tag
+function. When a file is opened using <a class="reference internal" href="../../api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a>, the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class will
+automatically call all the tag functions to determine the tags for the
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object, and then determine if the file being opened is
+appropriately tagged for the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class. If it is not, the class is
+not used to load in the object and its data; otherwise, it attempts to resolve
+all known <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> types to construct the appropriate instance.</p>
+<p><a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> only knows of <em>registered</em> <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class types. To register our
+class, we use <code class="xref py py-class docutils literal notranslate"><span class="pre">AstroDataFactory</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">astrodata.factory</span> <span class="k">as</span> <span class="nn">factory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">factory</span><span class="o">.</span><span class="n">addClass</span><span class="p">(</span><span class="n">MyAstroData</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">factory</span><span class="o">.</span><span class="n">getClasses</span><span class="p">())</span>
+<span class="go">[&lt;class &#39;astrodata.ad_tag_example_user.MyAstroData&#39;&gt;]</span>
+</pre></div>
+</div>
+<p>We now see our class is registered, and can use <a class="reference internal" href="../../api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a> to open a file that has
+the identifying tag:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fake FITS file with a MYTAG keyword</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;mytag.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">tags</span>
+<span class="c1"># {&#39;MYTAG&#39;}</span>
+
+<span class="c1"># Create one from scratch with the MYTAG keyword</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">create_from_scratch</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;MYTAG&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span><span class="o">.</span><span class="n">header</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">create_from_scratch</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">tags</span><span class="p">)</span>
+<span class="c1"># {&#39;MYTAG&#39;}</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+<span class="c1"># &lt;class &#39;astrodata.ad_tag_example_user.MyAstroData&#39;&gt;</span>
+</pre></div>
+</div>
+<p>The tag function looks at the provided headers and if the keyword “OBSTYPE” is
+set to “ARC”, the tags “ARC” and “CAL” (for calibration) will be assigned to
+the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code> functionality is primarily designed with FITS files in mind.  If you
+are extending <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> to work with other data types, you will need to
+define your own tag functions that specifically handle resolving tags for
+that file type.</p>
+<p>This does <strong>not</strong> mean that you cannot use <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> with other data
+types, or that it is especially difficult. It just means that you will need
+to define your own tag functions in such a way that they do not use, e.g.,
+<code class="docutils literal notranslate"><span class="pre">self.phu</span></code> if no such concept/equivalent exists in your desired file
+type.</p>
+</div>
+<p>A whole suite of such tag functions is needed to fully characterize all
+types of data an instrument can produce. <code class="xref py py-mod docutils literal notranslate"><span class="pre">DRAGONS:gemini_instruments</span></code> is an
+example of a package defining a number of <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> types that use the
+tag system to automaticlaly and precisely identify the specific instrument
+used to produce the data, and to process it accordingly.</p>
+<p>Tags should be exact and precise. For quantities and values that are
+not so well defined (for example, the type of observation), descriptors
+are used. For more information about descriptors, see the section on
+<a class="reference internal" href="headers.html#headers"><span class="std std-ref">Metadata and Headers</span></a>.</p>
+<p>For more information on creating and working with Tags, as well as developing
+with/for <a class="reference internal" href="../../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, see the <a class="reference internal" href="../progmanual/index.html"><span class="doc">Developer Guide</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="iomef.html" class="btn btn-neutral float-left" title="Input and Output Operations and Extension Manipulation - MEF" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="headers.html" class="btn btn-neutral float-right" title="Metadata and Headers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstroData and Derivatives &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Data Containers" href="containers.html" />
+    <link rel="prev" title="General Design" href="design.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usermanual/index.html">User Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Programmer’s Manual</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="design.html">General Design</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AstroData and Derivatives</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-tags-property">The <code class="docutils literal notranslate"><span class="pre">tags</span></code> Property</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-an-astrodata-derivative">Writing an <code class="docutils literal notranslate"><span class="pre">AstroData</span></code> Derivative</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html">Data Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tags.html">Tags</a></li>
+<li class="toctree-l3"><a class="reference internal" href="descriptors.html">Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Programmer’s Manual</a></li>
+      <li class="breadcrumb-item active">AstroData and Derivatives</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/progmanual/adclass.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="astrodata-and-derivatives">
+<span id="astrodata"></span><h1>AstroData and Derivatives<a class="headerlink" href="#astrodata-and-derivatives" title="Link to this heading"></a></h1>
+<p>The <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class is the main interface to the package. When opening files
+or creating new objects, a derivative of this class is returned, as the base
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class is not intended to be used directly. It provides the logic to
+calculate the <a class="reference internal" href="tags.html#ad-tags"><span class="std std-ref">tag set</span></a> for an image, which is common to all
+data products. Aside from that, it lacks any kind of specialized knowledge
+about the different instruments that produce the FITS files. More importantly,
+it defines two methods (<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.info" title="astrodata.AstroData.info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">info()</span></code></a> and
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.load" title="astrodata.AstroData.load"><code class="xref py py-meth docutils literal notranslate"><span class="pre">load()</span></code></a>) that read in and offer access to
+data in FITS files.  When extending to other file types, these methods should
+be re-implemented.  <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> also defines several useful properties and
+methods for FITS files specifically, such as <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.phu" title="astrodata.AstroData.phu"><code class="xref py py-meth docutils literal notranslate"><span class="pre">astrodata.AstroData.phu()</span></code></a>,
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.hdr" title="astrodata.AstroData.hdr"><code class="xref py py-meth docutils literal notranslate"><span class="pre">astrodata.AstroData.hdr()</span></code></a>, and <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.write" title="astrodata.AstroData.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">astrodata.AstroData.write()</span></code></a>,
+that should also be overridden when extending to other file types.</p>
+<p><a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> defines a common interface. Much of it consists of implementing
+semantic behavior (access to components through indices, like a list;
+arithmetic using standard operators; etc), mostly by implementing standard
+Python methods:</p>
+<ul class="simple">
+<li><p>Defines a common <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code> function.</p></li>
+<li><p>Implements <code class="docutils literal notranslate"><span class="pre">__deepcopy__</span></code>.</p></li>
+<li><p>Implements <code class="docutils literal notranslate"><span class="pre">__iter__</span></code> to allow sequential iteration over the main set of
+components (e.g., FITS science HDUs).</p></li>
+<li><p>Implements <code class="docutils literal notranslate"><span class="pre">__getitem__</span></code> to allow data slicing (e.g., <code class="docutils literal notranslate"><span class="pre">ad[2:4]</span></code> returns
+a new <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> instance that contains only the third and fourth main
+components).</p></li>
+<li><p>Implements <code class="docutils literal notranslate"><span class="pre">__delitem__</span></code> to allow for data removal based on index. It does
+not define <code class="docutils literal notranslate"><span class="pre">__setitem__</span></code>, though. The basic AstroData series of classes
+only allows to append new data blocks, not to replace them in one sweeping
+move.</p></li>
+<li><p>Implements <code class="docutils literal notranslate"><span class="pre">__add__</span></code>, <code class="docutils literal notranslate"><span class="pre">__sub__</span></code>, <code class="docutils literal notranslate"><span class="pre">__mul__</span></code>, <code class="docutils literal notranslate"><span class="pre">__truediv__</span></code>, and
+their in-place equivalents, based on them.</p></li>
+</ul>
+<p>There are a few other methods. For a detailed discussion, please refer to the
+<a class="reference internal" href="../full_api.html#api"><span class="std std-ref">Reference API</span></a>.</p>
+<section id="the-tags-property">
+<span id="tags-prop-entry"></span><h2>The <code class="docutils literal notranslate"><span class="pre">tags</span></code> Property<a class="headerlink" href="#the-tags-property" title="Link to this heading"></a></h2>
+<p>Additionally, and crucial to the package, AstroData offers a <code class="docutils literal notranslate"><span class="pre">tags</span></code> property,
+that returns a resolved set of textual tags that describe the object
+represented by an instance (as a set of strings). This is useful for quickly
+determining if a certain dataset belongs to an arbitrary category.</p>
+<p>The implementation for the tags property is just a call to
+<code class="docutils literal notranslate"><span class="pre">AstroData._process_tags()</span></code>. This function implements the actual logic behind
+calculating the tag set (described <a class="reference internal" href="tags.html#ad-tags"><span class="std std-ref">below</span></a>). A derivative class
+could override this to provide a different logic, but this is not recommended
+unless there is a very good reason to do so.</p>
+<p>For an example of how tags are resolved, seet <a class="reference internal" href="tags.html#ad-tags"><span class="std std-ref">Tags</span></a>.</p>
+</section>
+<section id="writing-an-astrodata-derivative">
+<h2>Writing an <code class="docutils literal notranslate"><span class="pre">AstroData</span></code> Derivative<a class="headerlink" href="#writing-an-astrodata-derivative" title="Link to this heading"></a></h2>
+<p>We will step through the process of creating a new <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> derivative.</p>
+<section id="create-a-new-class">
+<h3>Create a new class<a class="headerlink" href="#create-a-new-class" title="Link to this heading"></a></h3>
+<p>The first step to creating a new <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> derivative is to create a new
+class that inherits from <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>. If the new class is intended to handle
+non-FITS files, it should override the <code class="docutils literal notranslate"><span class="pre">info</span></code> and <code class="docutils literal notranslate"><span class="pre">load</span></code> methods. In this
+case, we will create a class to handle the following ASCII file:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Wavelength (nm)  Flux (erg/cm2/s/nm)
+1.0              1.0
+2.0              1.5
+3.0              2.0
+4.0              2.5
+5.0              3.0
+6.0              2.5
+7.0              1.0
+</pre></div>
+</div>
+<p>Let’s create our class to just override the info and load methods, and return a
+formatted string containing  the information in the header of the file when the
+<code class="docutils literal notranslate"><span class="pre">AstroData.info</span></code> method is called:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">AstroData</span><span class="p">,</span> <span class="n">NDAstroData</span>
+
+<span class="k">class</span> <span class="nc">AstroDataMyFile</span><span class="p">(</span><span class="n">AstroData</span><span class="p">):</span>
+    <span class="n">_wavelength</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">NDAstroData</span>
+    <span class="n">_flux</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">NDAstroData</span>
+    <span class="n">_header</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_flux</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_matches_data</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">source</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.txt&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">batch</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ndx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">iterable</span><span class="p">[</span><span class="n">ndx</span><span class="p">:</span><span class="nb">min</span><span class="p">(</span><span class="n">ndx</span> <span class="o">+</span> <span class="n">n</span><span class="p">,</span> <span class="n">l</span><span class="p">)]</span>
+
+        <span class="c1"># Just printing out information retrieved from the text file</span>
+        <span class="c1"># header.</span>
+        <span class="k">return</span> <span class="s1">&#39; || &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">w</span><span class="si">:</span><span class="s1">&gt;10</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">f</span><span class="si">:</span><span class="s1">&gt;10</span><span class="si">}</span><span class="s1">&#39;</span>
+          <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># First line is the header info</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+            <span class="c1"># This should keep units with the data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_header</span> <span class="o">=</span> <span class="p">[</span>
+              <span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+              <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_header</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+            <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                  <span class="n">w</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">_wavelength</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
+                  <span class="bp">self</span><span class="o">.</span><span class="n">_flux</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>We now have a class that can be used to load and store data from our ASCII
+file. The <code class="docutils literal notranslate"><span class="pre">info</span></code> method returns a formatted string containing the header
+information, and the <code class="docutils literal notranslate"><span class="pre">load</span></code> method reads in the data from the file. The
+<code class="docutils literal notranslate"><span class="pre">_matches_data</span></code> method is used to determine if the file is of the correct
+type. In this case, we are just checking that the file extension is <code class="docutils literal notranslate"><span class="pre">.txt</span></code>.</p>
+<p>However, suppose we only want to use this class for files that contain
+wavelength and flux information and nothing else. In that case, we can check
+the header information in the <code class="docutils literal notranslate"><span class="pre">_matches_data</span></code> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@staticmethod</span>
+<span class="k">def</span> <span class="nf">_matches_data</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="c1"># Check that the header contains no extra information.</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Wavelength&#39;</span><span class="p">,</span> <span class="s1">&#39;Flux&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">header</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="c1"># Check that the header contains both wavelength and flux information.</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
+      <span class="nb">any</span><span class="p">(</span><span class="n">col</span> <span class="o">==</span> <span class="n">name</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">header</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;Wavelength&#39;</span><span class="p">,</span> <span class="s1">&#39;Flux&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To conserve space in this document, we will only include modified code
+snippets (with any necessary context) for the rest of the examples. At the
+end of the document there will be an executable with the “final” code. Feel
+free to use this code as a template.</p>
+</div>
+<p>If there were other metadata contained in the file header, such as intrument
+and mode information, we could use that to determine if the file is of the
+correct type.</p>
+</section>
+<section id="code-organization-optional">
+<span id="code-organization"></span><h3>Code Organization (Optional)<a class="headerlink" href="#code-organization-optional" title="Link to this heading"></a></h3>
+<p>The code for our new class can be placed in a single file, but it is often
+useful to organize our code into multiple files depending on their scope and
+purpose.</p>
+<p>In DRAGONS, astrodata classes for individual instruments are organized into
+packages. We’ll use DRAGONS’ GMOS instrument as an example (see
+<a class="reference external" href="https://github.com/GeminiDRSoftware/DRAGONS/tree/master/gemini_instruments/gmos">the DRAGONS repository</a>
+for the full code). It has the following structure:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>gemini_instruments
+    __init__.py
+    gmos
+        tests/
+        __init__.py
+        adclass.py
+        lookup.py
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">adclass.py</span></code> contains the <code class="docutils literal notranslate"><span class="pre">AstroDataGmos</span></code> class, and <code class="docutils literal notranslate"><span class="pre">lookup.py</span></code>
+contains a dictionary of filter names and their central wavelengths. The
+<code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> files are used to import the classes and functions that are
+needed by the package. For example, the <code class="docutils literal notranslate"><span class="pre">gmos/__init__.py</span></code> file contains the
+following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AstroDataGmos&#39;</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">factory</span>
+<span class="kn">from</span> <span class="nn">..gemini</span> <span class="kn">import</span> <span class="n">addInstrumentFilterWavelengths</span>
+<span class="kn">from</span> <span class="nn">.adclass</span> <span class="kn">import</span> <span class="n">AstroDataGmos</span>
+<span class="kn">from</span> <span class="nn">.lookup</span> <span class="kn">import</span> <span class="n">filter_wavelengths</span>
+
+<span class="n">factory</span><span class="o">.</span><span class="n">addClass</span><span class="p">(</span><span class="n">AstroDataGmos</span><span class="p">)</span>
+<span class="c1"># Use the generic GMOS name for both GMOS-N and GMOS-S</span>
+<span class="n">addInstrumentFilterWavelengths</span><span class="p">(</span><span class="s1">&#39;GMOS&#39;</span><span class="p">,</span> <span class="n">filter_wavelengths</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">lookup.py</span></code> contains information that is specific to the instrument but is
+not explicitly required by the <code class="docutils literal notranslate"><span class="pre">AstroDataGmos</span></code> class. In this case, it is a
+dictionary of filter names and their central wavelengths. The
+<code class="docutils literal notranslate"><span class="pre">addInstrumentFilterWavelengths</span></code> function is used to add this information to
+the <code class="docutils literal notranslate"><span class="pre">AstroDataGemini</span></code> class, which is the parent class of <code class="docutils literal notranslate"><span class="pre">AstroDataGmos</span></code>.
+This function is defined in the <code class="docutils literal notranslate"><span class="pre">gemini/__init__.py</span></code> file, which is imported
+by <code class="docutils literal notranslate"><span class="pre">gmos/__init__.py</span></code>. The motivation here is to keep these lookup data
+separated from the class so changes to these data are only reflected in one and
+will not modify the class itself.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory contains unit tests for the <code class="docutils literal notranslate"><span class="pre">AstroDataGmos</span></code> class.
+Determining the nature and scale of tests is left to the developer.</p>
+<p>Some highlights:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">__keyword_dict</span></code><a class="footnote-reference brackets" href="#keywdict" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> defines one-to-one mappings, assigning a more
+readable moniker for an HDU header keyword. The idea here is to prevent
+hard-coding the names of the keywords, in the actual code. While these are
+typically quite stable and not prone to change, it’s better to be safe than
+sorry, and this can come in useful during instrument development, which is
+the more likely source of instability. The actual value can be extracted by
+calling <code class="docutils literal notranslate"><span class="pre">self._keyword_for('moniker')</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">_matches_data</span></code> is a static method. It does not have any knowledge about
+the class itself, and it does not work on an <em>instance</em> of the class: it’s
+a member of the class just to make it easier for the AstroData registry to
+find it. This method is passed some object containing cues of the internal
+structure and contents of the data. This could be, for example, an instance
+of <code class="docutils literal notranslate"><span class="pre">HDUList</span></code>. Using these data, <code class="docutils literal notranslate"><span class="pre">_matches_data</span></code> must return a boolean,
+with <code class="docutils literal notranslate"><span class="pre">True</span></code> meaning “I know how to handle this data”.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">True</span></code> <strong>does not mean “I have full knowledge of the data”</strong>. It
+is acceptable for more than one class to claim compatibility. For a GMOS FITS
+file, the classes that will return <code class="docutils literal notranslate"><span class="pre">True</span></code> are: <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> (because it is
+a FITS file that comply with certain minimum requirements),
+<cite>~gemini_instruments.gemini.AstroDataGemini</cite> (the data contains Gemini
+Facility common metadata), and <cite>~gemini_instruments.gmos.AstroDataGmos</cite> (the
+actual handler!).</p>
+<p>But this does not mean that multiple classes can be valid “final” candidates.
+If AstroData’s automatic class discovery finds more than one class claiming
+matching with the data, it will start discarding them on the basis of
+inheritance: any class that appears in the inheritance tree of another one is
+dropped, because the more specialized one is preferred. If at some point the
+algorithm cannot find more classes to drop, and there is more than one left
+in the list, an exception will occur, as AstroData will have no way to choose
+one over the other.</p>
+</li>
+<li><p>A number of “tag methods” have been declared. Their naming is a convention,
+at the end of the day (the “<code class="docutils literal notranslate"><span class="pre">_tag_</span></code>” prefix, and the related “<code class="docutils literal notranslate"><span class="pre">_status_</span></code>”
+one, are <em>just hints</em> for the programmer): each team should establish
+a convention that works for them. What is important here is to <strong>decorate</strong>
+them using <cite>~astrodata.astro_data_tag</cite>, which earmarks the method so that it
+can be discovered later, and ensures that it returns an appropriate value.</p>
+<p>A tag method will return either a <cite>~astrodata.TagSet</cite> instance (which can be
+empty), or <code class="docutils literal notranslate"><span class="pre">None</span></code>, which is the same as returning an empty
+<cite>~astrodata.TagSet</cite><a class="footnote-reference brackets" href="#tagset1" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>.</p>
+<p><strong>All</strong> these methods will be executed when looking up for tags, and it’s up
+to the tag set construction algorithm (see <a class="reference internal" href="tags.html#ad-tags"><span class="std std-ref">Tags</span></a>) to figure out the final
+result.  In theory, one <strong>could</strong> provide <em>just one</em> big method, but this is
+feasible only when the logic behind deciding the tag set is simple. The
+moment that there are a few competing alternatives, with some conditions
+precluding other branches, one may end up with a rather complicated dozens of
+lines of logic. Let the algorithm do the heavy work for you: split the tags
+as needed to keep things simple, with an easy to understand logic.</p>
+<p>Also, keeping the individual (or related) tags in separate methods lets you
+exploit the inheritance, keeping common ones at a higher level, and
+redefining them as needed later on, at derived classes.</p>
+<p>Please, refer to <cite>~gemini_instruments.gemini.AstroDataGemini</cite>,
+<cite>~gemini_instruments.gmos.AstroDataGmos</cite>, and
+<cite>~gemini_instruments.gnirs.AstroDataGnirs</cite> for examples using most of the
+features.</p>
+</li>
+<li><p>The <cite>astrodata.AstroData.read</cite> method calls the <cite>astrodata.fits.read_fits</cite>
+function, which uses metadata in the FITS headers to determine how the data
+should be stored in the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. In particular, the <code class="docutils literal notranslate"><span class="pre">EXTNAME</span></code>
+and <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> keywords are used to assign individual FITS HDUs, using the
+same names (<code class="docutils literal notranslate"><span class="pre">SCI</span></code>, <code class="docutils literal notranslate"><span class="pre">DQ</span></code>, and <code class="docutils literal notranslate"><span class="pre">VAR</span></code>) as Gemini-IRAF for the <code class="docutils literal notranslate"><span class="pre">data</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mask</span></code>, and <code class="docutils literal notranslate"><span class="pre">variance</span></code> planes.  A <code class="docutils literal notranslate"><span class="pre">SCI</span></code> HDU <em>must</em> exist if there is
+another HDU with the same <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code>, or else an error will occur.</p>
+<p>If the raw data do not conform to this format, the <cite>astrodata.AstroData.read</cite>
+method can be overridden by your class, by having it call the
+<cite>astrodata.fits.read_fits</cite> function with an additional parameter,
+<code class="docutils literal notranslate"><span class="pre">extname_parser</span></code>, that provides a function to modify the header. This
+function will be called on each HDU before further processing. As an example,
+the SOAR Adaptive Module Imager (SAMI) instrument writes raw data as
+a 4-extension MEF file, with the extensions having <code class="docutils literal notranslate"><span class="pre">EXTNAME</span></code> values
+<code class="docutils literal notranslate"><span class="pre">im1</span></code>, <code class="docutils literal notranslate"><span class="pre">im2</span></code>, etc. These need to be modified to <code class="docutils literal notranslate"><span class="pre">SCI</span></code>, and an
+appropriate <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> keyword added` <a class="footnote-reference brackets" href="#extver" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. This can be done by
+writing a suitable <code class="docutils literal notranslate"><span class="pre">read</span></code> method for the <code class="docutils literal notranslate"><span class="pre">AstroDataSami</span></code> class:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@classmethod</span>
+<span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">extname_parser</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">sami_parser</span><span class="p">(</span><span class="n">hdu</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s1">&#39;im(\d)&#39;</span><span class="p">,</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;EXTNAME&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;EXTNAME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;SCI&#39;</span><span class="p">,</span> <span class="s1">&#39;Added by AstroData&#39;</span><span class="p">)</span>
+            <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;EXTVER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span> <span class="s1">&#39;Added by AstroData&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">extname_parser</span><span class="o">=</span><span class="n">extname_parser</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><em>Descriptors</em> will make the bulk of the class: again, the name is arbitrary,
+and it should be descriptive. What <em>may</em> be important here is to use
+<cite>~astrodata.astro_data_descriptor</cite> to decorate them. This is <em>not required</em>,
+because unlike tag methods, descriptors are meant to be called explicitly by
+the programmer, but they can still be marked (using this decorator) to be
+listed when calling the <code class="docutils literal notranslate"><span class="pre">descriptors</span></code> property. The decorator does not
+alter the descriptor input or output in any way, so it is always safe to use
+it, and you probably should, unless there’s a good reason against it (e.g.,
+if a descriptor is deprecated and you don’t want it to show up in lookups).</p>
+<p>More detailed information can be found in <a class="reference internal" href="descriptors.html#ad-descriptors"><span class="std std-ref">Descriptors</span></a>.</p>
+</li>
+</ul>
+</section>
+<section id="register-your-class">
+<span id="class-registration"></span><h3>Register your class<a class="headerlink" href="#register-your-class" title="Link to this heading"></a></h3>
+<p>Finally, you need to include your class in the <strong>AstroData Registry</strong>. This is
+an internal structure with a list of all the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>-derived classes that
+we want to make available for our programs. Including the classes in this
+registry is an important step, because a file should be opened using
+<cite>astrodata.from_file</cite> or <cite>astrodata.create_from_scratch</cite>, which uses the
+registry to identify the appropriate class (via the <code class="docutils literal notranslate"><span class="pre">_matches_data</span></code> methods),
+instead of having the user specify it explicitly.</p>
+<p>A typical <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file on an instrument package (example above) will
+look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AstroDataMyInstrument&#39;</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">factory</span>
+<span class="kn">from</span> <span class="nn">.adclass</span> <span class="kn">import</span> <span class="n">AstroDataMyInstrument</span>
+
+<span class="n">factory</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="n">AstroDataMyInstrument</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The call to <code class="docutils literal notranslate"><span class="pre">factory.add_class</span></code> is the one registering the class. This step
+<strong>needs</strong> to be done <strong>before</strong> the class can be used effectively in the
+AstroData system. Placing the registration step in the <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file is
+convenient, because importing the package will be enough!</p>
+<p>Thus, a script making use of DRAGONS’ AstroData to manipulate GMOS data
+could start like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astrodata</span>
+<span class="kn">from</span> <span class="nn">gemini_instruments</span> <span class="kn">import</span> <span class="n">gmos</span>
+
+<span class="o">...</span>
+
+<span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">some_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The first import line is not needed, technically, because the <code class="docutils literal notranslate"><span class="pre">gmos</span></code> package
+will import it too, anyway, but we’ll probably need the <code class="docutils literal notranslate"><span class="pre">astrodata</span></code> package
+in the namespace anyway, and it’s always better to be explicit. Our
+typical DRAGONS scripts and modules start like this, instead:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astrodata</span>
+<span class="kn">import</span> <span class="nn">gemini_instruments</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">gemini_instruments</span></code> imports all the packages under it, making knowledge
+about all Gemini instruments available for the script, which is perfect for a
+multi-instrument pipeline, for example. Loading all the instrument classes is
+not typically a burden on memory, though, so it’s easier for everyone to take
+the more general approach. It also makes things easier on the end user, because
+they won’t need to know internal details of our packages (like their naming
+scheme). We suggest this “<em>cascade import</em>” scheme for all new source trees,
+letting the user decide which level of detail they need.</p>
+<p>As an additional step, the <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> file in a package may do extra
+initialization. For example, for the Gemini modules, one piece of functionality
+that is shared across instruments is a descriptor that translates a filter’s
+name (say “u” or “FeII”) to its central wavelength (e.g.,
+0.35µm, 1.644µm). As it is a rather common function for us, it is implemented
+by <cite>~gemini_instruments.gemini.AstroDataGemini</cite>. This class <strong>does not know</strong>
+about its daughter classes, though, meaning that it <strong>cannot know</strong> about the
+filters offered by their instruments. Instead, we offer a function that can
+be used to update the filter → wavelength mapping in
+<cite>gemini_instruments.gemini.lookup</cite> so that it is accessible by the
+<cite>~gemini_instruments.gemini.AstroDataGemini</cite>-level descriptor. So our
+<code class="docutils literal notranslate"><span class="pre">gmos/__init__.py</span></code> looks like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;AstroDataGmos&#39;</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">factory</span>
+<span class="kn">from</span> <span class="nn">..gemini</span> <span class="kn">import</span> <span class="n">addInstrumentFilterWavelengths</span>
+<span class="kn">from</span> <span class="nn">.adclass</span> <span class="kn">import</span> <span class="n">AstroDataGmos</span>
+<span class="kn">from</span> <span class="nn">.lookup</span> <span class="kn">import</span> <span class="n">filter_wavelengths</span>
+
+<span class="n">factory</span><span class="o">.</span><span class="n">addClass</span><span class="p">(</span><span class="n">AstroDataGmos</span><span class="p">)</span>
+<span class="c1"># Use the generic GMOS name for both GMOS-N and GMOS-S</span>
+<span class="n">addInstrumentFilterWavelengths</span><span class="p">(</span><span class="s1">&#39;GMOS&#39;</span><span class="p">,</span> <span class="n">filter_wavelengths</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <cite>~gemini_instruments.gemini.addInstrumentFilterWavelengths</cite> is provided
+by the <code class="docutils literal notranslate"><span class="pre">gemini</span></code> package to perform the update in a controlled way.</p>
+<p>We encourage package maintainers and creators to follow such explicit
+initialization methods, driven by the modules that add functionality
+themselves, as opposed to active discovery methods on the core code. This
+favors decoupling between modules, which is generally a good idea.</p>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="keywdict" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>The keyword dictionary is a “private” property of the
+class (due to the double-underscore prefix). Each class can define its own
+set, which will not be replaced by derivative classes. <code class="docutils literal notranslate"><span class="pre">_keyword_for</span></code> is
+aware of this and will look up each class up the inheritance chain, in turn,
+when looking up for keywords.</p>
+</aside>
+<aside class="footnote brackets" id="tagset1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>The example functions will return only
+a <cite>~astrodata.TagSet</cite>, if appropriate. This is OK, remember that <em>every
+function</em> in Python returns a value, which will be <code class="docutils literal notranslate"><span class="pre">None</span></code>, implicitly, if
+you don’t specify otherwise.</p>
+</aside>
+<aside class="footnote brackets" id="extver" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>An <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> keyword is not explicitly required; the
+<cite>astrodata.fits.read_fits</cite> method will assign the lowest available integer
+to a <code class="docutils literal notranslate"><span class="pre">SCI</span></code> header with no <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> keyword (or if its value is -1). But
+we wish to be able to identify the original <code class="docutils literal notranslate"><span class="pre">im1</span></code> header by assigning it
+an <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> of 1, etc.</p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="design.html" class="btn btn-neutral float-left" title="General Design" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="containers.html" class="btn btn-neutral float-right" title="Data Containers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

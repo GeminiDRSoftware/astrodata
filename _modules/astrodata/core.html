@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>astrodata.core &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../astrodata.html">astrodata</a></li>
+      <li class="breadcrumb-item active">astrodata.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for astrodata.core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This is the core module of the AstroData package. It provides the</span>
+<span class="sd">`AstroData` class, which is the main interface to manipulate astronomical</span>
+<span class="sd">data sets.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">from</span> <span class="nn">astropy.nddata</span> <span class="kn">import</span> <span class="n">NDData</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+<span class="kn">from</span> <span class="nn">astropy.utils</span> <span class="kn">import</span> <span class="n">format_doc</span>
+
+<span class="kn">from</span> <span class="nn">.fits</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_EXTENSION</span><span class="p">,</span>
+    <span class="n">FitsHeaderCollection</span><span class="p">,</span>
+    <span class="n">_process_table</span><span class="p">,</span>
+    <span class="n">read_fits</span><span class="p">,</span>
+    <span class="n">write_fits</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.nddata</span> <span class="kn">import</span> <span class="n">ADVarianceUncertainty</span>
+<span class="kn">from</span> <span class="nn">.nddata</span> <span class="kn">import</span> <span class="n">NDAstroData</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">assign_only_single_slice</span><span class="p">,</span>
+    <span class="n">astro_data_descriptor</span><span class="p">,</span>
+    <span class="n">deprecated</span><span class="p">,</span>
+    <span class="n">normalize_indices</span><span class="p">,</span>
+    <span class="n">returns_list</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">NO_DEFAULT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+
+
+<span class="n">_ARIT_DOC</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    Performs </span><span class="si">{name}</span><span class="s2"> by evaluating ``self </span><span class="si">{op}</span><span class="s2"> operand``.</span>
+
+<span class="s2">    Parameters</span>
+<span class="s2">    ----------</span>
+<span class="s2">    oper : number or object</span>
+<span class="s2">        The operand to perform the operation  ``self </span><span class="si">{op}</span><span class="s2"> operand``.</span>
+
+<span class="s2">    Returns</span>
+<span class="s2">    --------</span>
+<span class="s2">    `AstroData` instance</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="AstroData">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData">[docs]</a>
+<span class="k">class</span> <span class="nc">AstroData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for the AstroData software package. It provides an interface</span>
+<span class="sd">    to manipulate astronomical data sets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nddata : `astrodata.NDAstroData` or list of `astrodata.NDAstroData`</span>
+<span class="sd">        List of NDAstroData objects.</span>
+
+<span class="sd">    tables : dict[name, `astropy.table.Table`]</span>
+<span class="sd">        Dict of table objects.</span>
+
+<span class="sd">    phu : `astropy.io.fits.Header`</span>
+<span class="sd">        Primary header.</span>
+
+<span class="sd">    indices : list of int</span>
+<span class="sd">        List of indices mapping the `astrodata.NDAstroData` objects that this</span>
+<span class="sd">        object will access to. This is used when slicing an object, then the</span>
+<span class="sd">        sliced AstroData will have the ``.nddata`` list from its parent and</span>
+<span class="sd">        access the sliced NDAstroData through this list of indices.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Derived classes may provide their own __keyword_dict. Being a private</span>
+    <span class="c1"># variable, each class will preserve its own, and there&#39;s no risk of</span>
+    <span class="c1"># overriding the whole thing</span>
+    <span class="n">__keyword_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;instrument&quot;</span><span class="p">:</span> <span class="s2">&quot;INSTRUME&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="s2">&quot;OBJECT&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;telescope&quot;</span><span class="p">:</span> <span class="s2">&quot;TELESCOP&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ut_date&quot;</span><span class="p">:</span> <span class="s2">&quot;DATE-OBS&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="AstroData.__init__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__init__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">nddata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_single</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">nddata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nddata</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Check that nddata is either a single or iterable of NDAstroData</span>
+        <span class="c1"># objects</span>
+        <span class="n">is_nddata</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nddata</span><span class="p">,</span> <span class="n">NDAstroData</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">is_nddata_iterable</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nddata</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">NDAstroData</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="c1"># Fall back on checking if it&#39;s a list or tuple---could be empty.</span>
+            <span class="n">is_nddata_iterable</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nddata</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">is_nddata</span> <span class="ow">or</span> <span class="n">is_nddata_iterable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;nddata must be an NDAstroData object or a list of &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;NDAstroData objects, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">nddata</span><span class="p">)</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">nddata</span><span class="si">}</span><span class="s2">).&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># If nddata is a single NDAstroData object, make it a list.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_nddata_iterable</span><span class="p">:</span>
+            <span class="n">nddata</span> <span class="o">=</span> <span class="p">[</span><span class="n">nddata</span><span class="p">]</span>
+
+        <span class="c1"># _all_nddatas contains all the extensions from the original file or</span>
+        <span class="c1"># object.  And _indices is used to map extensions for sliced objects.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span> <span class="o">=</span> <span class="n">nddata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="o">=</span> <span class="n">indices</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span> <span class="o">=</span> <span class="n">is_single</span>
+
+        <span class="k">if</span> <span class="n">tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tables must be a dict&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span> <span class="o">=</span> <span class="n">tables</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phu</span> <span class="o">=</span> <span class="n">phu</span> <span class="ow">or</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_settable</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;uncertainty&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mask&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;variance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wcs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_orig_filename</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__deepcopy__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__deepcopy__">[docs]</a>
+    <span class="k">def</span> <span class="nf">__deepcopy__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memo</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a new instance of this class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        memo : dict</span>
+<span class="sd">            See the documentation on `deepcopy` for an explanation on how</span>
+<span class="sd">            this works.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;_phu&quot;</span><span class="p">,</span> <span class="s2">&quot;_path&quot;</span><span class="p">,</span> <span class="s2">&quot;_orig_filename&quot;</span><span class="p">,</span> <span class="s2">&quot;_tables&quot;</span><span class="p">):</span>
+            <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">attr</span><span class="p">])</span>
+
+        <span class="n">obj</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;_all_nddatas&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_keyword_for</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the FITS keyword name associated to ``name``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The common &quot;key&quot; name for which we want to know the associated</span>
+<span class="sd">            FITS keyword.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The desired keyword name.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If there is no keyword for the specified ``name``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">mro</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
+                <span class="c1"># __keyword_dict is a mangled variable</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">__keyword_dict&quot;</span><span class="p">)[</span><span class="n">name</span><span class="p">]</span>
+
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No match for &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_process_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the tag set (as a set of str) for the current instance.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># Calling inspect.getmembers on `self` would trigger all the</span>
+        <span class="c1"># properties (tags, phu, hdr, etc.), and that&#39;s undesirable. To</span>
+        <span class="c1"># prevent that, we&#39;ll inspect the *class*.</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;tag_method&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">members</span><span class="p">:</span>
+            <span class="n">ts</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ts</span><span class="o">.</span><span class="n">add</span> <span class="ow">or</span> <span class="n">ts</span><span class="o">.</span><span class="n">remove</span> <span class="ow">or</span> <span class="n">ts</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+
+        <span class="c1"># Sort by the length of substractions... those that substract</span>
+        <span class="c1"># from others go first</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">remove</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">blocks</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Sort by length of blocked_by, those that are never disabled go first</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">blocked_by</span><span class="p">))</span>
+
+        <span class="c1"># Sort by length of if_present... those that need other tags to</span>
+        <span class="c1"># be present go last</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">if_present</span><span class="p">))</span>
+
+        <span class="n">tags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">removals</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">blocked</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">plus</span><span class="p">,</span> <span class="n">minus</span><span class="p">,</span> <span class="n">blocked_by</span><span class="p">,</span> <span class="n">blocks</span><span class="p">,</span> <span class="n">is_present</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_present</span><span class="p">:</span>
+                <span class="c1"># If this TagSet requires other tags to be present, make</span>
+                <span class="c1"># sure that all of them are. Otherwise, skip...</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tags</span> <span class="o">&amp;</span> <span class="n">is_present</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">is_present</span><span class="p">):</span>
+                    <span class="k">continue</span>
+
+            <span class="n">allowed</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tags</span> <span class="o">&amp;</span> <span class="n">blocked_by</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">plus</span> <span class="o">&amp;</span> <span class="n">blocked</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">allowed</span><span class="p">:</span>
+                <span class="c1"># This set is not being blocked by others...</span>
+                <span class="n">removals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">minus</span><span class="p">)</span>
+                <span class="n">tags</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">plus</span> <span class="o">-</span> <span class="n">removals</span><span class="p">)</span>
+                <span class="n">blocked</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">blocks</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tags</span>
+
+<div class="viewcode-block" id="AstroData.matches_data">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.matches_data">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">matches_data</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns True if the class can handle the data in the source.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source : list of `astropy.io.fits.HDUList`</span>
+<span class="sd">            The FITS file to be read.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the class can handle the data in the source.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Typically, this method is implemented by the static method</span>
+<span class="sd">        `Astrodata._matches_data` or by a class method with the same signature</span>
+<span class="sd">        for subclasses.</span>
+
+<span class="sd">        If you are implementing a subclass, you should override _matches_data</span>
+<span class="sd">        instead, which is a static method that takes a single argument, the</span>
+<span class="sd">        source data, and returns a boolean.</span>
+
+<span class="sd">        If that method is not overridden, this method will call it with the</span>
+<span class="sd">        source data as argument.</span>
+
+<span class="sd">        For more information, see the documentation for the</span>
+<span class="sd">        :py:meth:`~AstroData._matches_data` and the |DeveloperGuide|.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_matches_data</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_matches_data</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+        <span class="c1"># This one is trivial. Will be more specific for subclasses.</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Using default _matches_data with </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the file path.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+
+    <span class="nd">@path</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_orig_filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the file name.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+
+    <span class="nd">@filename</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot set the filename to an absolute path!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">orig_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the original file name (before it was modified).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_orig_filename</span>
+
+    <span class="nd">@orig_filename</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">orig_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_orig_filename</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">phu</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the primary header.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phu</span>
+
+    <span class="nd">@phu</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">phu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phu</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phu</span> <span class="o">=</span> <span class="n">phu</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">hdr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all headers, as a `astrodata.fits.FitsHeaderCollection`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">headers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span> <span class="k">else</span> <span class="n">FitsHeaderCollection</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="s2">&quot;Access to headers through this property is deprecated and &quot;</span>
+        <span class="s2">&quot;will be removed in the future. Use &#39;.hdr&#39; instead.&quot;</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deprecated header access. Use ``.hdr`` instead.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">ndd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">ndd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tags</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A set of strings that represent the tags defining this instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_tags</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">descriptors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sequence of names for the methods that have been</span>
+<span class="sd">        decorated as descriptors.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        tuple of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;descriptor_method&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">mname</span> <span class="k">for</span> <span class="p">(</span><span class="n">mname</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span> <span class="ow">in</span> <span class="n">members</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the extension identifier (1-based extension number)</span>
+<span class="sd">        for sliced objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot return id for an AstroData object &quot;</span>
+            <span class="s2">&quot;that is not a single slice&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the extensions indices for sliced objects.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_sliced</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If this data provider instance represents the whole dataset, return</span>
+<span class="sd">        False. If it represents a slice out of the whole, return True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="AstroData.is_settable">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.is_settable">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_settable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if the attribute is meant to be modified.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_sliced</span> <span class="ow">and</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;filename&quot;</span><span class="p">}:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_settable</span> <span class="ow">or</span> <span class="n">attr</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_nddata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the list of `astrodata.NDAstroData` objects. Contrary to</span>
+<span class="sd">        ``self.nddata`` this always returns a list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nddata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the list of `astrodata.NDAstroData` objects.</span>
+
+<span class="sd">        If the `AstroData` object is sliced, this returns only the NDData</span>
+<span class="sd">        objects of the sliced extensions. And if this is a single extension</span>
+<span class="sd">        object, the NDData object is returned directly (i.e. not a list).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span>
+
+<div class="viewcode-block" id="AstroData.table">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.table">[docs]</a>
+    <span class="k">def</span> <span class="nf">table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dictionary of `astropy.table.Table` objects.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This returns a _copy_ of the tables, so modifying them will not</span>
+<span class="sd">        affect the original ones.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># FIXME: do we need this in addition to .tables ?</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the names of the `astropy.table.Table` objects associated to</span>
+<span class="sd">        the top-level object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ext_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the names of the `astropy.table.Table` objects associated to</span>
+<span class="sd">        an extension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;this is only available for extensions&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span>
+            <span class="n">key</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Table</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@returns_list</span>
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the shape of the data array for each extension as a list of</span>
+<span class="sd">        shapes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">nd</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@returns_list</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of the arrays (or single array, if this is a single slice)</span>
+<span class="sd">        corresponding to the science data attached to each extension.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">nd</span><span class="o">.</span><span class="n">data</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+
+    <span class="nd">@data</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@assign_only_single_slice</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># Setting the ._data in the NDData is a bit kludgy, but we&#39;re all</span>
+        <span class="c1"># grown adults and know what we&#39;re doing, isn&#39;t it?</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;Trying to assign data to be something with no shape&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@returns_list</span>
+    <span class="k">def</span> <span class="nf">uncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of the uncertainty objects (or a single object, if this is</span>
+<span class="sd">        a single slice) attached to the science data, for each extension.</span>
+
+<span class="sd">        The objects are instances of AstroPy&#39;s `astropy.nddata.NDUncertainty`,</span>
+<span class="sd">        or `None` where no information is available.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        variance : The actual array supporting the uncertainty object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">nd</span><span class="o">.</span><span class="n">uncertainty</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+
+    <span class="nd">@uncertainty</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@assign_only_single_slice</span>
+    <span class="k">def</span> <span class="nf">uncertainty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@returns_list</span>
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of the mask arrays (or a single array, if this is a single</span>
+<span class="sd">        slice) attached to the science data, for each extension.</span>
+
+<span class="sd">        For objects that miss a mask, `None` will be provided instead.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">nd</span><span class="o">.</span><span class="n">mask</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+
+    <span class="nd">@mask</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@assign_only_single_slice</span>
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@returns_list</span>
+    <span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A list of the variance arrays (or a single array, if this is a</span>
+<span class="sd">        single slice) attached to the science data, for each extension.</span>
+
+<span class="sd">        For objects that miss uncertainty information, `None` will be provided</span>
+<span class="sd">        instead.</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        ---------</span>
+<span class="sd">        uncertainty : The uncertainty objects used under the hood.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">nd</span><span class="o">.</span><span class="n">variance</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">]</span>
+
+    <span class="nd">@variance</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@assign_only_single_slice</span>
+    <span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">ADVarianceUncertainty</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the list of WCS objects for each extension.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">wcs</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Cannot return WCS for an AstroData object &quot;</span>
+            <span class="s2">&quot;that is not a single slice&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@wcs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="nd">@assign_only_single_slice</span>
+    <span class="k">def</span> <span class="nf">wcs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="AstroData.__iter__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__iter__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+                <span class="k">yield</span> <span class="bp">self</span><span class="p">[</span><span class="n">n</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__getitem__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__getitem__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sliced view of the instance. It supports the standard</span>
+<span class="sd">        Python indexing syntax.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        slice : int, `slice`</span>
+<span class="sd">            An integer or an instance of a Python standard `slice` object</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If trying to slice an object when it doesn&#39;t make sense (e.g.</span>
+<span class="sd">            slicing a single slice)</span>
+
+<span class="sd">        ValueError</span>
+<span class="sd">            If `slice` does not belong to one of the recognized types</span>
+
+<span class="sd">        IndexError</span>
+<span class="sd">            If an index is out of range</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t slice a single slice!&quot;</span><span class="p">)</span>
+
+        <span class="n">indices</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">normalize_indices</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">nitems</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">:</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+
+        <span class="n">is_single</span> <span class="o">=</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">slice</span><span class="p">))</span>
+
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span><span class="p">,</span>
+            <span class="n">tables</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">,</span>
+            <span class="n">phu</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="p">,</span>
+            <span class="n">indices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
+            <span class="n">is_single</span><span class="o">=</span><span class="n">is_single</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">obj</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_orig_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">orig_filename</span>
+
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__delitem__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__delitem__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called to implement deletion of ``self[idx]``.  Supports standard</span>
+<span class="sd">        Python syntax (including negative indices).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            This index represents the order of the element that you want</span>
+<span class="sd">            to remove.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If `idx` is out of range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_sliced</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t remove items from a sliced object&quot;</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__getattr__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__getattr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when an attribute lookup has not found the attribute in the</span>
+<span class="sd">        usual places (not an instance attribute, and not in the class tree for</span>
+<span class="sd">        ``self``).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attribute : str</span>
+<span class="sd">            The attribute&#39;s name.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If the attribute could not be found/computed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If we&#39;re working with single slices, let&#39;s look some things up</span>
+        <span class="c1"># in the ND object</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span> <span class="ow">and</span> <span class="n">attribute</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span>
+            <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">KeyError</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> object has no &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;attribute </span><span class="si">{</span><span class="n">attribute</span><span class="si">!r}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__setattr__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__setattr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Called when an attribute assignment is attempted, instead of the</span>
+<span class="sd">        normal mechanism.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attribute : str</span>
+<span class="sd">            The attribute&#39;s name.</span>
+
+<span class="sd">        value : object</span>
+<span class="sd">            The value to be assigned to the attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_my_attribute</span><span class="p">(</span><span class="n">attr</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span> <span class="ow">or</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__dict__</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">attribute</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_settable</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">_my_attribute</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># This method is meant to let the user set certain attributes of</span>
+            <span class="c1"># the NDData objects. First we check if the attribute belongs to</span>
+            <span class="c1"># this object&#39;s dictionary.  Otherwise, see if we can pass it down.</span>
+            <span class="c1">#</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_sliced</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;This attribute can only be &quot;</span>
+                    <span class="s2">&quot;assigned to a single-slice object&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">attribute</span> <span class="o">==</span> <span class="n">DEFAULT_EXTENSION</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2"> extensions should be &quot;</span>
+                    <span class="s2">&quot;appended with .append&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;DQ&quot;</span><span class="p">,</span> <span class="s2">&quot;VAR&quot;</span><span class="p">}:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2"> should be set on the &quot;</span> <span class="s2">&quot;nddata object&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">add_to</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">attribute</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="n">add_to</span><span class="p">)</span>
+
+            <span class="k">return</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">attribute</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__delattr__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__delattr__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements attribute removal.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attribute</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__delattr__</span><span class="p">(</span><span class="n">attribute</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_sliced</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t delete attributes on non-single slices&quot;</span><span class="p">)</span>
+
+            <span class="n">other</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">other</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> sliced &quot;</span>
+                    <span class="s2">&quot;object has no attribute </span><span class="si">{attribute!r}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">attribute</span><span class="si">}</span><span class="s2">&#39; is not a global table &quot;</span> <span class="s2">&quot;for this instance&quot;</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__contains__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__contains__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implements the ability to use the ``in`` operator with an</span>
+<span class="sd">        `AstroData` object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attribute : str</span>
+<span class="sd">            An attribute name.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">exposed</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__len__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__len__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the number of independent extensions stored by the object.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indices</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">exposed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;A collection of strings with the names of objects that can be</span>
+<span class="sd">        accessed directly by name as attributes of this instance, and that are</span>
+<span class="sd">        not part of its standard interface (i.e. data objects that have been</span>
+<span class="sd">        added dynamically).</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ---------</span>
+<span class="sd">        &gt;&gt;&gt; ad[0].exposed  # doctest: +SKIP</span>
+<span class="sd">        set([&#39;OBJMASK&#39;, &#39;OBJCAT&#39;])</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exposed</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="n">exposed</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nddata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">exposed</span>
+
+    <span class="k">def</span> <span class="nf">_pixel_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">nd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">):</span>
+            <span class="n">other_objects</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">uncer</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">uncertainty</span>
+            <span class="n">fixed</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="s2">&quot;variance&quot;</span><span class="p">,</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">uncer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">uncer</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="n">nd</span><span class="o">.</span><span class="n">mask</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">fixed</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">())):</span>
+                <span class="k">if</span> <span class="n">other</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Table</span><span class="p">):</span>
+                    <span class="n">other_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;attr&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Table&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">columns</span><span class="p">))),</span>
+                            <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="s2">&quot;n/a&quot;</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">dim</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">):</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span>
+                        <span class="n">dim</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">):</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span>
+                        <span class="n">dim</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+                    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;array&quot;</span><span class="p">):</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span>
+                        <span class="n">dim</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dt</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+
+                    <span class="n">obj_dict</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;attr&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                        <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="n">dim</span><span class="p">,</span>
+                        <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+                    <span class="p">}</span>
+
+                    <span class="n">other_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_dict</span><span class="p">)</span>
+
+            <span class="n">main_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;science&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">nd</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
+                <span class="s2">&quot;data_type&quot;</span><span class="p">:</span> <span class="n">nd</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">out_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;idx&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">idx</span><span class="si">:</span><span class="s2">2</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;main&quot;</span><span class="p">:</span> <span class="n">main_dict</span><span class="p">,</span>
+                <span class="s2">&quot;other&quot;</span><span class="p">:</span> <span class="n">other_objects</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">yield</span> <span class="n">out_dict</span>
+
+<div class="viewcode-block" id="AstroData.info">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.info">[docs]</a>
+    <span class="k">def</span> <span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prints out information about the contents of this instance.&quot;&quot;&quot;</span>
+        <span class="n">unknown_file</span> <span class="o">=</span> <span class="s2">&quot;Unknown&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filename: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">unknown_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Tags with proper indent and wrapping.</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Tags: &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
+        <span class="n">textwrapper</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">TextWrapper</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">subsequent_indent</span><span class="o">=</span><span class="s2">&quot;    &quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">textwrapper</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+        <span class="c1"># Data information</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">main_fmt</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:6}</span><span class="s2"> </span><span class="si">{:24}</span><span class="s2"> </span><span class="si">{:17}</span><span class="s2"> </span><span class="si">{:14}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span>
+            <span class="n">other_fmt</span> <span class="o">=</span> <span class="s2">&quot;          .</span><span class="si">{:20}</span><span class="s2"> </span><span class="si">{:17}</span><span class="s2"> </span><span class="si">{:14}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Pixels Extensions&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="n">main_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;Index&quot;</span><span class="p">,</span> <span class="s2">&quot;Content&quot;</span><span class="p">,</span> <span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="s2">&quot;Dimensions&quot;</span><span class="p">,</span> <span class="s2">&quot;Format&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">pi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pixel_info</span><span class="p">():</span>
+                <span class="n">main_obj</span> <span class="o">=</span> <span class="n">pi</span><span class="p">[</span><span class="s2">&quot;main&quot;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="n">main_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">pi</span><span class="p">[</span><span class="s2">&quot;idx&quot;</span><span class="p">],</span>
+                        <span class="n">main_obj</span><span class="p">[</span><span class="s2">&quot;content&quot;</span><span class="p">][:</span><span class="mi">24</span><span class="p">],</span>
+                        <span class="n">main_obj</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">][:</span><span class="mi">17</span><span class="p">],</span>
+                        <span class="n">main_obj</span><span class="p">[</span><span class="s2">&quot;dim&quot;</span><span class="p">],</span>
+                        <span class="n">main_obj</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">],</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">pi</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="n">other_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">other</span><span class="p">[</span><span class="s2">&quot;attr&quot;</span><span class="p">][:</span><span class="mi">20</span><span class="p">],</span>
+                            <span class="n">other</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">][:</span><span class="mi">17</span><span class="p">],</span>
+                            <span class="n">other</span><span class="p">[</span><span class="s2">&quot;dim&quot;</span><span class="p">],</span>
+                            <span class="n">other</span><span class="p">[</span><span class="s2">&quot;data_type&quot;</span><span class="p">],</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># NOTE: This covers tables, only. Study other cases before</span>
+        <span class="c1"># implementing a more general solution</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Other Extensions&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;               Type        Dimensions&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="c1"># This is not a free floating table</span>
+                    <span class="k">continue</span>
+
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">name</span><span class="p">[:</span><span class="mi">13</span><span class="p">]</span><span class="si">:</span><span class="s2">13s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39;Table&#39;</span><span class="si">:</span><span class="s2">11s</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="p">),</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_oper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">operand</span><span class="p">):</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span>
+        <span class="n">ndd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">operand</span><span class="p">,</span> <span class="n">AstroData</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Operands are not the same size&quot;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">operand</span><span class="o">.</span><span class="n">nddata</span>
+                        <span class="k">if</span> <span class="n">operand</span><span class="o">.</span><span class="n">is_single</span>
+                        <span class="k">else</span> <span class="n">operand</span><span class="o">.</span><span class="n">nddata</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                    <span class="p">)</span>
+
+                    <span class="n">ndd</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ndd</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="n">n</span><span class="p">]],</span> <span class="n">data</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="c1"># This may happen if operand is a sliced, single</span>
+                    <span class="c1"># AstroData object</span>
+                    <span class="n">ndd</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ndd</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="n">n</span><span class="p">]],</span> <span class="n">operand</span><span class="o">.</span><span class="n">nddata</span><span class="p">)</span>
+
+            <span class="n">op_table</span> <span class="o">=</span> <span class="n">operand</span><span class="o">.</span><span class="n">table</span><span class="p">()</span>
+            <span class="n">ltab</span><span class="p">,</span> <span class="n">rtab</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">),</span> <span class="nb">set</span><span class="p">(</span><span class="n">op_table</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tab</span> <span class="ow">in</span> <span class="n">rtab</span> <span class="o">-</span> <span class="n">ltab</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">[</span><span class="n">tab</span><span class="p">]</span> <span class="o">=</span> <span class="n">op_table</span><span class="p">[</span><span class="n">tab</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)):</span>
+                <span class="n">ndd</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="n">n</span><span class="p">]]</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ndd</span><span class="p">[</span><span class="n">ind</span><span class="p">[</span><span class="n">n</span><span class="p">]],</span> <span class="n">operand</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_standard_nddata_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">operand</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_oper</span><span class="p">(</span>
+            <span class="n">partial</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">handle_mask</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bitwise_or</span><span class="p">,</span> <span class="n">handle_meta</span><span class="o">=</span><span class="s2">&quot;first_found&quot;</span><span class="p">),</span>
+            <span class="n">operand</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="AstroData.__add__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__add__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;addition&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="n">copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">copy</span> <span class="o">+=</span> <span class="n">oper</span>
+        <span class="k">return</span> <span class="n">copy</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__sub__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__sub__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;subtraction&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="n">copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">copy</span> <span class="o">-=</span> <span class="n">oper</span>
+        <span class="k">return</span> <span class="n">copy</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__mul__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__mul__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;multiplication&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="n">copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">copy</span> <span class="o">*=</span> <span class="n">oper</span>
+        <span class="k">return</span> <span class="n">copy</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__truediv__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__truediv__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;division&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="n">copy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">copy</span> <span class="o">/=</span> <span class="n">oper</span>
+        <span class="k">return</span> <span class="n">copy</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__iadd__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__iadd__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;inplace addition&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;+=&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__iadd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_standard_nddata_op</span><span class="p">(</span><span class="n">NDAstroData</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">oper</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__isub__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__isub__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;inplace subtraction&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;-=&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__isub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_standard_nddata_op</span><span class="p">(</span><span class="n">NDAstroData</span><span class="o">.</span><span class="n">subtract</span><span class="p">,</span> <span class="n">oper</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__imul__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__imul__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;inplace multiplication&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;*=&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__imul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_standard_nddata_op</span><span class="p">(</span><span class="n">NDAstroData</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="n">oper</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+<div class="viewcode-block" id="AstroData.__itruediv__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__itruediv__">[docs]</a>
+    <span class="nd">@format_doc</span><span class="p">(</span><span class="n">_ARIT_DOC</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;inplace division&quot;</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s2">&quot;/=&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__itruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_standard_nddata_op</span><span class="p">(</span><span class="n">NDAstroData</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span> <span class="n">oper</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+
+    <span class="n">add</span> <span class="o">=</span> <span class="fm">__iadd__</span>
+    <span class="n">subtract</span> <span class="o">=</span> <span class="fm">__isub__</span>
+    <span class="n">multiply</span> <span class="o">=</span> <span class="fm">__imul__</span>
+    <span class="n">divide</span> <span class="o">=</span> <span class="fm">__itruediv__</span>
+
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+
+<div class="viewcode-block" id="AstroData.__rsub__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__rsub__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="n">copy</span> <span class="o">=</span> <span class="p">(</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-</span> <span class="n">oper</span><span class="p">)</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">copy</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_rdiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndd</span><span class="p">,</span> <span class="n">operand</span><span class="p">):</span>
+        <span class="c1"># Divide method works with the operand first</span>
+        <span class="k">return</span> <span class="n">NDAstroData</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">operand</span><span class="p">,</span> <span class="n">ndd</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AstroData.__rtruediv__">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.__rtruediv__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oper</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_oper</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">_rdiv</span><span class="p">,</span> <span class="n">oper</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">obj</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_process_pixel_plane</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">pixim</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">top_level</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">custom_header</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="c1"># Assume that we get an ImageHDU or something that can be</span>
+        <span class="c1"># turned into one</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pixim</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">):</span>
+            <span class="n">nd</span> <span class="o">=</span> <span class="n">NDAstroData</span><span class="p">(</span><span class="n">pixim</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="n">pixim</span><span class="o">.</span><span class="n">header</span><span class="p">})</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pixim</span><span class="p">,</span> <span class="n">NDAstroData</span><span class="p">):</span>
+            <span class="n">nd</span> <span class="o">=</span> <span class="n">pixim</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nd</span> <span class="o">=</span> <span class="n">NDAstroData</span><span class="p">(</span><span class="n">pixim</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">custom_header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">custom_header</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">())</span>
+        <span class="n">currname</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">currname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">DEFAULT_EXTENSION</span>
+
+        <span class="k">if</span> <span class="n">top_level</span><span class="p">:</span>
+            <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">nd</span>
+
+    <span class="k">def</span> <span class="nf">_append_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;DQ&quot;</span><span class="p">,</span> <span class="s2">&quot;VAR&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; need to be associated to a &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">DEFAULT_EXTENSION</span><span class="si">}</span><span class="s2">&#39; one&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">add_to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Top level extension</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">hname</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">elif</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">hname</span> <span class="o">=</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">,</span> <span class="n">DEFAULT_EXTENSION</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">hname</span> <span class="o">=</span> <span class="n">DEFAULT_EXTENSION</span>
+
+            <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">hname</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_imagehdu</span><span class="p">(</span>
+                <span class="n">hdu</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">hname</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">add_to</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">][</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">_append_imagehdu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hdu</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">add_to</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;DQ&quot;</span><span class="p">,</span> <span class="s2">&quot;VAR&quot;</span><span class="p">}</span> <span class="ow">or</span> <span class="n">add_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_array</span><span class="p">(</span><span class="n">hdu</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="n">add_to</span><span class="p">)</span>
+
+        <span class="n">nd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_pixel_plane</span><span class="p">(</span>
+            <span class="n">hdu</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">top_level</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">custom_header</span><span class="o">=</span><span class="n">header</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_nddata</span><span class="p">(</span><span class="n">nd</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_append_raw_nddata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_nddata</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">add_to</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Appending data to nddata: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># We want to make sure that the instance we add is whatever we specify</span>
+        <span class="c1"># as NDDataObject, instead of the random one that the user may pass</span>
+        <span class="n">top_level</span> <span class="o">=</span> <span class="n">add_to</span> <span class="ow">is</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">raw_nddata</span><span class="p">,</span> <span class="n">NDAstroData</span><span class="p">):</span>
+            <span class="n">raw_nddata</span> <span class="o">=</span> <span class="n">NDAstroData</span><span class="p">(</span><span class="n">raw_nddata</span><span class="p">)</span>
+
+        <span class="n">processed_nddata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_pixel_plane</span><span class="p">(</span>
+            <span class="n">raw_nddata</span><span class="p">,</span> <span class="n">top_level</span><span class="o">=</span><span class="n">top_level</span><span class="p">,</span> <span class="n">custom_header</span><span class="o">=</span><span class="n">header</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_nddata</span><span class="p">(</span><span class="n">processed_nddata</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="n">add_to</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_append_nddata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_nddata</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">add_to</span><span class="p">):</span>
+        <span class="c1"># NOTE: This method is only used by others that have constructed NDData</span>
+        <span class="c1"># according to our internal format. We don&#39;t accept new headers at this</span>
+        <span class="c1"># point, and that&#39;s why it&#39;s missing from the signature.  &#39;name&#39; is</span>
+        <span class="c1"># ignored. It&#39;s there just to comply with the _append_XXX signature.</span>
+        <span class="k">if</span> <span class="n">add_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;You can only append NDData derived instances &quot;</span>
+                <span class="s2">&quot;at the top level&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">hd</span> <span class="o">=</span> <span class="n">new_nddata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span>
+        <span class="n">hname</span> <span class="o">=</span> <span class="n">hd</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">,</span> <span class="n">DEFAULT_EXTENSION</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hname</span> <span class="o">==</span> <span class="n">DEFAULT_EXTENSION</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_all_nddatas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_nddata</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Arbitrary image extensions can only be added &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;in association to a &#39;</span><span class="si">{</span><span class="n">DEFAULT_EXTENSION</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Appending data to nddata: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_nddata</span>
+
+    <span class="k">def</span> <span class="nf">_append_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_table</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">add_to</span><span class="p">):</span>
+        <span class="n">tb</span> <span class="o">=</span> <span class="n">_process_table</span><span class="p">(</span><span class="n">new_table</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+        <span class="n">hname</span> <span class="o">=</span> <span class="n">tb</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">find_next_num</span><span class="p">(</span><span class="n">tables</span><span class="p">):</span>
+            <span class="n">table_num</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="sa">f</span><span class="s2">&quot;TABLE</span><span class="si">{</span><span class="n">table_num</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">:</span>
+                <span class="n">table_num</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TABLE</span><span class="si">{</span><span class="n">table_num</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="n">add_to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Find table names for all extensions</span>
+            <span class="n">ext_tables</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">:</span>
+                <span class="n">ext_tables</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span>
+                    <span class="n">key</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">Table</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">hname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">hname</span> <span class="o">=</span> <span class="n">find_next_num</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">)</span> <span class="o">|</span> <span class="n">ext_tables</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">hname</span> <span class="ow">in</span> <span class="n">ext_tables</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Cannot append table &#39;</span><span class="si">{</span><span class="n">hname</span><span class="si">}</span><span class="s2">&#39; because it &quot;</span>
+                    <span class="s2">&quot;would hide an extension table&quot;</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">[</span><span class="n">hname</span><span class="p">]</span> <span class="o">=</span> <span class="n">tb</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">hname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tables</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Cannot append table &#39;</span><span class="si">{</span><span class="n">hname</span><span class="si">}</span><span class="s2">&#39; because it &quot;</span>
+                    <span class="s2">&quot;would hide a top-level table&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">add_to</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">][</span><span class="n">hname</span><span class="p">]</span> <span class="o">=</span> <span class="n">tb</span>
+
+        <span class="k">return</span> <span class="n">tb</span>
+
+    <span class="k">def</span> <span class="nf">_append_astrodata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ad</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">add_to</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Appending astrodata object: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ad</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot append AstroData instances that are &quot;</span>
+                <span class="s2">&quot;not single slices&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">add_to</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot append an AstroData slice to another slice&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">new_nddata</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">nddata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_nddata</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_nddata</span><span class="p">(</span><span class="n">new_nddata</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal method to dispatch to the type specific methods. This is</span>
+<span class="sd">        called either by ``.append`` to append on top-level objects only or</span>
+<span class="sd">        by ``__setattr__``. In the second case ``name`` cannot be None, so</span>
+<span class="sd">        this is always the case when appending to extensions (add_to != None).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dispatcher</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">NDData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_raw_nddata</span><span class="p">),</span>
+            <span class="p">((</span><span class="n">Table</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">TableHDU</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">BinTableHDU</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_table</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_imagehdu</span><span class="p">),</span>
+            <span class="p">(</span><span class="n">AstroData</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_astrodata</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">bases</span><span class="p">,</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">dispatcher</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">bases</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">method</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="n">add_to</span><span class="p">)</span>
+
+        <span class="c1"># Assume that this is an array for a pixel plane</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append_array</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">add_to</span><span class="o">=</span><span class="n">add_to</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AstroData.append">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.append">[docs]</a>
+    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a new top-level extension.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ext : array, `astropy.nddata.NDData`, `astropy.table.Table`, other</span>
+<span class="sd">            The contents for the new extension. The exact accepted types depend</span>
+<span class="sd">            on the class implementing this interface. Implementations specific</span>
+<span class="sd">            to certain data formats may accept specialized types (eg. a FITS</span>
+<span class="sd">            provider will accept an `astropy.io.fits.ImageHDU` and extract the</span>
+<span class="sd">            array out of it).</span>
+<span class="sd">        name : str, optional</span>
+<span class="sd">            A name that may be used to access the new object, as an attribute</span>
+<span class="sd">            of the provider. The name is typically ignored for top-level</span>
+<span class="sd">            (global) objects, and required for the others. If the name cannot</span>
+<span class="sd">            be derived from the metadata associated to ``ext``, you will</span>
+<span class="sd">            have to provider one.</span>
+<span class="sd">            It can consist in a combination of numbers and letters, with the</span>
+<span class="sd">            restriction that the letters have to be all capital, and the first</span>
+<span class="sd">            character cannot be a number (&quot;[A-Z][A-Z0-9]*&quot;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        --------</span>
+<span class="sd">        The same object, or a new one, if it was necessary to convert it to</span>
+<span class="sd">        a more suitable format for internal use.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If adding the object in an invalid situation (eg. ``name`` is</span>
+<span class="sd">            `None` when adding to a single slice).</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            Raised if the extension is of a proper type, but its value is</span>
+<span class="sd">            illegal somehow.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_sliced</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">&quot;Can&#39;t append objects to slices, use &quot;</span>
+                <span class="s2">&quot;&#39;ext.NAME = obj&#39; instead&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># NOTE: Most probably, if we want to copy the input argument, we</span>
+        <span class="c1">#       should do it here...</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Only one Primary HDU allowed. &quot;</span>
+                <span class="s2">&quot;Use .phu if you really need to set one&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">Table</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Tables should be set directly as attribute, &quot;</span>
+                <span class="s2">&quot;i.e. &#39;ad.MYTABLE = table&#39;&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">isupper</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;extension name &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; should be uppercase&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span>
+            <span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_append</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AstroData.read">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.read">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">extname_parser</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read from a file, file object, HDUList, etc.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">read_fits</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">extname_parser</span><span class="o">=</span><span class="n">extname_parser</span><span class="p">)</span></div>
+
+
+    <span class="n">load</span> <span class="o">=</span> <span class="n">read</span>  <span class="c1"># for backward compatibility</span>
+
+<div class="viewcode-block" id="AstroData.write">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.write">[docs]</a>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the object to disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str, optional</span>
+<span class="sd">            If the filename is not given, ``self.path`` is used.</span>
+<span class="sd">        overwrite : bool</span>
+<span class="sd">            If True, overwrites existing file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;A filename needs to be specified&quot;</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+
+        <span class="n">write_fits</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AstroData.operate">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.operate">[docs]</a>
+    <span class="k">def</span> <span class="nf">operate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies a function to the main data array on each extension, replacing</span>
+<span class="sd">        the data with the result. The data will be passed as the first argument</span>
+<span class="sd">        to the function.</span>
+
+<span class="sd">        It will be applied to the mask and variance of each extension, too, if</span>
+<span class="sd">        they exist.</span>
+
+<span class="sd">        This is a convenience method, which is equivalent to::</span>
+
+<span class="sd">            for ext in ad:</span>
+<span class="sd">                ext.data = operator(ext.data, *args, **kwargs)</span>
+<span class="sd">                if ext.mask is not None:</span>
+<span class="sd">                    ext.mask = operator(ext.mask, *args, **kwargs)</span>
+<span class="sd">                if ext.variance is not None:</span>
+<span class="sd">                    ext.variance = operator(ext.variance, *args, **kwargs)</span>
+
+<span class="sd">        with the additional advantage that it will work on single slices, too.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        operator : callable</span>
+<span class="sd">            A function that takes an array (and, maybe, other arguments)</span>
+<span class="sd">            and returns an array.</span>
+<span class="sd">        args, kwargs : optional</span>
+<span class="sd">            Additional arguments to be passed to the ``operator``.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        ---------</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; ad.operate(np.squeeze)  # doctest: +SKIP</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ensure we can iterate, even on a single slice</span>
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span> <span class="k">else</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">ext</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ext</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">variance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ext</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">variance</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AstroData.reset">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.reset">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">NO_DEFAULT</span><span class="p">,</span> <span class="n">variance</span><span class="o">=</span><span class="n">NO_DEFAULT</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the ``.data``, and optionally ``.mask`` and ``.variance``</span>
+<span class="sd">        attributes of a single-extension AstroData slice. This function will</span>
+<span class="sd">        optionally check whether these attributes have the same shape.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : ndarray</span>
+<span class="sd">            The array to assign to the ``.data`` attribute (&quot;SCI&quot;).</span>
+<span class="sd">        mask : ndarray, optional</span>
+<span class="sd">            The array to assign to the ``.mask`` attribute (&quot;DQ&quot;).</span>
+<span class="sd">        variance: ndarray, optional</span>
+<span class="sd">            The array to assign to the ``.variance`` attribute (&quot;VAR&quot;).</span>
+<span class="sd">        check: bool</span>
+<span class="sd">            If set, then the function will check that the mask and variance</span>
+<span class="sd">            arrays have the same shape as the data array.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        -------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            if an attempt is made to set the .mask or .variance attributes</span>
+<span class="sd">            with something other than an array</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            if the .mask or .variance attributes don&#39;t have the same shape as</span>
+<span class="sd">            .data, OR if this is called on an AD instance that isn&#39;t a single</span>
+<span class="sd">            extension slice</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_single</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Trying to reset a non-sliced AstroData object&quot;</span><span class="p">)</span>
+
+        <span class="c1"># In case data is an NDData object</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="c1"># Set mask, with checking if required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="n">check</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Mask shape incompatible with data shape&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span>
+
+            <span class="k">elif</span> <span class="n">mask</span> <span class="o">==</span> <span class="n">NO_DEFAULT</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mask</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Attempt to set mask inappropriately&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span>
+
+        <span class="c1"># Set variance, with checking if required</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variance</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="n">check</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Variance shape incompatible with data shape&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">variance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">elif</span> <span class="n">variance</span> <span class="o">==</span> <span class="n">NO_DEFAULT</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;uncertainty&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">uncertainty</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="s2">&quot;Attempt to set variance inappropriately&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">variance</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s2">&quot;wcs&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">wcs</span></div>
+
+
+<div class="viewcode-block" id="AstroData.update_filename">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.update_filename">[docs]</a>
+    <span class="k">def</span> <span class="nf">update_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">strip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the &quot;filename&quot; attribute of the AstroData object.</span>
+
+<span class="sd">        A prefix and/or suffix can be specified. If ``strip=True``, these will</span>
+<span class="sd">        replace the existing prefix/suffix; if ``strip=False``, they will</span>
+<span class="sd">        simply be prepended/appended.</span>
+
+<span class="sd">        The current filename is broken down into its existing prefix, root, and</span>
+<span class="sd">        suffix using the ``ORIGNAME`` phu keyword, if it exists and is</span>
+<span class="sd">        contained within the current filename. Otherwise, the filename is split</span>
+<span class="sd">        at the last underscore and the part before is assigned as the root and</span>
+<span class="sd">        the underscore and part after the suffix. No prefix is assigned.</span>
+
+<span class="sd">        Note that, if ``strip=True``, a prefix or suffix will only be stripped</span>
+<span class="sd">        if &#39;&#39; is specified.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prefix: str, optional</span>
+<span class="sd">            New prefix (None =&gt; leave alone)</span>
+
+<span class="sd">        suffix: str, optional</span>
+<span class="sd">            New suffix (None =&gt; leave alone)</span>
+
+<span class="sd">        strip: bool, optional</span>
+<span class="sd">            Strip existing prefixes and suffixes if new ones are given?</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the filename cannot be determined</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;ORIGNAME&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s2">&quot;ORIGNAME&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;A filename needs to be set before it can be updated&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Set the ORIGNAME keyword if it&#39;s not there</span>
+        <span class="k">if</span> <span class="s2">&quot;ORIGNAME&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                <span class="s2">&quot;ORIGNAME&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">orig_filename</span><span class="p">,</span>
+                <span class="s2">&quot;Original filename prior to processing&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">strip</span><span class="p">:</span>
+            <span class="n">root</span><span class="p">,</span> <span class="n">filetype</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s2">&quot;ORIGNAME&quot;</span><span class="p">])</span>
+            <span class="n">filename</span><span class="p">,</span> <span class="n">filetype</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(.*)</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="si">}</span><span class="s2">(.*)&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+            <span class="c1"># Do not strip a prefix/suffix unless a new one is provided</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">prefix</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+                <span class="n">existing_suffix</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="s2">&quot;_&quot;</span> <span class="ow">in</span> <span class="n">existing_suffix</span><span class="p">:</span>
+                    <span class="n">last_underscore</span> <span class="o">=</span> <span class="n">existing_suffix</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
+                    <span class="n">root</span> <span class="o">+=</span> <span class="n">existing_suffix</span><span class="p">[:</span><span class="n">last_underscore</span><span class="p">]</span>
+                    <span class="n">existing_suffix</span> <span class="o">=</span> <span class="n">existing_suffix</span><span class="p">[</span><span class="n">last_underscore</span><span class="p">:]</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">root</span><span class="p">,</span> <span class="n">existing_suffix</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">existing_suffix</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">existing_suffix</span>
+
+                <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="s2">&quot;Could not split filename (ValueError): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span>
+                    <span class="p">)</span>
+                    <span class="n">root</span><span class="p">,</span> <span class="n">existing_suffix</span> <span class="o">=</span> <span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="n">suffix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">suffix</span> <span class="o">=</span> <span class="n">existing_suffix</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">root</span><span class="p">,</span> <span class="n">filetype</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="c1"># Cope with prefix or suffix as None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="p">(</span><span class="n">prefix</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">root</span> <span class="o">+</span> <span class="p">(</span><span class="n">suffix</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">filetype</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_crop_nd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crop the input nd array and its associated attributes.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            nd: The input nd array.</span>
+<span class="sd">            x1: The starting x-coordinate of the crop region.</span>
+<span class="sd">            y1: The starting y-coordinate of the crop region.</span>
+<span class="sd">            x2: The ending x-coordinate of the crop region.</span>
+<span class="sd">            y2: The ending y-coordinate of the crop region.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">y_start</span><span class="p">,</span> <span class="n">y_end</span> <span class="o">=</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">x_start</span><span class="p">,</span> <span class="n">x_end</span> <span class="o">=</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">nd</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">y_start</span><span class="p">:</span><span class="n">y_end</span><span class="p">,</span> <span class="n">x_start</span><span class="p">:</span><span class="n">x_end</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">nd</span><span class="o">.</span><span class="n">uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nd</span><span class="o">.</span><span class="n">uncertainty</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">uncertainty</span><span class="p">[</span><span class="n">y_start</span><span class="p">:</span><span class="n">y_end</span><span class="p">,</span> <span class="n">x_start</span><span class="p">:</span><span class="n">x_end</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">nd</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nd</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">y_start</span><span class="p">:</span><span class="n">y_end</span><span class="p">,</span> <span class="n">x_start</span><span class="p">:</span><span class="n">x_end</span><span class="p">]</span>
+
+<div class="viewcode-block" id="AstroData.crop">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.crop">[docs]</a>
+    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crop the NDData objects given indices.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x1, y1, x2, y2 : int</span>
+<span class="sd">            Minimum and maximum indices for the x and y axis.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nddata</span><span class="p">:</span>
+            <span class="n">orig_shape</span> <span class="o">=</span> <span class="n">nd</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_crop_nd</span><span class="p">(</span><span class="n">nd</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">orig_shape</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_crop_nd</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="c1"># No &#39;shape&#39; attribute in the object. It&#39;s probably</span>
+                    <span class="c1"># not array-like</span>
+                    <span class="n">err_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not crop object </span><span class="si">{</span><span class="n">o</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">err_str</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="AstroData.instrument">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.instrument">[docs]</a>
+    <span class="nd">@astro_data_descriptor</span>
+    <span class="k">def</span> <span class="nf">instrument</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the instrument making the observation.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keyword_for</span><span class="p">(</span><span class="s2">&quot;instrument&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AstroData.object">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.object">[docs]</a>
+    <span class="nd">@astro_data_descriptor</span>
+    <span class="k">def</span> <span class="nf">object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the object being observed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keyword_for</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="AstroData.telescope">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.AstroData.telescope">[docs]</a>
+    <span class="nd">@astro_data_descriptor</span>
+    <span class="k">def</span> <span class="nf">telescope</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the telescope.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_keyword_for</span><span class="p">(</span><span class="s2">&quot;telescope&quot;</span><span class="p">))</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

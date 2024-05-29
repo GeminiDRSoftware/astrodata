@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>astrodata &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            astrodata
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">astrodata</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for astrodata</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;This package adds an abstraction layer to astronomical data by parsing the</span>
+<span class="sd">information contained in the headers as attributes. To do so, one must subclass</span>
+<span class="sd">:class:`astrodata.AstroData` and add parse methods accordingly to the</span>
+<span class="sd">:class:`~astrodata.TagSet` received.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">.core</span> <span class="kn">import</span> <span class="n">AstroData</span>
+<span class="kn">from</span> <span class="nn">.adfactory</span> <span class="kn">import</span> <span class="n">AstroDataFactory</span><span class="p">,</span> <span class="n">AstroDataError</span>
+<span class="kn">from</span> <span class="nn">.fits</span> <span class="kn">import</span> <span class="n">add_header_to_table</span>
+<span class="kn">from</span> <span class="nn">.nddata</span> <span class="kn">import</span> <span class="n">NDAstroData</span><span class="p">,</span> <span class="n">AstroDataMixin</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Section</span><span class="p">,</span>
+    <span class="n">TagSet</span><span class="p">,</span>
+    <span class="n">astro_data_descriptor</span><span class="p">,</span>
+    <span class="n">astro_data_tag</span><span class="p">,</span>
+    <span class="n">returns_list</span><span class="p">,</span>
+    <span class="n">deprecated</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">importlib.metadata</span>
+
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="s2">&quot;astrodata&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="version">
+<a class="viewcode-back" href="../manuals/full_api.html#astrodata.version">[docs]</a>
+<span class="k">def</span> <span class="nf">version</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the version of astrodata.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">__version__</span></div>
+
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;AstroData&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AstroDataError&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;AstroDataMixin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NDAstroData&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Section&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TagSet&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;__version__&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;add_header_to_table&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;astro_data_descriptor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;astro_data_tag&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from_file&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;create&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;returns_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">,</span>
+    <span class="c1"># Below this are deprecated</span>
+    <span class="s2">&quot;open&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Make sure __all__does not have duplicates</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">__all__</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">__all__</span><span class="p">)):</span>
+    <span class="n">duplicates</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">__all__</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">__all__</span><span class="p">[:</span><span class="n">i</span><span class="p">]]</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate entries in __all__: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">duplicates</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">factory</span> <span class="o">=</span> <span class="n">AstroDataFactory</span><span class="p">()</span>
+
+<span class="c1"># Let&#39;s make sure that there&#39;s at least one class that matches the data</span>
+<span class="c1"># (if we&#39;re dealing with a FITS file)</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="n">AstroData</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="from_file">
+<a class="viewcode-back" href="../manuals/full_api.html#astrodata.from_file">[docs]</a>
+<span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an |AstroData| object from a file.</span>
+
+<span class="sd">    For implementation details, see</span>
+<span class="sd">    :meth:`~astrodata.AstroDataFactory.get_astro_data`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">factory</span><span class="o">.</span><span class="n">get_astro_data</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create">
+<a class="viewcode-back" href="../manuals/full_api.html#astrodata.create">[docs]</a>
+<span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an |AstroData| object from data.</span>
+
+<span class="sd">    For implementation details, see</span>
+<span class="sd">    :meth:`~astrodata.AstroDataFactory.create_from_scratch`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">factory</span><span class="o">.</span><span class="n">create_from_scratch</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Without raising a warning or error.</span>
+<div class="viewcode-block" id="open">
+<a class="viewcode-back" href="../manuals/full_api.html#astrodata.open">[docs]</a>
+<span class="nd">@deprecated</span><span class="p">(</span>
+    <span class="s2">&quot;Use &#39;astrodata.from_file&#39;. astrodata.open is deprecated, &quot;</span>
+    <span class="s2">&quot;and will be removed in a future version.&quot;</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return an |AstroData| object from a file (deprecated, use</span>
+<span class="sd">    :func:`~astrodata.from_file`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">from_file</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="General Design" href="design.html" />
+    <link rel="prev" title="Programmer’s Manual" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usermanual/index.html">User Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Programmer’s Manual</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="design.html">General Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adclass.html">AstroData and Derivatives</a></li>
+<li class="toctree-l3"><a class="reference internal" href="containers.html">Data Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tags.html">Tags</a></li>
+<li class="toctree-l3"><a class="reference internal" href="descriptors.html">Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Programmer’s Manual</a></li>
+      <li class="breadcrumb-item active">Introduction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/progmanual/intro.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction">
+<span id="intro-progmanual"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h1>
+<p>AstroData is a Python package that provides a common interface to astronomical
+data. Originally part of the <a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a> package, the data reduction package
+developed at the Gemini Observatory, it has been split into its own package to
+allow its use in other projects and to be developed by a wider, public core to
+suit the needs of data reduction across the field of astronomy.</p>
+<p>AstroData’s common interface, the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class, is used to abstract the
+details of any given data into a set of <a class="reference internal" href="../usermanual/tags.html#tags"><span class="std std-ref">Astrodata Tag</span></a>, which can be used to resolve
+the properties and reduction requirements of a given data file (most commonly,
+a multi-extension FITS file). The <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class is also used to provide
+methods to access the data in a consistent manner, regardless of the
+underlying data format.</p>
+<p>The <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class is not intended to be used directly by the user. Instead,
+the user should use the <a class="reference internal" href="../../api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a> function, which will return an
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. The <a class="reference internal" href="../../api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a> function will determine the type of
+data file being opened and return the appropriate subclass of <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>.</p>
+<p>For the programmer using <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> to develop a data reduction pipeline, the
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class should be subclassed to provide the functionality required
+and to register the new class with the <a class="reference internal" href="../../api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a> function.</p>
+<p>Several examples may be found throughout the documentation (see <a class="reference internal" href="../../examples/index.html"><span class="doc">Examples</span></a>). A
+simple example is shown below as a complete, executable introduction.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Defining an AstroData subclass</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">AstroData</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">astro_data_tag</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">astro_data_descriptor</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">TagSet</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">astrodata</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyAstroData</span><span class="p">(</span><span class="n">AstroData</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@staticmethod</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">_matches_data</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="c1"># This method is used by astrodata.from_file to determine if this</span>
+<span class="gp">... </span>        <span class="c1"># class should be used to open the data. It should return True</span>
+<span class="gp">... </span>        <span class="c1"># if the data is of the correct type, False otherwise.</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># E.g., if file limited by FITS standard or not for instrument</span>
+<span class="gp">... </span>        <span class="c1"># keyword.</span>
+<span class="gp">... </span>        <span class="n">instrument_tags</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;INSTRUME&#39;</span><span class="p">,</span> <span class="s1">&#39;INSTRUMENT&#39;</span><span class="p">}</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">instrument_tags</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">if</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+<span class="gp">... </span>                <span class="k">return</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;MY_INSTRUMENT&#39;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># Could return None by default since it&#39;s Falsey, but this is more</span>
+<span class="gp">... </span>        <span class="c1"># explicit and follows typing expectations.</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="kc">False</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nd">@astro_data_tag</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">my_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="c1"># This method is used to define a new tag. It should return</span>
+<span class="gp">... </span>        <span class="c1"># a string that will be used as the tag name. The method name</span>
+<span class="gp">... </span>        <span class="c1"># is used as the tag name by default, but this can be overridden</span>
+<span class="gp">... </span>        <span class="c1"># by passing a name to the decorator, e.g.:</span>
+<span class="gp">... </span>        <span class="c1"># @astro_data_tag(name=&#39;my_tag_name&#39;)</span>
+<span class="gp">... </span>        <span class="c1"># The method should return None if the tag is not applicable</span>
+<span class="gp">... </span>        <span class="c1"># to the data.</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># This checks that the Primary HDU of the data has a specific</span>
+<span class="gp">... </span>        <span class="c1"># keyword, &#39;MY_TAG&#39;.</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MY_TAG&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">return</span> <span class="n">TagSet</span><span class="p">([</span><span class="s1">&#39;MY_TAG&#39;</span><span class="p">])</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># Not strictly necessary, but here for completeness.</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="n">TagSet</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="nd">@astro_data_descriptor</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">my_descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="c1"># This method is used to define a new descriptor. It should</span>
+<span class="gp">... </span>        <span class="c1"># return a string that will be used as the descriptor name.</span>
+<span class="gp">... </span>        <span class="c1"># The method name is used as the descriptor name by default,</span>
+<span class="gp">... </span>        <span class="c1"># but this can be overridden by passing a name to the decorator,</span>
+<span class="gp">... </span>        <span class="c1"># e.g.:</span>
+<span class="gp">... </span>        <span class="c1"># @astro_data_descriptor(name=&#39;my_descriptor_name&#39;)</span>
+<span class="gp">... </span>        <span class="c1"># The method should return None if the descriptor is not</span>
+<span class="gp">... </span>        <span class="c1"># applicable to the data.</span>
+<span class="gp">...</span>
+<span class="gp">... </span>        <span class="c1"># Returns None if &#39;MY_DESC&#39; is not in the Primary HDU</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MY_DESC&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Registering the new class with astrodata.factory</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">astrodata</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="n">MyAstroData</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now, if we give it a file that has the MY_TAG keyword in the Primary HDU,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># we can open it with astrodata.from_file and it will return an instance of</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># MyAstroData.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Defining an example FITS file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gwcs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">tempfile</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a new FITS HDU</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add the necessary tags to the FITS header</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;INSTRUME&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;MY_INSTRUMENT&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;MY_TAG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;example_tag&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;MY_DESC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;example_descriptor&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add a single dummy extension</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">HDUList</span><span class="p">([</span><span class="n">phdu</span><span class="p">,</span> <span class="n">image</span><span class="p">])</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Save the FITS file</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.fits&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">hdu</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># Open the file with astrodata.from_file</span>
+<span class="gp">... </span>    <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># Check that the tag and descriptor are present</span>
+<span class="gp">... </span>    <span class="k">assert</span> <span class="s1">&#39;MY_TAG&#39;</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Tag &#39;my_tag&#39; not found in </span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">tags</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># Check that the tag and descriptor values are correct</span>
+<span class="gp">... </span>    <span class="k">assert</span> <span class="n">ad</span><span class="o">.</span><span class="n">my_descriptor</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;example_descriptor&#39;</span><span class="p">,</span> <span class="p">(</span>
+<span class="gp">... </span>        <span class="sa">f</span><span class="s2">&quot;Descriptor &#39;my_descriptor&#39; has incorrect value: &quot;</span>
+<span class="gp">... </span>        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">my_descriptor</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">... </span>    <span class="c1"># Finally, make sure that the object is an instance of MyAstroData.</span>
+<span class="gp">... </span>    <span class="c1"># We can generally infer this from the above, but it&#39;s good to be</span>
+<span class="gp">... </span>    <span class="c1"># thorough in our tests (in case any strange API change nullifies</span>
+<span class="gp">... </span>    <span class="c1"># the above checks).</span>
+<span class="gp">... </span>    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ad</span><span class="p">,</span> <span class="n">MyAstroData</span><span class="p">),</span> <span class="p">(</span>
+<span class="gp">... </span>        <span class="sa">f</span><span class="s2">&quot;Incorrect class </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected MyAstroData&quot;</span>
+<span class="gp">... </span>    <span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Now that our data is loaded in, we can use the AstroData API to access</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># the data.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># For example, we can get the data as a numpy array</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or we can get the WCS</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wcs</span> <span class="o">=</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wcs</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or we can get the value of a keyword</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_keyword</span> <span class="o">=</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;MY_KEYWORD&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or we can get the resolved tags</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_tags</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">tags</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Or we can get the value of a descriptor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_descriptor</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">my_descriptor</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Programmer’s Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="design.html" class="btn btn-neutral float-right" title="General Design" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

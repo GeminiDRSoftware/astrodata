@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quickstart &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=7026087e"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Astrodata Manual" href="manuals/index.html" />
+    <link rel="prev" title="astrodata Documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            astrodata
+              <img src="_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-files">Example Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#opening-files">Opening Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#digesting-metadata">Digesting metadata</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#viewing-metadata">Viewing metadata</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#accessing-data">Accessing Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#advanced-usage">Advanced Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-astrodata-with-developer-dependencies">Installing <code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code> with developer dependencies</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Quickstart</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/quickstart.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h1>
+<p>This guide is meant to familiarize you with the most important
+concepts of <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, specifically as someone using <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> to
+work with your own data.</p>
+<p>If you are a user getting started with <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, you will likely
+wnt to start with the <a class="reference internal" href="manuals/usermanual/index.html"><span class="doc">User Guide</span></a>. If you want a more detailed overview
+of the library, you can start with the <a class="reference internal" href="manuals/progmanual/index.html"><span class="doc">Developer Guide</span></a>, which covers the
+majority of topics discussed here in more detail.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>The easiest way to install <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> is to use <cite>pip</cite>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>astrodata
+</pre></div>
+</div>
+<p>This will install the latest stable release of <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, as well as
+all of its standard dependencies (i.e., not the development dependencies:
+see <a class="reference internal" href="#advanced-usage">Advanced Usage</a>).</p>
+</section>
+<section id="example-files">
+<h2>Example Files<a class="headerlink" href="#example-files" title="Link to this heading"></a></h2>
+<p>As <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> is part of the <a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a> software system, there are some testing
+helper functions to download example data for testing purposes. You can
+download files using <code class="xref py py-func docutils literal notranslate"><span class="pre">download_from_archive()</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astrodata.testing</span> <span class="kn">import</span> <span class="n">download_from_archive</span>
+
+<span class="c1"># Files we&#39;ll use in this example.</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;N20170614S0201&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170614S0202&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170614S0203&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170614S0204&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170614S0205&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170613S0180&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170613S0181&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170613S0182&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170613S0183&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170613S0184&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170615S0534&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170615S0535&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170615S0536&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170615S0537&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170615S0538&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170702S0178&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170702S0179&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170702S0180&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170702S0181&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;N20170702S0182&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;bpm_20170306_gmos-n_Ham_22_full_12amp&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="o">+</span> <span class="s1">&#39;.fits&#39;</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
+
+<span class="c1"># Download the files. We&#39;ll be placing these in a directory called &#39;data&#39;.</span>
+<span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">download_from_archive</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="n">sub_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>These files are from the <a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a> GMOS tutorial, but we’ll pretend we don’t
+have that and want to work with them using <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> alone. They will be
+stored in the <code class="docutils literal notranslate"><span class="pre">./data/</span></code> directory relative to your current working directory.</p>
+</section>
+<section id="opening-files">
+<h2>Opening Files<a class="headerlink" href="#opening-files" title="Link to this heading"></a></h2>
+<p>The primary way to interact with <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> is through the
+<a class="reference internal" href="api/astrodata.from_file.html#astrodata.from_file" title="astrodata.from_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">from_file()</span></code></a> function. This function will open a file and
+create an <a class="reference internal" href="api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object from it. You can then use this object to access
+the data and metadata in the file.</p>
+<p>Let’s just open one of the files without any other setup and see what happens:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">astrodata</span>
+
+<span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s1">&#39;data/N20170614S0201.fits&#39;</span><span class="p">)</span>
+
+<span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This will print out a summary of the contents of the file. In this case,
+it will look something like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Filename: data/N20170614S0201.fits
+Tags:
+
+Pixels Extensions
+Index  Content                  Type              Dimensions     Format
+[ 0]   science                  NDAstroData       (2112, 288)    uint16
+[ 1]   science                  NDAstroData       (2112, 288)    uint16
+[ 2]   science                  NDAstroData       (2112, 288)    uint16
+[ 3]   science                  NDAstroData       (2112, 288)    uint16
+[ 4]   science                  NDAstroData       (2112, 288)    uint16
+[ 5]   science                  NDAstroData       (2112, 288)    uint16
+[ 6]   science                  NDAstroData       (2112, 288)    uint16
+[ 7]   science                  NDAstroData       (2112, 288)    uint16
+[ 8]   science                  NDAstroData       (2112, 288)    uint16
+[ 9]   science                  NDAstroData       (2112, 288)    uint16
+[10]   science                  NDAstroData       (2112, 288)    uint16
+[11]   science                  NDAstroData       (2112, 288)    uint16
+</pre></div>
+</div>
+</section>
+<section id="digesting-metadata">
+<h2>Digesting metadata<a class="headerlink" href="#digesting-metadata" title="Link to this heading"></a></h2>
+<section id="viewing-metadata">
+<h3>Viewing metadata<a class="headerlink" href="#viewing-metadata" title="Link to this heading"></a></h3>
+<p>The <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> library is designed to work with astronomical data, and as such
+it has a number of features that are specific to this kind of data. One of the
+most important features is digesting and storing FITS-style metadata.</p>
+<p>When you open a file with <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, it will read the metadata from the file
+and try to determine the best <a class="reference internal" href="api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> subclass to use. This is registered
+in the <code class="xref py py-class docutils literal notranslate"><span class="pre">AstroDataFactory</span></code> class. Any class you create that inherits from
+<a class="reference internal" href="api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> can be registered with the factory, and <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> will use it
+when opening files.</p>
+<p>Let’s see what the metadata for these files looks like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Iterate over the FITS PHU and print the metadata.</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PHU Metadata for </span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)):</span>
+        <span class="k">continue</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which will print out the following (truncated for brevity):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>PHU Metadata for N20170614S0201.fits:
+SIMPLE: True
+BITPIX: 16
+NAXIS: 0
+EXTEND: True
+COMMENT:   FITS (Flexible Image Transport System) format is defined in &#39;Astronomy
+COMMENT:   and Astrophysics&#39;, volume 376, page 359; bibcode: 2001A&amp;A...376..359H
+INSTRUME: GMOS-N
+OBJECT: starfield
+OBSTYPE: OBJECT
+OBSCLASS: science
+&lt;...more header matter...&gt;
+OBSERVER: A. Smith
+OBSERVAT: Gemini-North
+TELESCOP: Gemini-North
+PARALLAX: 0.0
+RADVEL: 0.0
+EPOCH: 2000.0
+EQUINOX: 2000.0
+TRKEQUIN: 2000.0
+SSA: J. Miller
+RA: 285.00429583
+DEC: 24.98093611
+ELEVATIO: 84.5317708333333
+AZIMUTH: -17.5980347222222
+CRPA: 198.346843843749
+HA: +00:07:15.50
+LT: 01:57:59.2
+</pre></div>
+</div>
+<p>There’s quite a bit of metadata here! Let’s make a class that gets the most
+important parts to us right now to make it easier to work with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">AstroData</span><span class="p">,</span> <span class="n">factory</span>
+<span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">astro_data_tag</span><span class="p">,</span> <span class="n">TagSet</span>
+
+<span class="k">class</span> <span class="nc">GMOSAstroData</span><span class="p">(</span><span class="n">AstroData</span><span class="p">):</span>
+
+    <span class="c1"># _matches_data is a class attribute that tells the factory to use this</span>
+    <span class="c1"># class for files that match the given tags.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_matches_data</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+        <span class="c1"># Your definitions here must return a boolean, with True</span>
+        <span class="c1"># indicating that the class is appropriate for the file.</span>
+        <span class="n">observatory</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TELESCOP&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">observatory</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;GEMINI-NORTH&#39;</span><span class="p">,</span> <span class="s1">&#39;GEMINI-SOUTH&#39;</span><span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">GMOSScienceAstroData</span><span class="p">(</span><span class="n">GMOSAstroData</span><span class="p">):</span>
+
+    <span class="c1"># _matches_data is a class attribute that tells the factory to use this</span>
+    <span class="c1"># class for files that match the given tags.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_matches_data</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;OBSTYPE&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">obstype</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;OBSCLASS&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">obs</span> <span class="o">==</span> <span class="s1">&#39;OBJECT&#39;</span> <span class="ow">and</span> <span class="n">obstype</span> <span class="o">==</span> <span class="s1">&#39;SCIENCE&#39;</span>
+
+<span class="c1"># Register the classes with the factory.</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="n">GMOSAstroData</span><span class="p">)</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="n">GMOSScienceAstroData</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, when we open a file, <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> will use the appropriate subclass
+based on the metadata in the file. Let’s see what happens when we open
+all the files we downloaded:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data/</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opened </span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> with class </span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The result:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Opened N20170614S0201.fits with class &lt;class &#39;__main__.GMOSScienceAstroData&#39;&gt;
+Opened N20170614S0202.fits with class &lt;class &#39;__main__.GMOSScienceAstroData&#39;&gt;
+Opened N20170614S0203.fits with class &lt;class &#39;__main__.GMOSScienceAstroData&#39;&gt;
+Opened N20170614S0204.fits with class &lt;class &#39;__main__.GMOSScienceAstroData&#39;&gt;
+Opened N20170614S0205.fits with class &lt;class &#39;__main__.GMOSScienceAstroData&#39;&gt;
+Opened N20170613S0180.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170613S0181.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170613S0182.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170613S0183.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170613S0184.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170615S0534.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170615S0535.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170615S0536.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170615S0537.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170615S0538.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170702S0178.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170702S0179.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170702S0180.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170702S0181.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened N20170702S0182.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+Opened bpm_20170306_gmos-n_Ham_22_full_12amp.fits with class &lt;class &#39;__main__.GMOSAstroData&#39;&gt;
+</pre></div>
+</div>
+<p>The default factory (<code class="docutils literal notranslate"><span class="pre">factory</span></code>, above, where we registered our classes) was
+able to determine which files were science files and which were not, and
+used the appropriate class to open them.</p>
+</section>
+</section>
+<section id="accessing-data">
+<h2>Accessing Data<a class="headerlink" href="#accessing-data" title="Link to this heading"></a></h2>
+<p>Now that we have the data open, we can access the data and metadata in the
+file. The data is stored in the <code class="docutils literal notranslate"><span class="pre">.data</span></code> attribute of the <a class="reference internal" href="api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object,
+and the metadata is stored in the <code class="docutils literal notranslate"><span class="pre">.phu</span></code> attribute.</p>
+<p>Let’s see what the data looks like for one of the files:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the first science extension.</span>
+<span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="p">(</span><span class="n">astrodata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data/</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ad</span><span class="p">,</span> <span class="n">GMOSScienceAstroData</span><span class="p">):</span>
+        <span class="k">break</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="si">=}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[[  0   0   0 ...   0   0   0]
+ [  0   0   0 ...   0   0   0]
+ [  0   0   0 ...   0   0   0]
+ ...
+ [361 357 358 ... 366 364 370]
+ [367 366 365 ... 359 364 361]
+ [375 375 375 ... 351 347 353]]
+ad.data[0].shape=(2112, 288)
+</pre></div>
+</div>
+<p>This is fine, but what if we’re interested in a particular quantity for our
+work? It’s not much more useful than a FITS file at this point, other than the fancy
+class we’ve created. Let’s add a method to our class that will fetch us the
+central wavelength in nanometers for the data.</p>
+<p>First, we need to remove the <code class="docutils literal notranslate"><span class="pre">GMOSScienceAstroData</span></code> class we created from the
+factory to avoid conflicts with the new class we’re planning:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">factory</span><span class="o">.</span><span class="n">remove_class</span><span class="p">(</span><span class="n">GMOSScienceAstroData</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, let’s add a method to a new class, <code class="docutils literal notranslate"><span class="pre">GMOSSpectrumScienceAstroData</span></code> class that will fetch the
+central wavelength for the data. We’ll subclass <code class="docutils literal notranslate"><span class="pre">GMOSScienceAstroData</span></code> to
+reuse what we’ve written above.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">astrodata</span> <span class="kn">import</span> <span class="n">astro_data_descriptor</span>
+
+<span class="c1"># Note: This is bad practice! But we&#39;re working on an example.</span>
+<span class="c1">#       Normally, you will just add this to the old class!</span>
+<span class="c1">#       We&#39;re only doing this to show how to add a descriptor.</span>
+<span class="c1">#       You should *never* inherit from a class in a way that</span>
+<span class="c1">#       overwrites the original class.</span>
+<span class="k">class</span> <span class="nc">GMOSScienceAstroData</span><span class="p">(</span><span class="n">GMOSScienceAstroData</span><span class="p">):</span>
+
+    <span class="nd">@astro_data_descriptor</span>
+    <span class="k">def</span> <span class="nf">airmass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Get the airmass from the header.</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;AIRMASS&#39;</span><span class="p">)</span>
+
+<span class="c1"># Register the new class with the factory.</span>
+<span class="n">factory</span><span class="o">.</span><span class="n">add_class</span><span class="p">(</span><span class="n">GMOSScienceAstroData</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, when we open a file, we can access the central wavelength like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data/</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ad</span><span class="p">,</span> <span class="n">GMOSScienceAstroData</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opened </span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> with class </span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Airmass: </span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">airmass</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This is a pretty trivial use case, but one can imagine it being used to
+simplify the process of accessing data in a more complex way. These
+descriptors can be acessed from subclasses, for example, and you can
+get all descriptors from a class using the <code class="docutils literal notranslate"><span class="pre">.descriptors</span></code> attribute.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;data/</span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2"> descriptors:&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39; + &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">descriptors</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>You’ll see that our <code class="docutils literal notranslate"><span class="pre">airmass</span></code> descriptor is available for the
+<code class="docutils literal notranslate"><span class="pre">GMOSScienceAstroData</span></code> class, but not for the <code class="docutils literal notranslate"><span class="pre">GMOSAstroData</span></code> class.</p>
+</section>
+<section id="advanced-usage">
+<h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Link to this heading"></a></h2>
+<p>This is a very basic introduction to <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, and there are many more
+features available. For examples of usage in practice, check out <a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a>’s
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">DRAGONS:gemini_instruments</span></code> package.</p>
+<p>If you plan on developing <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, or you’d like to use the same
+development environment <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> uses, you can install <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> from
+with development dependencies.</p>
+<section id="installing-astrodata-with-developer-dependencies">
+<h3>Installing <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> with developer dependencies<a class="headerlink" href="#installing-astrodata-with-developer-dependencies" title="Link to this heading"></a></h3>
+<p><a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> relies on a number of packages for development, testing, and
+documentation. If you want to install these dependencies, you can do so
+by installing the code using <a class="reference external" href="https://python-poetry.org/">Poetry</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/GeminiDRSoftware/astrodata
+<span class="nb">cd</span><span class="w"> </span>astrodata
+
+<span class="c1"># If you don&#39;t have Poetry installed, you can install it with:</span>
+<span class="c1"># pip install poetry</span>
+poetry<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+<p>This will install <a class="reference internal" href="api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> in editable mode, along with all of the
+development dependencies. You can now run tests, build documentation,
+and run your code using a complete development environment genreated
+by <a class="reference external" href="https://python-poetry.org/">Poetry</a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run the tests</span>
+<span class="c1"># Note: tests are performed on all supported python versions, and if you</span>
+<span class="c1"># don&#39;t have a specific version installed, that test run will be skipped.</span>
+poetry<span class="w"> </span>run<span class="w"> </span>tox<span class="w"> </span>-rp
+
+<span class="c1"># Build the documentation from source.</span>
+poetry<span class="w"> </span>run<span class="w"> </span>sphinx-build<span class="w"> </span>docs<span class="w"> </span>docs/_build
+
+<span class="c1"># Run your code</span>
+poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>my_script.py
+</pre></div>
+</div>
+<p>You may, of course, install these dependencies into a local environment, if you
+prefer. For more information about <code class="docutils literal notranslate"><span class="pre">Poetry</span></code> and developing with it, see the
+<cite>Poetry basic usage documentation
+&lt;https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment&gt;</cite>.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="astrodata Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manuals/index.html" class="btn btn-neutral float-right" title="Astrodata Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

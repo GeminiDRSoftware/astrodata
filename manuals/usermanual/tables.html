@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Table Data &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Programmer’s Manual" href="../progmanual/index.html" />
+    <link rel="prev" title="Pixel Data" href="data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="structure.html">The AstroData Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iomef.html">Input and Output Operations and Extension Manipulation - MEF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tags.html">Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="headers.html">Metadata and Headers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html">Pixel Data</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Table Data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tables-and-astrodata">Tables and Astrodata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#operate-on-a-table">Operate on a Table</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-a-table">Create a Table</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../progmanual/index.html">Programmer’s Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">User Manual</a></li>
+      <li class="breadcrumb-item active">Table Data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/usermanual/tables.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="table-data">
+<span id="tables"></span><h1>Table Data<a class="headerlink" href="#table-data" title="Link to this heading"></a></h1>
+<p><strong>Try it yourself</strong></p>
+<p>Download the data package (<a class="reference internal" href="intro.html#datapkg"><span class="std std-ref">A quick example</span></a>) if you wish to follow along and run the
+examples.  Then</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;path&gt;/ad_usermanual/playground
+$ python
+</pre></div>
+</div>
+<p>Then import core astrodata and the Gemini astrodata configurations.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">astrodata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gemini_instruments</span>
+</pre></div>
+</div>
+<section id="tables-and-astrodata">
+<h2>Tables and Astrodata<a class="headerlink" href="#tables-and-astrodata" title="Link to this heading"></a></h2>
+<p>Tables are stored as <code class="docutils literal notranslate"><span class="pre">astropy.table</span></code> <code class="docutils literal notranslate"><span class="pre">Table</span></code> class.   FITS tables too
+are represented in Astrodata as <code class="docutils literal notranslate"><span class="pre">Table</span></code> and FITS headers are stored in
+the NDAstroData <cite>.meta</cite> attribute.  Most table access should be done
+through the <code class="docutils literal notranslate"><span class="pre">Table</span></code> interface.   The best reference on <code class="docutils literal notranslate"><span class="pre">Table</span></code> is the
+Astropy documentation itself.  In this chapter we covers some common
+examples to get the reader started.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">astropy.table</span></code> documentation can be found at: <a class="reference external" href="http://docs.astropy.org/en/stable/table/index.html">http://docs.astropy.org/en/stable/table/index.html</a></p>
+</section>
+<section id="operate-on-a-table">
+<h2>Operate on a Table<a class="headerlink" href="#operate-on-a-table" title="Link to this heading"></a></h2>
+<p>Let us open a file with tables.  Some tables are associated with specific
+extensions, and there is one table that is global to the <cite>AstroData</cite> object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>To access the global table named <code class="docutils literal notranslate"><span class="pre">REFCAT</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span>
+</pre></div>
+</div>
+<p>To access the <code class="docutils literal notranslate"><span class="pre">OBJCAT</span></code> table in the first extension</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span>
+</pre></div>
+</div>
+<section id="column-and-row-operations">
+<h3>Column and Row Operations<a class="headerlink" href="#column-and-row-operations" title="Link to this heading"></a></h3>
+<p>Columns are named.  Those names are used to access the data as columns.
+Rows are not names and are simply represented as a sequential list.</p>
+<section id="read-columns-and-rows">
+<h4>Read columns and rows<a class="headerlink" href="#read-columns-and-rows" title="Link to this heading"></a></h4>
+<p>To get the names of the columns present in the table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">colnames</span>
+<span class="go">[&#39;Id&#39;, &#39;Cat_Id&#39;, &#39;RAJ2000&#39;, &#39;DEJ2000&#39;, &#39;umag&#39;, &#39;umag_err&#39;, &#39;gmag&#39;,</span>
+<span class="go">&#39;gmag_err&#39;, &#39;rmag&#39;, &#39;rmag_err&#39;, &#39;imag&#39;, &#39;imag_err&#39;, &#39;zmag&#39;, &#39;zmag_err&#39;,</span>
+<span class="go">&#39;filtermag&#39;, &#39;filtermag_err&#39;]</span>
+</pre></div>
+</div>
+<p>Then it is easy to request the values for specific columns:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">,</span> <span class="s1">&#39;zmag_err&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To get the content of a specific row, row 10 in this case:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="mi">9</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To get the content of a specific row(s) from a specific column(s):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">,</span> <span class="s1">&#39;zmag_err&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="change-values">
+<h4>Change values<a class="headerlink" href="#change-values" title="Link to this heading"></a></h4>
+<p>Assigning new values works in a similar way.  When working on multiple elements
+it is important to feed a list that matches in size with the number of elements
+to replace.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;imag&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">20.999</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;imag&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">:</span><span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overwrite_col</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">)</span>  <span class="c1"># a list of zeros, size = nb of rows</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;imag_err&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">overwrite_col</span>
+</pre></div>
+</div>
+</section>
+<section id="add-a-row">
+<h4>Add a row<a class="headerlink" href="#add-a-row" title="Link to this heading"></a></h4>
+<p>To append a row, there is the <code class="docutils literal notranslate"><span class="pre">add_row()</span></code> method.  The length of the row
+should match the number of columns:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_row</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">colnames</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>   <span class="c1"># Cat_Id column is of &quot;str&quot; type.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">new_row</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="add-a-column">
+<h4>Add a column<a class="headerlink" href="#add-a-column" title="Link to this heading"></a></h4>
+<p>Adding a new column can be more involved.  If you need full control, please
+see the AstroPy Table documentation.  For a quick addition, which might be
+sufficient for your use case, we simply use the “dictionary” technique.  Please
+note that when adding a column, it is important to ensure that all the
+elements are of the same type.  Also, if you are planning to use that table
+in IRAF/PyRAF, we recommend not using 64-bit types.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Ensure that the type is int32, otherwise it will default to int64</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># which generally not necessary.  Also, IRAF 32-bit does not like it.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">new_column</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;my_column&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_column</span>
+</pre></div>
+</div>
+<p>If you are going to write that table back to disk as a FITS Bintable, then
+some additional headers need to be set.  Astrodata will take care of that
+under the hood when the <cite>write</cite> method is invoked.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;myfile_with_modified_table.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="selection-and-rejection-operations">
+<h3>Selection and Rejection Operations<a class="headerlink" href="#selection-and-rejection-operations" title="Link to this heading"></a></h3>
+<p>Normally, one does not know exactly where the information needed is located
+in a table.  Rather some sort of selection needs to be done.  This can also
+be combined with various calculations.  We show two such examples here.</p>
+<section id="select-a-table-element-from-criterion">
+<h4>Select a table element from criterion<a class="headerlink" href="#select-a-table-element-from-criterion" title="Link to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the magnitude of a star selected by ID number</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;Cat_Id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1237662500002005475&#39;</span><span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the ID and magnitude of all the stars brighter than zmag 18.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;Cat_Id&#39;</span><span class="p">,</span> <span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">18.</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="rejection-and-selection-before-statistics">
+<h4>Rejection and selection before statistics<a class="headerlink" href="#rejection-and-selection-before-statistics" title="Link to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span>   <span class="c1"># to save typing</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># The table has &quot;NaN&quot; values.  (&quot;Not a number&quot;)  We need to ignore them.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="go">nan</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># applying rejection of NaN values:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]))]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="go">20.377306</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="accessing-fits-table-headers-directly">
+<h3>Accessing FITS table headers directly<a class="headerlink" href="#accessing-fits-table-headers-directly" title="Link to this heading"></a></h3>
+<p>If for some reason you need to access the FITS table headers directly, here
+is how to do it.  It is very unlikely that you will need this.</p>
+<p>To see the FITS headers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>To retrieve a specific FITS table header:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">][</span><span class="s1">&#39;TTYPE3&#39;</span><span class="p">]</span>
+<span class="go">&#39;RAJ2000&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">][</span><span class="s1">&#39;TTYPE3&#39;</span><span class="p">]</span>
+<span class="go">&#39;Y_IMAGE&#39;</span>
+</pre></div>
+</div>
+<p>To retrieve all the keyword names matching a selection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">keynames</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;TTYPE&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="create-a-table">
+<h2>Create a Table<a class="headerlink" href="#create-a-table" title="Link to this heading"></a></h2>
+<p>To create a table that can be added to an <code class="docutils literal notranslate"><span class="pre">AstroData</span></code> object and eventually
+written to disk as a FITS file, the first step is to create an Astropy
+<code class="docutils literal notranslate"><span class="pre">Table</span></code>.</p>
+<p>Let us first add our data to NumPy arrays, one array per column:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">snr_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s1">&#39;S001&#39;</span><span class="p">,</span> <span class="s1">&#39;S002&#39;</span><span class="p">,</span> <span class="s1">&#39;S003&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">780.</span><span class="p">,</span> <span class="mf">78.</span><span class="p">,</span> <span class="mf">179.</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pabeta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">740.</span><span class="p">,</span> <span class="mf">307.</span><span class="p">,</span> <span class="mf">220.</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ratio</span> <span class="o">=</span> <span class="n">pabeta</span> <span class="o">/</span> <span class="n">feii</span>
+</pre></div>
+</div>
+<p>Then build the table from that data:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_astropy_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">([</span><span class="n">snr_id</span><span class="p">,</span> <span class="n">feii</span><span class="p">,</span> <span class="n">pabeta</span><span class="p">,</span> <span class="n">ratio</span><span class="p">],</span>
+<span class="gp">... </span>                         <span class="n">names</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;SNR_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;FeII&#39;</span><span class="p">,</span> <span class="s1">&#39;PaBeta&#39;</span><span class="p">,</span> <span class="s1">&#39;ratio&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Now we append this Astropy <code class="docutils literal notranslate"><span class="pre">Table</span></code> to a new <code class="docutils literal notranslate"><span class="pre">AstroData</span></code> object.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Since we are going to write a FITS, we build the AstroData object</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># from FITS objects.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">MYTABLE</span> <span class="o">=</span> <span class="n">my_astropy_table</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">MYTABLE</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new_table.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data.html" class="btn btn-neutral float-left" title="Pixel Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../progmanual/index.html" class="btn btn-neutral float-right" title="Programmer’s Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

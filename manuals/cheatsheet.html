@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cheat Sheet &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="User Manual" href="usermanual/index.html" />
+    <link rel="prev" title="Astrodata Manual" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            astrodata
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Cheat Sheet</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#imports">Imports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basic-read-and-write-operations">Basic read and write operations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#object-structure">Object structure</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#description">Description</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#modifying-the-structure">Modifying the structure</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#astrodata-tags">Astrodata tags</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#headers">Headers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#descriptors">Descriptors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#direct-access-to-header-keywords">Direct access to header keywords</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#pixel-data">Pixel data</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#arithmetics">Arithmetics</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#other-pixel-data-operations">Other pixel data operations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tables">Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-new-astrodata-object">Create new AstroData object</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="usermanual/index.html">User Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progmanual/index.html">Programmer’s Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Astrodata Manual</a></li>
+      <li class="breadcrumb-item active">Cheat Sheet</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/manuals/cheatsheet.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="cheat-sheet">
+<span id="cheatsheet"></span><h1>Cheat Sheet<a class="headerlink" href="#cheat-sheet" title="Link to this heading"></a></h1>
+<div class="admonition-document-id admonition">
+<p class="admonition-title">Document ID</p>
+<p>PIPE-USER-105_AstrodataCheatSheet</p>
+</div>
+<p>A data package is available for download if you wish to run the examples
+included in this cheat sheet.  Download it at:</p>
+<blockquote>
+<div><p><a class="reference external" href="http://www.gemini.edu/sciops/data/software/datapkgs/ad_usermanual_datapkg-v1.tar">http://www.gemini.edu/sciops/data/software/datapkgs/ad_usermanual_datapkg-v1.tar</a></p>
+</div></blockquote>
+<p>To unpack:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd &lt;somewhere_convenient&gt;
+$ tar xvf ad_usermanual_datapkg-v1.tar
+$ bunzip2 ad_usermanual/playdata/*.bz2
+</pre></div>
+</div>
+<p>Then go to the <code class="docutils literal notranslate"><span class="pre">ad_usermanual/playground</span></code> directory to run the examples.</p>
+<section id="imports">
+<h2>Imports<a class="headerlink" href="#imports" title="Link to this heading"></a></h2>
+<p>Import <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">gemini_instruments</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">import</span> <span class="nn">astrodata</span>
+<span class="o">&gt;&gt;</span> <span class="kn">import</span> <span class="nn">gemini_instruments</span>
+</pre></div>
+</div>
+</section>
+<section id="basic-read-and-write-operations">
+<h2>Basic read and write operations<a class="headerlink" href="#basic-read-and-write-operations" title="Link to this heading"></a></h2>
+<p>Open a file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Get path and filename:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">path</span>
+<span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">filename</span>
+<span class="s1">&#39;N20170609S0154.fits&#39;</span>
+</pre></div>
+</div>
+<p>Write to a new file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s1">&#39;new154.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">filename</span>
+<span class="n">N20170609S0154</span><span class="o">.</span><span class="n">fits</span>
+</pre></div>
+</div>
+<p>Overwrite the file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">adnew</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;new154.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">adnew</span><span class="o">.</span><span class="n">filename</span>
+<span class="n">new154</span><span class="o">.</span><span class="n">fits</span>
+<span class="o">&gt;&gt;</span> <span class="n">adnew</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="object-structure">
+<h2>Object structure<a class="headerlink" href="#object-structure" title="Link to this heading"></a></h2>
+<section id="description">
+<h3>Description<a class="headerlink" href="#description" title="Link to this heading"></a></h3>
+<p>The <a class="reference internal" href="../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object is assigned by “tags” that describe the
+type of data it contains. The tags are drawn from rules defined in
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">DRAGONS:gemini_instruments</span></code> and are based on header information.</p>
+<p>When mapping a FITS file, each science pixel extension is loaded as a
+<a class="reference internal" href="../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object. The list is zero-indexed. So FITS
+extension 1 becomes element 0 of the <a class="reference internal" href="../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. If a <code class="docutils literal notranslate"><span class="pre">VAR</span></code>
+extension is present, it is loaded to the variance attribute of the
+<a class="reference internal" href="../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a>. If a <code class="docutils literal notranslate"><span class="pre">DQ</span></code> extension is present, it is loaded to the <code class="docutils literal notranslate"><span class="pre">.mask</span></code>
+attribute of the <a class="reference internal" href="../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a>. <code class="docutils literal notranslate"><span class="pre">SCI</span></code>, <code class="docutils literal notranslate"><span class="pre">VAR</span></code> and <code class="docutils literal notranslate"><span class="pre">DQ</span></code> are associated
+through the <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> keyword value.</p>
+<p>In the file below, each <a class="reference internal" href="../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> “extension” contains the pixel data,
+then an error plane (<code class="docutils literal notranslate"><span class="pre">.variance</span></code>) and a bad pixel mask plane (<code class="docutils literal notranslate"><span class="pre">.mask</span></code>).
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code> can be attached to an extension, like OBJCAT, or to the
+<a class="reference internal" href="../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object globally, like REFCAT. (In this case, OBJCAT is a
+catalogue of the sources detected in the image, REFCAT is a reference catalog
+for the area covered by the whole file.)  If other 2D data needs to be
+associated with an extension this can also be done, like here with OBJMASK,
+a 2D mask matching the sources in the image.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<span class="n">Filename</span><span class="p">:</span> <span class="o">../</span><span class="n">playdata</span><span class="o">/</span><span class="n">N20170609S0154_varAdded</span><span class="o">.</span><span class="n">fits</span>
+<span class="n">Tags</span><span class="p">:</span> <span class="n">ACQUISITION</span> <span class="n">GEMINI</span> <span class="n">GMOS</span> <span class="n">IMAGE</span> <span class="n">NORTH</span> <span class="n">OVERSCAN_SUBTRACTED</span> <span class="n">OVERSCAN_TRIMMED</span>
+    <span class="n">PREPARED</span> <span class="n">SIDEREAL</span>
+<span class="n">Pixels</span> <span class="n">Extensions</span>
+<span class="n">Index</span>  <span class="n">Content</span>                  <span class="n">Type</span>              <span class="n">Dimensions</span>     <span class="n">Format</span>
+<span class="p">[</span> <span class="mi">0</span><span class="p">]</span>   <span class="n">science</span>                  <span class="n">NDAstroData</span>       <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">variance</span>             <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">mask</span>                 <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">int16</span>
+          <span class="o">.</span><span class="n">OBJCAT</span>               <span class="n">Table</span>             <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">43</span><span class="p">)</span>        <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+          <span class="o">.</span><span class="n">OBJMASK</span>              <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">uint8</span>
+<span class="p">[</span> <span class="mi">1</span><span class="p">]</span>   <span class="n">science</span>                  <span class="n">NDAstroData</span>       <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">variance</span>             <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">mask</span>                 <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">int16</span>
+          <span class="o">.</span><span class="n">OBJCAT</span>               <span class="n">Table</span>             <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">43</span><span class="p">)</span>        <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+          <span class="o">.</span><span class="n">OBJMASK</span>              <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">uint8</span>
+<span class="p">[</span> <span class="mi">2</span><span class="p">]</span>   <span class="n">science</span>                  <span class="n">NDAstroData</span>       <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">variance</span>             <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">mask</span>                 <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">int16</span>
+          <span class="o">.</span><span class="n">OBJCAT</span>               <span class="n">Table</span>             <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">43</span><span class="p">)</span>        <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+          <span class="o">.</span><span class="n">OBJMASK</span>              <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">uint8</span>
+<span class="p">[</span> <span class="mi">3</span><span class="p">]</span>   <span class="n">science</span>                  <span class="n">NDAstroData</span>       <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">variance</span>             <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">float32</span>
+          <span class="o">.</span><span class="n">mask</span>                 <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">int16</span>
+          <span class="o">.</span><span class="n">OBJCAT</span>               <span class="n">Table</span>             <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">43</span><span class="p">)</span>        <span class="n">n</span><span class="o">/</span><span class="n">a</span>
+          <span class="o">.</span><span class="n">OBJMASK</span>              <span class="n">ndarray</span>           <span class="p">(</span><span class="mi">2112</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>    <span class="n">uint8</span>
+<span class="n">Other</span> <span class="n">Extensions</span>
+               <span class="n">Type</span>        <span class="n">Dimensions</span>
+<span class="o">.</span><span class="n">REFCAT</span>        <span class="n">Table</span>       <span class="p">(</span><span class="mi">245</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="modifying-the-structure">
+<h3>Modifying the structure<a class="headerlink" href="#modifying-the-structure" title="Link to this heading"></a></h3>
+<p>Let’s first get our play data loaded. You are encouraged to do a
+<a class="reference internal" href="../api/astrodata.AstroData.html#astrodata.AstroData.info" title="astrodata.AstroData.info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">info()</span></code></a> before and after each structure-modification
+step, to see how things change.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">adcopy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">advar</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Append an extension:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">adcopy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">advar</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">adcopy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">advar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Delete an extension:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="k">del</span> <span class="n">adcopy</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Delete and add variance and mask planes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">var</span> <span class="o">=</span> <span class="n">adcopy</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span>
+<span class="o">&gt;&gt;</span> <span class="n">adcopy</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="o">&gt;&gt;</span> <span class="n">adcopy</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">var</span>
+</pre></div>
+</div>
+<p>Attach a table to an extension:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">adcopy</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">SMAUG</span> <span class="o">=</span> <span class="n">advar</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Attach a table to the <a class="reference internal" href="../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">adcopy</span><span class="o">.</span><span class="n">DROGON</span> <span class="o">=</span> <span class="n">advar</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Delete a table:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="k">del</span> <span class="n">adcopy</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">SMAUG</span>
+<span class="o">&gt;&gt;</span> <span class="k">del</span> <span class="n">adcopy</span><span class="o">.</span><span class="n">DROGON</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="astrodata-tags">
+<h2>Astrodata tags<a class="headerlink" href="#astrodata-tags" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&gt;&gt; ad = astrodata.open(&#39;../playdata/N20170521S0925_forStack.fits&#39;)
+&gt;&gt; ad.tags
+{&#39;GMOS&#39;, &#39;OVERSCAN_SUBTRACTED&#39;, &#39;SIDEREAL&#39;, &#39;NORTH&#39;, &#39;OVERSCAN_TRIMMED&#39;,
+&#39;PREPARED&#39;, &#39;IMAGE&#39;, &#39;GEMINI&#39;}
+
+&gt;&gt; type(ad.tags)
+&lt;class &#39;set&#39;&gt;
+
+&gt;&gt; {&#39;IMAGE&#39;, &#39;PREPARED&#39;}.issubset(ad.tags)
+True
+&gt;&gt; &#39;PREPARED&#39; in ad.tags
+True
+</pre></div>
+</div>
+</section>
+<section id="headers">
+<h2>Headers<a class="headerlink" href="#headers" title="Link to this heading"></a></h2>
+<p>The use of descriptors is favored over direct header access when retrieving
+values already represented by descriptors, and when writing instrument agnostic
+routines.</p>
+<section id="descriptors">
+<h3>Descriptors<a class="headerlink" href="#descriptors" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">filter_name</span><span class="p">()</span>
+<span class="s1">&#39;open1-6&amp;g_G0301&#39;</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">filter_name</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="s1">&#39;g&#39;</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">gain</span><span class="p">()</span>   <span class="c1"># uses a look-up table to get the correct values</span>
+<span class="p">[</span><span class="mf">2.03</span><span class="p">,</span> <span class="mf">1.97</span><span class="p">,</span> <span class="mf">1.96</span><span class="p">,</span> <span class="mf">2.01</span><span class="p">]</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;GAIN&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>    <span class="c1"># the wrong values contained in the raw data.</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">gain</span><span class="p">()</span>
+<span class="mf">2.03</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">gain</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="mf">2.03</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">descriptors</span>
+<span class="p">(</span><span class="s1">&#39;airmass&#39;</span><span class="p">,</span> <span class="s1">&#39;amp_read_area&#39;</span><span class="p">,</span> <span class="s1">&#39;ao_seeing&#39;</span><span class="p">,</span> <span class="o">...</span>
+ <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="direct-access-to-header-keywords">
+<h3>Direct access to header keywords<a class="headerlink" href="#direct-access-to-header-keywords" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="primary-header-unit">
+<h4>Primary Header Unit<a class="headerlink" href="#primary-header-unit" title="Link to this heading"></a></h4>
+<p>To see a print out of the full PHU:</p>
+<blockquote>
+<div><p>&gt;&gt; ad.phu</p>
+</div></blockquote>
+<p>Get value from PHU:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;EXPTIME&#39;</span><span class="p">]</span>
+<span class="mf">1.0</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">default</span> <span class="o">=</span> <span class="mf">5.</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;BOGUSKEY&#39;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+<span class="mf">5.0</span>
+</pre></div>
+</div>
+<p>Set PHU keyword, with and without comment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">50.</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;ANOTHER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="s1">&#39;Some comment&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Delete PHU keyword:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="k">del</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="pixel-extension-header">
+<h4>Pixel extension header<a class="headerlink" href="#pixel-extension-header" title="Link to this heading"></a></h4>
+<p>To see a print out of the full header for an extension or all the extensions:</p>
+<blockquote>
+<div><p>&gt;&gt; ad[0].hdr
+&gt;&gt; list(ad.hdr)</p>
+</div></blockquote>
+<p>Get value from an extension header:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;OVERSCAN&#39;</span><span class="p">]</span>
+<span class="mf">469.7444308769482</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;OVERSCAN&#39;</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Get keyword value for all extensions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;OVERSCAN&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="mf">469.7444308769482</span><span class="p">,</span> <span class="mf">469.656175780001</span><span class="p">,</span> <span class="mf">464.9815279808291</span><span class="p">,</span> <span class="mf">467.5701178951787</span><span class="p">]</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">hdr</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;BOGUSKEY&#39;</span><span class="p">,</span> <span class="mf">5.</span><span class="p">)</span>
+<span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Set extension header keyword, with and without comment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">50.</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;ANOTHER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="s1">&#39;Some comment&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Delete an extension keyword:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="k">del</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="table-header">
+<h4>Table header<a class="headerlink" href="#table-header" title="Link to this heading"></a></h4>
+<p>See the <a class="reference internal" href="#cheatsheet-tables"><span class="std std-ref">Tables</span></a> section.</p>
+</section>
+</section>
+</section>
+<section id="pixel-data">
+<h2>Pixel data<a class="headerlink" href="#pixel-data" title="Link to this heading"></a></h2>
+<section id="arithmetics">
+<h3>Arithmetics<a class="headerlink" href="#arithmetics" title="Link to this heading"></a></h3>
+<p>Arithmetics with variance and mask propagation is offered for
+<code class="docutils literal notranslate"><span class="pre">+</span></code>, <code class="docutils literal notranslate"><span class="pre">-</span></code>, <code class="docutils literal notranslate"><span class="pre">*</span></code>, <code class="docutils literal notranslate"><span class="pre">/</span></code>, and <code class="docutils literal notranslate"><span class="pre">**</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad_hcont</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170521S0925_forStack.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_halpha</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170521S0926_forStack.fits&#39;</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">adsub</span> <span class="o">=</span> <span class="n">ad_halpha</span> <span class="o">-</span> <span class="n">ad_hcont</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">ad_halpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">646.11896</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_hcont</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">581.81342</span>
+<span class="o">&gt;&gt;</span> <span class="n">adsub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">64.305862</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">ad_halpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">669.80664</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_hcont</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">598.46667</span>
+<span class="o">&gt;&gt;</span> <span class="n">adsub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">1268.274</span>
+
+
+<span class="c1"># In place multiplication</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_mult</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_mult</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_mult</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mf">5.</span><span class="p">)</span>
+
+
+<span class="c1"># Using descriptors to operate in-place on extensions.</span>
+<span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_gain</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="k">for</span> <span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">gain</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ad_gain</span><span class="p">,</span> <span class="n">ad_gain</span><span class="o">.</span><span class="n">gain</span><span class="p">()):</span>
+<span class="o">...</span>     <span class="n">ext</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">gain</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_gain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">366.39545</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">180.4904</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">gain</span><span class="p">()</span>
+<span class="mf">2.03</span>
+</pre></div>
+</div>
+</section>
+<section id="other-pixel-data-operations">
+<h3>Other pixel data operations<a class="headerlink" href="#other-pixel-data-operations" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad_halpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="mi">300</span><span class="p">:</span><span class="mi">350</span><span class="p">,</span><span class="mi">300</span><span class="p">:</span><span class="mi">350</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="o">&gt;&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ad_halpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">ad_halpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mask</span><span class="o">==</span><span class="mi">0</span><span class="p">])</span>
+<span class="mf">657.1994</span>
+<span class="o">&gt;&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ad_halpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="mf">646.11896</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="tables">
+<span id="cheatsheet-tables"></span><h2>Tables<a class="headerlink" href="#tables" title="Link to this heading"></a></h2>
+<p>Tables are stored as <code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.table.Table</span></code> class. FITS tables are
+represented in <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> as <code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code> and FITS headers are stored in the
+<a class="reference internal" href="../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a>  <code class="docutils literal notranslate"><span class="pre">meta</span></code> attribute. Most table
+access should be done through the <code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code> interface. The best reference is the
+<a class="reference external" href="http://docs.astropy.org/en/stable/">Astropy</a> documentation itself. Below are just a few examples.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Get column names:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">colnames</span>
+</pre></div>
+</div>
+<p>Get column content:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">,</span> <span class="s1">&#39;zmag_err&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Get content of row:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>     <span class="c1"># 5th row</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span>   <span class="c1"># 5th and 6th rows</span>
+</pre></div>
+</div>
+<p>Get content from specific row and column:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Add a column:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">new_column</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;new_column&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_column</span>
+</pre></div>
+</div>
+<p>Add a row:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">new_row</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">colnames</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">new_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>   <span class="c1"># Cat_Id column is of &quot;str&quot; type.</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="n">new_row</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Selecting value from criterion:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;Cat_Id&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;1237662500002005475&#39;</span><span class="p">]</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">18.</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Rejecting <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.nan</span></code> before doing something with the values:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">t</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span>   <span class="c1"># to save typing.</span>
+<span class="o">&gt;&gt;</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]),</span> <span class="mi">99</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">18.</span><span class="p">]</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">nan</span>
+<span class="o">&gt;&gt;</span> <span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s1">&#39;zmag&#39;</span><span class="p">]))]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="mf">20.377306</span>
+</pre></div>
+</div>
+<p>If for some reason you need to access the FITS table headers, here is how to do it.</p>
+<p>To see the FITS headers:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">meta</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span><span class="o">.</span><span class="n">meta</span>
+</pre></div>
+</div>
+<p>To retrieve a specific FITS table header:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">][</span><span class="s1">&#39;TTYPE3&#39;</span><span class="p">]</span>
+<span class="s1">&#39;RAJ2000&#39;</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">][</span><span class="s1">&#39;TTYPE3&#39;</span><span class="p">]</span>
+<span class="s1">&#39;Y_IMAGE&#39;</span>
+</pre></div>
+</div>
+<p>To retrieve all the keyword names matching a selection:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">keynames</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;header&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;TTYPE&#39;</span><span class="p">)]</span>
+</pre></div>
+</div>
+</section>
+<section id="create-new-astrodata-object">
+<h2>Create new AstroData object<a class="headerlink" href="#create-new-astrodata-object" title="Link to this heading"></a></h2>
+<p>Basic header and data array set to zeros:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+<span class="o">&gt;&gt;</span> <span class="n">pixel_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">()</span>
+<span class="o">&gt;&gt;</span> <span class="n">hdu</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pixel_data</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;SCI&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or another way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">pixel_data</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;SCI&#39;</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">,</span> <span class="p">[</span><span class="n">hdu</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code> as an <a class="reference internal" href="../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">my_astropy_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">100</span><span class="p">)),</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;col1&#39;</span><span class="p">,</span> <span class="s1">&#39;col2&#39;</span><span class="p">])</span>
+<span class="o">&gt;&gt;</span> <span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">SMAUG</span> <span class="o">=</span> <span class="n">my_astropy_table</span>
+
+<span class="o">&gt;&gt;</span> <span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+<span class="o">&gt;&gt;</span> <span class="n">ad</span><span class="o">.</span><span class="n">SMAUG</span> <span class="o">=</span> <span class="n">my_fits_table</span>
+</pre></div>
+</div>
+<p>WARNING: This last line will not run like the others as we have not defined
+<code class="docutils literal notranslate"><span class="pre">my_fits_table</span></code>.  This is nonetheless how it is done if you had a FITS table.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Astrodata Manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="usermanual/index.html" class="btn btn-neutral float-right" title="User Manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

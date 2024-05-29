@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metadata and Headers &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Pixel Data" href="data.html" />
+    <link rel="prev" title="Astrodata Tag" href="tags.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="structure.html">The AstroData Object</a></li>
+<li class="toctree-l3"><a class="reference internal" href="iomef.html">Input and Output Operations and Extension Manipulation - MEF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tags.html">Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Metadata and Headers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#astrodata-descriptors">Astrodata Descriptors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#accessing-metadata">Accessing Metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#updating-adding-and-deleting-metadata">Updating, Adding and Deleting Metadata</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#world-coordinate-system-attribute">World Coordinate System attribute</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#adding-descriptors-advanced-topic">Adding Descriptors [Advanced Topic]</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data.html">Pixel Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tables.html">Table Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../progmanual/index.html">Programmer’s Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">User Manual</a></li>
+      <li class="breadcrumb-item active">Metadata and Headers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/usermanual/headers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="metadata-and-headers">
+<span id="headers"></span><h1>Metadata and Headers<a class="headerlink" href="#metadata-and-headers" title="Link to this heading"></a></h1>
+<p>Metadata is a critical component of astronomical observations. These data are
+used to clarify and define various aspects of the observation, such as the
+instrument configuration, the observation conditions, and the data reduction
+history.  The metadata is often stored in the FITS headers of the data files,
+and in <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> metadata is manipulated and access in two ways: through
+descriptors (via <a class="reference internal" href="../../api/astrodata.astro_data_descriptor.html#astrodata.astro_data_descriptor" title="astrodata.astro_data_descriptor"><code class="xref py py-func docutils literal notranslate"><span class="pre">astro_data_descriptor()</span></code></a>) and directly in filetype-specific
+header access.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>While we say that header access is filetype-specific, it’s important to
+note that this is not the same as saying that the headers are different
+for each file type. The way headers are managed is FITS-centric, and
+therefore implementing header access for a new type requires either updating
+the methods that access headers or converting the headers to use
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">astropy.io.fits</span></code> objects after loading.</p>
+<p>For more information about developing with descriptors, see
+<a class="reference internal" href="../progmanual/descriptors.html"><span class="doc">Descriptors</span></a>.</p>
+</div>
+<section id="astrodata-descriptors">
+<h2>Astrodata Descriptors<a class="headerlink" href="#astrodata-descriptors" title="Link to this heading"></a></h2>
+<p>Descriptors provide a mapping between metadata or data and a value or set of
+values.  They are a way to access metadata in a consistent way, regardless of
+other differences between metadata (such as differences in the instrument,
+image type, etc.). Descriptors are implemented as methods, and can be
+found using the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.descriptors" title="astrodata.AstroData.descriptors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">astrodata.AstroData.descriptors()</span></code></a> property.</p>
+<p>As a user, your interactions with descriptors will depend on the specific
+implementation of <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> you are using. For example, if you’re using
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">DRAGONS:gemini_instruments</span></code> (from <a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a>), you will have access to the descriptors
+defined for Gemini instruments. If you’re using <a class="reference internal" href="../../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> directly, you will
+have access to the descriptors defined for the generic <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class.</p>
+<p>Descriptors are a way to access metadata in a consistent way, and may perform
+operations to arrive at a given value. Descriptors should not, in best
+practice, modify the state of any object; instead, they will return a new value
+every time they are used. Therefore, they can be more computationally expensive
+than direct header access, but they are far more flexible.</p>
+<p>For example, if the user is interested to know the effective filter used for a
+Gemini observation, normally one needs to know which specific keyword or set of
+keywords to look at for that instrument.  However, once the concept of “filter”
+is coded as a Descriptor (which happens in <code class="xref py py-mod docutils literal notranslate"><span class="pre">DRAGONS:gemini_instruments</span></code>), the user only
+needs to call the <code class="docutils literal notranslate"><span class="pre">filter_name()</span></code> descriptor to retrieve the information.</p>
+<p>This is all completely transparent to the user.  One simply opens the data
+file and all the descriptors are ready to be used.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyAstroData</span><span class="p">(</span><span class="n">astrodata</span><span class="o">.</span><span class="n">AstroData</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nd">@astro_data_descriptor</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">my_descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="mi">42</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">MyAstroData</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">my_descriptor</span><span class="p">()</span>
+<span class="go">42</span>
+
+<span class="go"># Descriptors can be listed as a tuple through the AstroData.descriptors</span>
+<span class="go"># property</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">descriptors</span>
+<span class="go">(&#39;my_descriptor&#39;,)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Descriptors must be defined for a given <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>-derived class.
+Descriptors are inherited like normal methods, so if a class inherits from
+another class that has descriptors, the new class will have those
+descriptors as well unless they are explicitly overridden.</p>
+</div>
+</section>
+<section id="accessing-metadata">
+<h2>Accessing Metadata<a class="headerlink" href="#accessing-metadata" title="Link to this heading"></a></h2>
+<section id="accessing-metadata-with-descriptors">
+<h3>Accessing Metadata with Descriptors<a class="headerlink" href="#accessing-metadata-with-descriptors" title="Link to this heading"></a></h3>
+<p>Whenever possible, descriptors should be used to get information from headers.
+This allows for straightforward re-usability of the code as it will propogate
+to any datasets with an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class.</p>
+<p>Here are a few examples using Descriptors</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#--- print a value</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The airmass is : &#39;</span><span class="p">,</span> <span class="n">ad</span><span class="o">.</span><span class="n">airmass</span><span class="p">())</span>
+<span class="go">The airmass is :  1.089</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#--- use a value to control the flow</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">ad</span><span class="o">.</span><span class="n">exposure_time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">240.</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;This is a short exposure.&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;This is a long exposure.&#39;</span><span class="p">)</span>
+<span class="go">This is a short exposure.</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#--- multiply all extensions by their respective gain</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">ext</span><span class="p">,</span> <span class="n">gain</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ad</span><span class="p">,</span> <span class="n">ad</span><span class="o">.</span><span class="n">gain</span><span class="p">()):</span>
+<span class="gp">... </span>    <span class="n">ext</span> <span class="o">*=</span> <span class="n">gain</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#--- do arithmetics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fwhm_pixel</span> <span class="o">=</span> <span class="mf">3.5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fwhm_arcsec</span> <span class="o">=</span> <span class="n">fwhm_pixel</span> <span class="o">*</span> <span class="n">ad</span><span class="o">.</span><span class="n">pixel_scale</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The return value of a descriptor is determined by the developer who created the
+descriptor. It’s best practice to return a value of the same—or similar,
+e.g., an iterable—type for each type of descriptor. However, this is not
+always desirable between different instrument sets. For example, Gemini data
+and JWST data may have different ways of describing specific values that are
+most useful to observers on their respective telescopes. To avoid confusion,
+check the return value of the descriptor explicitly when you are experimenting with
+new data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">TestAstroData</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">unknown_descriptor</span><span class="p">()</span>
+<span class="go">&#39;you know what I am now!&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">unknown_descriptor</span><span class="p">())</span>
+<span class="go">&lt;class &#39;str&#39;&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">OtherTestAstroData</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">unknown_descriptor</span><span class="p">()</span>
+<span class="go">[&#39;My&#39;, &#39;developer&#39;, &#39;decided&#39;, &quot;it&#39;s&quot;, &#39;more&#39;, &#39;useful&#39;, &#39;to&#39;, &#39;return&#39;, &#39;the&#39;, &#39;words&#39;, &#39;discretely&#39;]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">unknown_descriptor</span><span class="p">())</span>
+<span class="go">&lt;class &#39;list&#39;&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="descriptors-across-multiple-extensions">
+<h3>Descriptors across multiple extensions<a class="headerlink" href="#descriptors-across-multiple-extensions" title="Link to this heading"></a></h3>
+<p>The dataset used in this section has 4 extensions.  When the descriptor
+value can be different for each extension, the descriptor will return a
+Python list.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">airmass</span><span class="p">()</span>
+<span class="go">1.089</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">gain</span><span class="p">()</span>
+<span class="go">[2.03, 1.97, 1.96, 2.01]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filter_name</span><span class="p">()</span>
+<span class="go">&#39;open1-6&amp;g_G0301&#39;</span>
+</pre></div>
+</div>
+<p>Some descriptors accept arguments.  For example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filter_name</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&#39;g&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-metadata-directly">
+<h3>Accessing Metadata Directly<a class="headerlink" href="#accessing-metadata-directly" title="Link to this heading"></a></h3>
+<p>Not all header content is mapped to descriptors, nor should it be.  Direct
+access is available for header content falling outside the scope of the
+descriptors.</p>
+<p>One important thing to keep in mind is that the PHU (Primary Header Unit) and
+the extension headers are accessed slightly differently.  The attribute
+<code class="docutils literal notranslate"><span class="pre">phu</span></code> needs to be used for the PHU, and <code class="docutils literal notranslate"><span class="pre">hdr</span></code> for the extension headers.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">phu</span></code> and <code class="docutils literal notranslate"><span class="pre">hdr</span></code> attributes are not available for all <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>
+classes.  They are only available for classes that have been implemented to
+use them. The default <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class without modification does have
+minimal support for these attributes, but for other file types they will
+need to be implemented by a developer/the instrument team.</p>
+</div>
+<p>Here are some examples of direct header access</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#--- Get keyword value from the PHU</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;AOFOLD&#39;</span><span class="p">]</span>
+<span class="go">&#39;park-pos.&#39;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#--- Get keyword value from a specific extension</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;CRPIX1&#39;</span><span class="p">]</span>
+<span class="go">511.862999160781</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#--- Get keyword value from all the extensions in one call.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;CRPIX1&#39;</span><span class="p">]</span>
+<span class="go">[511.862999160781, 287.862999160781, -0.137000839218696, -224.137000839219]</span>
+</pre></div>
+</div>
+</section>
+<section id="whole-headers">
+<h3>Whole Headers<a class="headerlink" href="#whole-headers" title="Link to this heading"></a></h3>
+<p>Entire headers can be retrieved as <code class="docutils literal notranslate"><span class="pre">fits</span></code> <code class="docutils literal notranslate"><span class="pre">Header</span></code> objects</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">)</span>
+<span class="go">&lt;class &#39;astropy.io.fits.header.Header&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">)</span>
+<span class="go">&lt;class &#39;astropy.io.fits.header.Header&#39;&gt;</span>
+</pre></div>
+</div>
+<p>In interactive mode, it is possible to print the headers on the screen as
+follows</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span>
+<span class="go">SIMPLE  =                    T / file does conform to FITS standard</span>
+<span class="go">BITPIX  =                   16 / number of bits per data pixel</span>
+<span class="go">NAXIS   =                    0 / number of data axes</span>
+<span class="go">....</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span>
+<span class="go">XTENSION= &#39;IMAGE   &#39;           / IMAGE extension</span>
+<span class="go">BITPIX  =                   16 / number of bits per data pixel</span>
+<span class="go">NAXIS   =                    2 / number of data axes</span>
+<span class="go">....</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="updating-adding-and-deleting-metadata">
+<h2>Updating, Adding and Deleting Metadata<a class="headerlink" href="#updating-adding-and-deleting-metadata" title="Link to this heading"></a></h2>
+<p>Header cards can be updated, added to, or deleted from the headers.  The PHU
+and the extensions headers are again accessed in a mostly identical way
+with <code class="docutils literal notranslate"><span class="pre">phu</span></code> and <code class="docutils literal notranslate"><span class="pre">hdr</span></code>, respectively.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_to_data</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Add and update a keyword, without and with comment</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">50.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="s1">&#39;Updated PHU keyword&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">50.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">30.</span><span class="p">,</span> <span class="s1">&#39;Updated extension keyword&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Delete a keyword</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;NEWKEY&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="world-coordinate-system-attribute">
+<span id="world-coordinates"></span><h2>World Coordinate System attribute<a class="headerlink" href="#world-coordinate-system-attribute" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">wcs</span></code> of an extension’s <code class="docutils literal notranslate"><span class="pre">nddata</span></code> attribute (eg. <code class="docutils literal notranslate"><span class="pre">ad[0].nddata.wcs</span></code>;
+see <a class="reference internal" href="data.html#pixel-data"><span class="std std-ref">Pixel Data</span></a>) is stored as an instance of <code class="docutils literal notranslate"><span class="pre">astropy.wcs.WCS</span></code> (a
+standard FITS WCS object) or <code class="docutils literal notranslate"><span class="pre">gwcs.WCS</span></code> (a <a class="reference external" href="https://gwcs.readthedocs.io">“Generalized WCS” or gWCS</a> object). This defines a transformation between
+array indices and some other co-ordinate system such as “World” co-ordinates
+(see <a class="reference external" href="https://github.com/astropy/astropy-APEs/blob/master/APE14.rst">APE 14</a>). GWCS allows
+multiple, almost arbitrary co-ordinate mappings from different calibration
+steps (eg. CCD mosaicking, distortion correction &amp; wavelength calibration) to
+be combined in a single, reversible transformation chain — but this
+information cannot always be represented as a FITS standard WCS. If a gWCS
+object is too complex to be defined by the basic FITS keywords, it gets stored
+as a table extension named ‘WCS’ when the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> instance is saved to a
+file (with the same EXTVER as the corresponding ‘SCI’ array) and the FITS
+header keywords are updated to provide an approximation to the true WCS and an
+additional keyword <code class="docutils literal notranslate"><span class="pre">FITS-WCS</span></code> is added with the value ‘APPROXIMATE’.  The
+representation in the table is produced using <a class="reference external" href="https://asdf.readthedocs.io">ASDF</a>, with one line of text per row. Likewise, when
+the file is re-opened, the gWCS object gets recreated in <code class="docutils literal notranslate"><span class="pre">wcs</span></code> from the
+table. If the transformation defined by the gWCS object can be accurately
+described by standard FITS keywords, then no WCS extension is created as the
+gWCS object can be created from these keywords when the file is re-opened.</p>
+<p>In future, it is intended to improve the quality of the FITS approximation
+using the Simple Imaging Polynomial convention
+(<a class="reference external" href="https://fits.gsfc.nasa.gov/registry/sip.html">SIP</a>) or
+a discrete sampling of the World co-ordinate
+values will be stored as part of the FITS WCS, following <a class="reference external" href="http://adsabs.harvard.edu/abs/2006A%26A...446..747G">Greisen et al. (2006)</a>, S6 (in addition to the
+definitive ‘WCS’ table), allowing standard FITS readers to report accurate
+World co-ordinates for each pixel.</p>
+</section>
+<section id="adding-descriptors-advanced-topic">
+<span id="defining-descriptors"></span><h2>Adding Descriptors [Advanced Topic]<a class="headerlink" href="#adding-descriptors-advanced-topic" title="Link to this heading"></a></h2>
+<p>To learn how to add descriptors to <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>, see the <a class="reference internal" href="../progmanual/index.html"><span class="doc">Developer Guide</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tags.html" class="btn btn-neutral float-left" title="Astrodata Tag" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data.html" class="btn btn-neutral float-right" title="Pixel Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

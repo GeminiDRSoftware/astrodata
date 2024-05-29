@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>astrodata.fits &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../astrodata.html">astrodata</a></li>
+      <li class="breadcrumb-item active">astrodata.fits</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for astrodata.fits</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Functions used when interacting with FITS files and HDUs.</span>
+
+<span class="sd">.. |NDData| replace:: :class:`~astropy.nddata.NDData`</span>
+<span class="sd">.. |NDDataRef| replace:: :class:`~astropy.nddata.NDDataRef`</span>
+<span class="sd">.. |BinTableHDU| replace:: :class:`~astropy.io.fits.BinTableHDU`</span>
+<span class="sd">.. |TableHDU| replace:: :class:`~astropy.io.fits.TableHDU`</span>
+<span class="sd">.. |NDAstroData| replace:: :class:`~astrodata.nddata.NDAstroData`</span>
+<span class="sd">.. |NDAstroDataRef| replace:: :class:`~astrodata.nddata.NDAstroDataRef`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span> <span class="k">as</span> <span class="n">cart_product</span><span class="p">,</span> <span class="n">zip_longest</span>
+<span class="kn">import</span> <span class="nn">gc</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">astropy</span> <span class="kn">import</span> <span class="n">units</span> <span class="k">as</span> <span class="n">u</span>
+<span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+<span class="kn">from</span> <span class="nn">astropy.io.fits</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BinTableHDU</span><span class="p">,</span>
+    <span class="n">Column</span><span class="p">,</span>
+    <span class="n">DELAYED</span><span class="p">,</span>
+    <span class="n">HDUList</span><span class="p">,</span>
+    <span class="n">ImageHDU</span><span class="p">,</span>
+    <span class="n">PrimaryHDU</span><span class="p">,</span>
+    <span class="n">TableHDU</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">astropy.nddata</span> <span class="kn">import</span> <span class="n">NDData</span>
+
+<span class="c1"># NDDataRef is still not in the stable astropy, but this should be the one</span>
+<span class="c1"># we use in the future...</span>
+<span class="c1"># from astropy.nddata import NDData, NDDataRef as NDDataObject</span>
+<span class="kn">from</span> <span class="nn">astropy.table</span> <span class="kn">import</span> <span class="n">Table</span>
+
+<span class="kn">import</span> <span class="nn">asdf</span>
+<span class="kn">import</span> <span class="nn">astropy</span>
+<span class="kn">import</span> <span class="nn">jsonschema</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="kn">from</span> <span class="nn">gwcs.wcs</span> <span class="kn">import</span> <span class="n">WCS</span> <span class="k">as</span> <span class="n">gWCS</span>
+
+<span class="kn">from</span> <span class="nn">.nddata</span> <span class="kn">import</span> <span class="n">ADVarianceUncertainty</span><span class="p">,</span> <span class="n">NDAstroData</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">.wcs</span> <span class="kn">import</span> <span class="n">fitswcs_to_gwcs</span><span class="p">,</span> <span class="n">gwcs_to_fits</span>
+
+<span class="n">DEFAULT_EXTENSION</span> <span class="o">=</span> <span class="s2">&quot;SCI&quot;</span>
+<span class="n">NO_DEFAULT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+<span class="n">LOGGER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">FitsHeaderCollection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Group access to a list of FITS Header-like objects.</span>
+
+<span class="sd">    It exposes a number of methods (``set``, ``get``, etc.) that operate over</span>
+<span class="sd">    all the headers at the same time. It can also be iterated.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    headers : list of `astropy.io.fits.Header`</span>
+<span class="sd">        List of Header objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">headers</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">comment</span><span class="o">=</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a keyword in all the headers.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">:</span>
+            <span class="n">header</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">missing_at</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;Assigning None to header missing keyword </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span>
+                <span class="p">)</span>
+
+                <span class="n">missing_at</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                <span class="n">ret</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">missing_at</span><span class="p">:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="ne">KeyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The keyword couldn&#39;t be found at headers: &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">missing_at</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">error</span><span class="o">.</span><span class="n">missing_at</span> <span class="o">=</span> <span class="n">missing_at</span>
+            <span class="n">error</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">ret</span>
+            <span class="k">raise</span> <span class="n">error</span>
+
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a keyword, defaulting to None.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">values</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">err</span><span class="o">.</span><span class="n">missing_at</span><span class="p">:</span>
+                <span class="n">vals</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">default</span>
+            <span class="k">return</span> <span class="n">vals</span>
+
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a keyword from all the headers.&quot;&quot;&quot;</span>
+        <span class="n">deleted</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">header</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">deleted</span> <span class="o">=</span> <span class="n">deleted</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">deleted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39; is not on any of the extensions&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the comment for a keyword, from all the headers, as a list.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">header</span><span class="o">.</span><span class="n">comments</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">set_comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">comment</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the comment for a keyword in all the headers.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_inner_set_comment</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keyword </span><span class="si">{</span><span class="n">key</span><span class="si">!r}</span><span class="s2"> not available&quot;</span><span class="p">)</span>
+
+            <span class="n">header</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="n">comment</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">header</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_inner_set_comment</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">err</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> at header </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">h</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">new_imagehdu</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new ImageHDU from data and header.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : `numpy.ndarray`</span>
+<span class="sd">        The data array.</span>
+
+<span class="sd">    header : `astropy.io.fits.Header`</span>
+<span class="sd">        The header.</span>
+
+<span class="sd">    name : str</span>
+<span class="sd">        The extension name.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Assigning data in a delayed way, won&#39;t reset BZERO/BSCALE in the header,</span>
+<span class="sd">    for some reason. Need to investigated. Maybe astropy.io.fits bug. Figure</span>
+<span class="sd">    out WHY were we delaying in the first place.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">    &gt;&gt; i = ImageHDU(data=DELAYED, header=header.copy(), name=name)</span>
+<span class="sd">    &gt;&gt; i.data = data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Assigning data in a delayed way, won&#39;t reset BZERO/BSCALE in the header,</span>
+    <span class="c1"># for some reason. Need to investigated. Maybe astropy.io.fits bug. Figure</span>
+    <span class="c1"># out WHY were we delaying in the first place.</span>
+    <span class="c1">#    i = ImageHDU(data=DELAYED, header=header.copy(), name=name)</span>
+    <span class="c1">#    i.data = data</span>
+    <span class="k">return</span> <span class="n">ImageHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">table_to_bintablehdu</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">extname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert an astropy Table object to a BinTableHDU before writing to disk.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    table: astropy.table.Table instance</span>
+<span class="sd">        the table to be converted to a BinTableHDU</span>
+
+<span class="sd">    extname: str</span>
+<span class="sd">        name to go in the EXTNAME field of the FITS header</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    BinTableHDU</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># remove header to avoid warning from table_to_hdu</span>
+    <span class="n">table_header</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># table_to_hdu sets units only if the unit conforms to the FITS standard,</span>
+    <span class="c1"># otherwise it issues a warning, which we catch here.</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">table_to_hdu</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+
+    <span class="c1"># And now we try to set the units that do not conform to the standard,</span>
+    <span class="c1"># using unit.to_string() without the format=&#39;fits&#39; argument.</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">table</span><span class="o">.</span><span class="n">itercols</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">col</span><span class="o">.</span><span class="n">unit</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">hdu</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span><span class="p">:</span>
+            <span class="n">hdu</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="n">col</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">col</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">to_string</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">table_header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Update with cards from table.meta, but skip structural FITS</span>
+        <span class="c1"># keywords since those have been set by table_to_hdu</span>
+        <span class="n">exclude</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;SIMPLE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;XTENSION&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;BITPIX&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;NAXIS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;EXTEND&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;PCOUNT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;GCOUNT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TFIELDS&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TFORM&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TSCAL&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TZERO&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TNULL&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TTYPE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TUNIT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TDISP&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TDIM&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;THEAP&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TBCOL&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">hdr</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">card</span>
+                <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">table_header</span><span class="o">.</span><span class="n">cards</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">card</span><span class="o">.</span><span class="n">keyword</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">exclude</span><span class="p">)</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">update_header</span><span class="p">(</span><span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">hdr</span><span class="p">)</span>
+        <span class="c1"># reset table&#39;s header</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_header</span>
+    <span class="k">if</span> <span class="n">extname</span><span class="p">:</span>
+        <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">extname</span><span class="p">,</span> <span class="s2">&quot;added by AstroData&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hdu</span>
+
+
+<span class="k">def</span> <span class="nf">header_for_table</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a FITS header for a table.&quot;&quot;&quot;</span>
+    <span class="n">table_header</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;header&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">fits_header</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">table_to_hdu</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">header</span>
+
+    <span class="k">if</span> <span class="n">table_header</span><span class="p">:</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_header</span>  <span class="c1"># restore original meta</span>
+        <span class="n">fits_header</span> <span class="o">=</span> <span class="n">update_header</span><span class="p">(</span><span class="n">table_header</span><span class="p">,</span> <span class="n">fits_header</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fits_header</span>
+
+
+<div class="viewcode-block" id="add_header_to_table">
+<a class="viewcode-back" href="../../manuals/full_api.html#astrodata.add_header_to_table">[docs]</a>
+<span class="k">def</span> <span class="nf">add_header_to_table</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a FITS header to a table.&quot;&quot;&quot;</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="n">header_for_table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+    <span class="n">table</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header</span>
+    <span class="k">return</span> <span class="n">header</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_process_table</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a BinTableHDU or TableHDU to an astropy Table object.</span>
+
+<span class="sd">    Arguments</span>
+<span class="sd">    ---------</span>
+<span class="sd">    table : |BinTableHDU| or |TableHDU| or |Table|</span>
+<span class="sd">        The table to convert. If it&#39;s already an |Table|, it will be returned</span>
+<span class="sd">        as is.</span>
+
+<span class="sd">    name : str</span>
+<span class="sd">        The name to assign to the table.</span>
+
+<span class="sd">    header : `astropy.io.fits.Header`</span>
+<span class="sd">        The header to assign to the table.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="p">(</span><span class="n">BinTableHDU</span><span class="p">,</span> <span class="n">TableHDU</span><span class="p">)):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">table</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="n">header</span> <span class="ow">or</span> <span class="n">table</span><span class="o">.</span><span class="n">header</span><span class="p">})</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">obj</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="n">Unit</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;TUNIT</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+                <span class="k">pass</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">Table</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;header&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">header_for_table</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">table</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> is not a recognized table type&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">][</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">return</span> <span class="n">obj</span>
+
+
+<span class="k">def</span> <span class="nf">card_filter</span><span class="p">(</span><span class="n">cards</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter a list of cards, lazily returning only those that match the</span>
+<span class="sd">    criteria.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cards : iterable</span>
+<span class="sd">        The cards to filter.</span>
+
+<span class="sd">    include : iterable of str</span>
+<span class="sd">        Only cards with these keywords will be returned.</span>
+
+<span class="sd">    exclude : iterable of str</span>
+<span class="sd">        Cards with these keywords will be skipped.</span>
+
+<span class="sd">    Yields</span>
+<span class="sd">    ------</span>
+<span class="sd">    card : tuple</span>
+<span class="sd">        A card that matches the criteria.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">cards</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">card</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">include</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">card</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">yield</span> <span class="n">card</span>
+
+
+<span class="k">def</span> <span class="nf">update_header</span><span class="p">(</span><span class="n">headera</span><span class="p">,</span> <span class="n">headerb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Update headera with the cards from headerb, but only if they are</span>
+<span class="sd">    different.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    headera : `astropy.io.fits.Header`</span>
+<span class="sd">        The header to update.</span>
+
+<span class="sd">    headerb : `astropy.io.fits.Header`</span>
+<span class="sd">        The header to update from.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cardsa</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cr</span><span class="p">)</span> <span class="k">for</span> <span class="n">cr</span> <span class="ow">in</span> <span class="n">headera</span><span class="o">.</span><span class="n">cards</span><span class="p">)</span>
+    <span class="n">cardsb</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cr</span><span class="p">)</span> <span class="k">for</span> <span class="n">cr</span> <span class="ow">in</span> <span class="n">headerb</span><span class="o">.</span><span class="n">cards</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">cardsa</span> <span class="o">==</span> <span class="n">cardsb</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">headera</span>
+
+    <span class="c1"># Ok, headerb differs somehow. Let&#39;s try to bring the changes to headera</span>
+    <span class="c1"># Updated keywords that should be unique</span>
+    <span class="n">difference</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">cardsb</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">cardsa</span><span class="p">)</span>
+    <span class="n">headera</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">card_filter</span><span class="p">(</span><span class="n">difference</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;HISTORY&quot;</span><span class="p">,</span> <span class="s2">&quot;COMMENT&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">}))</span>
+
+    <span class="c1"># Check the HISTORY and COMMENT cards, just in case</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;HISTORY&quot;</span><span class="p">,</span> <span class="s2">&quot;COMMENT&quot;</span><span class="p">):</span>
+        <span class="n">fltcardsa</span> <span class="o">=</span> <span class="n">card_filter</span><span class="p">(</span><span class="n">cardsa</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="p">{</span><span class="n">key</span><span class="p">})</span>
+        <span class="n">fltcardsb</span> <span class="o">=</span> <span class="n">card_filter</span><span class="p">(</span><span class="n">cardsb</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="p">{</span><span class="n">key</span><span class="p">})</span>
+        <span class="c1"># assume we start with two headers that are mostly the same and</span>
+        <span class="c1"># that will have added comments/history at the end (in headerb)</span>
+        <span class="k">for</span> <span class="n">ca</span><span class="p">,</span> <span class="n">cb</span> <span class="ow">in</span> <span class="n">zip_longest</span><span class="p">(</span><span class="n">fltcardsa</span><span class="p">,</span> <span class="n">fltcardsb</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ca</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">headera</span><span class="o">.</span><span class="n">update</span><span class="p">((</span><span class="n">cb</span><span class="p">,))</span>
+
+    <span class="k">return</span> <span class="n">headera</span>
+
+
+<span class="k">def</span> <span class="nf">fits_ext_comp_key</span><span class="p">(</span><span class="n">ext</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a pair (int, str) that will be used to sort extensions.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">PrimaryHDU</span><span class="p">):</span>
+        <span class="c1"># This will guarantee that the primary HDU goes first</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># When two extensions share version number, we&#39;ll use their names</span>
+        <span class="c1"># to sort them out. Choose a suitable key so that:</span>
+        <span class="c1">#</span>
+        <span class="c1">#  - SCI extensions come first</span>
+        <span class="c1">#  - unnamed extensions come last</span>
+        <span class="c1">#</span>
+        <span class="c1"># We&#39;ll resort to add &#39;z&#39; in front of the usual name to force</span>
+        <span class="c1"># SCI to be the &quot;smallest&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;zzzz&quot;</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="o">!=</span> <span class="n">DEFAULT_EXTENSION</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;z&quot;</span> <span class="o">+</span> <span class="n">name</span>
+
+        <span class="n">ver</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ver</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="c1"># In practice, this number should be larger than any EXTVER found</span>
+            <span class="c1"># in real life HDUs, pushing unnumbered HDUs to the end.</span>
+            <span class="n">ver</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># For the general case, just return version and name, to let them</span>
+        <span class="c1"># be sorted naturally</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="n">ver</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ret</span>
+
+
+<span class="k">class</span> <span class="nc">FitsLazyLoadable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to delay loading of data from a FITS file.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        obj : `astropy.io.fits.ImageHDU` or `astropy.io.fits.BinTableHDU`</span>
+<span class="sd">            The HDU to delay loading from.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lazy</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">_create_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an empty array to hold the data.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Scale the data, if necessary.&quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">bscale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_orig_bscale</span>
+        <span class="n">bzero</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_orig_bzero</span>
+
+        <span class="c1"># If bscale is None, then the data is already scaled</span>
+        <span class="k">if</span> <span class="n">bscale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+        <span class="k">if</span> <span class="n">bscale</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">bzero</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">bscale</span> <span class="o">*</span> <span class="n">data</span> <span class="o">+</span> <span class="n">bzero</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr_slice</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">section</span><span class="p">[</span><span class="n">arr_slice</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The header of the HDU.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">header</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The data of the HDU.&quot;&quot;&quot;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_result</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">shape</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The shape of the data.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Need to to some overriding of astropy.io.fits since it doesn&#39;t</span>
+<span class="sd">        know about BITPIX=8</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">bitpix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_orig_bitpix</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_orig_bscale</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_orig_bzero</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">BITPIX2DTYPE</span><span class="p">[</span><span class="n">bitpix</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># this method from astropy will return the dtype if the data</span>
+            <span class="c1"># needs to be converted to unsigned int or scaled to float</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_dtype_for_bitpix</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bitpix</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;float</span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">bitpix</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;DQ&quot;</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_uint</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj</span><span class="o">.</span><span class="n">_orig_bscale</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="n">bitpix</span> <span class="o">==</span> <span class="mi">8</span>
+        <span class="p">):</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span>
+
+        <span class="k">return</span> <span class="n">dtype</span>
+
+
+<span class="k">def</span> <span class="nf">_prepare_hdulist</span><span class="p">(</span><span class="n">hdulist</span><span class="p">,</span> <span class="n">default_extension</span><span class="o">=</span><span class="s2">&quot;SCI&quot;</span><span class="p">,</span> <span class="n">extname_parser</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare an HDUList for reading.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    hdulist : `astropy.io.fits.HDUList`</span>
+<span class="sd">        The HDUList to prepare.</span>
+
+<span class="sd">    default_extension : str</span>
+<span class="sd">        The name of the default extension.</span>
+
+<span class="sd">    extname_parser : callable</span>
+<span class="sd">        A function to parse the EXTNAME of an HDU.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hdulist : `astropy.io.fits.HDUList`</span>
+<span class="sd">        The prepared HDUList.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">highest_ver</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">recognized</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hdulist</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hdulist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># MEF file</span>
+        <span class="c1"># First get HDUs for which EXTVER is defined</span>
+        <span class="k">for</span> <span class="n">hdu</span> <span class="ow">in</span> <span class="n">hdulist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">extname_parser</span><span class="p">:</span>
+                <span class="n">extname_parser</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+            <span class="n">ver</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ver</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">hdu</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">highest_ver</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">highest_ver</span><span class="p">,</span> <span class="n">ver</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">PrimaryHDU</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+            <span class="n">recognized</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+
+        <span class="c1"># Then HDUs that miss EXTVER</span>
+        <span class="k">for</span> <span class="n">hdu</span> <span class="ow">in</span> <span class="n">hdulist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">hdu</span> <span class="ow">in</span> <span class="n">recognized</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">ImageHDU</span><span class="p">):</span>
+                <span class="n">highest_ver</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="s2">&quot;EXTNAME&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+                    <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">default_extension</span><span class="p">,</span>
+                        <span class="s2">&quot;Added by AstroData&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">highest_ver</span><span class="p">,</span> <span class="s2">&quot;Added by AstroData&quot;</span><span class="p">)</span>
+
+            <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+            <span class="n">recognized</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Uh-oh, a single image FITS file</span>
+        <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">))</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">ImageHDU</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="c1"># Fudge due to apparent issues with assigning ImageHDU from data</span>
+        <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">_orig_bscale</span> <span class="o">=</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_orig_bscale</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">_orig_bzero</span> <span class="o">=</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_orig_bzero</span>
+
+        <span class="k">for</span> <span class="n">keyw</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;SIMPLE&quot;</span><span class="p">,</span> <span class="s2">&quot;EXTEND&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">keyw</span> <span class="ow">in</span> <span class="n">image</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="n">keyw</span><span class="p">]</span>
+
+        <span class="n">image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">default_extension</span><span class="p">,</span> <span class="s2">&quot;Added by AstroData&quot;</span><span class="p">)</span>
+        <span class="n">image</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Added by AstroData&quot;</span><span class="p">)</span>
+        <span class="n">new_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">HDUList</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">new_list</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">fits_ext_comp_key</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">read_fits</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">extname_parser</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes either a string (with the path to a file) or an HDUList as input,</span>
+<span class="sd">    and tries to return a populated AstroData (or descendant) instance.</span>
+
+<span class="sd">    It will raise exceptions if the file is not found, or if there is no match</span>
+<span class="sd">    for the HDUList, among the registered AstroData classes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cls : class</span>
+<span class="sd">        The class to instantiate.</span>
+
+<span class="sd">    source : str or `astropy.io.fits.HDUList`</span>
+<span class="sd">        The path to the file, or an HDUList.</span>
+
+<span class="sd">    extname_parser : callable</span>
+<span class="sd">        A function to parse the EXTNAME of an HDU.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ad : `astrodata.AstroData` or descendant</span>
+<span class="sd">        The populated AstroData object. This is of the type specified by cls.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ad</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">)):</span>
+        <span class="n">hdulist</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+            <span class="n">source</span><span class="p">,</span> <span class="n">memmap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">do_not_scale_image_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;readonly&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">ad</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">source</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hdulist</span> <span class="o">=</span> <span class="n">source</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">source</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ORIGNAME&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Attribute error in read_fits: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># This is a hack to get around the fact that we don&#39;t have a proper way to</span>
+    <span class="c1"># pass the original filename to the object. This is needed for the writer</span>
+    <span class="c1"># to be able to write the ORIGNAME keyword.</span>
+    <span class="c1"># pylint: disable=protected-access</span>
+    <span class="n">_file</span> <span class="o">=</span> <span class="n">hdulist</span><span class="o">.</span><span class="n">_file</span>
+
+    <span class="n">hdulist</span> <span class="o">=</span> <span class="n">_prepare_hdulist</span><span class="p">(</span>
+        <span class="n">hdulist</span><span class="p">,</span>
+        <span class="n">default_extension</span><span class="o">=</span><span class="n">DEFAULT_EXTENSION</span><span class="p">,</span>
+        <span class="n">extname_parser</span><span class="o">=</span><span class="n">extname_parser</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hdulist</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">_file</span>
+
+    <span class="c1"># Initialize the object containers to a bare minimum</span>
+    <span class="c1"># pylint: disable=no-member</span>
+    <span class="k">if</span> <span class="s2">&quot;ORIGNAME&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span> <span class="ow">and</span> <span class="n">ad</span><span class="o">.</span><span class="n">orig_filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+            <span class="s2">&quot;ORIGNAME&quot;</span><span class="p">,</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">orig_filename</span><span class="p">,</span>
+            <span class="s2">&quot;Original filename prior to processing&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">ad</span><span class="o">.</span><span class="n">phu</span> <span class="o">=</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span>
+
+    <span class="c1"># This is hashable --- we can use it to check if we&#39;ve seen this object</span>
+    <span class="c1"># before.</span>
+    <span class="c1"># pylint: disable=unhashable-member</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="p">{</span><span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+
+    <span class="n">skip_names</span> <span class="o">=</span> <span class="p">{</span><span class="n">DEFAULT_EXTENSION</span><span class="p">,</span> <span class="s2">&quot;REFCAT&quot;</span><span class="p">,</span> <span class="s2">&quot;MDF&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">associated_extensions</span><span class="p">(</span><span class="n">ver</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">hdu</span> <span class="ow">in</span> <span class="n">hdulist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">ver</span> <span class="ow">and</span> <span class="n">hdu</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">skip_names</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">hdu</span>
+
+    <span class="c1"># Only SCI HDUs</span>
+    <span class="n">sci_units</span> <span class="o">=</span> <span class="p">[</span><span class="n">hdu</span> <span class="k">for</span> <span class="n">hdu</span> <span class="ow">in</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">if</span> <span class="n">hdu</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">DEFAULT_EXTENSION</span><span class="p">]</span>
+
+    <span class="n">seen_vers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">hdu</span> <span class="ow">in</span> <span class="n">sci_units</span><span class="p">:</span>
+        <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+        <span class="n">ver</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ver</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">seen_vers</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">ver</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Multiple SCI extension with EXTVER </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ver</span><span class="p">)</span>
+
+        <span class="n">seen_vers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ver</span><span class="p">)</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">hdu</span><span class="p">,</span>
+            <span class="s2">&quot;uncertainty&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;mask&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;wcs&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;other&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+
+        <span class="c1"># For each SCI HDU find if it has an associated variance, mask, wcs</span>
+        <span class="k">for</span> <span class="n">extra_unit</span> <span class="ow">in</span> <span class="n">associated_extensions</span><span class="p">(</span><span class="n">ver</span><span class="p">):</span>
+            <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">extra_unit</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">extra_unit</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;DQ&quot;</span><span class="p">:</span>
+                <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">extra_unit</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;VAR&quot;</span><span class="p">:</span>
+                <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;uncertainty&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">extra_unit</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;WCS&quot;</span><span class="p">:</span>
+                <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;wcs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">extra_unit</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">extra_unit</span><span class="p">)</span>
+
+        <span class="n">header</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">header</span>
+        <span class="n">lazy</span> <span class="o">=</span> <span class="n">hdulist</span><span class="o">.</span><span class="n">_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">hdulist</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">memmap</span>
+
+        <span class="k">for</span> <span class="n">part_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="s2">&quot;uncertainty&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="n">part_name</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">lazy</span><span class="p">:</span>
+                    <span class="c1"># Use FitsLazyLoadable to delay loading of the data</span>
+                    <span class="n">parts</span><span class="p">[</span><span class="n">part_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">FitsLazyLoadable</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="n">part_name</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#  We open the file with do_not_scale_data=True, so</span>
+                    <span class="c1">#  the data array does not have the correct data values.</span>
+                    <span class="c1">#  AstroData handles scaling internally, and we can ensure</span>
+                    <span class="c1">#  it does that by making the data a FitsLazyLoadable; the</span>
+                    <span class="c1">#  side-effect of this is that the is_lazy() function will</span>
+                    <span class="c1">#  return True, but this has minimal knock-on effects.</span>
+                    <span class="c1">#  Hopefully astropy will handle this better in future.</span>
+                    <span class="k">if</span> <span class="n">hdulist</span><span class="o">.</span><span class="n">_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># probably compressed</span>
+                        <span class="n">parts</span><span class="p">[</span><span class="n">part_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">FitsLazyLoadable</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="n">part_name</span><span class="p">])</span>
+
+                    <span class="k">else</span><span class="p">:</span>  <span class="c1"># for astrodata.create() files</span>
+                        <span class="n">parts</span><span class="p">[</span><span class="n">part_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="n">part_name</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="c1"># handle the variance if not lazy</span>
+        <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;uncertainty&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;uncertainty&quot;</span><span class="p">],</span> <span class="n">FitsLazyLoadable</span>
+        <span class="p">):</span>
+            <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;uncertainty&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ADVarianceUncertainty</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="s2">&quot;uncertainty&quot;</span><span class="p">])</span>
+
+        <span class="c1"># Create the NDData object</span>
+        <span class="n">nd</span> <span class="o">=</span> <span class="n">NDAstroData</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">parts</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">],</span>
+            <span class="n">uncertainty</span><span class="o">=</span><span class="n">parts</span><span class="p">[</span><span class="s2">&quot;uncertainty&quot;</span><span class="p">],</span>
+            <span class="n">mask</span><span class="o">=</span><span class="n">parts</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">],</span>
+            <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="n">header</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nd</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">DEFAULT_EXTENSION</span><span class="p">)</span>
+
+        <span class="c1"># This is used in the writer to keep track of the extensions that</span>
+        <span class="c1"># were read from the current object.</span>
+        <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;parent_ad&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skip HDU </span><span class="si">{</span><span class="n">other</span><span class="si">}</span><span class="s2"> because it has no EXTNAME&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">ad</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="s2">&quot;wcs&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Load the gWCS object from the ASDF extension</span>
+            <span class="n">nd</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">asdftablehdu_to_wcs</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="s2">&quot;wcs&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">nd</span><span class="o">.</span><span class="n">wcs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Fallback to the data header</span>
+            <span class="n">nd</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">fitswcs_to_gwcs</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">nd</span><span class="o">.</span><span class="n">wcs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># In case WCS info is in the PHU</span>
+                <span class="n">nd</span><span class="o">.</span><span class="n">wcs</span> <span class="o">=</span> <span class="n">fitswcs_to_gwcs</span><span class="p">(</span><span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">hdulist</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTNAME&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Discarding </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> :</span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ad</span>
+
+
+<span class="k">def</span> <span class="nf">ad_to_hdulist</span><span class="p">(</span><span class="n">ad</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates an HDUList from an AstroData object.&quot;&quot;&quot;</span>
+    <span class="n">hdul</span> <span class="o">=</span> <span class="n">HDUList</span><span class="p">()</span>
+    <span class="n">hdul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">DELAYED</span><span class="p">))</span>
+
+    <span class="c1"># Find the maximum EXTVER for extensions that belonged with this</span>
+    <span class="c1"># object if it was read from a FITS file</span>
+    <span class="c1"># pylint: disable=protected-access</span>
+    <span class="n">ad_nddata</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">nddata</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ad_nddata</span><span class="p">,</span> <span class="n">NDAstroData</span><span class="p">):</span>
+        <span class="n">ad_nddata</span> <span class="o">=</span> <span class="p">[</span><span class="n">ad_nddata</span><span class="p">]</span>
+
+    <span class="n">maxver</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">ad_nddata</span>
+            <span class="k">if</span> <span class="n">nd</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;parent_ad&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+        <span class="p">),</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">ad_nddata</span><span class="p">:</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">):</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;parent_ad&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">ad</span><span class="p">):</span>
+            <span class="c1"># If the extension belonged with this object, use its</span>
+            <span class="c1"># original EXTVER</span>
+            <span class="n">ver</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Otherwise renumber the extension</span>
+            <span class="n">ver</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxver</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">maxver</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">wcs</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">wcs</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wcs</span><span class="p">,</span> <span class="n">gWCS</span><span class="p">):</span>
+            <span class="c1"># We don&#39;t have access to the AD tags so see if it&#39;s an image</span>
+            <span class="c1"># Catch ValueError as any sort of failure</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">wcs_dict</span> <span class="o">=</span> <span class="n">gwcs_to_fits</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Must delete keywords if image WCS has been downscaled</span>
+                <span class="c1"># from a higher number of dimensions</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;CDELT</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;CRVAL</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;CUNIT</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;CTYPE</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;NAXIS</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="p">):</span>
+                        <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                            <span class="k">del</span> <span class="n">header</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span>
+
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+                        <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CD</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;PC</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;CRPIX</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                                <span class="k">del</span> <span class="n">header</span><span class="p">[</span><span class="n">kw</span><span class="p">]</span>
+
+                <span class="c1"># Delete this if it&#39;s left over from a previous save</span>
+                <span class="k">if</span> <span class="s2">&quot;FITS-WCS&quot;</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;FITS-WCS&quot;</span><span class="p">]</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">extensions</span> <span class="o">=</span> <span class="n">wcs_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;extensions&quot;</span><span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">extensions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">ext</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+                <span class="n">header</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">wcs_dict</span><span class="p">)</span>
+
+                <span class="c1"># Use &quot;in&quot; here as the dict entry may be (value, comment)</span>
+                <span class="k">if</span> <span class="s2">&quot;APPROXIMATE&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">wcs_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FITS-WCS&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+                    <span class="n">wcs</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># There&#39;s no need to create a WCS extension</span>
+
+        <span class="n">hdul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_imagehdu</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="s2">&quot;SCI&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">uncertainty</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_imagehdu</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">uncertainty</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="s2">&quot;VAR&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hdul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_imagehdu</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="s2">&quot;DQ&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">wcs</span><span class="p">,</span> <span class="n">gWCS</span><span class="p">):</span>
+            <span class="n">hdul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wcs_to_asdftablehdu</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">wcs</span><span class="p">,</span> <span class="n">extver</span><span class="o">=</span><span class="n">ver</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">other</span> <span class="ow">in</span> <span class="n">ext</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Table</span><span class="p">):</span>
+                <span class="n">hdu</span> <span class="o">=</span> <span class="n">table_to_bintablehdu</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">extname</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+                <span class="n">hdu</span> <span class="o">=</span> <span class="n">new_imagehdu</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">header</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">NDAstroData</span><span class="p">):</span>
+                <span class="n">hdu</span> <span class="o">=</span> <span class="n">new_imagehdu</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">ext</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;header&quot;</span><span class="p">])</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;I don&#39;t know how to write back an object &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">hdu</span><span class="o">.</span><span class="n">ver</span> <span class="o">=</span> <span class="n">ver</span>
+            <span class="n">hdul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdu</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ad</span><span class="o">.</span><span class="n">_tables</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">table</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">_tables</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">hdul</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">table_to_bintablehdu</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">extname</span><span class="o">=</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="c1"># Additional FITS compatibility, add to PHU</span>
+    <span class="c1"># pylint: disable=no-member</span>
+    <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;NEXTEND&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hdul</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">hdul</span>
+
+
+<span class="k">def</span> <span class="nf">write_fits</span><span class="p">(</span><span class="n">ad</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Writes the AstroData object to a FITS file.&quot;&quot;&quot;</span>
+    <span class="n">hdul</span> <span class="o">=</span> <span class="n">ad_to_hdulist</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+    <span class="n">hdul</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
+
+
+<span class="nd">@deprecated</span><span class="p">(</span>
+    <span class="s2">&quot;Renamed to &#39;windowed_operation&#39;, this is just an alias for now, &quot;</span>
+    <span class="s2">&quot;and will be removed in a future version.&quot;</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">windowedOp</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=invalid-name</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deprecated alias for windowed_operation.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">windowed_operation</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_boxes</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Break the input into chunks.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">kernel</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Incompatible shape (</span><span class="si">{</span><span class="n">shape</span><span class="si">}</span><span class="s2">) and kernel (</span><span class="si">{</span><span class="n">kernel</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">ticks</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">[(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span> <span class="o">+</span> <span class="n">step</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">step</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">axis</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">cart_product</span><span class="p">(</span><span class="o">*</span><span class="n">ticks</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_get_shape</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the shape of the input.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">({</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">})</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Can&#39;t calculate final shape: sequence elements &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;mismatch on shape, and none was provided.&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; (shapes: </span><span class="si">{</span><span class="n">shapes</span><span class="si">}</span><span class="s2">, found &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">shapes</span><span class="p">))</span><span class="si">}</span><span class="s2"> unique shapes: </span><span class="si">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">shapes</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+
+
+<span class="k">def</span> <span class="nf">_apply_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a given function to a sequence of elements within specified boxes and store the result in the result object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : function</span>
+<span class="sd">        The function to apply to the elements.</span>
+<span class="sd">    sequence : list</span>
+<span class="sd">        The sequence of elements to apply the function to.</span>
+<span class="sd">    boxes : list</span>
+<span class="sd">        The list of boxes specifying the sections of the elements to apply the function to.</span>
+<span class="sd">    result : object</span>
+<span class="sd">        The object to store the result in.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
+<span class="sd">    This function applies the function to the elements in the sequence within</span>
+<span class="sd">    the specified boxes and stores the result in the result object. There is no</span>
+<span class="sd">    data returned by this function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">boxes</span><span class="p">:</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">func</span><span class="p">([</span><span class="n">element</span><span class="o">.</span><span class="n">window</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">set_section</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span>
+
+        <span class="c1"># propagate additional attributes</span>
+        <span class="k">if</span> <span class="n">out</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">,</span> <span class="n">coords</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">windowed_operation</span><span class="p">(</span>
+    <span class="n">func</span><span class="p">,</span>
+    <span class="n">sequence</span><span class="p">,</span>
+    <span class="n">kernel</span><span class="p">,</span>
+    <span class="n">shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">with_uncertainty</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">with_mask</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply function on a NDData obbjects, splitting the data in chunks to</span>
+<span class="sd">    limit memory usage.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : callable</span>
+<span class="sd">        The function to apply.</span>
+
+<span class="sd">    sequence : list of NDData</span>
+<span class="sd">        List of NDData objects.</span>
+
+<span class="sd">    kernel : tuple of int</span>
+<span class="sd">        Shape of the blocks.</span>
+
+<span class="sd">    shape : tuple of int</span>
+<span class="sd">        Shape of inputs. Defaults to ``sequence[0].shape``.</span>
+
+<span class="sd">    dtype : str or dtype</span>
+<span class="sd">        Type of the output array. Defaults to ``sequence[0].dtype``.</span>
+
+<span class="sd">    with_uncertainty : bool</span>
+<span class="sd">        Compute uncertainty?</span>
+
+<span class="sd">    with_mask : bool</span>
+<span class="sd">        Compute mask?</span>
+
+<span class="sd">    **kwargs</span>
+<span class="sd">        Additional args are passed to ``func``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="n">_get_shape</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">window</span><span class="p">[:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">NDAstroData</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="n">variance</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span> <span class="k">if</span> <span class="n">with_uncertainty</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mask</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span> <span class="k">if</span> <span class="n">with_mask</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">meta</span><span class="o">=</span><span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+        <span class="n">wcs</span><span class="o">=</span><span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">wcs</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Delete other extensions because we don&#39;t know what to do with them</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+    <span class="c1"># The Astropy logger&#39;s &quot;INFO&quot; messages aren&#39;t warnings, so have to fudge</span>
+    <span class="c1"># pylint: disable=no-member</span>
+    <span class="n">log_level</span> <span class="o">=</span> <span class="n">astropy</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">conf</span><span class="o">.</span><span class="n">log_level</span>
+    <span class="n">astropy</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">astropy</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">_generate_boxes</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">_apply_func</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">astropy</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span>  <span class="c1"># and reset</span>
+
+    <span class="c1"># Now if the input arrays where splitted in chunks, we need to gather</span>
+    <span class="c1"># the data arrays for the additional attributes.</span>
+    <span class="n">other</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;other&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">other</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">coords</span><span class="p">),</span> <span class="n">obj</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">NDData</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;only NDData objects are handled here&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+                    <span class="n">other</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">NDAstroData</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">obj</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="n">section</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="n">coords</span><span class="p">)</span>
+                <span class="n">other</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">set_section</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+                <span class="k">del</span> <span class="n">other</span><span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">coords</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">other</span><span class="p">:</span>
+            <span class="c1"># To set the name of our object we need to save it as an ndarray,</span>
+            <span class="c1"># otherwise for a NDData one AstroData would use the name of the</span>
+            <span class="c1"># AstroData object.</span>
+            <span class="n">other</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">other</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># gWCS &lt;-&gt; FITS WCS helper functions go here</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Could parametrize some naming conventions in the following two functions if</span>
+<span class="c1"># done elsewhere for hard-coded names like &#39;SCI&#39; in future, but they only have</span>
+<span class="c1"># to be self-consistent with one another anyway.</span>
+
+
+<span class="k">def</span> <span class="nf">wcs_to_asdftablehdu</span><span class="p">(</span><span class="n">wcs</span><span class="p">,</span> <span class="n">extver</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serialize a gWCS object as a FITS TableHDU (ASCII) extension.</span>
+
+<span class="sd">    The ASCII table is actually a mini ASDF file. The constituent AstroPy</span>
+<span class="sd">    models must have associated ASDF &quot;tags&quot; that specify how to serialize them.</span>
+
+<span class="sd">    In the event that serialization as pure ASCII fails (this should not</span>
+<span class="sd">    happen), a binary table representation will be used as a fallback.</span>
+
+<span class="sd">    Returns None (issuing a warning) if the WCS object cannot be serialized,</span>
+<span class="sd">    so the rest of the file can still be written.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wcs : gWCS</span>
+<span class="sd">        The gWCS object to serialize.</span>
+
+<span class="sd">    extver : int</span>
+<span class="sd">        The EXTVER to assign to the extension.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hdu : TableHDU or BinTableHDU</span>
+<span class="sd">        The FITS table extension containing the serialized WCS object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Create a small ASDF file in memory containing the WCS object</span>
+    <span class="c1"># representation because there&#39;s no public API for generating only the</span>
+    <span class="c1"># relevant YAML subsection and an ASDF file handles the &quot;tags&quot; properly.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">af</span> <span class="o">=</span> <span class="n">asdf</span><span class="o">.</span><span class="n">AsdfFile</span><span class="p">({</span><span class="s2">&quot;wcs&quot;</span><span class="p">:</span> <span class="n">wcs</span><span class="p">})</span>
+    <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="c1"># (The original traceback also gets printed here)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Cannot serialize model(s) for &#39;WCS&#39; extension &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">extver</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+    <span class="c1"># ASDF can only dump YAML to a binary file object, so do that and read</span>
+    <span class="c1"># the contents back from it for storage in a FITS extension:</span>
+    <span class="k">with</span> <span class="n">BytesIO</span><span class="p">()</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">af</span><span class="p">:</span>
+            <span class="c1"># Generate the YAML, dumping any binary arrays as text:</span>
+            <span class="n">af</span><span class="o">.</span><span class="n">write_to</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">all_array_storage</span><span class="o">=</span><span class="s2">&quot;inline&quot;</span><span class="p">)</span>
+        <span class="n">fd</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">wcsbuf</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="c1"># Convert the bytes to readable lines of text for storage (falling back to</span>
+    <span class="c1"># saving as binary in the unexpected event that this is not possible):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">wcsbuf</span> <span class="o">=</span> <span class="n">wcsbuf</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="c1"># This should not happen, but if the ASDF contains binary data in</span>
+        <span class="c1"># spite of the &#39;inline&#39; option above, we have to dump the bytes to</span>
+        <span class="c1"># a non-human-readable binary table rather than an ASCII one:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Could not convert WCS </span><span class="si">%s</span><span class="s2"> ASDF to ASCII; saving table &quot;</span>
+            <span class="s2">&quot;as binary (error was </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">extver</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">err</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">hduclass</span> <span class="o">=</span> <span class="n">BinTableHDU</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s2">&quot;B&quot;</span>
+        <span class="n">wcsbuf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">wcsbuf</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hduclass</span> <span class="o">=</span> <span class="n">TableHDU</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;A</span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">wcsbuf</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Construct the FITS table extension:</span>
+    <span class="n">col</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;gWCS&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">fmt</span><span class="p">,</span> <span class="n">array</span><span class="o">=</span><span class="n">wcsbuf</span><span class="p">,</span> <span class="n">ascii</span><span class="o">=</span><span class="n">hduclass</span> <span class="ow">is</span> <span class="n">TableHDU</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">hduclass</span><span class="o">.</span><span class="n">from_columns</span><span class="p">([</span><span class="n">col</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;WCS&quot;</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="n">extver</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">asdftablehdu_to_wcs</span><span class="p">(</span><span class="n">hdu</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recreate a gWCS object from its serialization in a FITS table extension.</span>
+
+<span class="sd">    Returns None (issuing a warning) if the extension cannot be parsed, so</span>
+<span class="sd">    the rest of the file can still be read.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ver</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXTVER&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="p">(</span><span class="n">TableHDU</span><span class="p">,</span> <span class="n">BinTableHDU</span><span class="p">)):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">colarr</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;gWCS&quot;</span><span class="p">]</span>
+
+        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Ignoring &#39;WCS&#39; extension </span><span class="si">%s</span><span class="s2"> with no &#39;gWCS&#39; table &quot;</span>
+                <span class="s2">&quot;column (error was </span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                <span class="n">ver</span><span class="p">,</span>
+                <span class="n">err</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># If this table column contains text strings as expected, join the rows</span>
+        <span class="c1"># as separate lines of a string buffer and encode the resulting YAML as</span>
+        <span class="c1"># bytes that ASDF can parse. If AstroData has produced another format,</span>
+        <span class="c1"># it will be a binary dump due to the unexpected presence of non-ASCII</span>
+        <span class="c1"># data, in which case we just extract unmodified bytes from the table.</span>
+        <span class="k">if</span> <span class="n">colarr</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">):</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span>
+            <span class="c1"># Just in case io.fits ever produces &#39;S&#39; on Py 3 (not the default):</span>
+            <span class="c1"># join lines as str &amp; avoid a TypeError with unicode linesep; could</span>
+            <span class="c1"># also use astype(&#39;U&#39;) but it assumes an encoding implicitly.</span>
+            <span class="k">if</span> <span class="n">colarr</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;S&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+                <span class="n">colarr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">char</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">colarr</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ascii&quot;</span>
+                <span class="p">)</span>
+            <span class="n">wcsbuf</span> <span class="o">=</span> <span class="n">sep</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">colarr</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">wcsbuf</span> <span class="o">=</span> <span class="n">colarr</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+
+        <span class="c1"># Convert the stored text to a Bytes file object that ASDF can open:</span>
+        <span class="k">with</span> <span class="n">BytesIO</span><span class="p">(</span><span class="n">wcsbuf</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="c1"># Try to extract a &#39;wcs&#39; entry from the YAML:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">af</span> <span class="o">=</span> <span class="n">asdf</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Ignoring &#39;WCS&#39; extension </span><span class="si">%s</span><span class="s2">: failed to parse &quot;</span>
+                    <span class="s2">&quot;ASDF.</span><span class="se">\n</span><span class="s2">Error was as follows:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">ver</span><span class="p">,</span>
+                    <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span>
+                <span class="p">)</span>
+
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">with</span> <span class="n">af</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">wcs</span> <span class="o">=</span> <span class="n">af</span><span class="o">.</span><span class="n">tree</span><span class="p">[</span><span class="s2">&quot;wcs&quot;</span><span class="p">]</span>
+
+                <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Ignoring &#39;WCS&#39; extension </span><span class="si">%s</span><span class="s2">: missing &quot;</span>
+                        <span class="s2">&quot;&#39;wcs&#39; dict entry. Error was </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">ver</span><span class="p">,</span>
+                        <span class="n">err</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">LOGGER</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring non-FITS-table &#39;WCS&#39; extension </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">ver</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">wcs</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

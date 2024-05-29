@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Containers &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Tags" href="tags.html" />
+    <link rel="prev" title="AstroData and Derivatives" href="adclass.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usermanual/index.html">User Manual</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Programmer’s Manual</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="design.html">General Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="adclass.html">AstroData and Derivatives</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Data Containers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ndastrodata-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code> class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#slicing">Slicing</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tags.html">Tags</a></li>
+<li class="toctree-l3"><a class="reference internal" href="descriptors.html">Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Programmer’s Manual</a></li>
+      <li class="breadcrumb-item active">Data Containers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/progmanual/containers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-containers">
+<span id="containers"></span><h1>Data Containers<a class="headerlink" href="#data-containers" title="Link to this heading"></a></h1>
+<p>The AstroData package is built around the concept of data containers. These are
+objects that contain the data for a single observation, and determine the
+structure of these data in memory. We have extended the Astropy <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> class
+to provide the core functionality of these containers, and added a number of
+mixins to provide additional functionality.</p>
+<p>Specifically, we extend <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> with the following:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">astrodata.NDAstroData</span></code></a> - the main data container class</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astrodata.NDAstroDataMixin</span></code> - a mixin class that adds additional functionality
+to <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code>, such as the ability to access image planes and tables stored in
+the <code class="docutils literal notranslate"><span class="pre">meta</span></code> dict as attributes of the object</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astrodata.NDArithmeticMixin</span></code> - a mixin class that adds arithmetic functionality</p></li>
+<li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astrodata.NDSlicingMixin</span></code> - a mixin class that adds slicing functionality</p></li>
+</ul>
+<section id="ndastrodata-class">
+<span id="ad-nddata"></span><h2><a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> class<a class="headerlink" href="#ndastrodata-class" title="Link to this heading"></a></h2>
+<p>Our main data container is <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a>. Fundamentally, it is
+a derivative of <code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.nddata.NDData</span></code>, plus a number of mixins to add
+functionality:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">NDAstroData</span><span class="p">(</span><span class="n">AstroDataMixin</span><span class="p">,</span> <span class="n">NDArithmeticMixin</span><span class="p">,</span> <span class="n">NDSlicingMixin</span><span class="p">,</span> <span class="n">NDData</span><span class="p">):</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>With these mixins, <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> is extended to allow for ease and efficiency
+of use, as if a common array, with extra features such as uncertainty
+propogation and efficient slicing with typically array syntax.</p>
+<p>Upon initialization (see <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>’s <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code>
+method), the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class will attempt to open the file in memory-mapping
+mode, which is the default mode for opening FITS files in Astropy. This means
+that the data is not loaded into memory until it is accessed, and is discarded
+from memory when it is no longer needed. This is particularly important for
+large data sets common in astronomy.</p>
+<p>Much of <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> acts to mimic the behavior of <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> and
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">astropy.io.fits</span></code> objects, but is designed to be extensible to other
+formats and means of storing, accessing, and manipulating data.</p>
+</section>
+<section id="slicing">
+<span id="ad-slices"></span><h2>Slicing<a class="headerlink" href="#slicing" title="Link to this heading"></a></h2>
+<p>One can already slice <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> objects as with <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code>, as normal Python arrays</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">some_fits_file</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">[(2048, 2048)]</span>
+
+<span class="go"># Access pixels 100-200 in both dimensions on the first image plane.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">100</span><span class="p">:</span><span class="mi">200</span><span class="p">,</span> <span class="mi">100</span><span class="p">:</span><span class="mi">200</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(100, 100)</span>
+</pre></div>
+</div>
+<p>It’s also useful to access specific “windows” in the data, which is implemented
+in <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> such that only the data necessary to access a window is loaded
+into memory.</p>
+<p>The <code class="xref py py-meth docutils literal notranslate"><span class="pre">astrodata.AstroData.window()</span></code> property returns an instance of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NDWindowing</span></code>, which only references the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>
+object being windowed (i.e., it contains no direct references to the data).
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NDWindowingAstroData</span></code>, which has references
+pointing to the memory mapped data requested by the window.</p>
+<p>The base <code class="docutils literal notranslate"><span class="pre">NDAstroData</span></code> class provides the memory-mapping functionality built
+upon by <code class="xref py py-class docutils literal notranslate"><span class="pre">NDWindowingAstroData</span></code>, with other important behaviors added by the
+other mixins.</p>
+<p>One addition is the <code class="docutils literal notranslate"><span class="pre">variance</span></code> property, which allows direct access and
+setting of the data’s uncertainty, without the user needing to explicitly wrap
+it as an <code class="docutils literal notranslate"><span class="pre">NDUncertainty</span></code> object. Internally, the variance is stored as an
+<code class="docutils literal notranslate"><span class="pre">ADVarianceUncertainty</span></code> object, which is subclassed from Astropy’s standard
+<code class="docutils literal notranslate"><span class="pre">VarianceUncertainty</span></code> class with the addition of a check for negative values
+whenever the array is accessed.</p>
+<p><code class="docutils literal notranslate"><span class="pre">NDAstroDataMixin</span></code> also changes the default method of combining the <code class="docutils literal notranslate"><span class="pre">mask</span></code>
+attributes during arithmetic operations from <code class="docutils literal notranslate"><span class="pre">logical_or</span></code> to <code class="docutils literal notranslate"><span class="pre">bitwise_or</span></code>,
+since the individual bits in the mask have separate meanings.</p>
+<p>The way slicing affects the <code class="docutils literal notranslate"><span class="pre">wcs</span></code> is also changed since DRAGONS regularly
+uses the callable nature of <code class="docutils literal notranslate"><span class="pre">gWCS</span></code> objects and this is broken by the standard
+slicing method.</p>
+<p>Finally, the additional image planes and tables stored in the <code class="docutils literal notranslate"><span class="pre">meta</span></code> dict
+are exposed as attributes of the <code class="docutils literal notranslate"><span class="pre">NDAstroData</span></code> object, and any image planes
+that have the same shape as the parent <code class="docutils literal notranslate"><span class="pre">NDAstroData</span></code> object will be handled
+by <code class="docutils literal notranslate"><span class="pre">NDWindowingAstroData</span></code>. Sections will be ignored when accessing image
+planes with a different shape, as well as tables.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We expect to make changes to <code class="docutils literal notranslate"><span class="pre">NDAstroData</span></code> in future releases. In particular,
+we plan to make use of the <code class="docutils literal notranslate"><span class="pre">unit</span></code> attribute provided by the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> class and increase the use of memory-mapping by default. These
+changes mostly represent increased functionality and we anticipate a high
+(and possibly full) degree of backward compatibility.</p>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="adclass.html" class="btn btn-neutral float-left" title="AstroData and Derivatives" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tags.html" class="btn btn-neutral float-right" title="Tags" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The AstroData Object &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Input and Output Operations and Extension Manipulation - MEF" href="iomef.html" />
+    <link rel="prev" title="Introduction" href="intro.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">The AstroData Object</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#example-location">Example location</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#walkthrough">Walkthrough</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="iomef.html">Input and Output Operations and Extension Manipulation - MEF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tags.html">Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="headers.html">Metadata and Headers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html">Pixel Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tables.html">Table Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../progmanual/index.html">Programmer’s Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">User Manual</a></li>
+      <li class="breadcrumb-item active">The AstroData Object</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/usermanual/structure.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-astrodata-object">
+<span id="structure"></span><h1>The AstroData Object<a class="headerlink" href="#the-astrodata-object" title="Link to this heading"></a></h1>
+<p>The <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object represents the data and metadata of a single file on
+disk.  As of this version, <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> has a default implementation supporting
+the FITS file format. If you wish to extend <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> to support other file
+formats, see <a class="reference internal" href="../progmanual/adclass.html#astrodata"><span class="std std-ref">AstroData and Derivatives</span></a>.</p>
+<p>The internal structure of the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object makes uses of astropy’s
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code>, <code class="xref py py-mod docutils literal notranslate"><span class="pre">table</span></code>, and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Header</span></code>, the latter simply because it is a convenient
+ordered dictionary.</p>
+<section id="example-location">
+<h2>Example location<a class="headerlink" href="#example-location" title="Link to this heading"></a></h2>
+<p>The examples in this section can be found here: <span class="xref std std-ref">user_structure_examples</span>.</p>
+</section>
+<section id="walkthrough">
+<h2>Walkthrough<a class="headerlink" href="#walkthrough" title="Link to this heading"></a></h2>
+<section id="global-vs-extension-specific">
+<h3>Global vs Extension-specific<a class="headerlink" href="#global-vs-extension-specific" title="Link to this heading"></a></h3>
+<p>At the top level, the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> structure is divided in two types of
+information.  In the first category, there is the information that applies to
+the data globally, for example the information that would be stored in a FITS
+Primary Header Unit, a table from a catalog that matches the RA and DEC of the
+field, etc.  In the second category, there is the information specific to
+individual science pixel extensions, for example the gain of the amplifier, the
+data themselves, the error on those data, etc.</p>
+<p>The composition and amount of information depends on the contents of the file
+itself. This information varies dramatically between observatories, so ensure
+that you have characterized your data well. Accessing the contents of an
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object is done through the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.info" title="astrodata.AstroData.info"><code class="xref py py-meth docutils literal notranslate"><span class="pre">info()</span></code></a>
+method.</p>
+<p>The “Pixel Extensions” contain the pixel data (in this case, something specific
+to our data type).  Each extension is represented individually in a list
+(0-indexed like all Python lists).  The science pixel data, its associated
+metadata (extension header), and any other pixel or table extensions directly
+associated with that science pixel data are stored in a <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object
+which subclasses astropy’s <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code>. An <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> extension is accessed like
+any list: <code class="docutils literal notranslate"><span class="pre">ad[0]</span></code> will return the first image. To access the science pixels,
+one uses <code class="docutils literal notranslate"><span class="pre">ad[0].data</span></code>; for the object mask of the first extension,
+<code class="docutils literal notranslate"><span class="pre">ad[0].OBJMASK</span></code>; etc.</p>
+</section>
+<section id="organization-of-global-information">
+<h3>Organization of Global Information<a class="headerlink" href="#organization-of-global-information" title="Link to this heading"></a></h3>
+<p>All the global information can be accessed as attributes of the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>
+object.  The global headers, or Primary Header Unit (PHU), is stored in the
+<code class="docutils literal notranslate"><span class="pre">phu</span></code> attribute as an <code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.io.fits.Header</span></code>.</p>
+<p>Any global tables are stored in the private attribute <code class="docutils literal notranslate"><span class="pre">_tables</span></code>. For example,
+if we had a <code class="docutils literal notranslate"><span class="pre">REFCAT</span></code> global table as part of our data (see example
+<span class="needs-replacement">GEMINI_EXAMPLE</span> a Python dictionary with the name (eg.
+“REFCAT”) as the key.  All tables are stored as <code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.table.Table</span></code>.
+Access to those table is done using the key directly as if it were a normal
+attribute, eg.  <code class="docutils literal notranslate"><span class="pre">ad.REFCAT</span></code>. Header information for the table, if read in
+from a FITS table, is stored in the <code class="docutils literal notranslate"><span class="pre">meta</span></code> attribute of the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.table.Table</span></code>, eg.  <code class="docutils literal notranslate"><span class="pre">ad.REFCAT.meta['header']</span></code>. It is for
+information only, it is not used.</p>
+</section>
+<section id="organization-of-the-extension-specific-information">
+<h3>Organization of the Extension-specific Information<a class="headerlink" href="#organization-of-the-extension-specific-information" title="Link to this heading"></a></h3>
+<p>The pixel data are stored in the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> attribute <code class="docutils literal notranslate"><span class="pre">nddata</span></code> as a list
+of <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object. The <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object is a subclass of astropy
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> and it is fully compatible with any function expecting an <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> as
+input.  The pixel extensions are accessible through slicing, eg. <code class="docutils literal notranslate"><span class="pre">ad[0]</span></code> or
+even <code class="docutils literal notranslate"><span class="pre">ad[0:2]</span></code>. A slice of an AstroData object is an AstroData object, and
+all the global attributes are kept. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<span class="go">Filename: N20170609S0154_varAdded.fits</span>
+<span class="go">Tags: ACQUISITION GEMINI GMOS IMAGE NORTH OVERSCAN_SUBTRACTED OVERSCAN_TRIMMED</span>
+<span class="go">    PREPARED SIDEREAL</span>
+
+<span class="go">Pixels Extensions</span>
+<span class="go">Index  Content                  Type              Dimensions     Format</span>
+<span class="go">[ 0]   science                  NDAstroData       (2112, 256)    float32</span>
+<span class="go">          .variance             ndarray           (2112, 256)    float32</span>
+<span class="go">          .mask                 ndarray           (2112, 256)    uint16</span>
+<span class="go">          .OBJCAT               Table             (6, 43)        n/a</span>
+<span class="go">          .OBJMASK              ndarray           (2112, 256)    uint8</span>
+
+<span class="go">Other Extensions</span>
+<span class="go">               Type        Dimensions</span>
+<span class="go">.REFCAT        Table       (245, 16)</span>
+</pre></div>
+</div>
+<p>Note how <code class="docutils literal notranslate"><span class="pre">REFCAT</span></code> is still present.</p>
+<p>The science data is accessed as <code class="docutils literal notranslate"><span class="pre">ad[0].data</span></code>, the variance as <code class="docutils literal notranslate"><span class="pre">ad[0].variance</span></code>,
+and the data quality plane as <code class="docutils literal notranslate"><span class="pre">ad[0].mask</span></code>.   Those familiar with astropy
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> will recognize the structure “data, error, mask”, and will notice
+some differences. First <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> uses the variance for the error plane, not
+the standard deviation. Another difference will be evident only when one looks
+at the content of the mask. <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> masks contain booleans, <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> masks
+are <code class="docutils literal notranslate"><span class="pre">uint16</span></code> bit mask that contains information about the type of bad pixels
+rather than just flagging them a bad or not. Since <code class="docutils literal notranslate"><span class="pre">0</span></code> is equivalent to
+<code class="docutils literal notranslate"><span class="pre">False</span></code> (good pixel), the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> mask is fully compatible with the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> mask.</p>
+<p>Header information for the extension is stored in the <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> <code class="docutils literal notranslate"><span class="pre">meta</span></code>
+attribute.  All table and pixel extensions directly associated with the
+science extension are also stored in the <code class="docutils literal notranslate"><span class="pre">meta</span></code> attribute.</p>
+<p>Technically, an extension header is located in <code class="docutils literal notranslate"><span class="pre">ad.nddata[0].meta['header']</span></code>.
+However, for obviously needed convenience, the normal way to access that header
+is <code class="docutils literal notranslate"><span class="pre">ad[0].hdr</span></code>.</p>
+<p>Tables and pixel arrays associated with a science extension are
+stored in <code class="docutils literal notranslate"><span class="pre">ad.nddata[0].meta['other']</span></code> as a dictionary keyed on the array
+name, eg. <code class="docutils literal notranslate"><span class="pre">OBJCAT</span></code>, <code class="docutils literal notranslate"><span class="pre">OBJMASK</span></code>.   As it is for global tables, astropy tables
+are used for extension tables.  The extension tables and extra pixel arrays are
+accessed, like the global tables, by using the table name rather than the long
+format, for example <code class="docutils literal notranslate"><span class="pre">ad[0].OBJCAT</span></code> and <code class="docutils literal notranslate"><span class="pre">ad[0].OBJMASK</span></code>.</p>
+<p>When reading a FITS Table, the header information is stored in the
+<code class="docutils literal notranslate"><span class="pre">meta['header']</span></code> of the table, eg. <code class="docutils literal notranslate"><span class="pre">ad[0].OBJCAT.meta['header']</span></code>.  That
+information is not used, it is simply a place to store what was read from disk.</p>
+<p>The header of a pixel extension directly associated with the science extension
+should match that of the science extension.  Therefore such headers are not
+stored in <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>. For example, the header of <code class="docutils literal notranslate"><span class="pre">ad[0].OBJMASK</span></code> is the
+same as that of the science, <code class="docutils literal notranslate"><span class="pre">ad[0].hdr</span></code>.</p>
+<p>The world coordinate system (WCS) is stored internally in the <code class="docutils literal notranslate"><span class="pre">wcs</span></code> attribute
+of the <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object. It is constructed from the header keywords when
+the FITS file is read from disk, or directly from the <code class="docutils literal notranslate"><span class="pre">WCS</span></code> extension if
+present (see <a class="reference internal" href="iomef.html#fitskeys"><span class="std std-ref">the next chapter</span></a>). If the WCS is modified (for
+example, by refining the pointing or attaching a more accurate wavelength
+calibration), the FITS header keywords are not updated and therefore they should
+never be used to determine the world coordinates of any pixel. These keywords are
+only updated when the object is written to disk as a FITS file.  The WCS is
+retrieved as follows: <code class="docutils literal notranslate"><span class="pre">ad[0].wcs</span></code>.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="intro.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="iomef.html" class="btn btn-neutral float-right" title="Input and Output Operations and Extension Manipulation - MEF" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

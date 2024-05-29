@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input and Output Operations and Extension Manipulation - MEF &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Astrodata Tag" href="tags.html" />
+    <link rel="prev" title="The AstroData Object" href="structure.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            astrodata
+              <img src="../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Astrodata Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../cheatsheet.html">Cheat Sheet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">User Manual</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="structure.html">The AstroData Object</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Input and Output Operations and Extension Manipulation - MEF</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#open-and-access-existing-dataset">Open and access existing dataset</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#modify-existing-mef-files">Modify Existing MEF Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-back-to-a-file">Writing back to a file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#create-new-mef-files">Create New MEF Files</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tags.html">Astrodata <code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="headers.html">Metadata and Headers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html">Pixel Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tables.html">Table Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../progmanual/index.html">Programmer’s Manual</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../full_api.html">Reference API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../appendix_descriptors.html">List of Gemini Standard Descriptors</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Astrodata Manual</a></li>
+          <li class="breadcrumb-item"><a href="index.html">User Manual</a></li>
+      <li class="breadcrumb-item active">Input and Output Operations and Extension Manipulation - MEF</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/manuals/usermanual/iomef.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="input-and-output-operations-and-extension-manipulation-mef">
+<span id="iomef"></span><h1>Input and Output Operations and Extension Manipulation - MEF<a class="headerlink" href="#input-and-output-operations-and-extension-manipulation-mef" title="Link to this heading"></a></h1>
+<p><a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> is not intended to exclusively support Multi-Extension FITS (MEF)
+files. However, given FITS’ unflagging popularity as an astronomical data format,
+the base <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object supports FITS and MEF files without any additional
+effort by a user or programmer.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For more information about FITS support and extending <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> to
+support other file formats, see <a class="reference internal" href="../progmanual/adclass.html#astrodata"><span class="std std-ref">AstroData and Derivatives</span></a>.</p>
+</div>
+<section id="open-and-access-existing-dataset">
+<h2>Open and access existing dataset<a class="headerlink" href="#open-and-access-existing-dataset" title="Link to this heading"></a></h2>
+<section id="read-in-the-dataset">
+<h3>Read in the dataset<a class="headerlink" href="#read-in-the-dataset" title="Link to this heading"></a></h3>
+<p>The file on disk is loaded into the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class associated with the
+instrument the data is from. This association is done automatically based on
+header content.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">astrodata</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">EXAMPLE_FILE</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+<span class="go">&lt;class &#39;gemini_instruments.gmos.adclass.AstroDataGmos&#39;&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ad</span></code> has loaded in the file’s header and parsed the keys present. Header access is done
+through the <code class="docutils literal notranslate"><span class="pre">.hdr</span></code> attribute.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;CCDSEC&#39;</span><span class="p">]</span>
+<span class="go">[&#39;[1:512,1:4224]&#39;, &#39;[513:1024,1:4224]&#39;, &#39;[1025:1536,1:4224]&#39;, &#39;[1537:2048,1:4224]&#39;]</span>
+
+<span class="go">With descriptors:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">array_section</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">[&#39;[1:512,1:4224]&#39;, &#39;[513:1024,1:4224]&#39;, &#39;[1025:1536,1:4224]&#39;, &#39;[1537:2048,1:4224]&#39;]</span>
+</pre></div>
+</div>
+<p>The original path and filename are also stored. If you were to write
+the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object to disk without specifying anything, path and
+file name would be set to <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">path</span>
+<span class="go">&#39;../playdata/N20170609S0154.fits&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span>
+<span class="go">&#39;N20170609S0154.fits&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="accessing-the-content-of-a-mef-file">
+<h3>Accessing the content of a MEF file<a class="headerlink" href="#accessing-the-content-of-a-mef-file" title="Link to this heading"></a></h3>
+<p><a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> uses <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> as the core of its structure. Each FITS extension
+becomes a <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object, subclassed from <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code>, and is added to
+a list representing all extensions in the file.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For details on the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object, please refer to
+<a class="reference internal" href="structure.html#structure"><span class="std std-ref">The AstroData Object</span></a>.</p>
+</div>
+<section id="pixel-data">
+<h4>Pixel data<a class="headerlink" href="#pixel-data" title="Link to this heading"></a></h4>
+<p>To access pixel data, the list index and the <code class="docutils literal notranslate"><span class="pre">.data</span></code> attribute are used. That
+returns a <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code>. The list of <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> is zero-indexed.
+<em>Extension number 1 in a MEF is index 0 in an |AstroData| object</em>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="go">&lt;class &#39;numpy.ndarray&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(2112, 256)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This implementation ignores the fact that the first extension in a MEF
+file is the Primary Header Unit (PHU). The PHU is accessibly through the
+<code class="docutils literal notranslate"><span class="pre">.phu</span></code> attribute of the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object, and indexing with <code class="docutils literal notranslate"><span class="pre">[i]</span></code>
+notation will only access the extensions.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Remember that in a <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code> the ‘y-axis’ of the image is
+accessed through the first number.</p>
+</div>
+<p>The variance and data quality planes, the <code class="docutils literal notranslate"><span class="pre">VAR</span></code> and <code class="docutils literal notranslate"><span class="pre">DQ</span></code> planes in Gemini
+MEF files, are represented by the <code class="docutils literal notranslate"><span class="pre">.variance</span></code> and <code class="docutils literal notranslate"><span class="pre">.mask</span></code> attributes,
+respectively. They are not their own “extension”, they don’t have their own
+index in the list, unlike in a MEF. They are attached to the pixel data,
+packaged together by the <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object. They are represented as
+<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> just like the pixel data</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">var</span> <span class="o">=</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dq</span> <span class="o">=</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mask</span>
+</pre></div>
+</div>
+</section>
+<section id="tables">
+<h4>Tables<a class="headerlink" href="#tables" title="Link to this heading"></a></h4>
+<p>Tables in the MEF file will also be loaded into the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. If a table
+is associated with a specific science extension through the EXTVER header keyword, that
+table will be packaged within the same AstroData extension as the pixel data
+and accessible like an attribute.  The <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> “extension” is the
+<a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object plus any table or other pixel array associated with the
+image data. If the table is not associated with a specific extension and
+applies globally, it will be added to the AstroData object as a global
+addition. No indexing will be required to access it.  In the example below, one
+<code class="docutils literal notranslate"><span class="pre">OBJCAT</span></code> is associated with each extension, while the <code class="docutils literal notranslate"><span class="pre">REFCAT</span></code> has a global
+scope</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<span class="go">Filename: ../playdata/N20170609S0154_varAdded.fits</span>
+<span class="go">Tags: ACQUISITION GEMINI GMOS IMAGE NORTH OVERSCAN_SUBTRACTED OVERSCAN_TRIMMED</span>
+<span class="go">    PREPARED SIDEREAL</span>
+
+<span class="go">Pixels Extensions</span>
+<span class="go">Index  Content                  Type              Dimensions     Format</span>
+<span class="go">[ 0]   science                  NDAstroData       (2112, 256)    float32</span>
+<span class="go">          .variance             ndarray           (2112, 256)    float32</span>
+<span class="go">          .mask                 ndarray           (2112, 256)    uint16</span>
+<span class="go">          .OBJCAT               Table             (6, 43)        n/a</span>
+<span class="go">          .OBJMASK              ndarray           (2112, 256)    uint8</span>
+<span class="go">[ 1]   science                  NDAstroData       (2112, 256)    float32</span>
+<span class="go">          .variance             ndarray           (2112, 256)    float32</span>
+<span class="go">          .mask                 ndarray           (2112, 256)    uint16</span>
+<span class="go">          .OBJCAT               Table             (8, 43)        n/a</span>
+<span class="go">          .OBJMASK              ndarray           (2112, 256)    uint8</span>
+<span class="go">[ 2]   science                  NDAstroData       (2112, 256)    float32</span>
+<span class="go">          .variance             ndarray           (2112, 256)    float32</span>
+<span class="go">          .mask                 ndarray           (2112, 256)    uint16</span>
+<span class="go">          .OBJCAT               Table             (7, 43)        n/a</span>
+<span class="go">          .OBJMASK              ndarray           (2112, 256)    uint8</span>
+<span class="go">[ 3]   science                  NDAstroData       (2112, 256)    float32</span>
+<span class="go">          .variance             ndarray           (2112, 256)    float32</span>
+<span class="go">          .mask                 ndarray           (2112, 256)    uint16</span>
+<span class="go">          .OBJCAT               Table             (5, 43)        n/a</span>
+<span class="go">          .OBJMASK              ndarray           (2112, 256)    uint8</span>
+
+<span class="go">Other Extensions</span>
+<span class="go">               Type        Dimensions</span>
+<span class="go">.REFCAT        Table       (245, 16)</span>
+</pre></div>
+</div>
+<p>The tables are stored internally as <code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.table.Table</span></code> objects.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span>
+<span class="go">&lt;Table length=6&gt;</span>
+<span class="go">NUMBER X_IMAGE Y_IMAGE ... REF_MAG_ERR PROFILE_FWHM PROFILE_EE50</span>
+<span class="go">int32  float32 float32 ...   float32     float32      float32</span>
+<span class="go">------ ------- ------- ... ----------- ------------ ------------</span>
+<span class="go">     1 283.461 55.4393 ...     0.16895       -999.0       -999.0</span>
+<span class="go">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span><span class="p">)</span>
+<span class="go">&lt;class &#39;astropy.table.table.Table&#39;&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">refcat</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">refcat</span><span class="p">)</span>
+<span class="go">&lt;class &#39;astropy.table.table.Table&#39;&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Tables are accessed through attribute notation. However, if a conflicting
+attribute exists for a given <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> or <code class="xref py py-class docutils literal notranslate"><span class="pre">NDData</span></code> object, a
+<code class="xref py py-exc docutils literal notranslate"><span class="pre">AttributeError</span></code> will be raised to avoid confusion.</p>
+</div>
+</section>
+<section id="headers">
+<h4>Headers<a class="headerlink" href="#headers" title="Link to this heading"></a></h4>
+<p>Headers are stored in the <a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> <code class="docutils literal notranslate"><span class="pre">.meta</span></code> attribute as
+<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.io.fits.Header</span></code> objects, which implements a <code class="docutils literal notranslate"><span class="pre">dict</span></code>-like
+object. Headers associated with extensions are stored with the corresponding
+<a class="reference internal" href="../../api/astrodata.NDAstroData.html#astrodata.NDAstroData" title="astrodata.NDAstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">NDAstroData</span></code></a> object. The MEF Primary Header Unit (PHU) is stored as an
+attribute in the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. When slicing an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object or
+accessing an index, the PHU will be included in the new sliced object.  The
+slice of an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object is an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object.  Headers can be
+accessed directly, or for some predefined concepts, the use of Descriptors is
+preferred.  More detailed information on Headers is covered in  the section
+<a class="reference internal" href="headers.html#headers"><span class="std std-ref">Metadata and Headers</span></a>.</p>
+<p>Using Descriptors</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filter_name</span><span class="p">()</span>
+<span class="go">&#39;open1-6&amp;g_G0301&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filter_name</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&#39;g&#39;</span>
+</pre></div>
+</div>
+<p>Using direct header access</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;FILTER1&#39;</span><span class="p">]</span>
+<span class="go">&#39;open1-6&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">phu</span><span class="p">[</span><span class="s1">&#39;FILTER2&#39;</span><span class="p">]</span>
+<span class="go">&#39;g_G0301&#39;</span>
+</pre></div>
+</div>
+<p>Accessing the extension headers</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;CCDSEC&#39;</span><span class="p">]</span>
+<span class="go">[&#39;[1:512,1:4224]&#39;, &#39;[513:1024,1:4224]&#39;, &#39;[1025:1536,1:4224]&#39;, &#39;[1537:2048,1:4224]&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;CCDSEC&#39;</span><span class="p">]</span>
+<span class="go">&#39;[1:512,1:4224]&#39;</span>
+
+<span class="go">With descriptors:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">array_section</span><span class="p">(</span><span class="n">pretty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">[&#39;[1:512,1:4224]&#39;, &#39;[513:1024,1:4224]&#39;, &#39;[1025:1536,1:4224]&#39;, &#39;[1537:2048,1:4224]&#39;]</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="modify-existing-mef-files">
+<h2>Modify Existing MEF Files<a class="headerlink" href="#modify-existing-mef-files" title="Link to this heading"></a></h2>
+<section id="appending-an-extension">
+<h3>Appending an extension<a class="headerlink" href="#appending-an-extension" title="Link to this heading"></a></h3>
+<p>Extensions can be appended to an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> objects using the
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData.append" title="astrodata.AstroData.append"><code class="xref py py-meth docutils literal notranslate"><span class="pre">append()</span></code></a> method.</p>
+<p>Here is an example appending a whole AstroData extension, with pixel data,
+variance, mask and tables. While these are treated as separate extensions in
+the MEF file, they are all packaged together in the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">advar</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<span class="go">Filename: ../playdata/N20170609S0154.fits</span>
+<span class="go">Tags: ACQUISITION GEMINI GMOS IMAGE NORTH RAW SIDEREAL UNPREPARED</span>
+<span class="go">Pixels Extensions</span>
+<span class="go">Index  Content                  Type              Dimensions     Format</span>
+<span class="go">[ 0]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 1]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 2]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 3]   science                  NDAstroData       (2112, 288)    uint16</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">advar</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<span class="go">Filename: ../playdata/N20170609S0154.fits</span>
+<span class="go">Tags: ACQUISITION GEMINI GMOS IMAGE NORTH RAW SIDEREAL UNPREPARED</span>
+<span class="go">Pixels Extensions</span>
+<span class="go">Index  Content                  Type              Dimensions     Format</span>
+<span class="go">[ 0]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 1]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 2]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 3]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 4]   science                  NDAstroData       (2112, 256)    float32</span>
+<span class="go">          .variance             ndarray           (2112, 256)    float32</span>
+<span class="go">          .mask                 ndarray           (2112, 256)    int16</span>
+<span class="go">          .OBJCAT               Table             (5, 43)        n/a</span>
+<span class="go">          .OBJMASK              ndarray           (2112, 256)    uint8</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;EXTVER&#39;</span><span class="p">]</span>
+<span class="go">4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">advar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">[</span><span class="s1">&#39;EXTVER&#39;</span><span class="p">]</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+<p>As you can see above, the fourth extension of <code class="docutils literal notranslate"><span class="pre">advar</span></code>, along with everything
+it contains was appended at the end of the first <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. However,
+note that, because the <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> of the extension in <code class="docutils literal notranslate"><span class="pre">advar</span></code> was 4, there are
+now two extensions in <code class="docutils literal notranslate"><span class="pre">ad</span></code> with this <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code>. This is not a problem because
+<code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> is not used by <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> (it uses the index instead) and it is handled
+only when the file is written to disk.</p>
+<p>In this next example, we are appending only the pixel data, leaving behind the other
+associated data. One can attach the headers too, like we do here.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">advar</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">advar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">advar</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">hdr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<span class="go">Filename: ../playdata/N20170609S0154.fits</span>
+<span class="go">Tags: ACQUISITION GEMINI GMOS IMAGE NORTH RAW SIDEREAL UNPREPARED</span>
+<span class="go">Pixels Extensions</span>
+<span class="go">Index  Content                  Type              Dimensions     Format</span>
+<span class="go">[ 0]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 1]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 2]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 3]   science                  NDAstroData       (2112, 288)    uint16</span>
+<span class="go">[ 4]   science                  NDAstroData       (2112, 256)    float32</span>
+</pre></div>
+</div>
+<p>Notice how a new extension was created but <code class="docutils literal notranslate"><span class="pre">variance</span></code>, <code class="docutils literal notranslate"><span class="pre">mask</span></code>, the OBJCAT
+table and OBJMASK image were not copied over. Only the science pixel data was
+copied over.</p>
+<p>Please note, there is no implementation for the “insertion” of an extension.</p>
+</section>
+<section id="removing-an-extension-or-part-of-one">
+<h3>Removing an extension or part of one<a class="headerlink" href="#removing-an-extension-or-part-of-one" title="Link to this heading"></a></h3>
+<p>Removing an extension or a part of an extension is straightforward. The
+Python command <code class="xref py py-func docutils literal notranslate"><span class="pre">del()</span></code> is used on the item to remove. Below are a few
+examples, but first let us load a file</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154_varAdded.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>As you go through these examples, check the new structure with <code class="xref py py-func docutils literal notranslate"><span class="pre">ad.info()</span></code>
+after every removal to see how the structure has changed.</p>
+<p>Deleting a whole <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> extension, the fourth one</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ad</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Deleting only the variance array from the second extension</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p>Deleting a table associated with the first extension</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">OBJCAT</span>
+</pre></div>
+</div>
+<p>Deleting a global table, not attached to a specific extension</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">ad</span><span class="o">.</span><span class="n">REFCAT</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="writing-back-to-a-file">
+<h2>Writing back to a file<a class="headerlink" href="#writing-back-to-a-file" title="Link to this heading"></a></h2>
+<p>The <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> class implements methods for writing its data back to a
+MEF file on disk.</p>
+<section id="writing-to-a-new-file">
+<h3>Writing to a new file<a class="headerlink" href="#writing-to-a-new-file" title="Link to this heading"></a></h3>
+<p>There are various ways to define the destination for the new FITS file.
+The most common and natural way is</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new154.fits&#39;</span><span class="p">)</span>
+<span class="go"># If the file already exists, an error will be raised unless overwrite=True</span>
+<span class="go"># is specified.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new154.fits&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This will write a FITS file named ‘new154.fits’ in the current directory.  With
+<code class="docutils literal notranslate"><span class="pre">overwrite=True</span></code>, it will overwrite the file if it already exists.  A path
+can be prepended to the filename if the current directory is not the
+destination.</p>
+<p>Note that <code class="docutils literal notranslate"><span class="pre">ad.filename</span></code> and <code class="docutils literal notranslate"><span class="pre">ad.path</span></code> have not changed, we have just
+written to the new file, the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object is in no way associated with
+that new file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">path</span>
+<span class="go">&#39;../playdata/N20170609S0154.fits&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span>
+<span class="go">&#39;N20170609S0154.fits&#39;</span>
+</pre></div>
+</div>
+<p>If you want to create that association, the <code class="docutils literal notranslate"><span class="pre">ad.filename</span></code> and <code class="docutils literal notranslate"><span class="pre">ad.path</span></code>
+needs to be modified first.  For example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;new154.fits&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">path</span>
+<span class="go">&#39;../playdata/new154.fits&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">filename</span>
+<span class="go">&#39;new154.fits&#39;</span>
+</pre></div>
+</div>
+<p>Changing <code class="docutils literal notranslate"><span class="pre">ad.filename</span></code> also changes the filename in the <code class="docutils literal notranslate"><span class="pre">ad.path</span></code>. The
+sequence above will write ‘new154.fits’ not in the current directory but
+rather to the directory that is specified in <code class="docutils literal notranslate"><span class="pre">ad.path</span></code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">ad.write()</span></code> has an argument named <code class="docutils literal notranslate"><span class="pre">filename</span></code>.  Setting <code class="docutils literal notranslate"><span class="pre">filename</span></code>
+in the call to <code class="xref py py-func docutils literal notranslate"><span class="pre">ad.write()</span></code>, as in <code class="docutils literal notranslate"><span class="pre">ad.write(filename='new154.fits')</span></code>
+will NOT modify <code class="docutils literal notranslate"><span class="pre">ad.filename</span></code> or <code class="docutils literal notranslate"><span class="pre">ad.path</span></code>.  The two “filenames”, one a
+method argument the other a class attribute have no association to each
+other.</p>
+</div>
+</section>
+<section id="updating-an-existing-file-on-disk">
+<h3>Updating an existing file on disk<a class="headerlink" href="#updating-an-existing-file-on-disk" title="Link to this heading"></a></h3>
+<p>Updating an existing file on disk requires explicitly allowing overwrite.</p>
+<p>If you have not written ‘new154.fits’ to disk yet (from previous section)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new154.fits&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now let’s open ‘new154.fits’, and write to it</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">adnew</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;new154.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adnew</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="a-note-on-fits-header-keywords">
+<h3>A note on FITS header keywords<a class="headerlink" href="#a-note-on-fits-header-keywords" title="Link to this heading"></a></h3>
+<p id="fitskeys">When writing an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object as a FITS file, it is necessary to add or
+update header keywords to represent some of the internally-stored information.
+Any extensions that did not originally belong to a given <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> instance
+will be assigned new <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> keywords to avoid conflicts with existing
+extensions, and the internal <code class="docutils literal notranslate"><span class="pre">WCS</span></code> is converted to the appropriate FITS keywords.
+Note that in some cases it may not be possible for standard FITS keywords to
+accurately represent the true <code class="docutils literal notranslate"><span class="pre">WCS</span></code>. In such cases, the FITS keywords are written
+as an approximation to the true <code class="docutils literal notranslate"><span class="pre">WCS</span></code>, together with an additional keyword</p>
+<p>to indicate this. The accurate <code class="docutils literal notranslate"><span class="pre">WCS</span></code> is written as an additional FITS extension with
+<code class="docutils literal notranslate"><span class="pre">EXTNAME='WCS'</span></code> that AstroData will recognize when the file is read back in. The
+<code class="docutils literal notranslate"><span class="pre">WCS</span></code> extension will not be written to disk if there is an accurate FITS
+representation of the <code class="docutils literal notranslate"><span class="pre">WCS</span></code> (e.g., for a simple image).</p>
+</section>
+</section>
+<section id="create-new-mef-files">
+<h2>Create New MEF Files<a class="headerlink" href="#create-new-mef-files" title="Link to this heading"></a></h2>
+<p>A new MEF file can be created from an existing, maybe modified, file or
+created from scratch (e.g., using computer-generated data/images).</p>
+<section id="create-new-copy-of-mef-files">
+<h3>Create New Copy of MEF Files<a class="headerlink" href="#create-new-copy-of-mef-files" title="Link to this heading"></a></h3>
+<section id="basic-example">
+<h4>Basic example<a class="headerlink" href="#basic-example" title="Link to this heading"></a></h4>
+<p>As seen above, a MEF file can be opened with <a class="reference internal" href="../../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>
+object can be modified (or not), and then written back to disk under a
+new name.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="gp">... </span><span class="n">optional</span> <span class="n">modifications</span> <span class="n">here</span> <span class="o">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;newcopy.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="needing-true-copies-in-memory">
+<h4>Needing true copies in memory<a class="headerlink" href="#needing-true-copies-in-memory" title="Link to this heading"></a></h4>
+<p>Sometimes it is a true copy in memory that is needed.  This is not specific
+to MEF.  In Python, doing something like <code class="docutils literal notranslate"><span class="pre">adnew</span> <span class="pre">=</span> <span class="pre">ad</span></code> does not create a
+new copy of the AstrodData object; it just gives it a new name.  If you
+modify <code class="docutils literal notranslate"><span class="pre">adnew</span></code> you will be modifying <code class="docutils literal notranslate"><span class="pre">ad</span></code> too.  They point to the same
+block of memory.</p>
+<p>To create a true independent copy, the <code class="docutils literal notranslate"><span class="pre">deepcopy</span></code> utility needs to be used.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">..</span> <span class="n">code</span><span class="o">-</span><span class="n">block</span><span class="p">::</span> <span class="n">python</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;../playdata/N20170609S0154.fits&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adcopy</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code class="docutils literal notranslate"><span class="pre">deepcopy</span></code> can cause memory problems, depending on the size of the data
+being copied as well as the size of objects it references. If you notice
+your memory becoming large/full, consider breaking down the copy into
+smaller pieces and f.</p>
+</div>
+</section>
+</section>
+<section id="create-new-mef-files-from-scratch">
+<h3>Create New MEF Files from Scratch<a class="headerlink" href="#create-new-mef-files-from-scratch" title="Link to this heading"></a></h3>
+<p>Before one creates a new MEF file on disk, one has to create the AstroData
+object that will be eventually written to disk.  The <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object
+created also needs to know that it will have to be written using the MEF
+format. This is fortunately handled fairly transparently by <a class="reference internal" href="../../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>.</p>
+<p>The key to associating the FITS data to the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object is simply to
+create the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object from <code class="xref py py-mod docutils literal notranslate"><span class="pre">astropy.io.fits</span></code> header objects. Those
+will be recognized by <a class="reference internal" href="../../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> as FITS and the constructor for FITS will be
+used. The user does not need to do anything else special. Here is how it is
+done.</p>
+<section id="create-a-mef-with-basic-header-and-data-array-set-to-zeros">
+<h4>Create a MEF with basic header and data array set to zeros<a class="headerlink" href="#create-a-mef-with-basic-header-and-data-array-set-to-zeros" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">astropy.io</span> <span class="kn">import</span> <span class="n">fits</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pixel_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span><span class="mi">100</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hdu</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">pixel_data</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hdu</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;SCI&#39;</span><span class="p">)</span>
+
+<span class="go"># Or another way to do the last two blocks:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">ImageHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">pixel_data</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;SCI&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">,</span> <span class="p">[</span><span class="n">hdu</span><span class="p">])</span>
+
+<span class="go"># Finally write to a file.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;new_MEF.fits&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="associate-a-pixel-array-with-a-science-pixel-array">
+<h4>Associate a pixel array with a science pixel array<a class="headerlink" href="#associate-a-pixel-array-with-a-science-pixel-array" title="Link to this heading"></a></h4>
+<p>Only main science (labed as <code class="docutils literal notranslate"><span class="pre">SCI</span></code>) pixel arrays are added an
+<a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object.  It not uncommon to have pixel information associated with
+those main science pixels, such as pixel masks, variance arrays, or other
+information.</p>
+<p>These pixel arrays are added to specific slice of the astrodata object they are
+associated with.</p>
+<p>Building on the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object we created in the previously, we can add a
+new pixel array directly to the slice(s) of the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object it should be
+associated with by assigning it as an attribute of the object.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">extra_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">EXTRADATA</span> <span class="o">=</span> <span class="n">extra_data</span>
+</pre></div>
+</div>
+<p>When the file is written to disk as a MEF, an extension will be created with
+<code class="docutils literal notranslate"><span class="pre">EXTNAME</span> <span class="pre">=</span> <span class="pre">EXTRADATA</span></code> and an <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code> that matches the slice’s <code class="docutils literal notranslate"><span class="pre">EXTVER</span></code>,
+in this case is would be <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p>
+</section>
+<section id="represent-a-table-as-a-fits-binary-table-in-an-astrodata-object">
+<h4>Represent a table as a FITS binary table in an <code class="docutils literal notranslate"><span class="pre">AstroData</span></code> object<a class="headerlink" href="#represent-a-table-as-a-fits-binary-table-in-an-astrodata-object" title="Link to this heading"></a></h4>
+<p>One first needs to create a table, either an <code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.table.Table</span></code>
+or a <code class="xref py py-class docutils literal notranslate"><span class="pre">BinTableHDU</span></code>. See the <a class="reference external" href="http://docs.astropy.org/en/stable/">Astropy</a> documentation
+on tables and this manual’s <a class="reference internal" href="tables.html#tables"><span class="std std-ref">section</span></a> dedicated to tables for
+more information.</p>
+<p>In the first example, we assume that <code class="docutils literal notranslate"><span class="pre">my_astropy_table</span></code> is
+a <code class="xref py py-class docutils literal notranslate"><span class="pre">Table</span></code> ready to be attached to an <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a>
+object.  (Warning: we have not created <code class="docutils literal notranslate"><span class="pre">my_astropy_table</span></code> therefore the
+example below will not run, though this is how it would be done.)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">astrodata</span><span class="o">.</span><span class="n">add_header_to_table</span><span class="p">(</span><span class="n">my_astropy_table</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_astropy_table</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;SMAUG&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In the second example, we start with a FITS <code class="xref py py-class docutils literal notranslate"><span class="pre">BinTableHDU</span></code>
+and attach it to a new <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object. (Again, we have not created
+<code class="docutils literal notranslate"><span class="pre">my_fits_table</span></code> so the example will not run.)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">phu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span> <span class="o">=</span> <span class="n">astrodata</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">phu</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_fits_table</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;DROGON&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As before, once the <a class="reference internal" href="../../api/astrodata.AstroData.html#astrodata.AstroData" title="astrodata.AstroData"><code class="xref py py-class docutils literal notranslate"><span class="pre">AstroData</span></code></a> object is constructed, the <code class="docutils literal notranslate"><span class="pre">ad.write()</span></code>
+method can be used to write it to disk as a MEF file.</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="structure.html" class="btn btn-neutral float-left" title="The AstroData Object" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tags.html" class="btn btn-neutral float-right" title="Astrodata Tag" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

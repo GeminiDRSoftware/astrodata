@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AstroData &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/logo_variables.css?v=947f2b5d" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../_static/dark_mode_css/dark.css?v=70edf1c7" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="AstroDataError" href="astrodata.AstroDataError.html" />
+    <link rel="prev" title="open" href="astrodata.open.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            astrodata
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api_short.html">Common API for Users</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../api_short.html#module-astrodata">astrodata Package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../api_short.html#functions">Functions</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../api_short.html#classes">Classes</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">AstroData</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrodata.AstroDataError.html">AstroDataError</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrodata.AstroDataMixin.html">AstroDataMixin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrodata.NDAstroData.html">NDAstroData</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrodata.Section.html">Section</a></li>
+<li class="toctree-l4"><a class="reference internal" href="astrodata.TagSet.html">TagSet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api_short.html">Common API for Users</a></li>
+      <li class="breadcrumb-item active">AstroData</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/astrodata.AstroData.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="astrodata">
+<h1>AstroData<a class="headerlink" href="#astrodata" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="astrodata.AstroData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">astrodata.</span></span><span class="sig-name descname"><span class="pre">AstroData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nddata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_single</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#astrodata.AstroData.object" title="astrodata.AstroData.object"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for the AstroData software package. It provides an interface
+to manipulate astronomical data sets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nddata</strong> (<cite>astrodata.NDAstroData</cite> or list of <cite>astrodata.NDAstroData</cite>) – List of NDAstroData objects.</p></li>
+<li><p><strong>tables</strong> (dict[name, <cite>astropy.table.Table</cite>]) – Dict of table objects.</p></li>
+<li><p><strong>phu</strong> (<cite>astropy.io.fits.Header</cite>) – Primary header.</p></li>
+<li><p><strong>indices</strong> (<em>list</em><em> of </em><em>int</em>) – List of indices mapping the <cite>astrodata.NDAstroData</cite> objects that this
+object will access to. This is used when slicing an object, then the
+sliced AstroData will have the <code class="docutils literal notranslate"><span class="pre">.nddata</span></code> list from its parent and
+access the sliced NDAstroData through this list of indices.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Attributes Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.data" title="astrodata.AstroData.data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code></a></p></td>
+<td><p>A list of the arrays (or single array, if this is a single slice) corresponding to the science data attached to each extension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.descriptors" title="astrodata.AstroData.descriptors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">descriptors</span></code></a></p></td>
+<td><p>Returns a sequence of names for the methods that have been decorated as descriptors.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.exposed" title="astrodata.AstroData.exposed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exposed</span></code></a></p></td>
+<td><p>A collection of strings with the names of objects that can be accessed directly by name as attributes of this instance, and that are not part of its standard interface (i.e. data objects that have been added dynamically).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.ext_tables" title="astrodata.AstroData.ext_tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ext_tables</span></code></a></p></td>
+<td><p>Return the names of the <cite>astropy.table.Table</cite> objects associated to an extension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.filename" title="astrodata.AstroData.filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filename</span></code></a></p></td>
+<td><p>Return the file name.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.hdr" title="astrodata.AstroData.hdr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hdr</span></code></a></p></td>
+<td><p>Return all headers, as a <cite>astrodata.fits.FitsHeaderCollection</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.header" title="astrodata.AstroData.header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">header</span></code></a></p></td>
+<td><p>Deprecated header access.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.id" title="astrodata.AstroData.id"><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></a></p></td>
+<td><p>Returns the extension identifier (1-based extension number) for sliced objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.indices" title="astrodata.AstroData.indices"><code class="xref py py-obj docutils literal notranslate"><span class="pre">indices</span></code></a></p></td>
+<td><p>Returns the extensions indices for sliced objects.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.is_sliced" title="astrodata.AstroData.is_sliced"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_sliced</span></code></a></p></td>
+<td><p>If this data provider instance represents the whole dataset, return False.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.mask" title="astrodata.AstroData.mask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mask</span></code></a></p></td>
+<td><p>A list of the mask arrays (or a single array, if this is a single slice) attached to the science data, for each extension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.nddata" title="astrodata.AstroData.nddata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nddata</span></code></a></p></td>
+<td><p>Return the list of <cite>astrodata.NDAstroData</cite> objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.orig_filename" title="astrodata.AstroData.orig_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">orig_filename</span></code></a></p></td>
+<td><p>Return the original file name (before it was modified).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.path" title="astrodata.AstroData.path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">path</span></code></a></p></td>
+<td><p>Return the file path.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.phu" title="astrodata.AstroData.phu"><code class="xref py py-obj docutils literal notranslate"><span class="pre">phu</span></code></a></p></td>
+<td><p>Return the primary header.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.shape" title="astrodata.AstroData.shape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shape</span></code></a></p></td>
+<td><p>Return the shape of the data array for each extension as a list of shapes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.tables" title="astrodata.AstroData.tables"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tables</span></code></a></p></td>
+<td><p>Return the names of the <cite>astropy.table.Table</cite> objects associated to the top-level object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.tags" title="astrodata.AstroData.tags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tags</span></code></a></p></td>
+<td><p>A set of strings that represent the tags defining this instance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.uncertainty" title="astrodata.AstroData.uncertainty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uncertainty</span></code></a></p></td>
+<td><p>A list of the uncertainty objects (or a single object, if this is a single slice) attached to the science data, for each extension.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.variance" title="astrodata.AstroData.variance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variance</span></code></a></p></td>
+<td><p>A list of the variance arrays (or a single array, if this is a single slice) attached to the science data, for each extension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.wcs" title="astrodata.AstroData.wcs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wcs</span></code></a></p></td>
+<td><p>Returns the list of WCS objects for each extension.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods Summary</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.add" title="astrodata.AstroData.add"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add</span></code></a>(oper)</p></td>
+<td><p>Performs inplace addition by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">+=</span> <span class="pre">operand</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.append" title="astrodata.AstroData.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code></a>(ext[, name, header])</p></td>
+<td><p>Adds a new top-level extension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.crop" title="astrodata.AstroData.crop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crop</span></code></a>(x1, y1, x2, y2)</p></td>
+<td><p>Crop the NDData objects given indices.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.divide" title="astrodata.AstroData.divide"><code class="xref py py-obj docutils literal notranslate"><span class="pre">divide</span></code></a>(oper)</p></td>
+<td><p>Performs inplace division by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">/=</span> <span class="pre">operand</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.info" title="astrodata.AstroData.info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">info</span></code></a>()</p></td>
+<td><p>Prints out information about the contents of this instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.instrument" title="astrodata.AstroData.instrument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">instrument</span></code></a>()</p></td>
+<td><p>Returns the name of the instrument making the observation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.is_settable" title="astrodata.AstroData.is_settable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_settable</span></code></a>(attr)</p></td>
+<td><p>Return True if the attribute is meant to be modified.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.load" title="astrodata.AstroData.load"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load</span></code></a>(source[, extname_parser])</p></td>
+<td><p>Read from a file, file object, HDUList, etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.matches_data" title="astrodata.AstroData.matches_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matches_data</span></code></a>(source)</p></td>
+<td><p>Returns True if the class can handle the data in the source.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.multiply" title="astrodata.AstroData.multiply"><code class="xref py py-obj docutils literal notranslate"><span class="pre">multiply</span></code></a>(oper)</p></td>
+<td><p>Performs inplace multiplication by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">*=</span> <span class="pre">operand</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.object" title="astrodata.AstroData.object"><code class="xref py py-obj docutils literal notranslate"><span class="pre">object</span></code></a>()</p></td>
+<td><p>Returns the name of the object being observed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.operate" title="astrodata.AstroData.operate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">operate</span></code></a>(operator, *args, **kwargs)</p></td>
+<td><p>Applies a function to the main data array on each extension, replacing the data with the result.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.read" title="astrodata.AstroData.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(source[, extname_parser])</p></td>
+<td><p>Read from a file, file object, HDUList, etc.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.reset" title="astrodata.AstroData.reset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset</span></code></a>(data[, mask, variance, check])</p></td>
+<td><p>Sets the <code class="docutils literal notranslate"><span class="pre">.data</span></code>, and optionally <code class="docutils literal notranslate"><span class="pre">.mask</span></code> and <code class="docutils literal notranslate"><span class="pre">.variance</span></code> attributes of a single-extension AstroData slice.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.subtract" title="astrodata.AstroData.subtract"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subtract</span></code></a>(oper)</p></td>
+<td><p>Performs inplace subtraction by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">-=</span> <span class="pre">operand</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.table" title="astrodata.AstroData.table"><code class="xref py py-obj docutils literal notranslate"><span class="pre">table</span></code></a>()</p></td>
+<td><p>Return a dictionary of <cite>astropy.table.Table</cite> objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.telescope" title="astrodata.AstroData.telescope"><code class="xref py py-obj docutils literal notranslate"><span class="pre">telescope</span></code></a>()</p></td>
+<td><p>Returns the name of the telescope.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#astrodata.AstroData.update_filename" title="astrodata.AstroData.update_filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_filename</span></code></a>([prefix, suffix, strip])</p></td>
+<td><p>Update the &quot;filename&quot; attribute of the AstroData object.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#astrodata.AstroData.write" title="astrodata.AstroData.write"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write</span></code></a>([filename, overwrite])</p></td>
+<td><p>Write the object to disk.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#astrodata.AstroData.data" title="Link to this definition"></a></dt>
+<dd><p>A list of the arrays (or single array, if this is a single slice)
+corresponding to the science data attached to each extension.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.descriptors">
+<span class="sig-name descname"><span class="pre">descriptors</span></span><a class="headerlink" href="#astrodata.AstroData.descriptors" title="Link to this definition"></a></dt>
+<dd><p>Returns a sequence of names for the methods that have been
+decorated as descriptors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple of str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.exposed">
+<span class="sig-name descname"><span class="pre">exposed</span></span><a class="headerlink" href="#astrodata.AstroData.exposed" title="Link to this definition"></a></dt>
+<dd><p>A collection of strings with the names of objects that can be
+accessed directly by name as attributes of this instance, and that are
+not part of its standard interface (i.e. data objects that have been
+added dynamically).</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">exposed</span>  
+<span class="go">set([&#39;OBJMASK&#39;, &#39;OBJCAT&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.ext_tables">
+<span class="sig-name descname"><span class="pre">ext_tables</span></span><a class="headerlink" href="#astrodata.AstroData.ext_tables" title="Link to this definition"></a></dt>
+<dd><p>Return the names of the <cite>astropy.table.Table</cite> objects associated to
+an extension.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><a class="headerlink" href="#astrodata.AstroData.filename" title="Link to this definition"></a></dt>
+<dd><p>Return the file name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.hdr">
+<span class="sig-name descname"><span class="pre">hdr</span></span><a class="headerlink" href="#astrodata.AstroData.hdr" title="Link to this definition"></a></dt>
+<dd><p>Return all headers, as a <cite>astrodata.fits.FitsHeaderCollection</cite>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.header">
+<span class="sig-name descname"><span class="pre">header</span></span><a class="headerlink" href="#astrodata.AstroData.header" title="Link to this definition"></a></dt>
+<dd><p>Deprecated header access. Use <code class="docutils literal notranslate"><span class="pre">.hdr</span></code> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#astrodata.AstroData.id" title="Link to this definition"></a></dt>
+<dd><p>Returns the extension identifier (1-based extension number)
+for sliced objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.indices">
+<span class="sig-name descname"><span class="pre">indices</span></span><a class="headerlink" href="#astrodata.AstroData.indices" title="Link to this definition"></a></dt>
+<dd><p>Returns the extensions indices for sliced objects.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.is_sliced">
+<span class="sig-name descname"><span class="pre">is_sliced</span></span><a class="headerlink" href="#astrodata.AstroData.is_sliced" title="Link to this definition"></a></dt>
+<dd><p>If this data provider instance represents the whole dataset, return
+False. If it represents a slice out of the whole, return True.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><a class="headerlink" href="#astrodata.AstroData.mask" title="Link to this definition"></a></dt>
+<dd><p>A list of the mask arrays (or a single array, if this is a single
+slice) attached to the science data, for each extension.</p>
+<p>For objects that miss a mask, <cite>None</cite> will be provided instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.nddata">
+<span class="sig-name descname"><span class="pre">nddata</span></span><a class="headerlink" href="#astrodata.AstroData.nddata" title="Link to this definition"></a></dt>
+<dd><p>Return the list of <cite>astrodata.NDAstroData</cite> objects.</p>
+<p>If the <cite>AstroData</cite> object is sliced, this returns only the NDData
+objects of the sliced extensions. And if this is a single extension
+object, the NDData object is returned directly (i.e. not a list).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.orig_filename">
+<span class="sig-name descname"><span class="pre">orig_filename</span></span><a class="headerlink" href="#astrodata.AstroData.orig_filename" title="Link to this definition"></a></dt>
+<dd><p>Return the original file name (before it was modified).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.path">
+<span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#astrodata.AstroData.path" title="Link to this definition"></a></dt>
+<dd><p>Return the file path.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.phu">
+<span class="sig-name descname"><span class="pre">phu</span></span><a class="headerlink" href="#astrodata.AstroData.phu" title="Link to this definition"></a></dt>
+<dd><p>Return the primary header.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.shape">
+<span class="sig-name descname"><span class="pre">shape</span></span><a class="headerlink" href="#astrodata.AstroData.shape" title="Link to this definition"></a></dt>
+<dd><p>Return the shape of the data array for each extension as a list of
+shapes.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.tables">
+<span class="sig-name descname"><span class="pre">tables</span></span><a class="headerlink" href="#astrodata.AstroData.tables" title="Link to this definition"></a></dt>
+<dd><p>Return the names of the <cite>astropy.table.Table</cite> objects associated to
+the top-level object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><a class="headerlink" href="#astrodata.AstroData.tags" title="Link to this definition"></a></dt>
+<dd><p>A set of strings that represent the tags defining this instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.uncertainty">
+<span class="sig-name descname"><span class="pre">uncertainty</span></span><a class="headerlink" href="#astrodata.AstroData.uncertainty" title="Link to this definition"></a></dt>
+<dd><p>A list of the uncertainty objects (or a single object, if this is
+a single slice) attached to the science data, for each extension.</p>
+<p>The objects are instances of AstroPy’s <cite>astropy.nddata.NDUncertainty</cite>,
+or <cite>None</cite> where no information is available.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#astrodata.AstroData.variance" title="astrodata.AstroData.variance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">variance</span></code></a></dt><dd><p>The actual array supporting the uncertainty object.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.variance">
+<span class="sig-name descname"><span class="pre">variance</span></span><a class="headerlink" href="#astrodata.AstroData.variance" title="Link to this definition"></a></dt>
+<dd><p>A list of the variance arrays (or a single array, if this is a
+single slice) attached to the science data, for each extension.</p>
+<p>For objects that miss uncertainty information, <cite>None</cite> will be provided
+instead.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#astrodata.AstroData.uncertainty" title="astrodata.AstroData.uncertainty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uncertainty</span></code></a></dt><dd><p>The uncertainty objects used under the hood.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="astrodata.AstroData.wcs">
+<span class="sig-name descname"><span class="pre">wcs</span></span><a class="headerlink" href="#astrodata.AstroData.wcs" title="Link to this definition"></a></dt>
+<dd><p>Returns the list of WCS objects for each extension.</p>
+</dd></dl>
+
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrodata.AstroData.add" title="Link to this definition"></a></dt>
+<dd><p>Performs inplace addition by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">+=</span> <span class="pre">operand</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>oper</strong> (<em>number</em><em> or </em><em>object</em>) – The operand to perform the operation  <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">+=</span> <span class="pre">operand</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>AstroData</cite> instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.append">
+<span class="sig-name descname"><span class="pre">append</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.append"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.append" title="Link to this definition"></a></dt>
+<dd><p>Adds a new top-level extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ext</strong> (array, <cite>astropy.nddata.NDData</cite>, <cite>astropy.table.Table</cite>, other) – The contents for the new extension. The exact accepted types depend
+on the class implementing this interface. Implementations specific
+to certain data formats may accept specialized types (eg. a FITS
+provider will accept an <cite>astropy.io.fits.ImageHDU</cite> and extract the
+array out of it).</p></li>
+<li><p><strong>name</strong> (<em>str</em><em>, </em><em>optional</em>) – A name that may be used to access the new object, as an attribute
+of the provider. The name is typically ignored for top-level
+(global) objects, and required for the others. If the name cannot
+be derived from the metadata associated to <code class="docutils literal notranslate"><span class="pre">ext</span></code>, you will
+have to provider one.
+It can consist in a combination of numbers and letters, with the
+restriction that the letters have to be all capital, and the first
+character cannot be a number (“[A-Z][A-Z0-9]*”).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>The same object, or a new one, if it was necessary to convert it to</em></p></li>
+<li><p><em>a more suitable format for internal use.</em></p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>TypeError</strong> – If adding the object in an invalid situation (eg. <code class="docutils literal notranslate"><span class="pre">name</span></code> is
+    <cite>None</cite> when adding to a single slice).</p></li>
+<li><p><strong>ValueError</strong> – Raised if the extension is of a proper type, but its value is
+    illegal somehow.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.crop">
+<span class="sig-name descname"><span class="pre">crop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.crop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.crop" title="Link to this definition"></a></dt>
+<dd><p>Crop the NDData objects given indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1</strong> (<em>int</em>) – Minimum and maximum indices for the x and y axis.</p></li>
+<li><p><strong>y1</strong> (<em>int</em>) – Minimum and maximum indices for the x and y axis.</p></li>
+<li><p><strong>x2</strong> (<em>int</em>) – Minimum and maximum indices for the x and y axis.</p></li>
+<li><p><strong>y2</strong> (<em>int</em>) – Minimum and maximum indices for the x and y axis.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.divide">
+<span class="sig-name descname"><span class="pre">divide</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrodata.AstroData.divide" title="Link to this definition"></a></dt>
+<dd><p>Performs inplace division by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">/=</span> <span class="pre">operand</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>oper</strong> (<em>number</em><em> or </em><em>object</em>) – The operand to perform the operation  <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">/=</span> <span class="pre">operand</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>AstroData</cite> instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.info" title="Link to this definition"></a></dt>
+<dd><p>Prints out information about the contents of this instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.instrument">
+<span class="sig-name descname"><span class="pre">instrument</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.instrument"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.instrument" title="Link to this definition"></a></dt>
+<dd><p>Returns the name of the instrument making the observation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.is_settable">
+<span class="sig-name descname"><span class="pre">is_settable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">attr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.is_settable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.is_settable" title="Link to this definition"></a></dt>
+<dd><p>Return True if the attribute is meant to be modified.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extname_parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrodata.AstroData.load" title="Link to this definition"></a></dt>
+<dd><p>Read from a file, file object, HDUList, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.matches_data">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">matches_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.matches_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.matches_data" title="Link to this definition"></a></dt>
+<dd><p>Returns True if the class can handle the data in the source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source</strong> (list of <cite>astropy.io.fits.HDUList</cite>) – The FITS file to be read.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the class can handle the data in the source.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Typically, this method is implemented by the static method
+<cite>Astrodata._matches_data</cite> or by a class method with the same signature
+for subclasses.</p>
+<p>If you are implementing a subclass, you should override _matches_data
+instead, which is a static method that takes a single argument, the
+source data, and returns a boolean.</p>
+<p>If that method is not overridden, this method will call it with the
+source data as argument.</p>
+<p>For more information, see the documentation for the
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">_matches_data()</span></code> and the <a class="reference internal" href="../manuals/progmanual/index.html"><span class="doc">Developer Guide</span></a>.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.multiply">
+<span class="sig-name descname"><span class="pre">multiply</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrodata.AstroData.multiply" title="Link to this definition"></a></dt>
+<dd><p>Performs inplace multiplication by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">*=</span> <span class="pre">operand</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>oper</strong> (<em>number</em><em> or </em><em>object</em>) – The operand to perform the operation  <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">*=</span> <span class="pre">operand</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>AstroData</cite> instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.object">
+<span class="sig-name descname"><span class="pre">object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.object" title="Link to this definition"></a></dt>
+<dd><p>Returns the name of the object being observed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.operate">
+<span class="sig-name descname"><span class="pre">operate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.operate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.operate" title="Link to this definition"></a></dt>
+<dd><p>Applies a function to the main data array on each extension, replacing
+the data with the result. The data will be passed as the first argument
+to the function.</p>
+<p>It will be applied to the mask and variance of each extension, too, if
+they exist.</p>
+<p>This is a convenience method, which is equivalent to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">ad</span><span class="p">:</span>
+    <span class="n">ext</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ext</span><span class="o">.</span><span class="n">mask</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">variance</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ext</span><span class="o">.</span><span class="n">variance</span> <span class="o">=</span> <span class="n">operator</span><span class="p">(</span><span class="n">ext</span><span class="o">.</span><span class="n">variance</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>with the additional advantage that it will work on single slices, too.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>operator</strong> (<em>callable</em>) – A function that takes an array (and, maybe, other arguments)
+and returns an array.</p></li>
+<li><p><strong>args</strong> (<em>optional</em>) – Additional arguments to be passed to the <code class="docutils literal notranslate"><span class="pre">operator</span></code>.</p></li>
+<li><p><strong>kwargs</strong> (<em>optional</em>) – Additional arguments to be passed to the <code class="docutils literal notranslate"><span class="pre">operator</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ad</span><span class="o">.</span><span class="n">operate</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">)</span>  
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.read">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extname_parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.read" title="Link to this definition"></a></dt>
+<dd><p>Read from a file, file object, HDUList, etc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variance=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.reset" title="Link to this definition"></a></dt>
+<dd><p>Sets the <code class="docutils literal notranslate"><span class="pre">.data</span></code>, and optionally <code class="docutils literal notranslate"><span class="pre">.mask</span></code> and <code class="docutils literal notranslate"><span class="pre">.variance</span></code>
+attributes of a single-extension AstroData slice. This function will
+optionally check whether these attributes have the same shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>) – The array to assign to the <code class="docutils literal notranslate"><span class="pre">.data</span></code> attribute (“SCI”).</p></li>
+<li><p><strong>mask</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – The array to assign to the <code class="docutils literal notranslate"><span class="pre">.mask</span></code> attribute (“DQ”).</p></li>
+<li><p><strong>variance</strong> (<em>ndarray</em><em>, </em><em>optional</em>) – The array to assign to the <code class="docutils literal notranslate"><span class="pre">.variance</span></code> attribute (“VAR”).</p></li>
+<li><p><strong>check</strong> (<em>bool</em>) – If set, then the function will check that the mask and variance
+arrays have the same shape as the data array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>TypeError</strong> – if an attempt is made to set the .mask or .variance attributes
+    with something other than an array</p></li>
+<li><p><strong>ValueError</strong> – if the .mask or .variance attributes don’t have the same shape as
+    .data, OR if this is called on an AD instance that isn’t a single
+    extension slice</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.subtract">
+<span class="sig-name descname"><span class="pre">subtract</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#astrodata.AstroData.subtract" title="Link to this definition"></a></dt>
+<dd><p>Performs inplace subtraction by evaluating <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">-=</span> <span class="pre">operand</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>oper</strong> (<em>number</em><em> or </em><em>object</em>) – The operand to perform the operation  <code class="docutils literal notranslate"><span class="pre">self</span> <span class="pre">-=</span> <span class="pre">operand</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><cite>AstroData</cite> instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.table">
+<span class="sig-name descname"><span class="pre">table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.table" title="Link to this definition"></a></dt>
+<dd><p>Return a dictionary of <cite>astropy.table.Table</cite> objects.</p>
+<p class="rubric">Notes</p>
+<p>This returns a _copy_ of the tables, so modifying them will not
+affect the original ones.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.telescope">
+<span class="sig-name descname"><span class="pre">telescope</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.telescope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.telescope" title="Link to this definition"></a></dt>
+<dd><p>Returns the name of the telescope.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.update_filename">
+<span class="sig-name descname"><span class="pre">update_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.update_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.update_filename" title="Link to this definition"></a></dt>
+<dd><p>Update the “filename” attribute of the AstroData object.</p>
+<p>A prefix and/or suffix can be specified. If <code class="docutils literal notranslate"><span class="pre">strip=True</span></code>, these will
+replace the existing prefix/suffix; if <code class="docutils literal notranslate"><span class="pre">strip=False</span></code>, they will
+simply be prepended/appended.</p>
+<p>The current filename is broken down into its existing prefix, root, and
+suffix using the <code class="docutils literal notranslate"><span class="pre">ORIGNAME</span></code> phu keyword, if it exists and is
+contained within the current filename. Otherwise, the filename is split
+at the last underscore and the part before is assigned as the root and
+the underscore and part after the suffix. No prefix is assigned.</p>
+<p>Note that, if <code class="docutils literal notranslate"><span class="pre">strip=True</span></code>, a prefix or suffix will only be stripped
+if ‘’ is specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefix</strong> (<em>str</em><em>, </em><em>optional</em>) – New prefix (None =&gt; leave alone)</p></li>
+<li><p><strong>suffix</strong> (<em>str</em><em>, </em><em>optional</em>) – New suffix (None =&gt; leave alone)</p></li>
+<li><p><strong>strip</strong> (<em>bool</em><em>, </em><em>optional</em>) – Strip existing prefixes and suffixes if new ones are given?</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the filename cannot be determined</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="astrodata.AstroData.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/astrodata/core.html#AstroData.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#astrodata.AstroData.write" title="Link to this definition"></a></dt>
+<dd><p>Write the object to disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<em>str</em><em>, </em><em>optional</em>) – If the filename is not given, <code class="docutils literal notranslate"><span class="pre">self.path</span></code> is used.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – If True, overwrites existing file.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="astrodata.open.html" class="btn btn-neutral float-left" title="open" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="astrodata.AstroDataError.html" class="btn btn-neutral float-right" title="AstroDataError" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
