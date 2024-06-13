@@ -11,6 +11,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import unittest
 import urllib
 import warnings
@@ -492,6 +493,7 @@ def download_from_archive(
     env_var="ASTRODATA_TEST",
     cache=True,
     fail_on_error=True,
+    suppress_stdout=False,
 ):
     """Download file from the archive and store it in the local cache.
 
@@ -518,18 +520,20 @@ def download_from_archive(
     fail_on_error : bool
         If True, raise an error if the download fails. If False, return None.
 
+    suppress_stdout : bool
+        If True, suppress the output of the download command.
+
     Returns
     -------
     str
         Name of the cached file with the path added to it.
     """
-    # Handle None sub_path
     if sub_path is None:
         sub_path = ""
         warnings.warn(
             "sub_path is None, so the file will be saved to the root of the "
             "cache directory. To suppress this warning, set sub_path to a "
-            "valid path (e.g., empty string)."
+            "valid path (e.g., empty string instead of None)."
         )
 
     # Check that the environment variable is a valid name.
@@ -574,7 +578,18 @@ def download_from_archive(
             # Use the cached file
             return local_path
 
-        tmp_path = download_file(url, cache=False)
+        # Use a context that suppresses the output of the download command
+        with open(os.devnull, "w") as devnull:
+            stdout_prev = sys.stdout
+
+            if suppress_stdout:
+                sys.stdout = devnull
+
+            try:
+                tmp_path = download_file(url, cache=False)
+
+            finally:
+                sys.stdout = stdout_prev
 
         shutil.move(tmp_path, local_path)
 
