@@ -5,6 +5,7 @@ projects/gmosimg-drtutorial/en/v3.2.0/ex1_gmosim_starfield_api.html
 """
 
 import importlib
+import os
 
 import pytest
 
@@ -57,6 +58,10 @@ def _downloaded_gmos_imaging_data_star_field(
 def gmos_imaging_data_star_field(
     tmp_path, _downloaded_gmos_imaging_data_star_field
 ):
+    """This copies files from another fixture
+    (_downloaded_gmos_imaging_data_star_field), and copies those into a path
+    for the current test.
+    """
     # Copy the files from the temporary directory to the test directory instead
     # of re-downlaoding them.
     data = {}
@@ -80,10 +85,12 @@ def test_correct_astrodata():
 @pytest.mark.filterwarnings("ignore:use 'astrodata.from_file'")
 @pytest.mark.filterwarnings("ignore:Renamed to 'as_iraf_section'")
 @pytest.mark.filterwarnings("ignore:Renamed to add_class")
-@pytest.mark.filterwarnings("ignore:Deprecated API features detected!")
+@pytest.mark.filterwarnings("ignore:Renamed to 'windowed_operation'")
+@pytest.mark.filterwarnings("ignore")
 @pytest.mark.dragons
 def test_gmos_imaging_tutorial_star_field(
-    tmp_path, gmos_imaging_data_star_field
+    use_temporary_working_directory,
+    gmos_imaging_data_star_field,
 ):
     """Test based on the DRAGONS GMOS imaging tutorial.
 
@@ -106,16 +113,16 @@ def test_gmos_imaging_tutorial_star_field(
     dataselect = importlib.import_module("gempy.adlibrary.dataselect")
     cal_service = importlib.import_module("recipe_system.cal_service")
 
-    all_files = sorted(list(data.values()))
+    all_files = sorted([str(p) for p in data.values()])
 
-    # Sifting through teh data with data_select
-    list_of_biases = dataselect.select_data(
+    # Sifting through the data with data_select
+    biases = dataselect.select_data(
         all_files,
         ["BIAS"],
         [],
     )
 
-    list_of_flats = dataselect.select_data(
+    flats = dataselect.select_data(
         all_files,
         ["FLAT"],
         [],
@@ -124,7 +131,7 @@ def test_gmos_imaging_tutorial_star_field(
         ),
     )
 
-    list_of_science = dataselect.select_data(
+    science = dataselect.select_data(
         all_files,
         [],
         ["CAL"],
@@ -133,8 +140,29 @@ def test_gmos_imaging_tutorial_star_field(
         ),
     )
 
-    caldb = cal_service.LocalDB(tmp_path / "calibration.db")
+    # Initialize calibration service
+    if os.path.exists("calibration.db"):
+        os.remove("calibration.db")
+
+    caldb = cal_service.LocalDB("calibration.db")
     caldb.init()
 
     for bpm in dataselect.select_data(all_files, ["BPM"]):
         caldb.add_cal(bpm)
+
+    # Primary/"Master" bias
+    reduce_bias = Reduce()
+    reduce_bias.files.extend(biases)
+    reduce_bias.runr()
+
+    # Primary/"Master" flat
+    reduce_flats = Reduce()
+    reduce_flats.files.extend(flats)
+    reduce_flats.runr()
+
+    # Science images
+    reduce_science = Reduce()
+    reduce_science.files.extend(science)
+    reduce_science.runr()
+
+    # TODO: Add tests of the output files.

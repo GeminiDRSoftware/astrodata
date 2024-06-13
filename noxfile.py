@@ -20,7 +20,7 @@ class SessionVariables:
     poetry_install_options = ["--with", "test", "--without", "dev,docs"]
 
     # pytest options for sessions
-    pytest_options = ["-xvvs", "--cov=astrodata", "--cov-report=term-missing"]
+    pytest_options = ["--cov=astrodata", "--cov-report=term-missing"]
 
     dragons_pytest_options = pytest_options + ["-m", "dragons"]
 
