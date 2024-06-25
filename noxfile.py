@@ -6,11 +6,24 @@ TODO:
     - [ ] Get the dependencies from the poetry.lock file.
 """
 
+import os
+from os.path import join
+import functools
+
+
 import nox
+
+
+# Nox configuration
+nox.options.sessions = ["dragons_release_tests", "unit_tests", "coverage"]
 
 
 class SessionVariables:
     """Session variables for the nox sessions."""
+
+    # Useful paths -- access through static methods
+    _test_dir = join(os.path.dirname(__file__), "tests")
+    _noxfile_dir = os.path.dirname(__file__)
 
     # DRAGONS download channel
     dragons_channel = "http://astroconda.gemini.edu/public"
@@ -22,7 +35,8 @@ class SessionVariables:
     # pytest options for sessions
     pytest_options = ["--cov=astrodata", "--cov-report=term-missing"]
 
-    dragons_pytest_options = pytest_options + ["-m", "dragons"]
+    dragons_tests_path = os.path.join(_test_dir, "integration/dragons")
+    dragons_pytest_options = pytest_options + [dragons_tests_path]
 
     # TODO: Unit tests should probably get their own tag, or the way this is
     # handled should be updated.
@@ -35,10 +49,60 @@ class SessionVariables:
         "3.12",
     ]
 
+    @staticmethod
+    def noxfile_dir() -> str:
+        """Get the directory of the noxfile."""
+        return SessionVariables._noxfile_dir
+
+    @staticmethod
+    def test_dir() -> str:
+        return SessionVariables._test_dir
+
     # This class is not meant to be instantiated. It is just used as a
     # namespace.
     def __new__(cls):
         raise NotImplementedError("This class should not be instantiated.")
+
+
+def dragons_isolated_dir(func):
+    """Create an isolated directory and environment for the dragons tests.
+
+    This wraps a function and creates a temporary directory and sets
+    some DRAGONS environment variables.
+    """
+
+    @functools.wraps(func)
+    def wrapper(session):
+        tmp_path = session.create_tmp()
+        with session.chdir(tmp_path):
+            # Set the DRAGONSRC environment variable.
+            os.environ["DRAGONSRC"] = join(os.getcwd(), "dragonsrc")
+
+            # Create the DRAGONSRC file.
+            dragonsrc_contents = f"""
+            [calibs]
+            databases = {tmp_path} get store
+            """
+
+            # Remove leading and trailing whitespace from each line and remove
+            # empty lines.
+            dragonsrc_contents = "\n".join(
+                line.strip() for line in dragonsrc_contents.split("\n") if line
+            )
+
+            with open(os.environ["DRAGONSRC"], "w+") as f:
+                f.write(dragonsrc_contents)
+
+            # Create the calibrations database file.
+            with open(join(os.getcwd(), "calibrations.db"), "w+") as f:
+                pass
+
+            # Run the function.
+            result = func(session)
+
+        return result
+
+    return wrapper
 
 
 def get_poetry_dependencies(session, only=""):
@@ -82,12 +146,13 @@ def get_poetry_dependencies(session, only=""):
 
 def install_test_dependencies(session):
     """Install the test dependencies from the poetry.lock file."""
-    packages = get_poetry_dependencies(session, "test")
+    packages = get_poetry_dependencies(session, "main,test")
 
     session.install(*packages)
 
 
 @nox.session(venv_backend="conda", python="3.10")
+@dragons_isolated_dir
 def dragons_release_tests(session):
     """Run the tests for the DRAGONS conda package."""
     # Fetch test dependencies from the poetry.lock file.
@@ -104,7 +169,7 @@ def dragons_release_tests(session):
         channel=SessionVariables.dragons_conda_channels,
     )
 
-    session.install(".", "--no-deps")
+    session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
@@ -147,3 +212,31 @@ def coverage(session):
 
     # Generate the HTML report.
     session.run("coverage", "html")
+
+
+# `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
+#
+# Important note --- these tests should be run as a part of the routine tests
+# above. They are separated here for ease of diagnosis for common problems.
+@nox.session(venv_backend="conda", python="3.10")
+@dragons_isolated_dir
+def dragons_calibration(session):
+    """Run the calibration tests."""
+    session.conda_install(
+        "dragons==3.2",
+        channel=SessionVariables.dragons_conda_channels,
+    )
+
+    install_test_dependencies(session)
+
+    session.install("-e", ".", "--no-deps")
+
+    # Positional arguments after -- are passed to pytest.
+    pos_args = session.posargs
+
+    # Run the tests. Need to pass arguments to pytest.
+    session.run(
+        "pytest",
+        "tests/integration/dragons/test_calibration_setup.py",
+        *pos_args,
+    )

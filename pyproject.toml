@@ -46,6 +46,7 @@ pytest-doctestplus = "^1.2.1"
 tox = "^4.14.1"
 hypothesis = "^6.99.13"
 nox = "^2024.4.15"
+watchdog = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]

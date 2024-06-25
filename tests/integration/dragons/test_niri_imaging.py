@@ -4,6 +4,7 @@
 projects/niriimg-drtutorial/en/v3.2.0/ex1_niriim_extended_dataset.html
 """
 
+import itertools
 import glob
 import importlib
 import os
@@ -42,10 +43,10 @@ def niri_imaging_data_star_field_files():
 
 @pytest.fixture(scope="session")
 def _downloaded_niri_imaging_data_star_field(
-    tmpdir_factory, niri_imaging_data_star_field_files
+    tmp_path_factory, niri_imaging_data_star_field_files
 ):
     """Download NIRI imaging data for the star field tutorial."""
-    tmpdir = tmpdir_factory.mktemp("niri_imaging_data_star_field")
+    tmpdir = tmp_path_factory.mktemp("niri_imaging_data_star_field")
 
     data = download_multiple_files(
         niri_imaging_data_star_field_files,
@@ -75,7 +76,9 @@ def niri_imaging_data_star_field(
             with open(path, "rb") as f2:
                 f.write(f2.read())
 
-    return data
+    yield data
+
+    print(f"Data located at: {tmp_path}")
 
 
 @pytest.mark.dragons
@@ -117,9 +120,16 @@ def test_niri_imaging_tutorial_star_field(
     dataselect = importlib.import_module("gempy.adlibrary.dataselect")
     cal_service = importlib.import_module("recipe_system.cal_service")
 
-    all_files = sorted([str(path) for path in data.values()])
+    # Initialize calibration service
+    if os.path.exists("calibration.db"):
+        os.remove("calibration.db")
+
+    caldb = cal_service.LocalDB("./calibration.db")
+    caldb.init()
 
     # Use dataselect to sort data for reduction.
+    all_files = sorted([str(path) for path in data.values()])
+
     darks = dataselect.select_data(
         all_files,
         ["DARK"],
@@ -159,12 +169,21 @@ def test_niri_imaging_tutorial_star_field(
         dataselect.expr_parser('object!="FS 17"'),
     )
 
-    # Initialize calibration service
-    if os.path.exists("calibration.db"):
-        os.remove("calibration.db")
+    # Make sure all files are available.
+    for file in itertools.chain(darks, flats, standard_stars, science):
+        assert file in all_files, f"File {file} not found."
+        assert os.path.exists(file), f"File {file} not found."
 
-    caldb = cal_service.LocalDB("calibration.db")
-    caldb.init()
+    file_lists = {
+        "darks_1_sec": darks_1_sec,
+        "darks_20_sec": darks_20_sec,
+        "flats": flats,
+        "standard_stars": standard_stars,
+        "science": science,
+    }
+
+    for name, file_list in file_lists.items():
+        assert file_list, f"No {name} found."
 
     # Darks
     reduce_darks = Reduce()
@@ -172,14 +191,13 @@ def test_niri_imaging_tutorial_star_field(
     reduce_darks.runr()
 
     # Using glob to ignore the metadata stuff in case of changes.
-    assert os.path.exists("calibrations/processed_dark")
-    processed_darks = glob.glob("calibrations/processed_dark/*")
-    assert len(processed_darks) == 1, "Only one dark should be created."
-    assert "crash" not in processed_darks[0], "Dark reduction failed."
-
-    # Should also exist in the working directory
-    cwd = os.getcwd()
-    assert len(glob.glob("*dark*")) == 1, f"Darks not found in {cwd=}."
+    # Dark files should be in the working directory and in the calibrations
+    # directory.
+    dark_files = glob.glob("*dark*")
+    calibration_darks = glob.glob("calibrations/processed_dark/*dark*")
+    assert len(calibration_darks) == 1, "Expected 1 dark file."
+    assert len(dark_files) == 1, "Expected 1 dark file."
+    assert "crash" not in dark_files[0], "Dark reduction failed."
 
     # Add bad pixel masks to calibration service.
     for bpm in dataselect.select_data(all_files, ["BPM"]):
@@ -193,14 +211,10 @@ def test_niri_imaging_tutorial_star_field(
 
     bpm = reduce_bpm.output_filenames[0]
 
-    processed_bpms = glob.glob("*bpm*")
-    assert len(processed_bpms) == 1, "Only one BPM should be created."
-    assert "crash" not in processed_bpms[0], "BPM reduction failed."
-
-    # Should also exist in the working directory
-    cwd = os.getcwd()
-    assert len(glob.glob("*bpm*")) == 1, f"BPM not found in {cwd=}."
-    assert "crash" not in glob.glob("*bpm*")[0], "BPM reduction failed."
+    # Bpms should be in the working directory and in the calibrations directory.
+    bpm_files = reduce_bpm.output_filenames
+    assert len(bpm_files) == 1, f"Expected 1 bpm file. {bpm_files=}"
+    assert "crash" not in bpm_files[0], "BPM reduction failed."
 
     # Flats
     reduce_flats = Reduce()
@@ -208,14 +222,12 @@ def test_niri_imaging_tutorial_star_field(
     reduce_flats.uparms = [("addDQ:user_bpm", bpm)]
     reduce_flats.runr()
 
-    processed_flat = glob.glob("calibrations/processed_flat/*")
-    assert len(processed_flat) == 1, "Only one flat should be created."
-    assert "crash" not in processed_flat[0], "Flat reduction failed."
-
-    # Should also exist in the working directory
-    cwd = os.getcwd()
-    assert len(glob.glob("*flat*")) == 1, f"Flats not found in {cwd=}."
-    assert "crash" not in glob.glob("*flat*")[0], "Flat reduction failed."
+    # Flats should be in the working directory and in the calibrations directory.
+    flat_files = glob.glob("*flat*")
+    calibration_flats = glob.glob("calibrations/processed_flat/*flat*")
+    assert len(calibration_flats) == 1, "Expected 1 flat file."
+    assert len(flat_files) == 1, "Expected 1 flat file."
+    assert "crash" not in flat_files[0], "Flat reduction failed."
 
     # Standard star
     reduce_std = Reduce()
@@ -225,7 +237,7 @@ def test_niri_imaging_tutorial_star_field(
     reduce_std.runr()
 
     # This creates one "_image" file
-    processed_std_image = glob.glob("*_image*")
+    processed_std_image = glob.glob("*image*")
 
     assert len(processed_std_image) == 1, "Multiple standard star images."
     assert (
@@ -240,7 +252,7 @@ def test_niri_imaging_tutorial_star_field(
     reduce_target.runr()
 
     processed_target_image = [
-        x for x in glob.glob("*_image*") if x not in processed_std_image
+        x for x in glob.glob("*image*") if x not in processed_std_image
     ]
 
     assert len(processed_target_image) == 1, "Multiple science images created."

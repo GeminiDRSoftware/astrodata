@@ -4,6 +4,7 @@
 projects/gmosimg-drtutorial/en/v3.2.0/ex1_gmosim_starfield_api.html
 """
 
+import glob
 import importlib
 import os
 
@@ -40,10 +41,10 @@ def gmos_imaging_data_star_field_files():
 
 @pytest.fixture(scope="session")
 def _downloaded_gmos_imaging_data_star_field(
-    tmpdir_factory, gmos_imaging_data_star_field_files
+    tmp_path_factory, gmos_imaging_data_star_field_files
 ):
     """Download GMOS imaging data for the star field tutorial."""
-    tmpdir = tmpdir_factory.mktemp("gmos_imaging_data_star_field")
+    tmpdir = tmp_path_factory.mktemp("gmos_imaging_data_star_field")
 
     data = download_multiple_files(
         gmos_imaging_data_star_field_files,
@@ -145,24 +146,42 @@ def test_gmos_imaging_tutorial_star_field(
         os.remove("calibration.db")
 
     caldb = cal_service.LocalDB("calibration.db")
-    caldb.init()
+    caldb.init(wipe=True)
 
     for bpm in dataselect.select_data(all_files, ["BPM"]):
         caldb.add_cal(bpm)
+
+    assert caldb.list_files()
 
     # Primary/"Master" bias
     reduce_bias = Reduce()
     reduce_bias.files.extend(biases)
     reduce_bias.runr()
 
+    bias_files = glob.glob("*bias*")
+    calibration_biases = glob.glob("calibrations/processed_bias/*bias*")
+    assert len(calibration_biases) == 1, "Expected 1 bias file."
+    assert len(bias_files) == 1, "Expected 1 bias file."
+    assert "crash" not in bias_files[0], "Bias reduction failed."
+
     # Primary/"Master" flat
     reduce_flats = Reduce()
     reduce_flats.files.extend(flats)
     reduce_flats.runr()
 
+    flat_files = glob.glob("*flat*")
+    calibration_flats = glob.glob("calibrations/processed_flat/*flat*")
+    assert len(calibration_flats) == 1, "Expected 1 flat file."
+    assert len(flat_files) == 1, "Expected 1 flat file."
+    assert "crash" not in flat_files[0], "Flat reduction failed."
+
     # Science images
     reduce_science = Reduce()
     reduce_science.files.extend(science)
     reduce_science.runr()
+
+    science_files = glob.glob("*image*")
+    assert len(science_files) == 1, "Expected 1 science file."
+    assert "crash" not in science_files[0], "Science reduction failed."
 
     # TODO: Add tests of the output files.

@@ -21,25 +21,20 @@ The DRAGONS tests alone may be selected using either the pytest mark
 + TODO: Add fixture to set up calibration service for individual tests.
 """
 
-import importlib
+import os
+
 
 import pytest
 
 
-@pytest.fixture(autouse=True)
-def send_logging_to_temporary_file(tmp_path):
-    """Configure logging to go to a temporary file."""
-    logutils = importlib.import_module("gempy.utils.logutils")
-    logutils.config(file_name=str(tmp_path / "test.log"))
-
-
-@pytest.fixture(scope="function")
-def use_temporary_working_directory(tmp_path_factory):
+@pytest.fixture
+def use_temporary_working_directory(tmp_path):
     """Change the working directory to a temporary directory."""
-    import os
+    # TODO: Remove this fixture --- it is managed by nox now.
+    return os.getcwd()
 
     original_directory = os.getcwd()
-    tmp_path = tmp_path_factory.mktemp("working_directory")
+    # tmp_path = tmp_path_factory.mktemp("working_directory")
     os.chdir(tmp_path)
 
     yield tmp_path
