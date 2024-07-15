@@ -7,7 +7,7 @@ TODO:
 """
 
 import os
-from os.path import join
+from pathlib import Path
 import functools
 
 
@@ -15,15 +15,17 @@ import nox
 
 
 # Nox configuration
-nox.options.sessions = ["dragons_release_tests", "unit_tests", "coverage"]
+# Default nox sessions to run when executing "nox" without session
+# specifications (i.e., without the -s flag).
+nox.options.sessions = ["unit_tests", "coverage"]
 
 
 class SessionVariables:
     """Session variables for the nox sessions."""
 
     # Useful paths -- access through static methods
-    _test_dir = join(os.path.dirname(__file__), "tests")
-    _noxfile_dir = os.path.dirname(__file__)
+    _test_dir = Path(__file__).parent / "tests"
+    _noxfile_dir = Path(__file__).parent
 
     # DRAGONS download channel
     dragons_channel = "http://astroconda.gemini.edu/public"
@@ -72,11 +74,11 @@ def dragons_isolated_dir(func):
     """
 
     @functools.wraps(func)
-    def wrapper(session):
+    def wrapper(session: nox.Session) -> None:
         tmp_path = session.create_tmp()
         with session.chdir(tmp_path):
             # Set the DRAGONSRC environment variable.
-            os.environ["DRAGONSRC"] = join(os.getcwd(), "dragonsrc")
+            os.environ["DRAGONSRC"] = tmp_path / "dragonsrc"
 
             # Create the DRAGONSRC file.
             dragonsrc_contents = f"""
@@ -94,7 +96,7 @@ def dragons_isolated_dir(func):
                 f.write(dragonsrc_contents)
 
             # Create the calibrations database file.
-            with open(join(os.getcwd(), "calibrations.db"), "w+") as f:
+            with open(tmp_path / "calibrations.db", "w+") as f:
                 pass
 
             # Run the function.
@@ -105,7 +107,7 @@ def dragons_isolated_dir(func):
     return wrapper
 
 
-def get_poetry_dependencies(session, only=""):
+def get_poetry_dependencies(session: nox.Session, only: str = ""):
     """Get the dependencies from the poetry.lock file.
 
     This assumes poetry is installed in the session.
@@ -144,7 +146,7 @@ def get_poetry_dependencies(session, only=""):
     return packages
 
 
-def install_test_dependencies(session):
+def install_test_dependencies(session: nox.Session) -> None:
     """Install the test dependencies from the poetry.lock file."""
     packages = get_poetry_dependencies(session, "main,test")
 
@@ -153,7 +155,7 @@ def install_test_dependencies(session):
 
 @nox.session(venv_backend="conda", python="3.10")
 @dragons_isolated_dir
-def dragons_release_tests(session):
+def dragons_release_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
     # Fetch test dependencies from the poetry.lock file.
     install_test_dependencies(session)
@@ -182,7 +184,7 @@ def dragons_release_tests(session):
 
 
 @nox.session(python=SessionVariables.python_versions)
-def unit_tests(session):
+def unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
     install_test_dependencies(session)
     session.install(".")
@@ -199,13 +201,10 @@ def unit_tests(session):
 
 
 @nox.session
-def coverage(session):
+def coverage(session: nox.Session) -> None:
     """Run the tests and generate a coverage report."""
     # Install the test dependencies.
     install_test_dependencies(session)
-
-    # Run the tests with coverage.
-    # session.run("pytest", "--cov=src", *SessionVariables.unit_pytest_options)
 
     # Generate the coverage report.
     session.run("coverage", "report", "--show-missing")
@@ -220,7 +219,7 @@ def coverage(session):
 # above. They are separated here for ease of diagnosis for common problems.
 @nox.session(venv_backend="conda", python="3.10")
 @dragons_isolated_dir
-def dragons_calibration(session):
+def dragons_calibration(session: nox.Session) -> None:
     """Run the calibration tests."""
     session.conda_install(
         "dragons==3.2",
