@@ -188,7 +188,7 @@ def dragons_release_tests(session: nox.Session) -> None:
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
 
-    session.run(
+    _ = session.run(
         "pytest",
         *SessionVariables.dragons_pytest_options,
         *pos_args,
@@ -205,7 +205,7 @@ def unit_tests(session: nox.Session) -> None:
     pos_args = session.posargs
 
     # Run the tests. Need to pass arguments to pytest.
-    session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
+    _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
 @nox.session
@@ -215,10 +215,10 @@ def coverage(session: nox.Session) -> None:
     install_test_dependencies(session)
 
     # Generate the coverage report.
-    session.run("coverage", "report", "--show-missing")
+    _ = session.run("coverage", "report", "--show-missing")
 
     # Generate the HTML report.
-    session.run("coverage", "html")
+    _ = session.run("coverage", "html")
 
 
 # `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
@@ -242,7 +242,7 @@ def dragons_calibration(session: nox.Session) -> None:
     pos_args = session.posargs
 
     # Run the tests. Need to pass arguments to pytest.
-    session.run(
+    _ = session.run(
         "pytest",
         "tests/integration/dragons/test_calibration_setup.py",
         *pos_args,
