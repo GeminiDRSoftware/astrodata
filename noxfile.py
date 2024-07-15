@@ -6,13 +6,12 @@ TODO:
     - [ ] Get the dependencies from the poetry.lock file.
 """
 
+import functools
 import os
 from pathlib import Path
-import functools
-
+from typing import Callable, ClassVar
 
 import nox
-
 
 # Nox configuration
 # Default nox sessions to run when executing "nox" without session
@@ -29,44 +28,59 @@ class SessionVariables:
 
     # DRAGONS download channel
     dragons_channel = "http://astroconda.gemini.edu/public"
-    dragons_conda_channels = ["conda-forge", dragons_channel]
+    dragons_conda_channels: ClassVar[list[str]] = [
+        "conda-forge",
+        dragons_channel,
+    ]
 
     # Poetry install options
-    poetry_install_options = ["--with", "test", "--without", "dev,docs"]
+    poetry_install_options: ClassVar[list[str]] = [
+        "--with",
+        "test",
+        "--without",
+        "dev,docs",
+    ]
 
     # pytest options for sessions
     pytest_options = ["--cov=astrodata", "--cov-report=term-missing"]
 
-    dragons_tests_path = os.path.join(_test_dir, "integration/dragons")
+    dragons_tests_path = _test_dir / "integration/dragons"
     dragons_pytest_options = pytest_options + [dragons_tests_path]
 
     # TODO: Unit tests should probably get their own tag, or the way this is
     # handled should be updated.
-    unit_pytest_options = pytest_options + ["-m", "not dragons"]
+    unit_pytest_options: ClassVar[list[str]] = [
+        *pytest_options,
+        "-m",
+        "not dragons",
+    ]
 
     # Python versions
-    python_versions = [
+    python_versions: ClassVar[list[str]] = [
         "3.10",
         "3.11",
         "3.12",
     ]
 
     @staticmethod
-    def noxfile_dir() -> str:
-        """Get the directory of the noxfile."""
+    def noxfile_dir() -> Path:
+        """Return the path of the directory containing this file."""
         return SessionVariables._noxfile_dir
 
     @staticmethod
-    def test_dir() -> str:
+    def test_dir() -> Path:
+        """Return the test directory path."""
         return SessionVariables._test_dir
 
     # This class is not meant to be instantiated. It is just used as a
     # namespace.
-    def __new__(cls):
-        raise NotImplementedError("This class should not be instantiated.")
+    def __new__(cls) -> None:
+        """Just catches accidental invocations."""
+        message = "This class should not be instantiated."
+        raise NotImplementedError(message)
 
 
-def dragons_isolated_dir(func):
+def dragons_isolated_dir(func: Callable[nox.Session]) -> Callable[nox.Session]:
     """Create an isolated directory and environment for the dragons tests.
 
     This wraps a function and creates a temporary directory and sets
@@ -92,11 +106,12 @@ def dragons_isolated_dir(func):
                 line.strip() for line in dragonsrc_contents.split("\n") if line
             )
 
-            with open(os.environ["DRAGONSRC"], "w+") as f:
+            with Path(os.environ["DRAGONSRC"]).open("w+") as f:
                 f.write(dragonsrc_contents)
 
             # Create the calibrations database file.
-            with open(tmp_path / "calibrations.db", "w+") as f:
+            calibration_path = tmp_path / "calibrations.db"
+            with calibration_path.open("w+") as f:
                 pass
 
             # Run the function.
@@ -107,7 +122,7 @@ def dragons_isolated_dir(func):
     return wrapper
 
 
-def get_poetry_dependencies(session: nox.Session, only: str = ""):
+def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
     """Get the dependencies from the poetry.lock file.
 
     This assumes poetry is installed in the session.
