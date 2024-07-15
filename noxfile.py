@@ -3,7 +3,9 @@
 TODO:
 - [x] Add nox session for dragons environment creation.
 - [x] Add nox session for running unit tests.
-    - [ ] Get the dependencies from the poetry.lock file.
+    - [x] Get the dependencies from the poetry.lock file.
+- [ ] Test the astrodata pip installations using devpi.
+- [ ] Test release builds.
 """
 
 import functools
@@ -48,7 +50,7 @@ class SessionVariables:
     dragons_pytest_options = pytest_options + [str(dragons_tests_path)]
 
     unit_tests_path = _test_dir / "unit"
-    unit_pytest_options = pytest_options + [str(dragons_tests_path)]
+    unit_pytest_options = pytest_options + [str(unit_tests_path)]
 
     # Python versions
     python_versions: ClassVar[list[str]] = [
