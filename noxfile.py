@@ -45,15 +45,10 @@ class SessionVariables:
     pytest_options = ["--cov=astrodata", "--cov-report=term-missing"]
 
     dragons_tests_path = _test_dir / "integration/dragons"
-    dragons_pytest_options = pytest_options + [dragons_tests_path]
+    dragons_pytest_options = pytest_options + [str(dragons_tests_path)]
 
-    # TODO: Unit tests should probably get their own tag, or the way this is
-    # handled should be updated.
-    unit_pytest_options: ClassVar[list[str]] = [
-        *pytest_options,
-        "-m",
-        "not dragons",
-    ]
+    unit_tests_path = _test_dir / "unit"
+    unit_pytest_options = pytest_options + [str(dragons_tests_path)]
 
     # Python versions
     python_versions: ClassVar[list[str]] = [
@@ -80,7 +75,9 @@ class SessionVariables:
         raise NotImplementedError(message)
 
 
-def dragons_isolated_dir(func: Callable[nox.Session]) -> Callable[nox.Session]:
+def dragons_isolated_dir(
+    func: Callable[[nox.Session], None],
+) -> Callable[[nox.Session], None]:
     """Create an isolated directory and environment for the dragons tests.
 
     This wraps a function and creates a temporary directory and sets
@@ -89,10 +86,10 @@ def dragons_isolated_dir(func: Callable[nox.Session]) -> Callable[nox.Session]:
 
     @functools.wraps(func)
     def wrapper(session: nox.Session) -> None:
-        tmp_path = session.create_tmp()
+        tmp_path = Path(session.create_tmp())
         with session.chdir(tmp_path):
             # Set the DRAGONSRC environment variable.
-            os.environ["DRAGONSRC"] = tmp_path / "dragonsrc"
+            os.environ["DRAGONSRC"] = str(tmp_path / "dragonsrc")
 
             # Create the DRAGONSRC file.
             dragonsrc_contents = f"""
@@ -107,7 +104,7 @@ def dragons_isolated_dir(func: Callable[nox.Session]) -> Callable[nox.Session]:
             )
 
             with Path(os.environ["DRAGONSRC"]).open("w+") as f:
-                f.write(dragonsrc_contents)
+                _ = f.write(dragonsrc_contents)
 
             # Create the calibrations database file.
             calibration_path = tmp_path / "calibrations.db"
@@ -208,11 +205,7 @@ def unit_tests(session: nox.Session) -> None:
     pos_args = session.posargs
 
     # Run the tests. Need to pass arguments to pytest.
-    session.run(
-        "pytest",
-        *SessionVariables.unit_pytest_options,
-        *pos_args,
-    )
+    session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
 @nox.session
