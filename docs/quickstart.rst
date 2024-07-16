@@ -361,7 +361,7 @@ by installing the code using |Poetry|.
 
     # If you don't have Poetry installed, you can install it with:
     # pip install poetry
-    poetry install .
+    poetry install
 
 This will install |astrodata| in editable mode, along with all of the
 development dependencies. You can now run tests, build documentation,
