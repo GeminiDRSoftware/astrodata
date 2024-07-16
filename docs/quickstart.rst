@@ -6,7 +6,7 @@ concepts of |astrodata|, specifically as someone using |astrodata| to
 work with your own data.
 
 If you are a user getting started with |astrodata|, you will likely
-wnt to start with the |UserManual|. If you want a more detailed overview
+want to start with the |UserManual|. If you want a more detailed overview
 of the library, you can start with the |DeveloperGuide|, which covers the
 majority of topics discussed here in more detail.
 
@@ -26,7 +26,7 @@ see `Advanced Usage`_).
 Example Files
 =============
 
-As |astrodata| is part of the |DRAGONS| software system, there are some testing
+As |astrodata| is part of the |DRAGONS| software system, there are some
 helper functions to download example data for testing purposes. You can
 download files using :func:`~astrodata.testing.download_from_archive`:
 
@@ -344,7 +344,7 @@ features available. For examples of usage in practice, check out |DRAGONS|'s
 |gemini_instruments| package.
 
 If you plan on developing |astrodata|, or you'd like to use the same
-development environment |astrodata| uses, you can install |astrodata| from
+development environment |astrodata| uses, you can install |astrodata|
 with development dependencies.
 
 Installing |astrodata| with developer dependencies
