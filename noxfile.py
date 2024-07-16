@@ -89,6 +89,7 @@ def dragons_isolated_dir(
     @functools.wraps(func)
     def wrapper(session: nox.Session) -> None:
         tmp_path = Path(session.create_tmp())
+
         with session.chdir(tmp_path):
             # Set the DRAGONSRC environment variable.
             os.environ["DRAGONSRC"] = str(tmp_path / "dragonsrc")
