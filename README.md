@@ -175,11 +175,24 @@ repository run
 pip install --upgrade pip
 pip install poetry
 poetry install
+```
 
-# To install without specific development groups. Omit those you would prefer
-# not be installed
+To install without specific development groups. Omit those you would prefer
+not be installed
+```
 poetry install --without test,docs,dev
 ```
+
+
+Or, you can specify specific groups to be installed. E.g., to install the
+main and development dependencies:
+```
+poetry install --only main,dev
+```
+
+The command installs the requested dependencies as well as the current
+project in "editable" mode (equivalent to `pip install -e .`).
+
 
 Contributing
 ------------
