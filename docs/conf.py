@@ -160,6 +160,9 @@ rst_prolog = """
 .. |ProgManual| replace:: |DeveloperGuide|
 .. |ProgrammerManual| replace:: |DeveloperGuide|
 .. |Examples| replace:: :doc:`Examples </examples/index>`
+.. |QuickStart| replace:: :doc:`Quick Start </quickstart>`
+.. |DeveloperInstall| replace:: :doc:`Developer Installation </developer/index>`
+
 
 
 .. _`Anaconda`: https://www.anaconda.com/
