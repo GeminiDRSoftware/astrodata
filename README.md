@@ -177,7 +177,7 @@ pip install poetry
 poetry install
 ```
 
-To install without specific development groups. Omit those you would prefer
+To install without specific development groups, omit those you would prefer
 not be installed
 ```
 poetry install --without test,docs,dev
