@@ -6,6 +6,13 @@
 Introduction
 ************
 
+
+.. note::
+    This guide discusses programming your own data interfaces using
+    |astrodata|. If you instead plan to develop the |astrodata| package
+    itself, please see |DeveloperInstall| before starting this guide to install
+    developer dependencies.
+
 AstroData is a Python package that provides a common interface to astronomical
 data. Originally part of the |DRAGONS| package, the data reduction package
 developed at the Gemini Observatory, it has been split into its own package to
