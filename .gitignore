@@ -184,3 +184,13 @@ test.fits
 
 # scratch directory
 .scratch/
+
+# Loggging files
+*.log
+*.logs
+
+# Coverage json
+*coverage.json
+
+# Meta yaml file
+astrodata/meta.yaml
