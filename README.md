@@ -1,6 +1,6 @@
 [DRAGONS link]: https://github.com/GeminiDRSoftware/DRAGONS
 [astrodata docs]: https://geminidrsoftware.github.io/astrodata/
-[astrodata repo]: https://geminidrsoftware.github.io/astrodata/
+[astrodata repo]: https://github.com/GeminiDRSoftware/astrodata/
 [astropy link]: https://astropy.org
 [pypi link]: https://pypi.org/project/astrodata
 
@@ -167,39 +167,16 @@ Installing development dependencies
 -----------------------------------
 
 ``astrodata`` uses [Poetry](https://github.com/python-poetry/poetry) for build
-and package management. To install development dependencies, you must clone
-this repository. Once you have, at the top level directory of the `astrodata`
-repository run
-
-```
-pip install --upgrade pip
-pip install poetry
-poetry install
-```
-
-To install without specific development groups, omit those you would prefer
-not be installed
-```
-poetry install --without test,docs,dev
-```
-
-
-Or, you can specify specific groups to be installed. E.g., to install the
-main and development dependencies:
-```
-poetry install --only main,dev
-```
-
-The command installs the requested dependencies as well as the current
-project in "editable" mode (equivalent to `pip install -e .`).
-
+and package management. Our documentation includes an [installation guide for
+`astrodata`
+developers](https://geminidrsoftware.github.io/astrodata/developer/index.html)
 
 Contributing
 ------------
 
 See [our contributing guidelines](CONTRIBUTING.md) for information on
 contributing. If you're worried about contributing, or feel intimidated, please
-remember that your contribution is immensly appreciated---no matter how small!
+remember that your contribution is immensely appreciated---no matter how small!
 
 License
 -------
