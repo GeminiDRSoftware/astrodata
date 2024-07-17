@@ -345,43 +345,5 @@ features available. For examples of usage in practice, check out |DRAGONS|'s
 
 If you plan on developing |astrodata|, or you'd like to use the same
 development environment |astrodata| uses, you can install |astrodata|
-with development dependencies.
-
-Installing |astrodata| with developer dependencies
-++++++++++++++++++++++++++++++++++++++++++++++++++
-
-|astrodata| relies on a number of packages for development, testing, and
-documentation. If you want to install these dependencies, you can do so
-by installing the code using |Poetry|.
-
-.. code-block:: bash
-
-    git clone https://github.com/GeminiDRSoftware/astrodata
-    cd astrodata
-
-    # If you don't have Poetry installed, you can install it with:
-    # pip install poetry
-    poetry install
-
-This will install |astrodata| in editable mode, along with all of the
-development dependencies. You can now run tests, build documentation,
-and run your code using a complete development environment genreated
-by |Poetry|:
-
-.. code-block:: bash
-
-    # Run the tests
-    # Note: tests are performed on all supported python versions, and if you
-    # don't have a specific version installed, that test run will be skipped.
-    poetry run tox -rp
-
-    # Build the documentation from source.
-    poetry run sphinx-build docs docs/_build
-
-    # Run your code
-    poetry run python my_script.py
-
-You may, of course, install these dependencies into a local environment, if you
-prefer. For more information about ``Poetry`` and developing with it, see the
-`Poetry basic usage documentation
-<https://python-poetry.org/docs/basic-usage/#using-your-virtual-environment>`.
+with development dependencies. See the |DeveloperInstall| guide for more
+information.
