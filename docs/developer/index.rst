@@ -27,7 +27,7 @@ To install |astrodata|, you will need the following:
 - Python 3.10, 3.11, or 3.12
 - Poetry_ in some flavor
 
-Please see the |poetry| documentation for installation instructions.
+Please see the Poetry_ documentation for installation instructions.
 
 Clone the repository
 --------------------
