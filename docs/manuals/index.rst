@@ -23,7 +23,7 @@ Astrodata Manual
 This documentation provides different levels of information:
 
 - :doc:`cheatsheet` - A refresher on common astrodata operations
-- :doc:`usermanual/index` - How to code with astrodata
+- :doc:`usermanual/index` - How to code with astrodata objects
 - :doc:`progmanual/index` - How to code for astrodata
 - :doc:`full_api` - The full API documentation for developers.
 - :doc:`../examples/index` - Examples of how to use astrodata
