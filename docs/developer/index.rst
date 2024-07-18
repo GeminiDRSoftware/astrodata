@@ -1,3 +1,4 @@
+======================
 Developer Installation
 ======================
 
@@ -27,10 +28,16 @@ To install |astrodata|, you will need the following:
 - Python 3.10, 3.11, or 3.12
 - Poetry_ in some flavor
 
-Please see the Poetry_ documentation for installation instructions.
+Please see the Poetry_ documentation for installation instructions. Note that
+it is *not recommended to install Poetry with pip, especially in your working
+directory for the project*.  There are several solutions to this in their
+documentation.
+
+Instructions
+------------
 
 Clone the repository
---------------------
+====================
 
 First, clone the repository from GitHub. Using the command line:
 
@@ -41,7 +48,7 @@ First, clone the repository from GitHub. Using the command line:
 Or use your preferred method for cloning a repository.
 
 Install the dependencies
-------------------------
+========================
 
 ``cd`` into the repository directory:
 
@@ -115,3 +122,66 @@ And then run the tests for a specific environment by running:
     This will be soon replaced by ``nox``, which has continuing support for
     testing with ``conda`` environments. However, the setup/execution is
     similarly simple.
+
+Other development commands
+--------------------------
+
+
+Development with a Poetry environment
+=====================================
+
+|Poetry| also has a feature to create a shell with the dependencies installed.
+This is useful for development, as it allows you to run commands in the
+environment without activating it. To create a shell, run:
+
+.. code-block:: bash
+
+   poetry shell
+
+This will create a shell with the dependencies installed. You can then run
+commands in this shell as you would in a normal shell. To exit the shell, run:
+
+.. code-block:: bash
+
+   exit
+
+This takes similar steps to the above, but make Poetry handle the environment
+for you. While this is convenient, it can be confusing if you're not familiar
+with virtual environments and the shell command itself is somewhat limited in
+what it can do. It will work quickly, though, and can be useful for quick
+development tasks requiring a fresh environment.
+
+Refer to the `Poetry documentation
+<https://python-poetry.org/docs/cli/#shell>`__ for more information on the
+``shell`` command.
+
+Development without a Virtual Environment
+=========================================
+
+If you don't need a virtual environment, you can use the ``poetry run`` command
+to run commands in the environment without activating it. For example, to run
+the tests without activating the environment, you can run:
+
+.. code-block:: bash
+
+   poetry run tox
+
+This will run the tests in an environment created by poetry without activating
+the environment within your shell. This is especially useful for our CI/CD
+tasks, and can be useful for running in an environment that is not your
+development environment.
+
+Copy/Paste to create and enter a developer environment
+------------------------------------------------------
+
+This is for convenience to copy/paste the above commands required to create and
+enter a developer shell.
+
+.. code-block:: bash
+
+   # Start in the directory you'd like to keep astrodata in.
+   git clone git@github.com:GeminiDRSoftware/astrodata.git
+   cd astrodata
+   python -m venv .venv
+   source .venv/bin/activate
+   poetry install

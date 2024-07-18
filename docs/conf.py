@@ -206,7 +206,8 @@ rst_prolog = """
 .. |Tag| replace:: :class:`~astrodata.Tag`
 .. |Descriptors| replace:: :ref:`ad_descriptors`
 
-.. |IssueTracker| replace:: `Issue Tracker <https://github.com/teald/astrodata/issues>`__
+.. |IssueTracker| replace:: `Issue Tracker <https://github.com/GeminiDRSoftware/astrodata/issues>`__
+.. |astrodata_github| replace:: `astrodata GitHub <https://github.com/GeminiDRSoftware/astrodata>`__
 
 .. TODO: below are broken links
 
