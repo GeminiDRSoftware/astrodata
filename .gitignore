@@ -184,3 +184,6 @@ test.fits
 
 # scratch directory
 .scratch/
+
+# Quickstart data
+quickstart_data/
