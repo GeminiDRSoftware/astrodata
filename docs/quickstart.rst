@@ -66,7 +66,7 @@ download files using :func:`~astrodata.testing.download_from_archive`:
 
 These files are from the |DRAGONS| GMOS tutorial, but we'll pretend we don't
 have that and want to work with them using |astrodata| alone. They will be
-stored in the ``./data/`` directory relative to your current working directory.
+stored in the ``./quickstart_data/`` directory relative to your current working directory.
 
 Opening Files
 =============
@@ -82,7 +82,7 @@ Let's just open one of the files without any other setup and see what happens:
 
     import astrodata
 
-    ad = astrodata.from_file('data/N20170614S0201.fits')
+    ad = astrodata.from_file('quickstart_data/N20170614S0201.fits')
 
     ad.info()
 
@@ -91,7 +91,7 @@ it will look something like this:
 
 .. code-block:: text
 
-    Filename: data/N20170614S0201.fits
+    Filename: quickstart_data/N20170614S0201.fits
     Tags:
 
     Pixels Extensions
@@ -213,7 +213,7 @@ all the files we downloaded:
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'data/{f}')
+        ad = astrodata.from_file(f'quickstart_data/{f}')
         print(f"Opened {ad.filename} with class {ad.__class__}")
 
 The result:
@@ -258,7 +258,7 @@ Let's see what the data looks like for one of the files:
 .. code-block:: python
 
     # Get the first science extension.
-    for ad in (astrodata.from_file(f'data/{f}') for f in files):
+    for ad in (astrodata.from_file(f'quickstart_data/{f}') for f in files):
         if isinstance(ad, GMOSScienceAstroData):
             break
 
@@ -316,7 +316,7 @@ Now, when we open a file, we can access the airmass like this:
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'data/{f}')
+        ad = astrodata.from_file(f'quickstart_data/{f}')
         if isinstance(ad, GMOSScienceAstroData):
             print(f"Opened {ad.filename} with class {ad.__class__})")
             print(f"Airmass: {ad.airmass()}")
@@ -329,7 +329,7 @@ get all descriptors from a class using the ``.descriptors`` attribute.
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'data/{f}')
+        ad = astrodata.from_file(f'quickstart_data/{f}')
         print(f"{ad.filename} descriptors:")
         print(' + ' + ', '.join(ad.descriptors))
 
