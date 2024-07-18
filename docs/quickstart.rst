@@ -62,7 +62,7 @@ download files using :func:`~astrodata.testing.download_from_archive`:
 
     # Download the files. We'll be placing these in a directory called 'data'.
     for f in files:
-        download_from_archive(f, path='data', sub_path='')
+        download_from_archive(f, path='quickstart_data', sub_path='')
 
 These files are from the |DRAGONS| GMOS tutorial, but we'll pretend we don't
 have that and want to work with them using |astrodata| alone. They will be
