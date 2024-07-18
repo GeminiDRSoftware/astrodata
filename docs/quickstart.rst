@@ -279,7 +279,7 @@ Let's see what the data looks like for one of the files:
 This is fine, but what if we're interested in a particular quantity for our
 work? It's not much more useful than a FITS file at this point, other than the fancy
 class we've created. Let's add a method to our class that will fetch us the
-central wavelength in nanometers for the data.
+airmass in nanometers for the data.
 
 First, we need to remove the ``GMOSScienceAstroData`` class we created from the
 factory to avoid conflicts with the new class we're planning:
@@ -289,7 +289,7 @@ factory to avoid conflicts with the new class we're planning:
     factory.remove_class(GMOSScienceAstroData)
 
 Now, let's add a method to a new class, ``GMOSSpectrumScienceAstroData`` class that will fetch the
-central wavelength for the data. We'll subclass ``GMOSScienceAstroData`` to
+airmass for the data. We'll subclass ``GMOSScienceAstroData`` to
 reuse what we've written above.
 
 .. code-block:: python
@@ -311,7 +311,7 @@ reuse what we've written above.
     # Register the new class with the factory.
     factory.add_class(GMOSScienceAstroData)
 
-Now, when we open a file, we can access the central wavelength like this:
+Now, when we open a file, we can access the airmass like this:
 
 .. code-block:: python
 
