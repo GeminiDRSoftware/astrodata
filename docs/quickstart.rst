@@ -197,10 +197,10 @@ important parts to us right now to make it easier to work with:
         # class for files that match the given tags.
         @staticmethod
         def _matches_data(source):
-            obs = source[0].header.get('OBSTYPE', '').upper()
-            obstype = source[0].header.get('OBSCLASS', '').upper()
+            obstype = source[0].header.get('OBSTYPE', '').upper()
+            obsclass = source[0].header.get('OBSCLASS', '').upper()
 
-            return obs == 'OBJECT' and obstype == 'SCIENCE'
+            return obstype == 'OBJECT' and obsclass == 'SCIENCE'
 
     # Register the classes with the factory.
     factory.add_class(GMOSAstroData)
