@@ -185,3 +185,8 @@ enter a developer shell.
    python -m venv .venv
    source .venv/bin/activate
    poetry install
+
+..
+   If there is anything else needed for this document, please
+   split this up into separate documents. It's at its visual limit here
+   (otherwise there's too much text for this to be a quick read).
