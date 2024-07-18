@@ -66,7 +66,8 @@ download files using :func:`~astrodata.testing.download_from_archive`:
 
 These files are from the |DRAGONS| GMOS tutorial, but we'll pretend we don't
 have that and want to work with them using |astrodata| alone. They will be
-stored in the ``./quickstart_data/`` directory relative to your current working directory.
+stored in the ``quickstart_data/`` directory within your current working
+directory.
 
 Opening Files
 =============
