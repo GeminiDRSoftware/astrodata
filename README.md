@@ -3,6 +3,8 @@
 [astrodata repo]: https://geminidrsoftware.github.io/astrodata/
 [astropy link]: https://astropy.org
 [pypi link]: https://pypi.org/project/astrodata
+[citation link]: https://github.com/GeminiDRSoftware/astrodata/blob/main/CITATION.md
+[DRAGONS citation]: https://zenodo.org/records/10841622
 
 [coverage badge]: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teald/d2f3af2a279efc1f6e90d457a3c50e47/raw/covbadge.json
 [docs build badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/documentation.yml/badge.svg
@@ -210,3 +212,12 @@ BSD 3-clause license through AURA astronomy. This package is based upon the
 guide](https://github.com/OpenAstronomy/packaging-guide) which is licensed
 under the standard BSD 3-clause license. See the LICENSE file for more
 information.
+
+Citations
+---------
+
+To cite `astrodata` in your work, please see [CITATION.md][citation link]
+for complete information, including a `bibtex` example.
+
+For ease of reference, the current citation to use is:
+[Simpson et al. 2024][DRAGONS citation].
