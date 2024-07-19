@@ -24,13 +24,16 @@
   >
 </picture>
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+![Supported python versions -- 3.10, 3.11, 3.12](https://img.shields.io/badge/3.10%2C%203.11%2C%203.12-%234b8bbe?logo=Python&logoColor=%234b8bbe&label=For%20Python%3A)
+[![PyPI version badge][pypi package version badge]](https://badge.fury.io/py/astrodata)
+
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
 ![Testing status badge][test status badge]
 
 ### Building & Publishing
 ![Documentation build status badge][docs build badge]
-[![PyPI version badge][pypi package version badge]](https://badge.fury.io/py/astrodata)
 ![pypi packaging status badge][pypi packaging badge]
 
 <!-- Clearing the logo for the next header -->
@@ -41,7 +44,7 @@ Making astronomical data consistent and approachable
 
 `astrodata` is a package for managing astronomical data through a uniform
 interface. It is designed to be used with the
-[Astropy package][astropy link]. `astrodata` was designed by and
+[Astropy package][astropy link]. `astrodata` was created
 for use as part of the [`DRAGONS`][DRAGONS link] data reduction pipeline, but it is now
 implemented to be useful for any astronomical data reduction or analysis
 project.
