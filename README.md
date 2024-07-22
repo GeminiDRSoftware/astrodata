@@ -69,7 +69,7 @@ Installation
 can be installed using `pip`:
 
 ```
-pip install astrodata
+python -m pip install astrodata
 ```
 
 Documentation
