@@ -45,6 +45,18 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install tox tox-gh-actions
 
+      - name: "Get public IP address of runner"
+        # Need to handle this for Windows, MacOS, and linux
+        # Fetch from ipinfo.io/ip and echo it
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            curl -s https://ipinfo.io/ip -UseBasicParsing
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            curl -s https://ipinfo.io/ip
+          else
+            curl -s https://ipinfo.io/ip
+          fi
+
       - name: "Run tox for ${{ matrix.python-version }}"
         run: |
           python -m tox -r -- -svv
