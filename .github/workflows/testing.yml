@@ -50,7 +50,7 @@ jobs:
         # Fetch from ipinfo.io/ip and echo it
         run: |
             if [[ "$RUNNER_OS" == "Windows" ]]; then
-              echo "Windows runner IP: $(curl -s https://ipinfo.io/ip -UseBasicParsing)"
+              echo "Windows runner IP: $(curl -s https://ipinfo.io/ip)"
             elif [[ "$RUNNER_OS" == "macOS" ]]; then
               echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
             else
