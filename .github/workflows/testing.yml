@@ -49,13 +49,13 @@ jobs:
         # Need to handle this for Windows, MacOS, and linux
         # Fetch from ipinfo.io/ip and echo it
         run: |
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            curl -s https://ipinfo.io/ip -UseBasicParsing
-          elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            curl -s https://ipinfo.io/ip
-          else
-            curl -s https://ipinfo.io/ip
-          fi
+            if [[ "$RUNNER_OS" == "Windows" ]]; then
+              echo "Windows runner IP: $(curl -s https://ipinfo.io/ip -UseBasicParsing)"
+            elif [[ "$RUNNER_OS" == "macOS" ]]; then
+              echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
+            else
+              echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
+            fi
 
       - name: "Run tox for ${{ matrix.python-version }}"
         run: |
