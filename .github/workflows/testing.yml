@@ -60,9 +60,12 @@ jobs:
                   # Unit tests
                   python -m nox -r
 
-                  # DRAGONS tests
+            - name: "DRAGONS integration tests"
+              run: |
+                if [[ "$RUNNER_OS" != "Windows" ]]; then
                   python -m nox -r -s dragons_calibration
                   python -m nox -r -s dragons_release_tests
+                fi
 
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v3
