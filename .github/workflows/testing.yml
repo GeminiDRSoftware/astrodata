@@ -27,6 +27,12 @@ jobs:
                     - windows-latest
 
         steps:
+            - uses: conda-incubator/setup-miniconda@v3
+              with:
+                auto-update-conda: true
+                auto-activate-base: false
+                python-version: "3.12"
+
             - name: "Check out the repo"
               uses: "actions/checkout@v4"
 
