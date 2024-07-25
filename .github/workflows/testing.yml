@@ -23,9 +23,8 @@ jobs:
             matrix:
                 os:
                     - ubuntu-latest
-                    # TODO:
-                    # - macos-latest
-                    # - windows-latest
+                    - macos-latest
+                    - windows-latest
 
         steps:
             - name: "Check out the repo"
@@ -58,7 +57,12 @@ jobs:
 
             - name: "Run nox"
               run: |
+                  # Unit tests
                   python -m nox -r
+
+                  # DRAGONS tests
+                  python -m nox -r -s dragons_calibration
+                  python -m nox -r -s dragons_release_tests
 
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v3
