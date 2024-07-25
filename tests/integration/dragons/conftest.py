@@ -21,26 +21,78 @@ The DRAGONS tests alone may be selected using either the pytest mark
 + TODO: Add fixture to set up calibration service for individual tests.
 """
 
-import os
-
+import importlib
+from pathlib import Path
 
 import pytest
 
+# Import the LocalDB class from the calibration service module, using importlib
+# to avoid undesirable kludging with any of the other dependencies. This is
+# probably overkill.
+try:
+    LocalDB = importlib.import_module("recipe_system.cal_service").LocalDB
+
+except ImportError:
+    # This is a bit of a hack, but it's the best way to handle this situation
+    # without adding a dependency on the recipe_system package.
+    LocalDB = None
+
+
+def _dragonsrc_generator(location: Path, db_file_path: Path) -> Path:
+    """Generate a .dragonsrc file with the given database file path.
+
+    Parameters
+    ----------
+    location : Path
+        The location to save the .dragonsrc file.
+
+    db_file_path : Path
+        The path to the database file.
+
+    Returns
+    -------
+    Path
+        The path to the .dragonsrc file.
+
+    Warning
+    -------
+    This function will overwrite any existing .dragonsrc file at the given
+    location. It is meant for tests where that's the desired behavior.
+    """
+    lines = (
+        "[calibs]",
+        f"databases = {db_file_path.resolve().absolute()} get store",
+    )
+
+    with location.open("w+") as f:
+        f.write("\n".join(lines))
+
+    with location.open("r") as f:
+        print("\n--- DRAGONSRC CONTENTS ---")
+        print(f.read())
+        print("^^^ DRAGONSRC CONTENTS ^^^\n")
+
+    return location
+
 
 @pytest.fixture
-def use_temporary_working_directory(tmp_path):
-    """Change the working directory to a temporary directory."""
-    # TODO: Remove this fixture --- it is managed by nox now.
-    return os.getcwd()
+def calibration_service(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> LocalDB:
+    """Fixture to set up the calibration service."""
+    # 1) Create a dragonsrc file and assign it to the session environment.
+    dragonsrc = tmp_path / ".dragonsrc"
+    calibration_path = tmp_path / "calibrations.db"
 
-    original_directory = os.getcwd()
-    # tmp_path = tmp_path_factory.mktemp("working_directory")
-    os.chdir(tmp_path)
+    _ = _dragonsrc_generator(dragonsrc, calibration_path)
 
-    yield tmp_path
+    monkeypatch.setenv("DRAGONSRC", str(dragonsrc))
 
-    os.chdir(original_directory)
+    # 2) Return the calibration service.
+    cal_service = importlib.import_module("recipe_system.cal_service")
+    cal_service.load_config(str(dragonsrc))
 
-    # Report the location of the temporary directory in case the test outputs
-    # need to be checked.
-    print(f"Temporary directory: {tmp_path}")
+    caldb = cal_service.LocalDB(str(calibration_path), force_init=True)
+    # caldb.init(wipe=True)
+
+    return caldb

@@ -8,10 +8,8 @@ TODO:
 - [ ] Test release builds.
 """
 
-import functools
-import os
 from pathlib import Path
-from typing import Callable, ClassVar
+from typing import ClassVar
 
 import nox
 
@@ -69,57 +67,10 @@ class SessionVariables:
         """Return the test directory path."""
         return SessionVariables._test_dir
 
-    # This class is not meant to be instantiated. It is just used as a
-    # namespace.
     def __new__(cls) -> None:
         """Just catches accidental invocations."""
         message = "This class should not be instantiated."
         raise NotImplementedError(message)
-
-
-def dragons_isolated_dir(
-    func: Callable[[nox.Session], None],
-) -> Callable[[nox.Session], None]:
-    """Create an isolated directory and environment for the dragons tests.
-
-    This wraps a function and creates a temporary directory and sets
-    some DRAGONS environment variables.
-    """
-
-    @functools.wraps(func)
-    def wrapper(session: nox.Session) -> None:
-        tmp_path = Path(session.create_tmp())
-
-        with session.chdir(tmp_path):
-            # Set the DRAGONSRC environment variable.
-            os.environ["DRAGONSRC"] = str(tmp_path / "dragonsrc")
-
-            # Create the DRAGONSRC file.
-            dragonsrc_contents = f"""
-            [calibs]
-            databases = {tmp_path} get store
-            """
-
-            # Remove leading and trailing whitespace from each line and remove
-            # empty lines.
-            dragonsrc_contents = "\n".join(
-                line.strip() for line in dragonsrc_contents.split("\n") if line
-            )
-
-            with Path(os.environ["DRAGONSRC"]).open("w+") as f:
-                _ = f.write(dragonsrc_contents)
-
-            # Create the calibrations database file.
-            calibration_path = tmp_path / "calibrations.db"
-            with calibration_path.open("w+") as f:
-                pass
-
-            # Run the function.
-            result = func(session)
-
-        return result
-
-    return wrapper
 
 
 def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
@@ -169,7 +120,6 @@ def install_test_dependencies(session: nox.Session) -> None:
 
 
 @nox.session(venv_backend="conda", python="3.10")
-@dragons_isolated_dir
 def dragons_release_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
     # Fetch test dependencies from the poetry.lock file.
@@ -229,8 +179,10 @@ def coverage(session: nox.Session) -> None:
 # Important note --- these tests should be run as a part of the routine tests
 # above. They are separated here for ease of diagnosis for common problems.
 @nox.session(venv_backend="conda", python="3.10")
-@dragons_isolated_dir
-def dragons_calibration(session: nox.Session) -> None:
+def dragons_calibration(
+    session: nox.Session,
+    dragonsrc_path: Path | None = None,
+) -> None:
     """Run the calibration tests."""
     session.conda_install(
         "dragons==3.2",
@@ -249,4 +201,5 @@ def dragons_calibration(session: nox.Session) -> None:
         "pytest",
         "tests/integration/dragons/test_calibration_setup.py",
         *pos_args,
+        env={"DRAGONSRC": str(dragonsrc_path)},
     )

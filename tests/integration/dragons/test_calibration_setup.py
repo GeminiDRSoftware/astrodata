@@ -13,14 +13,14 @@ def all_calibration_files(calibration_service) -> list[str]:
     Required because calibration_service.list_files() returns an
     iterator, not a list.
     """
-    return [f for f in calibration_service.list_files()]
+    return [f.name for f in calibration_service.list_files()]
 
 
 @pytest.mark.dragons
 def test_cal_service_add(calibration_service, tmp_path):
     """Test adding a calibration file."""
     # Download a file from the internet into a temporary directory.
-    bias_file = "S20240624S0106.fits"
+    bias_file = "bpm_20240423_gnirs_gnirsn_11_full_1amp.fits"
     file_path = download_from_archive(bias_file)
     calibration_service.add_cal(file_path)
     assert all_calibration_files(calibration_service) == [bias_file]

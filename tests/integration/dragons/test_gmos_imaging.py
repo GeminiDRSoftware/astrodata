@@ -90,6 +90,7 @@ def test_correct_astrodata():
 @pytest.mark.filterwarnings("ignore")
 @pytest.mark.dragons
 def test_gmos_imaging_tutorial_star_field(
+    calibration_service,
     use_temporary_working_directory,
     gmos_imaging_data_star_field,
 ):
@@ -145,7 +146,7 @@ def test_gmos_imaging_tutorial_star_field(
     if os.path.exists("calibration.db"):
         os.remove("calibration.db")
 
-    caldb = cal_service.LocalDB("calibration.db")
+    caldb = cal_service.set_local_database()
     caldb.init(wipe=True)
 
     for bpm in dataselect.select_data(all_files, ["BPM"]):
