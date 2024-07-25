@@ -91,8 +91,9 @@ def test_correct_astrodata():
 @pytest.mark.dragons
 def test_gmos_imaging_tutorial_star_field(
     calibration_service,
-    use_temporary_working_directory,
     gmos_imaging_data_star_field,
+    monkeypatch,
+    tmp_path,
 ):
     """Test based on the DRAGONS GMOS imaging tutorial.
 
@@ -104,6 +105,8 @@ def test_gmos_imaging_tutorial_star_field(
 
     Link: `DRAGONS_GMOSIMG_TUTORIAL`_
     """
+    # Isolated working dir.
+    monkeypatch.chdir(tmp_path)
     data = gmos_imaging_data_star_field
 
     # Import required modules

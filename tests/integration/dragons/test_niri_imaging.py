@@ -97,8 +97,10 @@ def test_correct_astrodata():
 @pytest.mark.filterwarnings("ignore")
 @pytest.mark.dragons
 def test_niri_imaging_tutorial_star_field(
-    use_temporary_working_directory,
+    calibration_service,
     niri_imaging_data_star_field,
+    monkeypatch,
+    tmp_path,
 ):
     """Test based on the DRAGONS NIRI imaging tutorial.
 
@@ -110,6 +112,8 @@ def test_niri_imaging_tutorial_star_field(
 
     Link: `DRAGONS_NIRIIMG_TUTORIAL`_
     """
+    monkeypatch.chdir(tmp_path)
+
     data = niri_imaging_data_star_field
 
     # Imports for running DRAGONS.
