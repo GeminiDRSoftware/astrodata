@@ -41,18 +41,18 @@ jobs:
                   python -m pip install nox poetry
 
             - name: "Get public IP address of runner"
-        # Need to handle this for Windows, MacOS, and linux
-        # Fetch from ipinfo.io/ip and echo it
-        run: |
-            if [[ "$RUNNER_OS" == "Windows" ]]; then
-              echo "Windows runner IP: $(curl -s https://ipinfo.io/ip)"
-            elif [[ "$RUNNER_OS" == "macOS" ]]; then
-              echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
-            else
-              echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
-            fi
+              # Need to handle this for Windows, MacOS, and linux
+              # Fetch from ipinfo.io/ip and echo it
+              run: |
+                  if [[ "$RUNNER_OS" == "Windows" ]]; then
+                    echo "Windows runner IP: $(curl -s https://ipinfo.io/ip)"
+                  elif [[ "$RUNNER_OS" == "macOS" ]]; then
+                    echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
+                  else
+                    echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
+                  fi
 
-      - name: "Run nox"
+            - name: "Run nox"
               run: |
                   python -m nox -r
 
