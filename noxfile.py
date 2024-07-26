@@ -32,6 +32,7 @@ class SessionVariables:
         "conda-forge",
         dragons_channel,
     ]
+    dragons_github_url = "https://github.com/GeminiDRSoftware/DRAGONS.git"
 
     # Poetry install options
     poetry_install_options: ClassVar[list[str]] = [
@@ -114,6 +115,7 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
 
 def install_test_dependencies(session: nox.Session) -> None:
     """Install the test dependencies from the poetry.lock file."""
+    session.install("--upgrade", "pip")
     packages = get_poetry_dependencies(session, "main,test")
 
     session.install(*packages)
@@ -135,6 +137,51 @@ def dragons_release_tests(session: nox.Session) -> None:
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
     )
+
+    session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
+
+    # Positional arguments after -- are passed to pytest.
+    pos_args = session.posargs
+
+    _ = session.run(
+        "pytest",
+        *SessionVariables.dragons_pytest_options,
+        *pos_args,
+    )
+
+
+@nox.session(python="3.10")
+def dragons_dev_tests(session: nox.Session) -> None:
+    """Run the tests for the DRAGONS conda package."""
+    # Fetch test dependencies from the poetry.lock file.
+    install_test_dependencies(session)
+
+    # Install the DRAGONS package, and ds9 for completeness.
+    tmp_dir = Path(session.create_tmp())
+
+    with session.cd(tmp_dir):
+        # Get cal_manager and obs_db_manager. GeminiObsDB is a dependency of
+        # GeminiCalMgr, and must be installed first.
+        session.install(
+            "git+https://github.com/GeminiDRSoftware/GeminiObsDB@v1.0.29",
+        )
+
+        session.install(
+            "git+https://github.com/GeminiDRSoftware/GeminiCalMgr@v1.1.24",
+        )
+
+        # Clone the DRAOGNS repository
+        session.run(
+            "git",
+            "clone",
+            SessionVariables.dragons_github_url,
+            "dragons",
+            external=True,
+        )
+
+        with session.cd("dragons"):
+            # Install the DRAGONS package
+            session.install("-e", ".")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
