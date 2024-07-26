@@ -170,7 +170,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
             "git+https://github.com/GeminiDRSoftware/GeminiCalMgr@v1.1.24",
         )
 
-        # Clone the DRAOGNS repository
+        # Clone the DRAGONS repository
         session.run(
             "git",
             "clone",
