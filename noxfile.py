@@ -115,7 +115,14 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
 
 def install_test_dependencies(session: nox.Session) -> None:
     """Install the test dependencies from the poetry.lock file."""
-    session.install("--upgrade", "pip")
+    # If using venv, upgrade pip first. If in a conda env, this is not needed
+    # because of nuances with the installed versions.
+    if session.venv_backend == "venv":
+        session.install("--upgrade", "pip")
+
+    # Report the pip version
+    session.run("python", "-m", "pip", "--version")
+
     packages = get_poetry_dependencies(session, "main,test")
 
     session.install(*packages)
