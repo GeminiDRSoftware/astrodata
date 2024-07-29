@@ -78,7 +78,6 @@ jobs:
             - name: "DRAGONS integration tests"
               run: |
                 if [[ "$RUNNER_OS" != "Windows" ]]; then
-                  brew install sextractor
                   python -m nox -r -s dragons_release_tests
                   python -m nox -r -s dragons_dev_tests
                 fi
