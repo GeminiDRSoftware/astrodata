@@ -150,11 +150,23 @@ def dragons_release_tests(session: nox.Session) -> None:
     )
 
 
-@nox.session(python="3.10")
+@nox.session(venv_backend="conda", python="3.10")
 def dragons_dev_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
     # Fetch test dependencies from the poetry.lock file.
     install_test_dependencies(session)
+
+    # Need to install sectractor as a conda package. Everything else in this
+    # install should be via pip, not conda.
+    session.conda_install(
+        "astromatic-source-extractor",
+        channel=SessionVariables.dragons_conda_channels,
+    )
+
+    session.conda_install(
+        "ds9",
+        channel=SessionVariables.dragons_conda_channels,
+    )
 
     # Install the DRAGONS package, and ds9 for completeness.
     tmp_dir = Path(session.create_tmp())
@@ -171,13 +183,19 @@ def dragons_dev_tests(session: nox.Session) -> None:
         )
 
         # Clone the DRAGONS repository
-        session.run(
-            "git",
-            "clone",
-            SessionVariables.dragons_github_url,
-            "dragons",
-            external=True,
-        )
+        # Only run this if the directory does not exist. Otherwise, it will try
+        # to install it even if re-using the session environemnt.
+        if not Path("dragons").exists():
+            session.run(
+                "git",
+                "clone",
+                SessionVariables.dragons_github_url,
+                "dragons",
+                external=True,
+            )
+
+        else:
+            print("DRAGONS repository already exists. Skipping clone.")
 
         with session.cd("dragons"):
             # Install the DRAGONS package
