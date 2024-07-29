@@ -178,17 +178,17 @@ def dragons_dev_tests(session: nox.Session) -> None:
     # Install the DRAGONS package, and ds9 for completeness.
     tmp_dir = Path(session.create_tmp())
 
+    # Get cal_manager and obs_db_manager. GeminiObsDB is a dependency of
+    # GeminiCalMgr, and must be installed first.
+    session.install(
+        "git+https://github.com/GeminiDRSoftware/GeminiObsDB@v1.0.29",
+    )
+
+    session.install(
+        "git+https://github.com/GeminiDRSoftware/GeminiCalMgr@v1.1.24",
+    )
+
     with session.cd(tmp_dir):
-        # Get cal_manager and obs_db_manager. GeminiObsDB is a dependency of
-        # GeminiCalMgr, and must be installed first.
-        session.install(
-            "git+https://github.com/GeminiDRSoftware/GeminiObsDB@v1.0.29",
-        )
-
-        session.install(
-            "git+https://github.com/GeminiDRSoftware/GeminiCalMgr@v1.1.24",
-        )
-
         # Clone the DRAGONS repository
         # Only run this if the directory does not exist. Otherwise, it will try
         # to install it even if re-using the session environemnt.
