@@ -64,13 +64,20 @@ jobs:
                   # the git repo ones, in the next step.
                   conda install git pip setuptools nox poetry -y
 
-            - name: "DRAGONS integration tests"
+            - name: "DRAGONS release tests"
               run: |
                 # Need to activate this here because the conda action doesn't
                 # play nicely with the default python setup.
                 conda activate test_env
 
                 python -m nox -r -s dragons_release_tests -- -xvv
+
+            - name: "DRAGONS dev tests"
+              run: |
+                # Need to activate this here because the conda action doesn't
+                # play nicely with the default python setup.
+                conda activate test_env
+
                 python -m nox -r -s dragons_dev_tests --verbose -- -xvv
 
             - name: "Upload coverage data"
