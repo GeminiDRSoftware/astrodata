@@ -75,6 +75,14 @@ def _dragonsrc_generator(location: Path, db_file_path: Path) -> Path:
     return location
 
 
+@pytest.fixture(autouse=True)
+def setup_logging():
+    """Set up logging for the tests."""
+    gempy = importlib.import_module("gempy")
+
+    gempy.utils.logutils.config(file_name="DRAGONS_log.log")
+
+
 @pytest.fixture
 def calibration_service(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
