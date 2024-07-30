@@ -8,6 +8,7 @@ TODO:
 - [ ] Test release builds.
 """
 
+import sys
 from pathlib import Path
 from typing import ClassVar
 
@@ -128,9 +129,20 @@ def install_test_dependencies(session: nox.Session) -> None:
     session.install(*packages)
 
 
+def apply_macos_config(session: nox.Session) -> None:
+    """Apply macOS specific configurations."""
+    # This configuration is to ensure that conda uses the correct architecture
+    # (x86_64) on M-series Macs.
+    if sys.platform == "darwin":
+        session.env["CONDA_SUBDIR"] = "osx-64"
+        session.run("conda", "config", "--env", "--set", "subdir", "osx-64")
+
+
 @nox.session(venv_backend="conda", python="3.10")
 def dragons_release_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
+    apply_macos_config(session)
+
     # Fetch test dependencies from the poetry.lock file.
     install_test_dependencies(session)
 
@@ -160,6 +172,8 @@ def dragons_release_tests(session: nox.Session) -> None:
 @nox.session(venv_backend="conda", python="3.10")
 def dragons_dev_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
+    apply_macos_config(session)
+
     # Fetch test dependencies from the poetry.lock file.
     install_test_dependencies(session)
 
