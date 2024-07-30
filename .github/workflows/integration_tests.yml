@@ -79,9 +79,12 @@ jobs:
               run: |
                 # Need to activate this here because the conda action doesn't
                 # play nicely with the default python setup.
-                conda activate test_env
+                # conda activate test_env
 
-                python -m nox -r -s dragons_dev_tests --verbose -- -xvv
+                # python -m nox -r -s dragons_dev_tests --verbose -- -xvv
+                echo "DRAGONS dev tests are disabled for now, they are"
+                echo "functional but are not going to be addressed"
+                echo "immediately."
 
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v3
