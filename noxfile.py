@@ -167,10 +167,6 @@ def dragons_dev_tests(session: nox.Session) -> None:
     # install should be via pip, not conda.
     session.conda_install(
         "astromatic-source-extractor",
-        channel=SessionVariables.dragons_conda_channels,
-    )
-
-    session.conda_install(
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
     )
