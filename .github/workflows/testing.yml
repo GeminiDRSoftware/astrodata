@@ -58,7 +58,7 @@ jobs:
             - name: "Run nox"
               run: |
                   # Unit tests
-                  python -m nox -r
+                  python -m nox -r -vv
 
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v3
