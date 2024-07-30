@@ -54,16 +54,16 @@ jobs:
                   # Configure conda to use x86_64 architecture for mac.
                   if [[ "$RUNNER_OS" == "Linux" ]]; then
                     CONDA_SUBDIR="linux-64" conda create -n "test_env" python=3.10 -y
+                    conda activate test_env
                   elif [[ "$RUNNER_OS" == "macOS" ]]; then
                     # Set the conda subdirectory to osx-64
-                    conda config --set subdir osx-64
-                    conda create -n "test_env" python=3.10 -y
+                    CONDA_SUBDIR=osx-64 conda create -n "test_env" python=3.10 -y
+                    conda activate test_env
+                    conda config --env --set subdir osx-64
                   else
                     echo "Unsupported OS: $RUNNER_OS"
                     exit 1
                   fi
-
-                  conda activate test_env
 
                   # These are required for installing dependencies, especially
                   # the git repo ones, in the next step.
