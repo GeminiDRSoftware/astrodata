@@ -23,8 +23,8 @@ jobs:
             matrix:
                 os:
                     - ubuntu-latest
-                    # TODO: - macos-latest
-                    # TODO: - windows-latest
+                    - macos-latest
+                    - windows-latest
 
         steps:
             - uses: conda-incubator/setup-miniconda@v2
@@ -65,7 +65,7 @@ jobs:
 
                   # These are required for installing dependencies, especially
                   # the git repo ones, in the next step.
-                  conda install git pip setuptools nox -y
+                  conda install git pip setuptools nox poetry -y
 
             - name: "DRAGONS integration tests"
               run: |
@@ -73,8 +73,8 @@ jobs:
                 # play nicely with the default python setup.
                 conda activate test_env
                 if [[ "$RUNNER_OS" != "Windows" ]]; then
-                  # python -m nox -r -s dragons_release_tests
-                  python -m nox -r -s dragons_dev_tests --verbose
+                  python -m nox -r -s dragons_release_tests -- -xvv
+                  python -m nox -r -s dragons_dev_tests --verbose -- -xvv
                 fi
 
             - name: "Upload coverage data"
