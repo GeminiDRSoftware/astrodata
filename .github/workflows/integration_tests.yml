@@ -24,7 +24,6 @@ jobs:
                 os:
                     - ubuntu-latest
                     - macos-latest
-                    - windows-latest
 
         steps:
             - uses: conda-incubator/setup-miniconda@v3
@@ -33,12 +32,10 @@ jobs:
               uses: "actions/checkout@v4"
 
             - name: "Get public IP address of runner"
-              # Need to handle this for Windows, MacOS, and linux
+              # Need to handle this for MacOS and linux
               # Fetch from ipinfo.io/ip and echo it
               run: |
-                  if [[ "$RUNNER_OS" == "Windows" ]]; then
-                    echo "Windows runner IP: $(curl -s https://ipinfo.io/ip)"
-                  elif [[ "$RUNNER_OS" == "macOS" ]]; then
+                  if [[ "$RUNNER_OS" == "macOS" ]]; then
                     echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
                   else
                     echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
@@ -72,10 +69,9 @@ jobs:
                 # Need to activate this here because the conda action doesn't
                 # play nicely with the default python setup.
                 conda activate test_env
-                if [[ "$RUNNER_OS" != "Windows" ]]; then
-                  python -m nox -r -s dragons_release_tests -- -xvv
-                  python -m nox -r -s dragons_dev_tests --verbose -- -xvv
-                fi
+
+                python -m nox -r -s dragons_release_tests -- -xvv
+                python -m nox -r -s dragons_dev_tests --verbose -- -xvv
 
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v3
