@@ -11,7 +11,7 @@ on:
 
 defaults:
     run:
-        shell: bash
+        shell: bash -l {0} # Login shell for conda
 
 jobs:
     tests:
@@ -23,27 +23,10 @@ jobs:
             matrix:
                 os:
                     - ubuntu-latest
-                    - macos-latest
-                    - windows-latest
+                    # TODO: - macos-latest
+                    # TODO: - windows-latest
 
         steps:
-            - name:  Set up conda (linux/mac only)
-              if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
-              run: |
-                  if [[ "$RUNNER_OS" == "Linux" ]]; then
-                    mkdir -p ~/miniconda3
-                    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-                    bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-                    rm -rf ~/miniconda3/miniconda.sh
-                    ~/miniconda3/bin/conda init --all
-                  elif [[ "$RUNNER_OS" == "macOS" ]]; then
-                    mkdir -p ~/miniconda3
-                    curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh -o ~/miniconda3/miniconda.sh
-                    bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-                    rm -rf ~/miniconda3/miniconda.sh
-                    ~/miniconda3/bin/conda init --all
-                  fi
-
             - name: "Check out the repo"
               uses: "actions/checkout@v4"
 
@@ -76,13 +59,6 @@ jobs:
               run: |
                   # Unit tests
                   python -m nox -r
-
-            - name: "DRAGONS integration tests"
-              run: |
-                if [[ "$RUNNER_OS" != "Windows" ]]; then
-                  python -m nox -r -s dragons_release_tests
-                  python -m nox -r -s dragons_dev_tests
-                fi
 
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v3

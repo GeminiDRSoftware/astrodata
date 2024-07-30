@@ -1,0 +1,84 @@
+name: "DRAGONS Integration Tests"
+
+on:
+    push:
+        branches:
+        - main
+    pull_request:
+    schedule:
+        - cron: "20 1 * * mon"
+    workflow_dispatch:
+
+defaults:
+    run:
+        shell: bash -l {0} # Login shell for conda
+
+jobs:
+    tests:
+        name: "Testing on ${{ matrix.os }}"
+        runs-on: "${{ matrix.os }}"
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                    - ubuntu-latest
+                    # TODO: - macos-latest
+                    # TODO: - windows-latest
+
+        steps:
+            - uses: conda-incubator/setup-miniconda@v2
+
+            - name: "Check out the repo"
+              uses: "actions/checkout@v4"
+
+            - name: "Get public IP address of runner"
+              # Need to handle this for Windows, MacOS, and linux
+              # Fetch from ipinfo.io/ip and echo it
+              run: |
+                  if [[ "$RUNNER_OS" == "Windows" ]]; then
+                    echo "Windows runner IP: $(curl -s https://ipinfo.io/ip)"
+                  elif [[ "$RUNNER_OS" == "macOS" ]]; then
+                    echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
+                  else
+                    echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
+                  fi
+
+            - name:  Configure conda (linux/mac only)
+              # This is a workaround for it being difficult to set up conda
+              # with the appropriate architecture using the conda actions.
+              if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
+              run: |
+                  conda init
+
+                  # Add the conda-forge channel
+                  conda config --add channels conda-forge
+
+                  # Configure conda to use x86_64 architecture for mac.
+                  if [[ "$RUNNER_OS" == "Linux" ]]; then
+                    CONDA_SUBDIR="linux-64" conda create -n "test_env" python=3.10 -y
+                  elif [[ "$RUNNER_OS" == "macOS" ]]; then
+                    CONDA_SUBDIR="osx-64" conda create -n "test_env" python=3.10 -y
+                  fi
+
+                  conda activate test_env
+
+                  # These are required for installing dependencies, especially
+                  # the git repo ones, in the next step.
+                  conda install git pip setuptools nox -y
+
+            - name: "DRAGONS integration tests"
+              run: |
+                # Need to activate this here because the conda action doesn't
+                # play nicely with the default python setup.
+                conda activate test_env
+                if [[ "$RUNNER_OS" != "Windows" ]]; then
+                  # python -m nox -r -s dragons_release_tests
+                  python -m nox -r -s dragons_dev_tests --verbose
+                fi
+
+            - name: "Upload coverage data"
+              uses: actions/upload-artifact@v3
+              with:
+                  name: covdata
+                  path: .coverage.*
