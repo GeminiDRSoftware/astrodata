@@ -25,4 +25,4 @@ jobs:
               run: poetry install --only=dev
 
             - name: Run pre-commit hooks
-              run: poetry run pre-commit run --all-files
+              run: SKIP=no-commit-to-branch poetry run pre-commit run --all-files
