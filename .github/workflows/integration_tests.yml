@@ -23,7 +23,7 @@ jobs:
             matrix:
                 os:
                     - ubuntu-latest
-                    - macos-latest
+                    # TODO(teald): - macos-latest | Issue #39
 
         steps:
             - name: "Check out the repo"
@@ -47,36 +47,9 @@ jobs:
                     echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
                   fi
 
-            # - name:  Configure conda
-            #   # This is a workaround for it being difficult to set up conda
-            #   # with the appropriate architecture using the conda actions.
-            #   if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
-            #   run: |
-            #       conda init
-
-            #       # Add the conda-forge channel
-            #       conda config --add channels conda-forge
-
-            #       # Configure conda to use x86_64 architecture for mac.
-            #       if [[ "$RUNNER_OS" == "Linux" ]]; then
-            #         CONDA_SUBDIR="linux-64" conda create -n "test_env" python=3.10 -y
-            #         conda activate test_env
-            #       elif [[ "$RUNNER_OS" == "macOS" ]]; then
-            #         # Set the conda subdirectory to osx-64
-            #         CONDA_SUBDIR=osx-64 conda create -n "test_env" python=3.10 -y
-            #         conda activate test_env
-            #         conda config --env --set subdir osx-64
-            #       else
-            #         echo "Unsupported OS: $RUNNER_OS"
-            #         exit 1
-            #       fi
-
-            #       # These are required for installing dependencies, especially
-            #       # the git repo ones, in the next step.
-            #       conda install git pip setuptools nox poetry -y
-
             - name: "Install nox, poetry in the base environment"
               run: |
+                  python -m pip install --upgrade pip
                   python -m pip install nox poetry
 
             - name: "DRAGONS release tests"
