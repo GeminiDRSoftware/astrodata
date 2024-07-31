@@ -42,6 +42,11 @@ class SessionVariables:
         "psutil",
     ]
 
+    dragons_venv_params = [
+        v for channel in dragons_conda_channels for v in ("-c", channel)
+    ]
+    dragons_venv_params += ["--override-channels"]
+
     # Poetry install options
     poetry_install_options: ClassVar[list[str]] = [
         "--with",
@@ -148,8 +153,14 @@ def apply_macos_config(session: nox.Session) -> None:
         session.env["CONDA_SUBDIR"] = "osx-64"
         session.run("conda", "config", "--env", "--set", "subdir", "osx-64")
 
+        print("Setting CONDA_SUBDIR to osx-64.")
 
-@nox.session(venv_backend="conda", python="3.10")
+
+@nox.session(
+    venv_backend="conda",
+    venv_params=SessionVariables.dragons_venv_params,
+    python="3.10",
+)
 def dragons_release_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
     apply_macos_config(session)
@@ -160,10 +171,6 @@ def dragons_release_tests(session: nox.Session) -> None:
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
         "dragons==3.2",
-        channel=SessionVariables.dragons_conda_channels,
-    )
-
-    session.conda_install(
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
     )
