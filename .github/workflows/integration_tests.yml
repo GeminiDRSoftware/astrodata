@@ -63,9 +63,9 @@ jobs:
                     conda activate test_env
                   elif [[ "$RUNNER_OS" == "macOS" ]]; then
                     # Set the conda subdirectory to osx-64
-                    CONDA_SUBDIR=osx-64 conda create -n "test_env" python=3.10 -y
+                    conda config --set subdir osx-64
+                    conda create -n "test_env" python=3.10 -y
                     conda activate test_env
-                    conda config --env --set subdir osx-64
                   else
                     echo "Unsupported OS: $RUNNER_OS"
                     exit 1
