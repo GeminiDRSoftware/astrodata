@@ -75,9 +75,9 @@ jobs:
             #       # the git repo ones, in the next step.
             #       conda install git pip setuptools nox poetry -y
 
-            - name: "Install nox in the base environment"
+            - name: "Install nox, poetry in the base environment"
               run: |
-                  python -m pip install nox
+                  python -m pip install nox poetry
 
             - name: "DRAGONS release tests"
               run: |
