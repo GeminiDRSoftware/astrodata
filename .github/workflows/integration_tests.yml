@@ -81,7 +81,7 @@ jobs:
                 # play nicely with the default python setup.
                 conda activate test_env
 
-                python -m nox -r -s dragons_release_tests -- -xvv
+                python -m nox -r -s dragons_release_tests --verbose -- -xvv
 
             - name: "DRAGONS dev tests"
               run: |
