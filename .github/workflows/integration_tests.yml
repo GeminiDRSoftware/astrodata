@@ -26,10 +26,16 @@ jobs:
                     - macos-latest
 
         steps:
-            - uses: conda-incubator/setup-miniconda@v3
-
             - name: "Check out the repo"
               uses: "actions/checkout@v4"
+
+            # Setup python
+            - name: "Setup Python"
+              uses: actions/setup-python@v5
+              with:
+                  python-version: "3.10"
+
+            - uses: conda-incubator/setup-miniconda@v3
 
             - name: "Get public IP address of runner"
               # Need to handle this for MacOS and linux
@@ -41,7 +47,7 @@ jobs:
                     echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
                   fi
 
-            - name:  Configure conda (linux/mac only)
+            - name:  Configure conda
               # This is a workaround for it being difficult to set up conda
               # with the appropriate architecture using the conda actions.
               if: startsWith(matrix.os, 'ubuntu') || startsWith(matrix.os, 'macos')
