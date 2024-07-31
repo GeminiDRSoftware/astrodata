@@ -34,6 +34,13 @@ class SessionVariables:
         dragons_channel,
     ]
     dragons_github_url = "https://github.com/GeminiDRSoftware/DRAGONS.git"
+    dragons_dev_packages = [
+        "astropy>=6",
+        "astroquery",
+        "matplotlib",
+        "numpy<2",
+        "psutil",
+    ]
 
     # Poetry install options
     poetry_install_options: ClassVar[list[str]] = [
@@ -114,7 +121,9 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
     return packages
 
 
-def install_test_dependencies(session: nox.Session) -> None:
+def install_test_dependencies(
+    session: nox.Session, packages: list[str] | None = None
+) -> None:
     """Install the test dependencies from the poetry.lock file."""
     # If using venv, upgrade pip first. If in a conda env, this is not needed
     # because of nuances with the installed versions.
@@ -124,7 +133,9 @@ def install_test_dependencies(session: nox.Session) -> None:
     # Report the pip version
     session.run("python", "-m", "pip", "--version")
 
-    packages = get_poetry_dependencies(session, "main,test")
+    # Get the dependencies from the poetry.lock file if no packages are provided.
+    if not packages:
+        packages = get_poetry_dependencies(session, "main,test")
 
     session.install(*packages)
 
@@ -176,6 +187,9 @@ def dragons_dev_tests(session: nox.Session) -> None:
 
     # Fetch test dependencies from the poetry.lock file.
     install_test_dependencies(session)
+    install_test_dependencies(
+        session, packages=SessionVariables.dragons_dev_packages
+    )
 
     # Need to install sectractor as a conda package. Everything else in this
     # install should be via pip, not conda.
