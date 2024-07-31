@@ -225,6 +225,11 @@ def dragons_dev_tests(session: nox.Session) -> None:
                 external=True,
             )
 
+            # Completely remove the dragons/astrodata directory. This is to
+            # ensure that the package is installed from the source code and
+            # catch any relative import issues.
+            session.run("rm", "-rf", "dragons/astrodata", external=True)
+
         else:
             print("DRAGONS repository already exists. Skipping clone.")
 
