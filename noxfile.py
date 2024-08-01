@@ -322,6 +322,8 @@ def docs(session: nox.Session) -> None:
     # Install the documentation dependencies.
     install_test_dependencies(session, poetry_groups=["main", "docs"])
 
+    session.install("-e", ".", "--no-deps")
+
     # Build the documentation.
     _ = session.run("sphinx-build", "docs", "_build")
 
