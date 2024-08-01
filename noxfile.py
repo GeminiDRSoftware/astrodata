@@ -175,6 +175,10 @@ def dragons_release_tests(session: nox.Session) -> None:
         channel=SessionVariables.dragons_conda_channels,
     )
 
+    # Need to downgrade numpy because of DRAGONS issue 464
+    # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
+    session.conda_install("numpy<2")
+
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
     # Positional arguments after -- are passed to pytest.
@@ -243,6 +247,10 @@ def dragons_dev_tests(session: nox.Session) -> None:
         with session.cd("dragons"):
             # Install the DRAGONS package
             session.install("-e", ".")
+
+    # Need to downgrade numpy because of DRAGONS issue 464
+    # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
+    session.conda_install("numpy<2")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
