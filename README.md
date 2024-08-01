@@ -10,7 +10,8 @@
 [docs build badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/documentation.yml/badge.svg
 [pypi packaging badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/publish_pypi.yml/badge.svg
 [pypi package version badge]: https://badge.fury.io/py/astrodata.svg
-[test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/testing.yml/badge.svg
+[unit test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/unit_tests.yml/badge.svg
+[integration test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/integration_tests.yml/badge.svg
 
 `astrodata`
 =============
@@ -32,7 +33,8 @@
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
-![Testing status badge][test status badge]
+![Unit test status badge][unit test status badge]
+![Integration test status badge][integration test status badge]
 
 ### Building & Publishing
 ![Documentation build status badge][docs build badge]
