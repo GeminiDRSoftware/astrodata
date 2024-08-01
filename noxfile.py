@@ -127,9 +127,34 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
 
 
 def install_test_dependencies(
-    session: nox.Session, packages: list[str] | None = None
+    session: nox.Session,
+    packages: list[str] | None = None,
+    poetry_groups: list[str] | None = None,
 ) -> None:
-    """Install the test dependencies from the poetry.lock file."""
+    """Install the test dependencies from the poetry.lock file.
+
+    Arguments
+    ---------
+    session : nox.sessions.Session
+        The nox session object.
+
+    packages : list, optional
+        A list of packages to install. If provided, this will be used instead
+        of the poetry.lock file.
+
+    poetry_groups : list, optional
+        A list of poetry groups to install. If provided, this will be used
+        instead of the default groups (main, test). Please note that the
+        main group is ignored if not provided in the list. For example,
+
+        .. code-block::python
+
+            poetry_groups = ["test"]
+
+        will install only the test dependencies, not |astrodata|.
+
+        Also, an empty list will still install the default groups (main, test).
+    """
     # If using venv, upgrade pip first. If in a conda env, this is not needed
     # because of nuances with the installed versions.
     if session.venv_backend == "venv":
@@ -140,7 +165,8 @@ def install_test_dependencies(
 
     # Get the dependencies from the poetry.lock file if no packages are provided.
     if not packages:
-        packages = get_poetry_dependencies(session, "main,test")
+        groups = ["main", "test"] if not poetry_groups else poetry_groups
+        packages = get_poetry_dependencies(session, ",".join(groups))
 
     session.install(*packages)
 
@@ -288,6 +314,16 @@ def coverage(session: nox.Session) -> None:
 
     # Generate the HTML report.
     _ = session.run("coverage", "html")
+
+
+@nox.session
+def docs(session: nox.Session) -> None:
+    """Build the documentation."""
+    # Install the documentation dependencies.
+    install_test_dependencies(session, poetry_groups=["main", "docs"])
+
+    # Build the documentation.
+    _ = session.run("sphinx-build", "docs", "_build")
 
 
 # `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
