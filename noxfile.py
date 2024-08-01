@@ -325,7 +325,7 @@ def docs(session: nox.Session) -> None:
     session.install("-e", ".", "--no-deps")
 
     # Build the documentation.
-    _ = session.run("sphinx-build", "docs", "_build")
+    _ = session.run("sphinx-build", "-n", "docs", "_build")
 
 
 # `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
