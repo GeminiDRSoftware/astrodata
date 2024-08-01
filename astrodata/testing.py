@@ -2,6 +2,7 @@
 """Fixtures to be used in tests in DRAGONS"""
 
 import enum
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import functools
 import io
 import itertools
@@ -10,6 +11,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import unittest
 import urllib
 import warnings
@@ -50,8 +52,8 @@ class DownloadState:
 
     The class is meant to be used as a singleton, so it should not be
     instantiated directly. Instead, the instance should be accessed via the
-    ``_self`` variable. Instantiation using ``_DownloadState()`` will do this
-    automatically.
+    ``_instance`` class attribute. Instantiation using ``DownloadState()`` will
+    do this automatically.
     """
 
     __slots__ = ["_state", "_valid_state", "test_result"]
@@ -387,6 +389,103 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
         )
 
 
+def download_multiple_files(
+    files,
+    path=None,
+    sub_path="",
+    use_threads=True,
+    sequential=False,
+    **kwargs,
+):
+    """Download multiple files from the archive and store them at a given path.
+
+    Parameters
+    ----------
+    files : list of str
+        List of filenames to download.
+
+    path : str or os.PathLike or None
+        Path to the cache directory. If None, the environment variable
+
+    sub_path : str
+        Sub-path to store the files. Default is "", which means the files are
+        stored at the root of the cache directory (path kwarg).
+
+    use_threads : bool
+        If True, use threads to download the files in parallel. If False, use
+        processes.
+
+    sequential : bool
+        If True, download the files sequentially. If False, download the files
+        in parallel. This overrides the use_threads argument.
+
+    kwargs : dict
+        Additional keyword arguments to pass to
+        :py:meth:`download_from_archive`.
+
+    Returns
+    -------
+    dict
+        Dictionary containing the downloaded files.
+    """
+    # Check if there are files to download
+    if not files:
+        return {}
+
+    # Ensure the directory exists and is a directory
+    if path is None:
+        if env_var := kwargs.get("env_var", None) is not None:
+            path = os.getenv(env_var)
+
+        else:
+            path = os.path.join(os.getcwd(), "_test_cache")
+            warnings.warn(
+                "Environment variable not set and no path provided, writing to "
+                f"{path}. To suppress this warning, set the "
+                "environment variable to the desired path for the "
+                "testing cache."
+            )
+
+            # This is cleaned up once the program finishes.
+            os.environ[env_var] = str(path)
+
+    if not os.path.isdir(path) and os.path.exists(path):
+        raise NotADirectoryError(f"{path} is not a directory")
+
+    os.makedirs(path, exist_ok=True)
+
+    # Download the files
+    downloaded_files = {}
+
+    if sequential:
+        downloaded_files = {
+            file: download_from_archive(
+                file, path=path, sub_path=sub_path, **kwargs
+            )
+            for file in files
+        }
+
+        return downloaded_files
+
+    executor_type = ThreadPoolExecutor if use_threads else ProcessPoolExecutor
+
+    with executor_type() as executor:
+        for file in files:
+            downloaded_files[file] = executor.submit(
+                download_from_archive,
+                file,
+                path=path,
+                sub_path=sub_path,
+                **kwargs,
+            )
+
+    downloaded_files = {
+        file: future.result() for file, future in downloaded_files.items()
+    }
+
+    return downloaded_files
+
+
 def download_from_archive(
     filename,
     path=None,
@@ -394,6 +493,7 @@ def download_from_archive(
     env_var="ASTRODATA_TEST",
     cache=True,
     fail_on_error=True,
+    suppress_stdout=False,
 ):
     """Download file from the archive and store it in the local cache.
 
@@ -420,18 +520,20 @@ def download_from_archive(
     fail_on_error : bool
         If True, raise an error if the download fails. If False, return None.
 
+    suppress_stdout : bool
+        If True, suppress the output of the download command.
+
     Returns
     -------
     str
         Name of the cached file with the path added to it.
     """
-    # Handle None sub_path
     if sub_path is None:
         sub_path = ""
         warnings.warn(
             "sub_path is None, so the file will be saved to the root of the "
             "cache directory. To suppress this warning, set sub_path to a "
-            "valid path (e.g., empty string)."
+            "valid path (e.g., empty string instead of None)."
         )
 
     # Check that the environment variable is a valid name.
@@ -476,7 +578,18 @@ def download_from_archive(
             # Use the cached file
             return local_path
 
-        tmp_path = download_file(url, cache=False)
+        # Use a context that suppresses the output of the download command
+        with open(os.devnull, "w") as devnull:
+            stdout_prev = sys.stdout
+
+            if suppress_stdout:
+                sys.stdout = devnull
+
+            try:
+                tmp_path = download_file(url, cache=False)
+
+            finally:
+                sys.stdout = stdout_prev
 
         shutil.move(tmp_path, local_path)
 
@@ -1166,3 +1279,32 @@ def process_string_to_python_script(string: str) -> str:
 
 def get_program_observations():
     raise NotImplementedError
+
+
+def expand_file_range(files: str) -> list[str]:
+    """Expand a range of files into a list of file names.
+
+    Parameters
+    ----------
+    files : str
+        A range of files, e.g., "N20170614S0201-205". This would produce:
+
+        ["N20170614S0201", "N20170614S0202", ..., "N20170614S0205"]
+
+    Returns
+    -------
+    list[str]
+        A list of file names.
+    """
+    if "-" in files:
+        file_prep, end = files.split("-")
+        file_prep, start = file_prep[: -len(end)], file_prep[-len(end) :]
+        start, end = int(start), int(end)
+        files = [
+            f"{file_prep}{str(i).zfill(len(str(end)))}"
+            for i in range(start, end + 1)
+        ]
+
+        return files
+
+    return [files]

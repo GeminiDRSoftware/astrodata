@@ -45,6 +45,8 @@ pytest-cov = "^4.1.0"
 pytest-doctestplus = "^1.2.1"
 tox = "^4.14.1"
 hypothesis = "^6.99.13"
+nox = "^2024.4.15"
+watchdog = "^4.0.1"
 
 [build-system]
 requires = ["poetry-core"]
@@ -58,6 +60,7 @@ testpaths = [
 
 markers = [
     "dragons_remote_data: data used by DRAGONS tests",
+    "dragons: tests that require a DRAGONS environment",
 ]
 
 doctest_plus = "enabled"
@@ -103,3 +106,13 @@ exclude_lines = [
   # Don't worry about breakpoints (from testing file)
   "breakpoint",
 ]
+
+
+# TODO: Expand ruff settings
+[tool.ruff.lint]
+ignore = [
+  "RET504",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
