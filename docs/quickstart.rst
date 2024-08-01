@@ -62,11 +62,11 @@ download files using :func:`~astrodata.testing.download_from_archive`:
 
     # Download the files. We'll be placing these in a directory called 'data'.
     for f in files:
-        download_from_archive(f, path='data', sub_path='')
+        download_from_archive(f, path='quickstart_data', sub_path='')
 
 These files are from the |DRAGONS| GMOS tutorial, but we'll pretend we don't
 have that and want to work with them using |astrodata| alone. They will be
-stored in the ``./data/`` directory relative to your current working directory.
+stored in the ``./quickstart_data/`` directory relative to your current working directory.
 
 Opening Files
 =============
@@ -82,7 +82,7 @@ Let's just open one of the files without any other setup and see what happens:
 
     import astrodata
 
-    ad = astrodata.from_file('data/N20170614S0201.fits')
+    ad = astrodata.from_file('quickstart_data/N20170614S0201.fits')
 
     ad.info()
 
@@ -91,7 +91,7 @@ it will look something like this:
 
 .. code-block:: text
 
-    Filename: data/N20170614S0201.fits
+    Filename: quickstart_data/N20170614S0201.fits
     Tags:
 
     Pixels Extensions
@@ -213,7 +213,7 @@ all the files we downloaded:
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'data/{f}')
+        ad = astrodata.from_file(f'quickstart_data/{f}')
         print(f"Opened {ad.filename} with class {ad.__class__}")
 
 The result:
@@ -258,7 +258,7 @@ Let's see what the data looks like for one of the files:
 .. code-block:: python
 
     # Get the first science extension.
-    for ad in (astrodata.from_file(f'data/{f}') for f in files):
+    for ad in (astrodata.from_file(f'quickstart_data/{f}') for f in files):
         if isinstance(ad, GMOSScienceAstroData):
             break
 
@@ -279,7 +279,7 @@ Let's see what the data looks like for one of the files:
 This is fine, but what if we're interested in a particular quantity for our
 work? It's not much more useful than a FITS file at this point, other than the fancy
 class we've created. Let's add a method to our class that will fetch us the
-central wavelength in nanometers for the data.
+airmass for the data.
 
 First, we need to remove the ``GMOSScienceAstroData`` class we created from the
 factory to avoid conflicts with the new class we're planning:
@@ -289,7 +289,7 @@ factory to avoid conflicts with the new class we're planning:
     factory.remove_class(GMOSScienceAstroData)
 
 Now, let's add a method to a new class, ``GMOSSpectrumScienceAstroData`` class that will fetch the
-central wavelength for the data. We'll subclass ``GMOSScienceAstroData`` to
+airmass for the data. We'll subclass ``GMOSScienceAstroData`` to
 reuse what we've written above.
 
 .. code-block:: python
@@ -311,12 +311,12 @@ reuse what we've written above.
     # Register the new class with the factory.
     factory.add_class(GMOSScienceAstroData)
 
-Now, when we open a file, we can access the central wavelength like this:
+Now, when we open a file, we can access the airmass like this:
 
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'data/{f}')
+        ad = astrodata.from_file(f'quickstart_data/{f}')
         if isinstance(ad, GMOSScienceAstroData):
             print(f"Opened {ad.filename} with class {ad.__class__})")
             print(f"Airmass: {ad.airmass()}")
@@ -329,7 +329,7 @@ get all descriptors from a class using the ``.descriptors`` attribute.
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'data/{f}')
+        ad = astrodata.from_file(f'quickstart_data/{f}')
         print(f"{ad.filename} descriptors:")
         print(' + ' + ', '.join(ad.descriptors))
 
