@@ -325,7 +325,10 @@ def docs(session: nox.Session) -> None:
     session.install("-e", ".", "--no-deps")
 
     # Build the documentation.
-    _ = session.run("sphinx-build", "-n", "docs", "_build")
+    # TODO(teald): Add nitpicky flag to fix warnings. -- Issue #42
+    target = Path("_build")
+    _ = session.run("rm", "-rf", target, external=True)
+    _ = session.run("sphinx-build", "docs", target)
 
 
 # `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
