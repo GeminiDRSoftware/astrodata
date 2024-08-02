@@ -194,3 +194,7 @@ test.fits
 
 # Meta yaml file
 astrodata/meta.yaml
+
+# The quickstart_data folder, which is sometime generated when testing the
+# quickstart manually (and contains large files).
+quickstart_data/
