@@ -45,12 +45,12 @@ From here, these tag sets can be used to understand what the data is describing
 and how best to process it. It can also contain information about the state of
 processing (e.g., ``RAW`` vs ``PROCESSED``), or any important flags.
 
-.. _ad_tags: :ref:`../progmanual/tags.rst`
-
 These tags are meant to work well with FITS data, using the headers to
 determine what the data is.  However, they can be used with any data type that
 can be described by a set of tags, as long as they are properly defined by the
-developer (see ad_tags_ for more information about developing with |Tag|).
+developer (see
+:doc:`the Tags section of the programmer's guide <../progmanual/tags>`
+for more information about developing with |Tag|).
 
 ..
     The Astrodata Tags identify the data represented in the |AstroData| object.
@@ -182,8 +182,10 @@ Creating New Astrodata Tags [Advanced Topic]
 ============================================
 
 The |ProgManual| describes how to create new |AstroData| classes for new
-instruments (specifically, see ad_tags_). This section describes the very basic
-steps for a new user to create self-defined tags.
+instruments (specifically, see
+:doc:`the Tags section of the programmer's guide<../progmanual/tags>`
+). This section describes the very basic steps for a new user to create
+self-defined tags.
 
 .. todo:: add example file.
 
