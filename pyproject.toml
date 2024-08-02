@@ -48,6 +48,11 @@ hypothesis = "^6.99.13"
 nox = "^2024.4.15"
 watchdog = "^4.0.1"
 
+
+[tool.poetry.group.build_test.dependencies]
+devpi-web = "^4.2.2"
+devpi-client = "^7.1.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
