@@ -5,9 +5,15 @@ TODO:
 - [x] Add nox session for running unit tests.
     - [x] Get the dependencies from the poetry.lock file.
 - [ ] Test the astrodata pip installations using devpi.
+    - [x] Get a devpi server running.
+    - [x] Configure it to accept uploads.
+    - [x] Run sessions using the server as the installation source to mimic a
+          release.
 - [ ] Test release builds.
 """
 
+import functools
+import subprocess
 import sys
 from pathlib import Path
 from typing import ClassVar
@@ -70,6 +76,40 @@ class SessionVariables:
         "3.11",
         "3.12",
     ]
+
+    # devpi server information
+    devpi_host = "localhost"
+    devpi_initial_port = 1420
+
+    @classmethod
+    @functools.cache
+    def devpi_port(self) -> int:
+        """Return the devpi port."""
+        # Find a free port
+        start_port = self.devpi_initial_port
+
+        # Just in case there's a bug/issue, only try a specific number of times.
+        attempts = 1000
+
+        from contextlib import closing
+        import socket
+
+        # Use python to test if the port is available.
+        with closing(
+            socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ) as sock:
+            for _ in range(attempts):
+                if sock.connect_ex(("localhost", start_port)) != 0:
+                    break
+
+                start_port += 1
+
+        return start_port
+
+    @classmethod
+    def devpi_url(cls) -> str:
+        """Return the devpi URL."""
+        return f"http://{cls.devpi_host}:{cls.devpi_port()}/"
 
     @staticmethod
     def noxfile_dir() -> Path:
@@ -329,6 +369,132 @@ def docs(session: nox.Session) -> None:
     target = Path("_build")
     _ = session.run("rm", "-rf", target, external=True)
     _ = session.run("sphinx-build", "docs", target)
+
+
+def use_devpi_server(func):
+    @functools.wraps(func)
+    def wrapper(session, *args, **kwargs):
+        # Create a temporary directory for the devpi server
+        install_test_dependencies(session, poetry_groups=["build_test"])
+
+        temp_dir = (Path(session.create_tmp()) / "devpi").absolute()
+        temp_dir.mkdir()
+
+        port = SessionVariables.devpi_port()
+
+        try:
+            # Start the devpi server
+            session.log("Starting devpi server...")
+
+            with session.cd(temp_dir):
+                session.run("devpi-init", "--serverdir", ".")
+                session.run(
+                    "devpi-gen-config",
+                    "--serverdir",
+                    temp_dir,
+                    "--port",
+                    str(port),
+                )
+
+            server_process = subprocess.Popen(
+                ["devpi-server", "--serverdir", temp_dir, "--port", str(port)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            # Wait for the server to start
+            session.log("Waiting for devpi server to start...")
+
+            import time
+
+            timeout = 25
+            started = False
+
+            for check in range(1, timeout + 1):
+                session.log(f"Checking for devpi server... {check}/{timeout}")
+
+                try:
+                    _ = session.run(
+                        "curl",
+                        SessionVariables.devpi_url(),
+                        silent=True,
+                        external=True,
+                    )
+                    started = True
+                    break
+
+                except nox.command.CommandFailed:
+                    time.sleep(1)
+
+            # If the process has failed, show the output and stderr
+            if server_process.poll() is not None or not started:
+                stdout, stderr = server_process.communicate()
+                print(f"stdout: {stdout}")
+                print(f"stderr: {stderr}")
+                raise RuntimeError("Devpi server failed to start.")
+
+            print(f"Server process: {server_process.pid}")
+
+            # Configure the devpi client
+            session.run("devpi", "use", f"http://localhost:{port}")
+            session.run("devpi", "user", "-c", "testuser", "password=123")
+            session.run("devpi", "login", "testuser", "--password=123", "-vvv")
+            session.run(
+                "devpi", "index", "-c", "dev", "bases=root/pypi", "-vvv"
+            )
+            session.run("devpi", "use", "-l")
+            session.run("devpi", "use", "testuser/dev")
+
+            # Set the pip index URL
+            session.env["PIP_INDEX_URL"] = (
+                f"http://localhost:{port}/testuser/dev/+simple/"
+            )
+
+            return func(session, *args, **kwargs)
+
+        finally:
+            # Stop the devpi server
+            session.log("Stopping devpi server...")
+            server_process.terminate()
+            server_process.wait()
+
+    return wrapper
+
+
+@nox.session(python=SessionVariables.python_versions)
+@use_devpi_server
+def build_tests(session: nox.Session) -> None:
+    """Builds the library, 'uploads' it to a devpi server, then installs and
+    tests it in an isolated environment.
+    """
+    # Build the package and upload it to the devpi server
+    tmp_build_dir = Path(session.create_tmp()) / "build"
+    tmp_build_dir.mkdir()
+
+    _ = session.run(
+        "poetry",
+        "build",
+        f"--output={tmp_build_dir}",
+        external=True,
+    )
+
+    # Shows available indexes
+    poetry_config_env_vars = {
+        "POETRY_REPOSITORIES_BUILD_TEST_URL": session.env["PIP_INDEX_URL"],
+        "POETRY_REPOSITORIES_BUILD_TEST_USERNAME": "testuser",
+        "POETRY_REPOSITORIES_BUILD_TEST_PASSWORD": "123",
+    }
+
+    _result = session.run(
+        "poetry",
+        "publish",
+        "--repository",
+        "build_test",
+        f"--dist-dir={tmp_build_dir.absolute()}",
+        "--no-cache",
+        external=True,
+        env=poetry_config_env_vars,
+    )
 
 
 # `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
