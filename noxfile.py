@@ -1,16 +1,6 @@
-"""File for running nox sessions.
+"""File for running nox sessions."""
 
-TODO:
-- [x] Add nox session for dragons environment creation.
-- [x] Add nox session for running unit tests.
-    - [x] Get the dependencies from the poetry.lock file.
-- [ ] Test the astrodata pip installations using devpi.
-    - [x] Get a devpi server running.
-    - [x] Configure it to accept uploads.
-    - [x] Run sessions using the server as the installation source to mimic a
-          release.
-- [ ] Test release builds.
-"""
+from __future__ import annotations
 
 import functools
 import subprocess
@@ -381,7 +371,7 @@ def install_test_dependencies(
 
     # Get the dependencies from the poetry.lock file if no packages are provided.
     if not packages:
-        groups = ["main", "test"] if not poetry_groups else poetry_groups
+        groups = poetry_groups if poetry_groups else ["main", "test"]
         packages = get_poetry_dependencies(session, ",".join(groups))
 
     session.install(*packages)
@@ -522,7 +512,8 @@ def unit_tests(session: nox.Session) -> None:
 def unit_test_build(session: nox.Session) -> None:
     """Run the unit tests using the build version of the package.
 
-    This is meant to be called from the `build_tests` session."""
+    This is meant to be called from the `build_tests` session.
+    """
     # Install the package from the devpi server
     install_test_dependencies(session, poetry_groups=["test"])
 
@@ -543,8 +534,34 @@ def unit_test_build(session: nox.Session) -> None:
 def integration_test_build(session: nox.Session) -> None:
     """Run the integration tests using the build version of the package.
 
-    This is meant to be called from the `build_tests` session."""
-    session.warn("This test has not been implemented yet! Auto-passing.")
+    This is meant to be called from the `build_tests` session.
+    """
+    apply_macos_config(session)
+
+    # Fetch test dependencies from the poetry.lock file.
+    install_test_dependencies(session)
+
+    # Install the DRAGONS package, and ds9 for completeness.
+    session.conda_install(
+        "dragons==3.2",
+        "ds9",
+        channel=SessionVariables.dragons_conda_channels,
+    )
+
+    # Need to downgrade numpy because of DRAGONS issue 464
+    # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
+    session.conda_install("numpy<2")
+
+    session.install("astrodata")
+
+    # Positional arguments after -- are passed to pytest.
+    pos_args = session.posargs
+
+    _ = session.run(
+        "pytest",
+        *SessionVariables.dragons_pytest_options,
+        *pos_args,
+    )
 
 
 @nox.session
@@ -585,12 +602,10 @@ def use_devpi_server(func):
     return wrapper
 
 
-@nox.session(python=SessionVariables.python_versions)
-@nox.parametrize("test_type", ["unit", "integration"])
-@use_devpi_server
-def build_tests(session: nox.Session, test_type: str) -> None:
-    """Builds the library, 'uploads' it to a devpi server, then installs and
-    tests it in an isolated environment.
+def build_and_publish_to_devpi(session: nox.Session):
+    """Build the astrodata package and publish it.
+
+    If the devpi server is not running, this will raise an error.
     """
     # Build the package and upload it to the devpi server
     tmp_build_dir = Path(session.create_tmp()) / "build"
@@ -617,25 +632,53 @@ def build_tests(session: nox.Session, test_type: str) -> None:
         "build_test",
         f"--dist-dir={tmp_build_dir.absolute()}",
         "--no-cache",
-        "--verbose",
         external=True,
         env=poetry_config_env_vars,
     )
 
-    if test_type == "unit":
-        # Run the unit tests using the build version of the package
-        unit_test_build(session)
 
-    elif test_type == "integration":
-        # Run the integration tests using the build version of the package
+@nox.session(venv_backend="conda", python="3.10", tags=["build_tests"])
+@use_devpi_server
+def build_tests_integration(session):
+    """Build tests using the devpi server.
+
+    This session will build the package, upload it to an isolated devpi server,
+    and run the tests using the build version of the package.
+    """
+    build_and_publish_to_devpi(session)
+
+    working_dir = Path(session.create_tmp())
+
+    with session.chdir(working_dir):
         integration_test_build(session)
 
-    else:
-        raise ValueError(f"Invalid test type ({test_type = }).")
+
+@nox.session(python=SessionVariables.python_versions, tags=["build_tests"])
+@use_devpi_server
+def build_tests_unit(session: nox.Session) -> None:
+    """Build tests using the devpi server.
+
+    This session will build the package, upload it to an isolated devpi server,
+    and run the tests using the build version of the package.
+    """
+    build_and_publish_to_devpi(session)
+
+    working_dir = Path(session.create_tmp())
+
+    with session.chdir(working_dir):
+        unit_test_build(session)
 
 
-# `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
-#
+@nox.session
+def linting(session: nox.Session) -> None:
+    """Run the linters."""
+    # Install the test dependencies.
+    install_test_dependencies(session, poetry_groups=["main", "dev"])
+
+    # Run the linters.
+    session.run("ruff", "lint", ".")
+
+
 # Important note --- these tests should be run as a part of the routine tests
 # above. They are separated here for ease of diagnosis for common problems.
 @nox.session(venv_backend="conda", python="3.10")
