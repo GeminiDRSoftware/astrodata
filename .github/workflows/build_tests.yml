@@ -1,0 +1,66 @@
+name: "Build Testing"
+
+on:
+    push:
+        branches:
+        - main
+    pull_request:
+    schedule:
+        - cron: "20 1 * * mon"
+    workflow_dispatch:
+
+defaults:
+    run:
+        shell: bash -l {0} # Login shell for conda
+
+jobs:
+    tests:
+        name: "Testing on ${{ matrix.os }}"
+        runs-on: "${{ matrix.os }}"
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                    - ubuntu-latest
+                    # TODO(teald): - macos-latest | Issue #39
+
+        steps:
+            - name: "Check out the repo"
+              uses: "actions/checkout@v4"
+
+            # Setup python
+            - name: "Setup Python"
+              uses: actions/setup-python@v5
+              with:
+                  python-version: |
+                    3.10
+                    3.11
+                    3.12
+
+            - uses: conda-incubator/setup-miniconda@v3
+
+            - name: "Get public IP address of runner"
+              # Need to handle this for MacOS and linux
+              # Fetch from ipinfo.io/ip and echo it
+              run: |
+                  if [[ "$RUNNER_OS" == "macOS" ]]; then
+                    echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
+                  else
+                    echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
+                  fi
+
+            - name: "Install nox, poetry in the base environment"
+              run: |
+                  python -m pip install --upgrade pip
+                  python -m pip install nox poetry
+
+            - name: "Build testing"
+              run: |
+                python -m nox -r -t build_tests --verbose -x -- -xvv
+
+            - name: "Upload coverage data"
+              uses: actions/upload-artifact@v3
+              with:
+                  name: covdata
+                  path: .coverage.*
