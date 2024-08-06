@@ -637,22 +637,6 @@ def build_and_publish_to_devpi(session: nox.Session):
     )
 
 
-@nox.session(venv_backend="conda", python="3.10", tags=["build_tests"])
-@use_devpi_server
-def build_tests_integration(session):
-    """Build tests using the devpi server.
-
-    This session will build the package, upload it to an isolated devpi server,
-    and run the tests using the build version of the package.
-    """
-    build_and_publish_to_devpi(session)
-
-    working_dir = Path(session.create_tmp())
-
-    with session.chdir(working_dir):
-        integration_test_build(session)
-
-
 @nox.session(python=SessionVariables.python_versions, tags=["build_tests"])
 @use_devpi_server
 def build_tests_unit(session: nox.Session) -> None:
@@ -667,6 +651,22 @@ def build_tests_unit(session: nox.Session) -> None:
 
     with session.chdir(working_dir):
         unit_test_build(session)
+
+
+@nox.session(venv_backend="conda", python="3.10", tags=["build_tests"])
+@use_devpi_server
+def build_tests_integration(session):
+    """Build tests using the devpi server.
+
+    This session will build the package, upload it to an isolated devpi server,
+    and run the tests using the build version of the package.
+    """
+    build_and_publish_to_devpi(session)
+
+    working_dir = Path(session.create_tmp())
+
+    with session.chdir(working_dir):
+        integration_test_build(session)
 
 
 @nox.session
