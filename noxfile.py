@@ -15,6 +15,7 @@ TODO:
 import functools
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import ClassVar
 
@@ -125,6 +126,181 @@ class SessionVariables:
         """Just catches accidental invocations."""
         message = "This class should not be instantiated."
         raise NotImplementedError(message)
+
+
+class DevpiServerManager:
+    """Context manager that will start and stop a devpi server."""
+
+    index_url: str | None
+    server_process: subprocess.Popen | None
+    session: nox.Session
+    tmp_dir: Path | None
+
+    active_servers: ClassVar[dict[int, "DevpiServerManager"]] = {}
+
+    # Host/port info
+    host: ClassVar[str] = SessionVariables.devpi_host
+    port: ClassVar[int] = SessionVariables.devpi_port()
+    url: ClassVar[str] = SessionVariables.devpi_url()
+
+    def __init__(
+        self, session: nox.Session, tmp_dir: Path | None = None
+    ) -> None:
+        """Initialize the context manager."""
+        self.session = session
+        self.tmp_dir = tmp_dir
+
+        # Initialize other attributes.
+        self.index_url = None
+        self.server_process = None
+
+        # Initialization methods
+        self.configure_devpi_tmp_dir()
+
+        # Register the server
+        self.active_servers[self.port] = self
+
+    def __enter__(self):
+        """Start the devpi server."""
+        session = self.session
+
+        install_test_dependencies(session, poetry_groups=["build_test"])
+
+        self.generate_config_file()
+        self.start_devpi_server()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Stop the devpi server."""
+        self.stop_devpi_server()
+
+    def configure_devpi_tmp_dir(self):
+        """Configure the temporary directory for the devpi server."""
+        session = self.session
+        tmp_dir = self.tmp_dir
+
+        if tmp_dir is None:
+            temp_dir = (Path(session.create_tmp()) / "devpi").absolute()
+
+        temp_dir.mkdir()
+
+        self.tmp_dir = temp_dir
+
+    def generate_config_file(self):
+        """Generate the devpi configuration file."""
+        session = self.session
+        tmp_dir = self.tmp_dir
+        port = self.port
+
+        with session.cd(tmp_dir):
+            session.run("devpi-init", "--serverdir", ".")
+            session.run(
+                "devpi-gen-config",
+                "--serverdir",
+                tmp_dir,
+                "--port",
+                str(port),
+            )
+
+    def wait_for_devpi_startup(self, session: nox.Session) -> bool:
+        """Wait for the devpi server to start. This assumes that the server
+        has been started, there is no check for the server process itself.
+
+        It performs a curl request to the devpi server to check if it is
+        running, and it will pass for any kind of response.
+        """
+        timeout = 25
+        started = False
+
+        for check in range(1, timeout + 1):
+            session.log(f"Checking for devpi server... {check}/{timeout}")
+
+            try:
+                _ = session.run(
+                    "curl",
+                    SessionVariables.devpi_url(),
+                    silent=True,
+                    external=True,
+                )
+                started = True
+                break
+
+            except nox.command.CommandFailed:
+                time.sleep(1)
+
+        # If the process has failed, show the output and stderr
+        print(f"Server process: {self.server_process.pid}")
+
+        return started
+
+    def check_devpi_server_process(self):
+        """Check that the devpi server process is running without issue."""
+        server_process = self.server_process
+        session = self.session
+        started = self.wait_for_devpi_startup(session)
+
+        if server_process.poll() is not None or not started:
+            stdout, stderr = server_process.communicate()
+            session.log(f"stdout: {stdout}")
+            session.log(f"stderr: {stderr}")
+            raise RuntimeError("Devpi server failed to start.")
+
+    def start_devpi_server(self):
+        """Start the devpi server."""
+        session = self.session
+        tmp_dir = self.tmp_dir
+        port = self.port
+
+        self.server_process = subprocess.Popen(
+            ["devpi-server", "--serverdir", tmp_dir, "--port", str(port)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        # Wait for the server to start
+        session.log("Waiting for devpi server to start...")
+
+        # If the process has failed, show the output and stderr
+        self.check_devpi_server_process()
+
+        print(f"Server process: {self.server_process.pid}")
+
+        self.configure_devpi_client()
+
+    def configure_devpi_client(self):
+        """Configure the devpi client."""
+        session = self.session
+        port = self.port
+
+        # Configure the devpi client
+        session.run("devpi", "use", f"http://localhost:{port}")
+        session.run("devpi", "user", "-c", "testuser", "password=123")
+        session.run("devpi", "login", "testuser", "--password=123")
+        session.run("devpi", "index", "-c", "dev", "bases=root/pypi")
+        session.run("devpi", "use", "-l")
+        session.run("devpi", "use", "testuser/dev")
+
+        # Set the pip index URL
+        session.env["PIP_INDEX_URL"] = (
+            f"http://localhost:{port}/testuser/dev/+simple/"
+        )
+
+        self.index_url = f"http://localhost:{port}/testuser/dev/+simple/"
+
+    def stop_devpi_server(self):
+        """Stop the devpi server."""
+        session = self.session
+        tmp_dir = self.tmp_dir
+
+        session.log("Stopping devpi server...")
+
+        if hasattr(self, "server_process") and self.server_process is not None:
+            self.server_process.terminate()
+            self.server_process.wait()
+
+        if tmp_dir is not None and tmp_dir.exists():
+            session.run("rm", "-rf", tmp_dir, external=True)
+
+        del self.active_servers[self.port]
 
 
 def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
@@ -343,6 +519,26 @@ def unit_tests(session: nox.Session) -> None:
     _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
+@nox.session(python=SessionVariables.python_versions)
+def unit_tests_build(session: nox.Session) -> None:
+    """Run the unit tests using the build version of the package."""
+    # Install the package from the devpi server
+    install_test_dependencies(session, poetry_groups=["test"])
+
+    # Install the package from the devpi server
+    session.install(
+        "astrodata",
+        "--index-url",
+        SessionVariables.devpi_url(),
+    )
+
+    # Positional arguments after -- are passed to pytest.
+    pos_args = session.posargs
+
+    # Run the tests. Need to pass arguments to pytest.
+    _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
+
+
 @nox.session
 def coverage(session: nox.Session) -> None:
     """Run the tests and generate a coverage report."""
@@ -375,88 +571,8 @@ def use_devpi_server(func):
     @functools.wraps(func)
     def wrapper(session, *args, **kwargs):
         # Create a temporary directory for the devpi server
-        install_test_dependencies(session, poetry_groups=["build_test"])
-
-        temp_dir = (Path(session.create_tmp()) / "devpi").absolute()
-        temp_dir.mkdir()
-
-        port = SessionVariables.devpi_port()
-
-        try:
-            # Start the devpi server
-            session.log("Starting devpi server...")
-
-            with session.cd(temp_dir):
-                session.run("devpi-init", "--serverdir", ".")
-                session.run(
-                    "devpi-gen-config",
-                    "--serverdir",
-                    temp_dir,
-                    "--port",
-                    str(port),
-                )
-
-            server_process = subprocess.Popen(
-                ["devpi-server", "--serverdir", temp_dir, "--port", str(port)],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-
-            # Wait for the server to start
-            session.log("Waiting for devpi server to start...")
-
-            import time
-
-            timeout = 25
-            started = False
-
-            for check in range(1, timeout + 1):
-                session.log(f"Checking for devpi server... {check}/{timeout}")
-
-                try:
-                    _ = session.run(
-                        "curl",
-                        SessionVariables.devpi_url(),
-                        silent=True,
-                        external=True,
-                    )
-                    started = True
-                    break
-
-                except nox.command.CommandFailed:
-                    time.sleep(1)
-
-            # If the process has failed, show the output and stderr
-            if server_process.poll() is not None or not started:
-                stdout, stderr = server_process.communicate()
-                print(f"stdout: {stdout}")
-                print(f"stderr: {stderr}")
-                raise RuntimeError("Devpi server failed to start.")
-
-            print(f"Server process: {server_process.pid}")
-
-            # Configure the devpi client
-            session.run("devpi", "use", f"http://localhost:{port}")
-            session.run("devpi", "user", "-c", "testuser", "password=123")
-            session.run("devpi", "login", "testuser", "--password=123", "-vvv")
-            session.run(
-                "devpi", "index", "-c", "dev", "bases=root/pypi", "-vvv"
-            )
-            session.run("devpi", "use", "-l")
-            session.run("devpi", "use", "testuser/dev")
-
-            # Set the pip index URL
-            session.env["PIP_INDEX_URL"] = (
-                f"http://localhost:{port}/testuser/dev/+simple/"
-            )
-
-            return func(session, *args, **kwargs)
-
-        finally:
-            # Stop the devpi server
-            session.log("Stopping devpi server...")
-            server_process.terminate()
-            server_process.wait()
+        with DevpiServerManager(session):
+            func(session, *args, **kwargs)
 
     return wrapper
 
