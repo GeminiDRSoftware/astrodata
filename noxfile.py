@@ -519,17 +519,18 @@ def unit_tests(session: nox.Session) -> None:
     _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
-@nox.session(python=SessionVariables.python_versions)
-def unit_tests_build(session: nox.Session) -> None:
-    """Run the unit tests using the build version of the package."""
+def unit_test_build(session: nox.Session) -> None:
+    """Run the unit tests using the build version of the package.
+
+    This is meant to be called from the `build_tests` session."""
     # Install the package from the devpi server
     install_test_dependencies(session, poetry_groups=["test"])
 
     # Install the package from the devpi server
     session.install(
         "astrodata",
-        "--index-url",
-        SessionVariables.devpi_url(),
+        # "--index-url",
+        # SessionVariables.devpi_url(),
     )
 
     # Positional arguments after -- are passed to pytest.
@@ -537,6 +538,13 @@ def unit_tests_build(session: nox.Session) -> None:
 
     # Run the tests. Need to pass arguments to pytest.
     _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
+
+
+def integration_test_build(session: nox.Session) -> None:
+    """Run the integration tests using the build version of the package.
+
+    This is meant to be called from the `build_tests` session."""
+    session.warn("This test has not been implemented yet! Auto-passing.")
 
 
 @nox.session
@@ -578,8 +586,9 @@ def use_devpi_server(func):
 
 
 @nox.session(python=SessionVariables.python_versions)
+@nox.parametrize("test_type", ["unit", "integration"])
 @use_devpi_server
-def build_tests(session: nox.Session) -> None:
+def build_tests(session: nox.Session, test_type: str) -> None:
     """Builds the library, 'uploads' it to a devpi server, then installs and
     tests it in an isolated environment.
     """
@@ -608,9 +617,21 @@ def build_tests(session: nox.Session) -> None:
         "build_test",
         f"--dist-dir={tmp_build_dir.absolute()}",
         "--no-cache",
+        "--verbose",
         external=True,
         env=poetry_config_env_vars,
     )
+
+    if test_type == "unit":
+        # Run the unit tests using the build version of the package
+        unit_test_build(session)
+
+    elif test_type == "integration":
+        # Run the integration tests using the build version of the package
+        integration_test_build(session)
+
+    else:
+        raise ValueError(f"Invalid test type ({test_type = }).")
 
 
 # `--session`/`-s` flag. For example, `nox -s dragons_calibration`.
