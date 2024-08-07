@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from contextlib import closing
+from pathlib import Path
+from typing import ClassVar
 import functools
+import socket
 import subprocess
 import sys
 import time
-from pathlib import Path
-from typing import ClassVar
 
 import nox
 
@@ -81,9 +83,6 @@ class SessionVariables:
 
         # Just in case there's a bug/issue, only try a specific number of times.
         attempts = 1000
-
-        from contextlib import closing
-        import socket
 
         # Use python to test if the port is available.
         with closing(
@@ -192,11 +191,12 @@ class DevpiServerManager:
             )
 
     def wait_for_devpi_startup(self, session: nox.Session) -> bool:
-        """Wait for the devpi server to start. This assumes that the server
-        has been started, there is no check for the server process itself.
+        """Wait for the devpi server to start.
 
-        It performs a curl request to the devpi server to check if it is
-        running, and it will pass for any kind of response.
+        This assumes that the server has been started, there is no check for
+        the server process itself.  It performs a curl request to the devpi
+        server to check if it is running, and it will pass for any kind of
+        response.
         """
         timeout = 25
         started = False
@@ -218,7 +218,7 @@ class DevpiServerManager:
                 time.sleep(1)
 
         # If the process has failed, show the output and stderr
-        print(f"Server process: {self.server_process.pid}")
+        session.log(f"Server process: {self.server_process.pid}")
 
         return started
 
@@ -240,8 +240,15 @@ class DevpiServerManager:
         tmp_dir = self.tmp_dir
         port = self.port
 
+        # Check that the server is available.abs
+        result = session.run(
+            "which", "devpi-server", silent=True, external=True
+        )
+
+        devpi_server_path = result.strip()
+
         self.server_process = subprocess.Popen(
-            ["devpi-server", "--serverdir", tmp_dir, "--port", str(port)],
+            [devpi_server_path, "--serverdir", tmp_dir, "--port", str(port)],  # noqa: S603
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -252,7 +259,7 @@ class DevpiServerManager:
         # If the process has failed, show the output and stderr
         self.check_devpi_server_process()
 
-        print(f"Server process: {self.server_process.pid}")
+        session.log(f"Server process: {self.server_process.pid}")
 
         self.configure_devpi_client()
 
@@ -385,7 +392,7 @@ def apply_macos_config(session: nox.Session) -> None:
         session.env["CONDA_SUBDIR"] = "osx-64"
         session.run("conda", "config", "--env", "--set", "subdir", "osx-64")
 
-        print("Setting CONDA_SUBDIR to osx-64.")
+        session.log("Setting CONDA_SUBDIR to osx-64.")
 
 
 @nox.session(
@@ -474,7 +481,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
             session.run("rm", "-rf", "dragons/astrodata", external=True)
 
         else:
-            print("DRAGONS repository already exists. Skipping clone.")
+            session.log("DRAGONS repository already exists. Skipping clone.")
 
         with session.cd("dragons"):
             # Install the DRAGONS package
