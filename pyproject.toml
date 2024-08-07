@@ -126,24 +126,54 @@ exclude = [
 [tool.ruff.lint]
 select = ["ALL"]
 
-# Ruff ignored linging rules:
+# Ruff ignored linting rules:
+# These rules are ignored for the entire project. They should be
+# used sparingly and only when the rule is not applicable to the
+# project as a whole.
+#
+# For most of these rules, they should be removed from the ignore
+# list and the code should be refactored to remove the issue(s).
+#
+# Some have associated issues that can be found in the project's
+# issue tracker
+# (https://github.com/GeminiDRSoftware/astrodata/issues)
 #  + ANN: Annotations
+#  + B: Bugbear lint rules
+#  + C: Complexity
 #  + DTZ003: datetime issue
-#  + EM101: string literals in exceptions
+#  + EM: Error messages
 #  + FIX: FIXME statements
+#  + N811: Imported constant names
+#  + PERF: Performance
 #  + PTH: os.path issue
+#  + PLR: Refactors
+#  + PYI024: collections.namedtuple
 #  + RET504: Return statement with no value
 #  + RUF: Ruff specific rules
+#  + SLOT: __slots__ in derived classes
+#  + SIM: Simplicity
+#  + SLF001: Private member accessed
+#  + T201: print statements
 #  + TD: TODO statements
 #  + TRY003: string literals in exceptions
 ignore = [
   "ANN",
+  "B",
+  "C",
   "DTZ003", # TODO: datetime issue -- Issue #17
-  "EM101",
+  "EM",
   "FIX",  # TODO: Reinstate TODO statements -- Issue #44
-  "PTH",  # TODO: os.path issue -- issue #45
+  "N811",
+  "PERF",
+  "PLR",
+  "PTH",  # TODO: os.path issue -- Issue #45
+  "PYI024",
   "RET504",
   "RUF",
+  "SIM",
+  "SLOT",
+  "SLF001",
+  "T201",
   "TD",  # TODO: Reinstate TODO statements -- Issue #44
   "TRY003",
 ]
@@ -167,6 +197,7 @@ ignore = [
 
 "astrodata/testing.py" = [
   "S101",
+  "S603",
 ]
 
 
