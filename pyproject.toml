@@ -112,10 +112,52 @@ exclude_lines = [
 
 
 # TODO: Expand ruff settings
+[tool.ruff]
+line-length = 79
+exclude = [
+   ".*/",
+   "_build",
+   "build",
+    "dist",
+    "docs",
+    "tests",  # TODO: Need to lint the tests. -- Issue #46
+]
+
 [tool.ruff.lint]
+select = ["ALL"]
 ignore = [
+  "ANN",
   "RET504",
+  "RUF",
+  "TD",  # TODO: Reinstate TODO statements -- Issue #44
+  "FIX",  # TODO: Reinstate TODO statements -- Issue #44
+  "DTZ003", # TODO: datetime issue -- Issue #17
+  "PTH",  # TODO: os.path issue -- issue #45
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests should not be worried about:
+#  + ERA001: Commented out code
+#  + S101: Use of assert
+#  + D: Docstring content
+#  + PLR2004: Magic numbers (false positives at times)
+#  + SLF001: Private member accessed
+#  + N: Naming convention
+"tests/*" = [
+  "ERA001",
+  "S101",
+  "D",
+  "PLR2004",
+  "SLF001",
+  "N",
+]
+
+"astrodata/testing.py" = [
+  "S101",
 ]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.ruff.lint.flake8-pytest-style]
+mark-parentheses = false
