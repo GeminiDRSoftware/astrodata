@@ -341,6 +341,7 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
     """
     temp_dir = Path(session.create_tmp())
     req_file_path = temp_dir / "requirements.txt"
+    only = only if only else "main,test"
 
     command = [
         "poetry",
