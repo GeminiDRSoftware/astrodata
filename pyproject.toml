@@ -125,14 +125,27 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["ALL"]
+
+# Ruff ignored linging rules:
+#  + ANN: Annotations
+#  + DTZ003: datetime issue
+#  + EM101: string literals in exceptions
+#  + FIX: FIXME statements
+#  + PTH: os.path issue
+#  + RET504: Return statement with no value
+#  + RUF: Ruff specific rules
+#  + TD: TODO statements
+#  + TRY003: string literals in exceptions
 ignore = [
   "ANN",
+  "DTZ003", # TODO: datetime issue -- Issue #17
+  "EM101",
+  "FIX",  # TODO: Reinstate TODO statements -- Issue #44
+  "PTH",  # TODO: os.path issue -- issue #45
   "RET504",
   "RUF",
   "TD",  # TODO: Reinstate TODO statements -- Issue #44
-  "FIX",  # TODO: Reinstate TODO statements -- Issue #44
-  "DTZ003", # TODO: datetime issue -- Issue #17
-  "PTH",  # TODO: os.path issue -- issue #45
+  "TRY003",
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -155,6 +168,7 @@ ignore = [
 "astrodata/testing.py" = [
   "S101",
 ]
+
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
