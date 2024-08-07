@@ -346,7 +346,7 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
         "poetry",
         "export",
         f"--only={only}",
-        "--format=constraints.txt",
+        "--format=requirements.txt",
         "--without-hashes",
     ]
 
