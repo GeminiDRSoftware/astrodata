@@ -315,8 +315,8 @@ class DevpiServerManager:
         del self.active_servers[self.port]
 
 
-def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
-    """Get the dependencies from the poetry.lock file.
+def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
+    """Create and return path to a requirements file from poetry.
 
     This assumes poetry is installed in the session.
 
@@ -328,36 +328,48 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> None:
     only : str, list, optional
         If provided, only return the dependencies that match the provided
         string or strings.
+
+    Returns
+    -------
+    Path
+        The path to the requirements file.
+
+    Notes
+    -----
+    This command will not work if the warning about the Poetry export plugin is
+    not supressed. Due to an issue with the poetry export command,
     """
-    command = ["poetry", "show"]
+    temp_dir = Path(session.create_tmp())
+    req_file_path = temp_dir / "requirements.txt"
 
-    if only:
-        command.extend(["--only", only])
+    command = [
+        "poetry",
+        "export",
+        f"--only={only}",
+        "--format=constraints.txt",
+        "--without-hashes",
+    ]
 
-    out = session.run(
+    requirements_str = session.run(
         *command,
         external=True,
         silent=True,
     )
 
-    # Poetry uses (!) to indicate a package is not installed when terminal
-    # colors are not available to it (e.g., in a nox session). Need to remove
-    # these. They are inconsistent from line to line.
-    out = out.replace("(!)", "")
-
-    package_strs = out.splitlines()
-    package_columns = [line.split() for line in package_strs]
-    packages = [
-        "==".join([column[0], column[1]]) for column in package_columns
+    lines = [
+        line.split(";")[0].strip() for line in requirements_str.split("\n")
     ]
+    req_file_path.write_text("\n".join(lines))
 
-    return packages
+    return req_file_path
 
 
 def install_test_dependencies(
     session: nox.Session,
     packages: list[str] | None = None,
     poetry_groups: list[str] | None = None,
+    *,
+    conda_install: bool = False,
 ) -> None:
     """Install the test dependencies from the poetry.lock file.
 
@@ -382,22 +394,34 @@ def install_test_dependencies(
         will install only the test dependencies, not |astrodata|.
 
         Also, an empty list will still install the default groups (main, test).
+
+    conda_install : bool, optional, kw-only
+        If True, install the dependencies using conda. Otherwise
+        use pip. Default is False.
     """
     # If using venv, upgrade pip first. If in a conda env, this is not needed
     # because of nuances with the installed versions.
-    if session.venv_backend == "venv":
+    if session.venv_backend == "venv" and not conda_install:
         session.install("--upgrade", "pip")
 
-    # Report the pip version
-    session.run("python", "-m", "pip", "--version")
+        # Report the pip version
+        session.run("python", "-m", "pip", "--version")
 
     # Get the dependencies from the poetry.lock file if no packages are
     # provided.
     if not packages:
         groups = poetry_groups if poetry_groups else ["main", "test"]
-        packages = get_poetry_dependencies(session, ",".join(groups))
+        req_file_path = get_poetry_dependencies(session, ",".join(groups))
 
-    session.install(*packages)
+    else:
+        req_file_path = Path(session.create_tmp()) / "requirements.txt"
+        req_file_path.write_text("\n".join(packages))
+
+    if not conda_install:
+        session.install("-r", str(req_file_path))
+
+    else:
+        session.conda_install("--file", str(req_file_path))
 
 
 def apply_macos_config(session: nox.Session) -> None:
@@ -446,7 +470,7 @@ def dragons_release_tests(session: nox.Session) -> None:
     )
 
 
-@nox.session(venv_backend="conda", python="3.10")
+@nox.session(venv_backend="conda", python="3.10", tags=["dragons"])
 def dragons_dev_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
     apply_macos_config(session)
@@ -525,6 +549,28 @@ def unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
     install_test_dependencies(session)
     session.install(".")
+
+    # Positional arguments after -- are passed to pytest.
+    pos_args = session.posargs
+
+    # Run the tests. Need to pass arguments to pytest.
+    _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
+
+
+@nox.session(venv_backend="conda", python=SessionVariables.python_versions)
+def conda_unit_tests(session: nox.Session) -> None:
+    """Run the unit tests."""
+    # Configure session channels.
+    _ = session.run(
+        "conda",
+        "config",
+        "--env",
+        "--add",
+        "channels",
+        "conda-forge",
+    )
+    install_test_dependencies(session, conda_install=True)
+    session.conda_install(".")
 
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
