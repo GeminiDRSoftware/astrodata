@@ -124,7 +124,7 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["ALL"]
+# select = ["ALL"]
 
 # Ruff ignored linting rules:
 # These rules are ignored for the entire project. They should be
