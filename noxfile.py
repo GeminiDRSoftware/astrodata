@@ -345,10 +345,8 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
 
     command = [
         "poetry",
-        "export",
+        "show",
         f"--only={only}",
-        "--format=requirements.txt",
-        "--without-hashes",
     ]
 
     requirements_str = session.run(
@@ -357,9 +355,9 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
         silent=True,
     )
 
-    lines = [
-        line.split(";")[0].strip() for line in requirements_str.split("\n")
-    ]
+    requirements_str = requirements_str.replace("(!)", "   ").strip()
+
+    lines = [line.split()[0].strip() for line in requirements_str.split("\n")]
     req_file_path.write_text("\n".join(lines))
 
     return req_file_path
