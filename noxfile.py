@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from contextlib import closing
-from pathlib import Path
-from typing import ClassVar
 import functools
 import socket
 import subprocess
 import sys
 import time
+from contextlib import closing
+from pathlib import Path
+from typing import ClassVar
 
 import nox
 
@@ -76,18 +76,18 @@ class SessionVariables:
 
     @classmethod
     @functools.cache
-    def devpi_port(self) -> int:
+    def devpi_port(cls) -> int:
         """Return the devpi port."""
         # Find a free port
-        start_port = self.devpi_initial_port
+        start_port = cls.devpi_initial_port
 
-        # Just in case there's a bug/issue, only try a specific number of times.
+        # Just in case there's a bug/issue, only try a specific number of
+        # times.
         attempts = 1000
 
         # Use python to test if the port is available.
-        with closing(
-            socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ) as sock:
+        af_inet, sock_stream = socket.AF_INET, socket.SOCK_STREAM
+        with closing(socket.socket(af_inet, sock_stream)) as sock:
             for _ in range(attempts):
                 if sock.connect_ex(("localhost", start_port)) != 0:
                     break
@@ -117,6 +117,14 @@ class SessionVariables:
         raise NotImplementedError(message)
 
 
+class DevpiServerError(RuntimeError):
+    """Exception for devpi server errors."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        super().__init__(f"Problem with devpi server: {message}")
+
+
 class DevpiServerManager:
     """Context manager that will start and stop a devpi server."""
 
@@ -125,7 +133,7 @@ class DevpiServerManager:
     session: nox.Session
     tmp_dir: Path | None
 
-    active_servers: ClassVar[dict[int, "DevpiServerManager"]] = {}
+    active_servers: ClassVar[dict[int, DevpiServerManager]] = {}
 
     # Host/port info
     host: ClassVar[str] = SessionVariables.devpi_host
@@ -133,7 +141,9 @@ class DevpiServerManager:
     url: ClassVar[str] = SessionVariables.devpi_url()
 
     def __init__(
-        self, session: nox.Session, tmp_dir: Path | None = None
+        self,
+        session: nox.Session,
+        tmp_dir: Path | None = None,
     ) -> None:
         """Initialize the context manager."""
         self.session = session
@@ -232,7 +242,9 @@ class DevpiServerManager:
             stdout, stderr = server_process.communicate()
             session.log(f"stdout: {stdout}")
             session.log(f"stderr: {stderr}")
-            raise RuntimeError("Devpi server failed to start.")
+
+            message = "Devpi server failed to start."
+            raise DevpiServerError(message)
 
     def start_devpi_server(self):
         """Start the devpi server."""
@@ -242,7 +254,10 @@ class DevpiServerManager:
 
         # Check that the server is available.abs
         result = session.run(
-            "which", "devpi-server", silent=True, external=True
+            "which",
+            "devpi-server",
+            silent=True,
+            external=True,
         )
 
         devpi_server_path = result.strip()
@@ -376,7 +391,8 @@ def install_test_dependencies(
     # Report the pip version
     session.run("python", "-m", "pip", "--version")
 
-    # Get the dependencies from the poetry.lock file if no packages are provided.
+    # Get the dependencies from the poetry.lock file if no packages are
+    # provided.
     if not packages:
         groups = poetry_groups if poetry_groups else ["main", "test"]
         packages = get_poetry_dependencies(session, ",".join(groups))
@@ -438,7 +454,8 @@ def dragons_dev_tests(session: nox.Session) -> None:
     # Fetch test dependencies from the poetry.lock file.
     install_test_dependencies(session)
     install_test_dependencies(
-        session, packages=SessionVariables.dragons_dev_packages
+        session,
+        packages=SessionVariables.dragons_dev_packages,
     )
 
     # Need to install sectractor as a conda package. Everything else in this
@@ -527,8 +544,6 @@ def unit_test_build(session: nox.Session) -> None:
     # Install the package from the devpi server
     session.install(
         "astrodata",
-        # "--index-url",
-        # SessionVariables.devpi_url(),
     )
 
     # Positional arguments after -- are passed to pytest.
@@ -600,6 +615,12 @@ def docs(session: nox.Session) -> None:
 
 
 def use_devpi_server(func):
+    """Start and stop a devpi server for the session.
+
+    This is used as a function decorator, and must come after the
+    ``@nox.session`` decorator.
+    """
+
     @functools.wraps(func)
     def wrapper(session, *args, **kwargs):
         # Create a temporary directory for the devpi server
