@@ -27,5 +27,6 @@ jobs:
 
         steps:
             - uses: "actions/checkout@v4"
+            - uses: abatilo/actions-poetry@v2
             - uses: excitedleigh/setup-nox@v2.0.0
             - run: nox -t build_tests -x --verbose -- -xvv
