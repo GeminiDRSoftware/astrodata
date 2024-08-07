@@ -96,32 +96,37 @@ installing with
 Run the tests
 -------------
 
-.. _tox: https://tox.readthedocs.io/
+.. _nox: https://nox.thea.codes/en/stable/
 
-|astrodata| uses tox_ for running tests. To run the tests, simply run:
-
-.. code-block:: bash
-
-   tox
-
-If you would like to run a specific test, or using a specific version or
-python, you can view the available test environments by running:
+|astrodata| uses nox_ for running tests. To run the tests, simply run:
 
 .. code-block:: bash
 
-   tox -l
+   nox
 
-And then run the tests for a specific environment by running:
+This will run all linting checks and unit tests for any supported Python
+distributions it can find, reporting on the coverage at the end of the run.
+
+You can see the available sessions by running:
 
 .. code-block:: bash
 
-   tox -e <environment>
-   # e.g., tox -e py310 to run tests with Python 3.10.
+   nox -l
 
-.. warning::
-    This will be soon replaced by ``nox``, which has continuing support for
-    testing with ``conda`` environments. However, the setup/execution is
-    similarly simple.
+This will output information about available session to run. To select a
+specific session, use the ``-s`` flag. For example, to run the unit tests on a
+Python 3.10 build of |astrodata|:
+
+.. code-block:: bash
+
+   nox -s "build_tests-3.10(unit)""
+
+Or, to run the normal unit tests and not the linter:
+
+.. code-block:: bash
+
+   nox -s "unit"
+
 
 Other development commands
 --------------------------
