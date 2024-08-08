@@ -4,6 +4,27 @@ Developer Installation
 
 This guide will walk you through setting up a development environment for
 |astrodata|. If you are a user looking to install |astrodata| for personal use,
+either as a developer or as a user, and are just looking to install the package
+as a dependency, see the |Quickstart|.
+
+
+Developer Documentation Overview
+================================
+
+This page specifically helps with setting up a development environment and
+running the unit tests.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   testing
+
+Developer environment setup
+===========================
+
+This guide will walk you through setting up a development environment for
+|astrodata|. If you are a user looking to install |astrodata| for personal use,
 and are just looking to install the package as a dependency, see the
 |Quickstart|.
 
@@ -126,6 +147,13 @@ Or, to run the normal unit tests and not the linter:
 .. code-block:: bash
 
    nox -s "unit"
+
+All tests will be run in isolated environments based on specifications in the
+``noxfile.py`` file in the main project directory. Those environments, by
+default, are re-created each time you run the tests. To avoid that, you can
+pass the ``--reuse-existing-virtualenvs``/``-r`` flag to ``nox``, which will
+reuse any existing virtual environments it finds. If the environment isn't
+found, it will be made.
 
 
 Other development commands
