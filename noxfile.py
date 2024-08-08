@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import functools
+import os
 import socket
 import subprocess
 import sys
@@ -315,7 +316,9 @@ class DevpiServerManager:
         del self.active_servers[self.port]
 
 
-def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
+def get_poetry_dependencies(
+    session: nox.Session, only: str = "", *, all_deps: bool = False
+) -> Path:
     """Create and return path to a requirements file from poetry.
 
     This assumes poetry is installed in the session.
@@ -328,6 +331,10 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
     only : str, list, optional
         If provided, only return the dependencies that match the provided
         string or strings.
+
+    all : bool, optional, kw-only
+        If True, return all dependencies. Default is False. If True, the ``only``
+        argument is ignored.
 
     Returns
     -------
@@ -347,7 +354,11 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
         "poetry",
         "show",
         f"--only={only}",
+        "--top-level",
     ]
+
+    if all_deps:
+        command.pop(2)
 
     requirements_str = session.run(
         *command,
@@ -355,9 +366,16 @@ def get_poetry_dependencies(session: nox.Session, only: str = "") -> Path:
         silent=True,
     )
 
+    session.run("python", "--version", silent=True)
+
     requirements_str = requirements_str.replace("(!)", "   ").strip()
 
-    lines = [line.split()[0].strip() for line in requirements_str.split("\n")]
+    lines = [
+        line.split()[0].strip()
+        for line in requirements_str.split("\n")
+        if not line.startswith("Skipping virtualenv creation")
+    ]
+
     req_file_path.write_text("\n".join(lines))
 
     return req_file_path
@@ -750,6 +768,142 @@ def linting(session: nox.Session) -> None:
 
     # Run the linters.
     session.run("ruff", "lint", ".")
+
+
+@nox.session(venv_backend="none")
+def devshell(session: nox.Session) -> None:
+    """Create a venv for development."""
+    session.env["POETRY_PREFER_ACTIVE_PYTHON"] = "true"
+    session.env["POETRY_VIRTUALENVS_CREATE"] = "false"
+
+    venv_path = Path(".astrodata_venv/").absolute()
+    activate_path = venv_path / "bin" / "activate"
+
+    # Check that poetry is installed
+    try:
+        _ = session.run("poetry", "--version", silent=True)
+
+    except nox.command.CommandFailed as err:
+        message_lines = (
+            "Poetry is not installed. Please install poetry before running ",
+            "this session.",
+            "Installation instructions can be found at ",
+            "https://python-poetry.org/docs/#installation.",
+        )
+        message = "\n".join(message_lines)
+
+        raise RuntimeError(message) from err
+
+    # Remove any existing venv
+    if venv_path.exists():
+        session.run("rm", "-rf", str(venv_path))
+
+    # Create the venv
+    _ = session.run(
+        "python", "-m", "venv", str(venv_path), "--prompt", "astrodata_venv"
+    )
+
+    req_file_path = get_poetry_dependencies(session, all_deps=True)
+    venv_python_bin = venv_path / "bin" / "python"
+
+    _ = session.run(
+        str(venv_python_bin), "-m", "pip", "install", "--upgrade", "pip"
+    )
+
+    _ = session.run(
+        str(venv_python_bin),
+        "-m",
+        "pip",
+        "install",
+        "--requirement",
+        str(req_file_path),
+    )
+
+    session.log("Virtual environment created.")
+    session.log("Activate the environment with:")
+    session.log(f"  source {activate_path.relative_to(Path.cwd())}")
+    session.log("Deactivate the environment with: deactivate")
+
+
+@nox.session(venv_backend="none")
+def devconda(session: nox.Session) -> None:
+    """Create a new conda environment for development."""
+    conda_venv_name = "astrodata"
+
+    conda_envs_var = "CONDA_EXE"
+    try:
+        conda_loc = Path(os.getenv(conda_envs_var))
+
+    except TypeError as err:
+        message = (
+            f"Environment variable {conda_envs_var} is not set. "
+            f"Is conda installed?"
+        )
+        raise RuntimeError(message) from err
+
+    conda_envs_loc = conda_loc.parent.parent / "envs"
+
+    session.env["POETRY_PREFER_ACTIVE_PYTHON"] = "true"
+    session.env["POETRY_VIRTUALENVS_PATH"] = conda_envs_loc
+    session.env["POETRY_VIRTUALENVS_CREATE"] = "false"
+
+    # Check that conda is installed
+    try:
+        _ = session.run("conda", "--version", silent=True)
+
+    except nox.command.CommandFailed as err:
+        message_lines = (
+            "Conda is not installed. Please install conda before running ",
+            "this session.",
+            "Installation instructions can be found at ",
+            "https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html.",
+        )
+        message = "\n".join(message_lines)
+
+        raise RuntimeError(message) from err
+
+    # Create the requirements file
+    req_file_path = get_poetry_dependencies(session, all_deps=True)
+
+    # Remove any existing venv
+    _ = session.run(
+        "conda", "env", "remove", "--name", conda_venv_name, "--yes"
+    )
+
+    # Create the venv
+    vers_info = sys.version_info
+    python_version = f"{vers_info.major}.{vers_info.minor}.{vers_info.micro}"
+
+    _ = session.run(
+        "conda",
+        "create",
+        "--name",
+        conda_venv_name,
+        f"python={python_version}",
+        "--channel=conda-forge",
+        "--yes",
+    )
+
+    _ = session.run("conda", "update", "-n", conda_venv_name, "--all", "--yes")
+
+    conda_python = conda_envs_loc / conda_venv_name / "bin" / "python"
+    _ = session.run(
+        str(conda_python), "-m", "pip", "install", "--upgrade", "pip"
+    )
+
+    _ = session.run(
+        str(conda_python),
+        "-m",
+        "pip",
+        "install",
+        "--requirement",
+        str(req_file_path),
+    )
+
+    session.log("Conda environment created.")
+    session.log("Activate the environment with:")
+    session.log(f"  conda activate {conda_venv_name}")
+    session.log("Deactivate the environment with: conda deactivate")
 
 
 # Important note --- these tests should be run as a part of the routine tests
