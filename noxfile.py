@@ -216,7 +216,7 @@ class DevpiServerManager:
             session.log(f"Checking for devpi server... {check}/{timeout}")
 
             try:
-                _ = session.run(
+                session.run(
                     "curl",
                     SessionVariables.devpi_url(),
                     silent=True,
@@ -480,7 +480,7 @@ def dragons_release_tests(session: nox.Session) -> None:
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
 
-    _ = session.run(
+    session.run(
         "pytest",
         *SessionVariables.dragons_pytest_options,
         *pos_args,
@@ -554,7 +554,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
 
-    _ = session.run(
+    session.run(
         "pytest",
         *SessionVariables.dragons_pytest_options,
         *pos_args,
@@ -571,14 +571,14 @@ def unit_tests(session: nox.Session) -> None:
     pos_args = session.posargs
 
     # Run the tests. Need to pass arguments to pytest.
-    _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
+    session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
 @nox.session(venv_backend="conda", python=SessionVariables.python_versions)
 def conda_unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
     # Configure session channels.
-    _ = session.run(
+    session.run(
         "conda",
         "config",
         "--env",
@@ -593,7 +593,7 @@ def conda_unit_tests(session: nox.Session) -> None:
     pos_args = session.posargs
 
     # Run the tests. Need to pass arguments to pytest.
-    _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
+    session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
 def unit_test_build(session: nox.Session) -> None:
@@ -613,7 +613,7 @@ def unit_test_build(session: nox.Session) -> None:
     pos_args = session.posargs
 
     # Run the tests. Need to pass arguments to pytest.
-    _ = session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
+    session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
 def integration_test_build(session: nox.Session) -> None:
@@ -642,7 +642,7 @@ def integration_test_build(session: nox.Session) -> None:
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
 
-    _ = session.run(
+    session.run(
         "pytest",
         *SessionVariables.dragons_pytest_options,
         *pos_args,
@@ -656,10 +656,10 @@ def coverage(session: nox.Session) -> None:
     install_test_dependencies(session)
 
     # Generate the coverage report.
-    _ = session.run("coverage", "report", "--show-missing")
+    session.run("coverage", "report", "--show-missing")
 
     # Generate the HTML report.
-    _ = session.run("coverage", "html")
+    session.run("coverage", "html")
 
 
 @nox.session
@@ -673,8 +673,8 @@ def docs(session: nox.Session) -> None:
     # Build the documentation.
     # TODO(teald): Add nitpicky flag to fix warnings. -- Issue #42
     target = Path("_build")
-    _ = session.run("rm", "-rf", target, external=True)
-    _ = session.run("sphinx-build", "docs", target)
+    session.run("rm", "-rf", target, external=True)
+    session.run("sphinx-build", "docs", target)
 
 
 def use_devpi_server(func):
@@ -702,7 +702,7 @@ def build_and_publish_to_devpi(session: nox.Session):
     tmp_build_dir = Path(session.create_tmp()) / "build"
     tmp_build_dir.mkdir()
 
-    _ = session.run(
+    session.run(
         "poetry",
         "build",
         f"--output={tmp_build_dir}",
@@ -781,7 +781,7 @@ def devshell(session: nox.Session) -> None:
 
     # Check that poetry is installed
     try:
-        _ = session.run("poetry", "--version", silent=True)
+        session.run("poetry", "--version", silent=True)
 
     except nox.command.CommandFailed as err:
         message_lines = (
@@ -799,18 +799,18 @@ def devshell(session: nox.Session) -> None:
         session.run("rm", "-rf", str(venv_path))
 
     # Create the venv
-    _ = session.run(
+    session.run(
         "python", "-m", "venv", str(venv_path), "--prompt", "astrodata_venv"
     )
 
     req_file_path = get_poetry_dependencies(session, all_deps=True)
     venv_python_bin = venv_path / "bin" / "python"
 
-    _ = session.run(
+    session.run(
         str(venv_python_bin), "-m", "pip", "install", "--upgrade", "pip"
     )
 
-    _ = session.run(
+    session.run(
         str(venv_python_bin),
         "-m",
         "pip",
@@ -849,7 +849,7 @@ def devconda(session: nox.Session) -> None:
 
     # Check that conda is installed
     try:
-        _ = session.run("conda", "--version", silent=True)
+        session.run("conda", "--version", silent=True)
 
     except nox.command.CommandFailed as err:
         message_lines = (
@@ -866,15 +866,13 @@ def devconda(session: nox.Session) -> None:
     req_file_path = get_poetry_dependencies(session, all_deps=True)
 
     # Remove any existing venv
-    _ = session.run(
-        "conda", "env", "remove", "--name", conda_venv_name, "--yes"
-    )
+    session.run("conda", "env", "remove", "--name", conda_venv_name, "--yes")
 
     # Create the venv
     vers_info = sys.version_info
     python_version = f"{vers_info.major}.{vers_info.minor}.{vers_info.micro}"
 
-    _ = session.run(
+    session.run(
         "conda",
         "create",
         "--name",
@@ -884,14 +882,12 @@ def devconda(session: nox.Session) -> None:
         "--yes",
     )
 
-    _ = session.run("conda", "update", "-n", conda_venv_name, "--all", "--yes")
+    session.run("conda", "update", "-n", conda_venv_name, "--all", "--yes")
 
     conda_python = conda_envs_loc / conda_venv_name / "bin" / "python"
-    _ = session.run(
-        str(conda_python), "-m", "pip", "install", "--upgrade", "pip"
-    )
+    session.run(str(conda_python), "-m", "pip", "install", "--upgrade", "pip")
 
-    _ = session.run(
+    session.run(
         str(conda_python),
         "-m",
         "pip",
@@ -927,7 +923,7 @@ def dragons_calibration(
     pos_args = session.posargs
 
     # Run the tests. Need to pass arguments to pytest.
-    _ = session.run(
+    session.run(
         "pytest",
         "tests/integration/dragons/test_calibration_setup.py",
         *pos_args,
