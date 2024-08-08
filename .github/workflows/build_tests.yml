@@ -37,8 +37,8 @@ jobs:
                   conda install -c conda-forge pip
                   pip install --upgrade pip poetry
 
-            # - name: "Unit tests"
-            #   run: nox -s build_tests_unit -x --verbose -- -xvv
+            - name: "Unit tests"
+              run: nox -s build_tests_unit -x --verbose -- -xvv
 
             - name: "Integration tests"
               run: nox -s build_tests_integration -x --verbose -- -xvv
