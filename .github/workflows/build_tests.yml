@@ -27,6 +27,18 @@ jobs:
 
         steps:
             - uses: "actions/checkout@v4"
-            - uses: abatilo/actions-poetry@v2
             - uses: excitedleigh/setup-nox@v2.0.0
-            - run: nox -t build_tests -x --verbose -- -xvv
+            - uses: conda-incubator/setup-miniconda@v3
+              with:
+                python-version: "3.10"
+
+            - name: "Install and update pip"
+              run: |
+                  conda install -c conda-forge pip
+                  pip install --upgrade pip poetry
+
+            # - name: "Unit tests"
+            #   run: nox -s build_tests_unit -x --verbose -- -xvv
+
+            - name: "Integration tests"
+              run: nox -s build_tests_integration -x --verbose -- -xvv
