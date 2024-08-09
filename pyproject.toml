@@ -46,6 +46,7 @@ pytest-doctestplus = "^1.2.1"
 hypothesis = "^6.99.13"
 nox = "^2024.4.15"
 watchdog = "^4.0.1"
+rst-extract = {git = "https://github.com/teald/rst_extract/"}
 
 
 [tool.poetry.group.build_test.dependencies]
