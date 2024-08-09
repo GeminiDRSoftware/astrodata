@@ -1,4 +1,3 @@
-.. |nox| replace:: `nox <https://nox.thea.codes/en/stable/>`__
 .. |pytest| replace:: `pytest <https://docs.pytest.org/en/stable/>`__
 
 .. _nox: https://nox.thea.codes/en/stable/
@@ -179,8 +178,8 @@ The process for adding a script to be tested is as follows:
        "path/to/script.rst" = "--some-argument"
 
 #. Run ``nox -s scripts -- path/to/script.rst`` to test the script
-   individually. Once you're happy with the script, you can run ``nox -s
-   scripts`` to test all scripts.
+   individually. Once you're happy with the script, you can run
+   ``nox -s scripts`` to test all scripts.
 
 Build/Release Tests
 -------------------

@@ -1,7 +1,7 @@
 .. _creating-documentation:
 
-Creating Documentation with Sphinx
-==================================
+Creating Documentation
+======================
 
 To generate documentation for your project using Sphinx, you can use the ``nox``
 task runner and the ``docs`` session.

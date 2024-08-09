@@ -138,10 +138,7 @@ installing with
 Run the tests
 -------------
 
-.. _nox: https://nox.thea.codes/en/stable/
-.. |nox| replace:: ``nox``
-
-|astrodata| uses nox_ for running tests. To run the tests, simply run:
+|astrodata| uses |nox| for running tests. To run the tests, simply run:
 
 .. code-block:: bash
 
