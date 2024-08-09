@@ -824,6 +824,8 @@ def devshell(session: nox.Session) -> None:
     session.log(f"  source {activate_path.relative_to(Path.cwd())}")
     session.log("Deactivate the environment with: deactivate")
 
+    session.notify("initialize_pre_commit")
+
 
 @nox.session(venv_backend="none")
 def devconda(session: nox.Session) -> None:
@@ -900,6 +902,21 @@ def devconda(session: nox.Session) -> None:
     session.log("Activate the environment with:")
     session.log(f"  conda activate {conda_venv_name}")
     session.log("Deactivate the environment with: conda deactivate")
+
+    session.notify("initialize_pre_commit")
+
+
+@nox.session
+def initialize_pre_commit(session: nox.Session) -> None:
+    """Initialize pre-commit hooks."""
+    session.install("pre-commit")
+    session.run(
+        "pre-commit",
+        "install",
+        "--install-hooks",
+        "--hook-type=pre-commit",
+        "--hook-type=commit-msg",
+    )
 
 
 # Important note --- these tests should be run as a part of the routine tests
