@@ -1,0 +1,44 @@
+name: "Build Testing"
+
+on:
+    push:
+        branches:
+        - main
+    pull_request:
+    schedule:
+        - cron: "20 1 * * mon"
+    workflow_dispatch:
+
+defaults:
+    run:
+        shell: bash -l {0} # Login shell for conda
+
+jobs:
+    tests:
+        name: "Testing on ${{ matrix.os }}"
+        runs-on: "${{ matrix.os }}"
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                    - ubuntu-latest
+                    # TODO(teald): - macos-latest | Issue #39
+
+        steps:
+            - uses: "actions/checkout@v4"
+            - uses: excitedleigh/setup-nox@v2.0.0
+            - uses: conda-incubator/setup-miniconda@v3
+              with:
+                python-version: "3.10"
+
+            - name: "Install and update pip"
+              run: |
+                  conda install -c conda-forge pip
+                  pip install --upgrade pip poetry
+
+            - name: "Unit tests"
+              run: nox -s build_tests_unit -x --verbose -- -xvv
+
+            - name: "Integration tests"
+              run: nox -s build_tests_integration -x --verbose -- -xvv

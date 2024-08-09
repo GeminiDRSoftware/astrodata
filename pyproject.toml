@@ -17,12 +17,12 @@ numpy = "^1.26.4"
 [tool.poetry.group.dev]
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.3.3"
+ruff = "^0.5.6"
 coverage = "^7.4.4"
 isort = "^5.13.2"
-poetry = "^1.8.2"
 pre-commit = "^3.6.2"
 xenon = "^0.9.1"
+tomlkit = "^0.13.0"
 
 [tool.poetry.group.docs]
 
@@ -43,10 +43,13 @@ pytest = "^8.1.1"
 coverage = "^7.4.4"
 pytest-cov = "^4.1.0"
 pytest-doctestplus = "^1.2.1"
-tox = "^4.14.1"
 hypothesis = "^6.99.13"
 nox = "^2024.4.15"
 watchdog = "^4.0.1"
+
+
+[tool.poetry.group.build_test.dependencies]
+devpi = "^2.2.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -109,10 +112,97 @@ exclude_lines = [
 
 
 # TODO: Expand ruff settings
-[tool.ruff.lint]
-ignore = [
-  "RET504",
+[tool.ruff]
+line-length = 79
+exclude = [
+   ".*/",
+   "_build",
+   "build",
+    "dist",
+    "docs",
+    "tests",  # TODO: Need to lint the tests. -- Issue #46
 ]
+
+[tool.ruff.lint]
+# select = ["ALL"]
+
+# Ruff ignored linting rules:
+# These rules are ignored for the entire project. They should be
+# used sparingly and only when the rule is not applicable to the
+# project as a whole.
+#
+# For most of these rules, they should be removed from the ignore
+# list and the code should be refactored to remove the issue(s).
+#
+# Some have associated issues that can be found in the project's
+# issue tracker
+# (https://github.com/GeminiDRSoftware/astrodata/issues)
+#  + ANN: Annotations
+#  + B: Bugbear lint rules
+#  + C: Complexity
+#  + DTZ003: datetime issue
+#  + EM: Error messages
+#  + FIX: FIXME statements
+#  + N811: Imported constant names
+#  + PERF: Performance
+#  + PTH: os.path issue
+#  + PLR: Refactors
+#  + PYI024: collections.namedtuple
+#  + RET504: Return statement with no value
+#  + RUF: Ruff specific rules
+#  + SLOT: __slots__ in derived classes
+#  + SIM: Simplicity
+#  + SLF001: Private member accessed
+#  + T201: print statements
+#  + TD: TODO statements
+#  + TRY003: string literals in exceptions
+ignore = [
+  "ANN",
+  "B",
+  "C",
+  "DTZ003", # TODO: datetime issue -- Issue #17
+  "EM",
+  "FIX",  # TODO: Reinstate TODO statements -- Issue #44
+  "N811",
+  "PERF",
+  "PLR",
+  "PTH",  # TODO: os.path issue -- Issue #45
+  "PYI024",
+  "RET504",
+  "RUF",
+  "SIM",
+  "SLOT",
+  "SLF001",
+  "T201",
+  "TD",  # TODO: Reinstate TODO statements -- Issue #44
+  "TRY003",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests should not be worried about:
+#  + ERA001: Commented out code
+#  + S101: Use of assert
+#  + D: Docstring content
+#  + PLR2004: Magic numbers (false positives at times)
+#  + SLF001: Private member accessed
+#  + N: Naming convention
+"tests/*" = [
+  "ERA001",
+  "S101",
+  "D",
+  "PLR2004",
+  "SLF001",
+  "N",
+]
+
+"astrodata/testing.py" = [
+  "S101",
+  "S603",
+]
+
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.ruff.lint.flake8-pytest-style]
+mark-parentheses = false

@@ -4,6 +4,30 @@ Developer Installation
 
 This guide will walk you through setting up a development environment for
 |astrodata|. If you are a user looking to install |astrodata| for personal use,
+either as a developer or as a user, and are just looking to install the package
+as a dependency, see the |Quickstart|.
+
+
+Developer Documentation Overview
+================================
+
+This page specifically helps with setting up a development environment and
+running the unit tests.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   documentation
+   testing
+
+.. _dev_environment_setup:
+
+Developer environment setup
+===========================
+
+This guide will walk you through setting up a development environment for
+|astrodata|. If you are a user looking to install |astrodata| for personal use,
 and are just looking to install the package as a dependency, see the
 |Quickstart|.
 
@@ -57,26 +81,44 @@ Install the dependencies
    cd astrodata
 
 If you are not already inside a virtual environment of some flavor, such as a
-``conda`` or ``venv`` environment, create one now. For example, to create a new
-virtual environment with ``venv``:
+``conda`` or ``venv`` environment, you can have ``nox`` create one for you:
 
 .. code-block:: bash
 
-   python -m venv .venv
-   source .venv/bin/activate
+   nox -s devshell  # Creates a virtual environment
+   nox -s devconda  # Creates a conda environment
 
-To install the dependencies, navigate to the root of the repository and run:
+.. note::
+
+   We recommend using the ``devshell`` session, as ``venv`` environments are
+   more flexible and allow for more pythonic automation in the development
+   process. The ``devconda`` session is provided for users who prefer to use
+   conda environments, but it's not as flexible as the ``devshell`` session and
+   may require manual tweaking.
+
+.. warning::
+
+   Both of these sessions will create a new environment, either located at
+   ``.astrodata_venv`` or in the ``astrodata`` conda environment. It will
+   remove any environments found there (for consistency when resetting the
+   environment).
+
+Otherwise, to install the dependencies in the current environment--or one
+you've set up and activate yourself--navigate to the root of the repository and
+run:
 
 .. code-block:: bash
 
    poetry install
 
 
+.. _editable_pip: https://setuptools.pypa.io/en/latest/userguide/development_mode.html
+
 This will install all the dependencies needed to run |astrodata| within your
 virtual environment, including all test, development, and documentation
 dependencies. This installs |astrodata| in a way that's equivalent to
 installing with
-`pip in editable mode <https://setuptools.pypa.io/en/latest/userguide/development_mode.html>`.
+`pip in editable mode <editable_pip>`.
 
 .. note::
     You can install specific dependency groups by running ``poetry install
@@ -96,64 +138,48 @@ installing with
 Run the tests
 -------------
 
-.. _tox: https://tox.readthedocs.io/
+.. _nox: https://nox.thea.codes/en/stable/
+.. |nox| replace:: ``nox``
 
-|astrodata| uses tox_ for running tests. To run the tests, simply run:
-
-.. code-block:: bash
-
-   tox
-
-If you would like to run a specific test, or using a specific version or
-python, you can view the available test environments by running:
+|astrodata| uses nox_ for running tests. To run the tests, simply run:
 
 .. code-block:: bash
 
-   tox -l
+   nox
 
-And then run the tests for a specific environment by running:
+This will run all linting checks and unit tests for any supported Python
+distributions it can find, reporting on the coverage at the end of the run.
+
+You can see the available sessions by running:
 
 .. code-block:: bash
 
-   tox -e <environment>
-   # e.g., tox -e py310 to run tests with Python 3.10.
+   nox -l
 
-.. warning::
-    This will be soon replaced by ``nox``, which has continuing support for
-    testing with ``conda`` environments. However, the setup/execution is
-    similarly simple.
+This will output information about available session to run. To select a
+specific session, use the ``-s`` flag. For example, to run the unit tests on a
+Python 3.10 build of |astrodata|:
+
+.. code-block:: bash
+
+   nox -s "build_tests-3.10(unit)""
+
+Or, to run the normal unit tests and not the linter:
+
+.. code-block:: bash
+
+   nox -s "unit_tests"
+
+All tests will be run in isolated environments based on specifications in the
+``noxfile.py`` file in the main project directory. Those environments, by
+default, are re-created each time you run the tests. To avoid that, you can
+pass the ``--reuse-existing-virtualenvs``/``-r`` flag to |nox|, which will
+reuse any existing virtual environments it finds. If the environment isn't
+found, it will be made.
+
 
 Other development commands
 --------------------------
-
-
-Development with a Poetry environment
-=====================================
-
-|Poetry| also has a feature to create a shell with the dependencies installed.
-This is useful for development, as it allows you to run commands in the
-environment without activating it. To create a shell, run:
-
-.. code-block:: bash
-
-   poetry shell
-
-This will create a shell with the dependencies installed. You can then run
-commands in this shell as you would in a normal shell. To exit the shell, run:
-
-.. code-block:: bash
-
-   exit
-
-This takes similar steps to the above, but make Poetry handle the environment
-for you. While this is convenient, it can be confusing if you're not familiar
-with virtual environments and the shell command itself is somewhat limited in
-what it can do. It will work quickly, though, and can be useful for quick
-development tasks requiring a fresh environment.
-
-Refer to the `Poetry documentation
-<https://python-poetry.org/docs/cli/#shell>`__ for more information on the
-``shell`` command.
 
 Development without a Virtual Environment
 =========================================
@@ -164,12 +190,7 @@ the tests without activating the environment, you can run:
 
 .. code-block:: bash
 
-   poetry run tox
-
-This will run the tests in an environment created by poetry without activating
-the environment within your shell. This is especially useful for our CI/CD
-tasks, and can be useful for running in an environment that is not your
-development environment.
+   poetry run nox
 
 Copy/Paste to create and enter a developer environment
 ------------------------------------------------------
@@ -182,9 +203,8 @@ enter a developer shell.
    # Start in the directory you'd like to keep astrodata in.
    git clone git@github.com:GeminiDRSoftware/astrodata.git
    cd astrodata
-   python -m venv .venv
-   source .venv/bin/activate
-   poetry install
+   nox -s devshell
+   source .astrodata_venv/bin/activate
 
 ..
    If there is anything else needed for this document, please
