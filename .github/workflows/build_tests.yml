@@ -14,7 +14,7 @@ defaults:
         shell: bash -l {0} # Login shell for conda
 
 jobs:
-    tests:
+    unit_tests:
         name: "Testing on ${{ matrix.os }}"
         runs-on: "${{ matrix.os }}"
 
@@ -25,12 +25,17 @@ jobs:
                     - ubuntu-latest
                     # TODO(teald): - macos-latest | Issue #39
 
+                python-version:
+                    - "3.10"
+                    - "3.11"
+                    - "3.12"
+
         steps:
             - uses: "actions/checkout@v4"
             - uses: excitedleigh/setup-nox@v2.0.0
             - uses: conda-incubator/setup-miniconda@v3
               with:
-                python-version: "3.10"
+                python-version: "${{ matrix.python-version }}"
 
             - name: "Install and update pip"
               run: |
@@ -38,7 +43,33 @@ jobs:
                   pip install --upgrade pip poetry
 
             - name: "Unit tests"
-              run: nox -s build_tests_unit -x --verbose -- -xvv
+              run: nox -s build_tests_unit -x -- -vv
+
+    integration_tests:
+        name: "Testing on ${{ matrix.os }}"
+        runs-on: "${{ matrix.os }}"
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                    - ubuntu-latest
+                    # TODO(teald): - macos-latest | Issue #39
+
+                python-version:
+                    - "3.10"
+
+        steps:
+            - uses: "actions/checkout@v4"
+            - uses: excitedleigh/setup-nox@v2.0.0
+            - uses: conda-incubator/setup-miniconda@v3
+              with:
+                python-version: "${{ matrix.python-version }}"
+
+            - name: "Install and update pip"
+              run: |
+                  conda install -c conda-forge pip
+                  pip install --upgrade pip poetry
 
             - name: "Integration tests"
-              run: nox -s build_tests_integration -x --verbose -- -xvv
+              run: nox -s build_tests_integration -x -- -vv
