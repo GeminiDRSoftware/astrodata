@@ -761,9 +761,30 @@ def build_tests_integration(session):
 def script_tests(session: nox.Session) -> None:
     """Run the script tests."""
     install_test_dependencies(session)
+    session.install(".")
 
     # Run the tests. Need to pass arguments to pytest.
     session.run("pytest", "tests/script_tests", *session.posargs)
+
+
+@nox.session(python=SessionVariables.python_versions)
+@use_devpi_server
+def build_tests_scripts(session: nox.Session) -> None:
+    """Run the script tests using the build version of the package."""
+    build_and_publish_to_devpi(session)
+
+    working_dir = Path(session.create_tmp())
+
+    with session.chdir(working_dir):
+        # Install the package from the devpi server
+        install_test_dependencies(session, poetry_groups=["test"])
+
+        # Install the package from the devpi server
+        session.install("astrodata")
+
+        # Run the tests. Need to pass arguments to pytest.
+        test_dir = Path(__file__).parent / "tests" / "script_tests"
+        session.run("pytest", test_dir, *session.posargs)
 
 
 @nox.session
