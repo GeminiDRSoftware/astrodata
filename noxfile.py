@@ -796,7 +796,7 @@ def linting(session: nox.Session) -> None:
     install_test_dependencies(session, poetry_groups=["main", "dev"])
 
     # Run the linters.
-    session.run("ruff", "lint", ".")
+    session.run("ruff", "check", ".")
 
 
 @nox.session(venv_backend="none")
