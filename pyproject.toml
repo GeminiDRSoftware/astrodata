@@ -127,11 +127,12 @@ exclude = [
 include = [
     "astrodata",
     "noxfile.py",
-    "tests/script_tests", 
+    "tests/script_tests",
 ]
 
 [tool.ruff.lint]
 # select = ["ALL"]
+select = ["F", "E", "I"]
 
 # Ruff ignored linting rules:
 # These rules are ignored for the entire project. They should be
@@ -213,3 +214,6 @@ convention = "numpy"
 
 [tool.ruff.lint.flake8-pytest-style]
 mark-parentheses = false
+
+[tool.script_tests]
+"docs/quickstart.rst" = ""
