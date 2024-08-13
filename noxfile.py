@@ -848,6 +848,17 @@ def devshell(session: nox.Session) -> None:
         str(req_file_path),
     )
 
+    # Install the package in editable mode
+    session.run(
+        str(venv_python_bin),
+        "-m",
+        "pip",
+        "install",
+        "-e",
+        ".",
+        "--no-deps",
+    )
+
     session.log("Virtual environment created.")
     session.log("Activate the environment with:")
     session.log(f"  source {activate_path.relative_to(Path.cwd())}")
@@ -927,6 +938,17 @@ def devconda(session: nox.Session) -> None:
         str(req_file_path),
     )
 
+    # Install the package in editable mode
+    session.run(
+        str(conda_python),
+        "-m",
+        "pip",
+        "install",
+        "-e",
+        ".",
+        "--no-deps",
+    )
+
     session.log("Conda environment created.")
     session.log("Activate the environment with:")
     session.log(f"  conda activate {conda_venv_name}")
@@ -935,7 +957,7 @@ def devconda(session: nox.Session) -> None:
     session.notify("initialize_pre_commit")
 
 
-@nox.session
+@nox.session(python="3.12")
 def initialize_pre_commit(session: nox.Session) -> None:
     """Initialize pre-commit hooks."""
     session.install("pre-commit")
