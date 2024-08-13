@@ -29,19 +29,6 @@ repos:
       args: [ --fix ]
     # Run the formatter.
     - id: ruff-format
-      args:
-            - --line-length=79
-            - --exclude="""\.git |
-              \.__pycache__|
-              \.hg|
-              \.mypy_cache|
-              \.tox|
-              \.venv|
-              _build|
-              buck-out|
-              build|
-              dist|
-              docs"""
 
 - repo: https://github.com/compilerla/conventional-pre-commit
   rev: v3.4.0
