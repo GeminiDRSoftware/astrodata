@@ -363,7 +363,7 @@ def get_poetry_dependencies(
     if all_deps:
         command.pop(2)
 
-    requirements_str = session.run(
+    session.run(
         *command,
         external=True,
         silent=True,
@@ -372,7 +372,9 @@ def get_poetry_dependencies(
     log_message = f"Poetry dependencies written to {req_file_path}"
 
     with req_file_path.open("r") as file:
-        file_contents = '\n'.join(f"   {line.strip()}" for line in file.readlines())
+        file_contents = "\n".join(
+            f"   {line.strip()}" for line in file.readlines()
+        )
         session.log(f"{log_message}\n{file_contents}")
 
     return req_file_path
