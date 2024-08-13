@@ -368,7 +368,7 @@ def get_poetry_dependencies(
     )
 
     lines = [
-        line.split(';')[0].strip()
+        line.split(";")[0].strip()
         for line in requirements_str.split("\n")
         if not line.startswith("Skipping virtualenv creation")
     ]
