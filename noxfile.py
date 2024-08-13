@@ -368,7 +368,7 @@ def get_poetry_dependencies(
     )
 
     lines = [
-        line.split(";")[0].strip()
+        line.split(';')[0].strip()
         for line in requirements_str.split("\n")
         if not line.startswith("Skipping virtualenv creation")
     ]
@@ -755,6 +755,14 @@ def build_tests_integration(session):
 
     with session.chdir(working_dir):
         integration_test_build(session)
+
+@nox.session(python=SessionVariables.python_versions)
+def script_tests(session: nox.Session) -> None:
+    """Run the script tests."""
+    install_test_dependencies(session)
+
+    # Run the tests. Need to pass arguments to pytest.
+    session.run("pytest", "tests/script_tests", *session.posargs)
 
 
 @nox.session
