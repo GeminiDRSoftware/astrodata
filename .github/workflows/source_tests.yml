@@ -67,7 +67,7 @@ jobs:
                   path: .coverage.*
 
     documentation_tests:
-        name: "Documentation tetsing on ${{ matrix.os }}"
+        name: "Documentation testing on ${{ matrix.os }}"
         runs-on: "${{ matrix.os }}"
 
         strategy:
@@ -119,7 +119,7 @@ jobs:
             #       path: .coverage.*
 
     integration_tests:
-        name: "Testing on ${{ matrix.os }}"
+        name: "DRAGONS integration testing on ${{ matrix.os }}"
         runs-on: "${{ matrix.os }}"
 
         strategy:
