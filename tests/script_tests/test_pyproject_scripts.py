@@ -1,6 +1,7 @@
 """These tests fetch the scripts from the pyproject.toml file and run them
 using ``rst-extract``.
 """
+
 from pathlib import Path
 
 import pytest
