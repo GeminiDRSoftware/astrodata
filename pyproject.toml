@@ -124,6 +124,12 @@ exclude = [
     "tests",  # TODO: Need to lint the tests. -- Issue #46
 ]
 
+include = [
+    "astrodata",
+    "noxfile.py",
+    "tests/script_tests", 
+]
+
 [tool.ruff.lint]
 # select = ["ALL"]
 
