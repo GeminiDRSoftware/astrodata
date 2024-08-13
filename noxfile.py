@@ -18,6 +18,7 @@ import nox
 # Default nox sessions to run when executing "nox" without session
 # specifications (i.e., without the -s flag).
 nox.options.sessions = ["unit_tests", "coverage"]
+nox.options.error_on_external_run = True
 
 
 class SessionVariables:
@@ -367,11 +368,29 @@ def get_poetry_dependencies(
         silent=True,
     )
 
-    lines = [
-        line.split(";")[0].strip()
-        for line in requirements_str.split("\n")
-        if not line.startswith("Skipping virtualenv creation")
-    ]
+    # Doing this check because it doesn't take long and it's important to *not*
+    # have warnings suppressed.
+    quiet_needed = False
+
+    for line in requirements_str.splitlines():
+        if line.lower().startswith("warning"):
+            session.warn(f"Poetry warning: {line}")
+            quiet_needed = True
+            continue
+
+        if line.startswith("Skipping"):
+            quiet_needed = True
+            continue
+
+    if quiet_needed:
+        requirements_str = session.run(
+            *command,
+            "--quiet",
+            external=True,
+            silent=True,
+        )
+
+    lines = requirements_str.splitlines()
 
     req_file_path.write_text("\n".join(lines))
 
