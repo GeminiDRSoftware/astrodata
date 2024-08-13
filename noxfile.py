@@ -352,9 +352,10 @@ def get_poetry_dependencies(
 
     command = [
         "poetry",
-        "show",
+        "export",
         f"--only={only}",
-        "--top-level",
+        "--without-hashes",
+        "--format=requirements.txt",
     ]
 
     if all_deps:
@@ -366,12 +367,8 @@ def get_poetry_dependencies(
         silent=True,
     )
 
-    session.run("python", "--version", silent=True)
-
-    requirements_str = requirements_str.replace("(!)", "   ").strip()
-
     lines = [
-        line.split()[0].strip()
+        line.split(';')[0].strip()
         for line in requirements_str.split("\n")
         if not line.startswith("Skipping virtualenv creation")
     ]
