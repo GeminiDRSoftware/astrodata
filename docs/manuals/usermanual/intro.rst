@@ -98,14 +98,18 @@ its metadata using an |AstroData| object
 
 .. code-block:: python
 
-    >>> import astrodata
+    import astrodata
+
     # Create a fake file to use.
-    >>> from astrodata.testing import create_test_file
+    from astrodata.testing import create_test_file
 
     # We can create a fake file to use for this example:
-    >>> path = create_test_file(include_header_keys=['INSTRUME', 'EXPTIME', 'DATE-OBS'])
-    >>> ad = astrodata.from_file(path)
-    >>> ad.phu['INSTRUME']
+    path = create_test_file(include_header_keys=['INSTRUME', 'EXPTIME', 'DATE-OBS'])
+    ad = astrodata.from_file(path)
+    print(ad.phu['INSTRUME'])
+
+.. code-block::
+
     'TEST_VALUE'
 
 All file opening, closing and metadata management (which selects the
