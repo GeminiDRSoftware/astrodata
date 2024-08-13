@@ -936,7 +936,8 @@ def _get_shape(sequence):
 
 def _apply_func(func, sequence, boxes, result, **kwargs):
     """
-    Apply a given function to a sequence of elements within specified boxes and store the result in the result object.
+    Apply a given function to a sequence of elements within specified boxes and
+    store the result in the result object.
 
     Parameters
     ----------
@@ -945,7 +946,8 @@ def _apply_func(func, sequence, boxes, result, **kwargs):
     sequence : list
         The sequence of elements to apply the function to.
     boxes : list
-        The list of boxes specifying the sections of the elements to apply the function to.
+        The list of boxes specifying the sections of the elements to apply the
+        function to.
     result : object
         The object to store the result in.
 
