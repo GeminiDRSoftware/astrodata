@@ -7,6 +7,7 @@ information contained in the headers as attributes. To do so, one must subclass
 
 import importlib.metadata
 
+from . import testing
 from .adfactory import AstroDataError, AstroDataFactory
 from .core import AstroData
 from .fits import add_header_to_table
@@ -43,6 +44,7 @@ __all__ = [
     "create",
     "returns_list",
     "version",
+    "testing",
     # Below this are deprecated
     "open",
 ]
