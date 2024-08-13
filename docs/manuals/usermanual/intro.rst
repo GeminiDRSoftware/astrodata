@@ -71,9 +71,9 @@ To install the standalone |astrodata| package, you can use pip::
 
 Or you can install it from the source code::
 
-        $ git clone https://github.com/teald/astrodata
-        $ cd astrodata # Or the directory where you cloned the repository
-        $ pip install -e .
+        git clone https://github.com/GeminiDRSoftware/astrodata
+        cd astrodata # Or the directory where you cloned the repository
+        pip install -e .
 
 If you're interested in using |astrodata| out-of-the-box with a specific
 type of data, you may want to install the astrodata package together with
