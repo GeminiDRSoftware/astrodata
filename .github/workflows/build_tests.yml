@@ -23,7 +23,7 @@ jobs:
             matrix:
                 os:
                     - ubuntu-latest
-                    # TODO(teald): - macos-latest | Issue #39
+                    - macos-latest
 
                 python-version:
                     - "3.10"
@@ -44,6 +44,53 @@ jobs:
 
             - name: "Unit tests"
               run: nox -s build_tests_unit -x -- -vv
+
+
+    documentation_tests:
+        name: "Documentation testing on ${{ matrix.os }}"
+        runs-on: "${{ matrix.os }}"
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                    - ubuntu-latest
+                    - macos-latest
+
+        steps:
+            - name: "Check out the repo"
+              uses: "actions/checkout@v4"
+
+            - name: "Set up Python"
+              uses: "actions/setup-python@v5"
+              with:
+                  python-version: |
+                    3.10
+                    3.11
+                    3.12
+
+            - name: "Install dependencies"
+              run: |
+                  python -m pip install --upgrade pip
+                  python -m pip install nox poetry
+
+            - name: "Get public IP address of runner"
+              # Need to handle this for Windows, MacOS, and linux
+              # Fetch from ipinfo.io/ip and echo it
+              run: |
+                  if [[ "$RUNNER_OS" == "Windows" ]]; then
+                    echo "Windows runner IP: $(curl -s https://ipinfo.io/ip)"
+                  elif [[ "$RUNNER_OS" == "macOS" ]]; then
+                    echo "macOS runner IP: $(curl -s https://ipinfo.io/ip)"
+                  else
+                    echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
+                  fi
+
+            - name: "Run nox"
+              run: |
+                  # Unit tests
+                  python -m nox -s build_tests_scripts --verbose -x -- -xvv
+
 
     integration_tests:
         name: "Testing on ${{ matrix.os }}"
