@@ -7,7 +7,6 @@ from copy import deepcopy
 from functools import reduce
 
 import numpy as np
-
 from astropy.io.fits import ImageHDU
 from astropy.modeling import Model, models
 from astropy.nddata import (
@@ -17,6 +16,7 @@ from astropy.nddata import (
     VarianceUncertainty,
 )
 from gwcs.wcs import WCS as gWCS
+
 from .wcs import remove_axis_from_frame
 
 INTEGER_TYPES = (int, np.integer)
