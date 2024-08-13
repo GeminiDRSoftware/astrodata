@@ -880,7 +880,8 @@ class AstroData:
                     continue
 
                 print(
-                    f".{name[:13]:13s} {'Table':11s} {len(table), len(table.columns)}"
+                    f".{name[:13]:13s} {'Table':11s} "
+                    f"{len(table), len(table.columns)}"
                 )
 
     def _oper(self, operator, operand):

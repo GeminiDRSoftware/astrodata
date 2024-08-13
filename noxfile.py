@@ -334,8 +334,8 @@ def get_poetry_dependencies(
         string or strings.
 
     all : bool, optional, kw-only
-        If True, return all dependencies. Default is False. If True, the ``only``
-        argument is ignored.
+        If True, return all dependencies. Default is False. If True, the
+        ``only`` argument is ignored.
 
     Returns
     -------

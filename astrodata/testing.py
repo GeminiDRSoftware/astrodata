@@ -227,8 +227,8 @@ def assert_most_close(
 
 
 def assert_most_equal(actual, desired, max_miss, verbose=True):
-    """Raises an AssertionError if more than `n` elements in two objects are not
-    equal. For more information, check :func:`numpy.testing.assert_equal`.
+    """Raises an AssertionError if more than `n` elements in two objects are
+    not equal. For more information, check :func:`numpy.testing.assert_equal`.
 
     Parameters
     ----------
@@ -438,8 +438,8 @@ def download_multiple_files(
         else:
             path = os.path.join(os.getcwd(), "_test_cache")
             warnings.warn(
-                "Environment variable not set and no path provided, writing to "
-                f"{path}. To suppress this warning, set the "
+                "Environment variable not set and no path provided, writing "
+                f"to {path}. To suppress this warning, set the "
                 "environment variable to the desired path for the "
                 "testing cache."
             )
@@ -1008,8 +1008,8 @@ def fake_fits_bytes(
         no header keywords are included.
 
     include_header_values : dict[str, str] | None
-        A dictionary of header keywords and values to be included in the primary
-        HDU. If None, no header keywords are included.
+        A dictionary of header keywords and values to be included in the
+        primary HDU. If None, no header keywords are included.
 
     masks : bool
         If True, a mask is created for the primary HDU or the image extensions.
@@ -1252,7 +1252,8 @@ def test_script_file(
 
 
 def process_string_to_python_script(string: str) -> str:
-    """Takes an input string and performs tasks to make it properly python-formatted.
+    """Takes an input string and performs tasks to make it properly
+    python-formatted.
 
     Parameters
     ----------
