@@ -56,21 +56,21 @@ def create_rst_extract_command(script: str, options: str | list[str]) -> str:
 
 
 @pytest.mark.parametrize("script, options", tuple(scripts().items()))
-def test_script_executes(script: str, options: str, tmp_path: Path) -> None:
+def test_script_executes(script: str, options: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Test the script."""
     # Use temporary directory as the working directory
-    with tmp_path:
-        command = create_rst_extract_command(script, options)
+    command = create_rst_extract_command(script, options)
 
-        result = subprocess.run(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+    monkeypatch.chdir(tmp_path)
+    result = subprocess.run(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
 
-        return_code = result.returncode
-        stdout = result.stdout.decode()
-        stderr = result.stderr.decode()
+    return_code = result.returncode
+    stdout = result.stdout.decode()
+    stderr = result.stderr.decode()
 
-        assert return_code == 0
-        assert not stderr
+    assert return_code == 0
+    assert not stderr
