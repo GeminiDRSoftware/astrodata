@@ -357,6 +357,7 @@ def get_poetry_dependencies(
         f"--only={only}",
         "--without-hashes",
         "--format=requirements.txt",
+        f"--output={req_file_path}",
     ]
 
     if all_deps:
@@ -368,31 +369,11 @@ def get_poetry_dependencies(
         silent=True,
     )
 
-    # Doing this check because it doesn't take long and it's important to *not*
-    # have warnings suppressed.
-    quiet_needed = False
+    log_message = f"Poetry dependencies written to {req_file_path}"
 
-    for line in requirements_str.splitlines():
-        if line.lower().startswith("warning"):
-            session.warn(f"Poetry warning: {line}")
-            quiet_needed = True
-            continue
-
-        if line.startswith("Skipping"):
-            quiet_needed = True
-            continue
-
-    if quiet_needed:
-        requirements_str = session.run(
-            *command,
-            "--quiet",
-            external=True,
-            silent=True,
-        )
-
-    lines = requirements_str.splitlines()
-
-    req_file_path.write_text("\n".join(lines))
+    with req_file_path.open("r") as file:
+        file_contents = '\n'.join(f"   {line.strip()}" for line in file.readlines())
+        session.log(f"{log_message}\n{file_contents}")
 
     return req_file_path
 
