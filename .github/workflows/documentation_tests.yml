@@ -1,0 +1,27 @@
+# Tests for the documentation.
+name: documentation_tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+
+permissions:
+    contents: read
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-python@v3
+        - name: Install dependencies
+          run: |
+            pip install --upgrade pip
+            pip install poetry nox
+        - name: Test scripts
+          run: |
+            nox -s script_tests --verbose -x -- -xvv
