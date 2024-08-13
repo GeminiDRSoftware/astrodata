@@ -2,7 +2,6 @@
 """Fixtures to be used in tests in DRAGONS"""
 
 import enum
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import functools
 import io
 import itertools
@@ -16,14 +15,13 @@ import unittest
 import urllib
 import warnings
 import xml.etree.ElementTree as et
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from typing import Iterable
 
+import numpy as np
 from astropy.io import fits
 from astropy.table import Table
 from astropy.utils.data import download_file
-
-import numpy as np
-
-from typing import Iterable
 
 # Disable pylint import error
 # pylint: disable=import-outside-toplevel

@@ -8,22 +8,27 @@
 .. |NDAstroDataRef| replace:: :class:`~astrodata.nddata.NDAstroDataRef`
 """
 
-from collections import OrderedDict
-from copy import deepcopy
-from io import BytesIO
-from itertools import product as cart_product, zip_longest
 import gc
 import logging
 import os
 import traceback
 import warnings
+from collections import OrderedDict
+from copy import deepcopy
+from io import BytesIO
+from itertools import product as cart_product
+from itertools import zip_longest
 
+import asdf
+import astropy
+import jsonschema
+import numpy as np
 from astropy import units as u
 from astropy.io import fits
 from astropy.io.fits import (
+    DELAYED,
     BinTableHDU,
     Column,
-    DELAYED,
     HDUList,
     ImageHDU,
     PrimaryHDU,
@@ -35,13 +40,6 @@ from astropy.nddata import NDData
 # we use in the future...
 # from astropy.nddata import NDData, NDDataRef as NDDataObject
 from astropy.table import Table
-
-import asdf
-import astropy
-import jsonschema
-import numpy as np
-
-
 from gwcs.wcs import WCS as gWCS
 
 from .nddata import ADVarianceUncertainty, NDAstroData
