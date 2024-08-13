@@ -15,7 +15,6 @@ from copy import deepcopy
 from functools import partial
 
 import numpy as np
-
 from astropy.io import fits
 from astropy.nddata import NDData
 from astropy.table import Table
@@ -28,8 +27,7 @@ from .fits import (
     read_fits,
     write_fits,
 )
-from .nddata import ADVarianceUncertainty
-from .nddata import NDAstroData
+from .nddata import ADVarianceUncertainty, NDAstroData
 from .utils import (
     assign_only_single_slice,
     astro_data_descriptor,

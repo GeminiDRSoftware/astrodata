@@ -5,21 +5,20 @@ information contained in the headers as attributes. To do so, one must subclass
 
 """
 
+import importlib.metadata
+
+from .adfactory import AstroDataError, AstroDataFactory
 from .core import AstroData
-from .adfactory import AstroDataFactory, AstroDataError
 from .fits import add_header_to_table
-from .nddata import NDAstroData, AstroDataMixin
+from .nddata import AstroDataMixin, NDAstroData
 from .utils import (
     Section,
     TagSet,
     astro_data_descriptor,
     astro_data_tag,
-    returns_list,
     deprecated,
+    returns_list,
 )
-
-import importlib.metadata
-
 
 __version__ = importlib.metadata.version("astrodata")
 

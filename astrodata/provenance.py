@@ -2,8 +2,8 @@
 `~astrodata.core.AstroData` objects.
 """
 
-from datetime import datetime
 import json
+from datetime import datetime
 
 from astropy.table import Table
 

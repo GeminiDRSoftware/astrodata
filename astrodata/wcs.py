@@ -10,7 +10,7 @@ import numpy as np
 from astropy import coordinates as coord
 from astropy import units as u
 from astropy.io import fits
-from astropy.modeling import core, models, projections, CompoundModel
+from astropy.modeling import CompoundModel, core, models, projections
 from astropy.table import Table
 from gwcs import coordinate_frames as cf
 from gwcs import utils as gwutils
