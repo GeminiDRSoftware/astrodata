@@ -35,7 +35,7 @@ For the programmer using |AstroData| to develop a data reduction pipeline, the
 |AstroData| class should be subclassed to provide the functionality required
 and to register the new class with the :func:`~astrodata.from_file` function.
 
-Several examples may be found throughout the documentation (see |Examples|). A
+Several examples may be found throughout the documentation. A
 simple example is shown below as a complete, executable introduction.
 
 .. code-block:: python
