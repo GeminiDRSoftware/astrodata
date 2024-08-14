@@ -275,7 +275,7 @@ def header_for_table(table):
     "astropy.io.fits.Header class."
 )
 def add_header_to_table(table):
-    """Add a FITS header to a table's metadata.
+    """Add a FITS header to a table's metadata. Deprecated.
 
     This does not modify the table itself, but adds the header to the table's
     metadata.  If a header is already present in the table's metadata, it will
