@@ -46,16 +46,29 @@ Requirements
 ------------
 
 .. _Poetry: https://python-poetry.org/docs/
+.. _nox: https://nox.thea.codes/en/stable/
 
 To install |astrodata|, you will need the following:
 
 - Python 3.10, 3.11, or 3.12
 - Poetry_ in some flavor
+- Nox_ (optional, see note below)
 
-Please see the Poetry_ documentation for installation instructions. Note that
-it is *not recommended to install Poetry with pip, especially in your working
-directory for the project*.  There are several solutions to this in their
-documentation.
+Please see the Poetry_ and nox_ documentation for installation instructions.
+Note that it is *not recommended to install Poetry with pip, especially in your
+working directory for the project*.  There are several solutions to this in
+their documentation.
+
+.. _pipx: https://pipx.pypa.io/stable/
+
+We recommend using pipx_ to install Poetry and nox, as it will install them in
+isolated environments and make them easier to manage.
+
+.. note::
+
+   If you'd prefer not to install nox_, you can invoke it using Poetry::
+
+         poetry run nox [...arguments...]
 
 Instructions
 ------------
