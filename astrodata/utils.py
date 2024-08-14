@@ -223,21 +223,44 @@ def astro_data_descriptor(fn):
 
 
 def returns_list(fn):
-    """Decorator to ensure that descriptors that should return a list (of one
-    value per extension) only returns single values when operating on single
-    slices; and vice versa.
+    """Ensure a function returns a list.
+
+    Decorator to ensure that descriptors returning a list (of one value per
+    extension) only returns single values when operating on single slices; and
+    vice versa.
 
     This is a common case, and you can use the decorator to simplify the
     logic of your descriptors.
 
-    Args
-    -----
-    fn : method
+    Arguments
+    ---------
+    fn : Callable
         The method to be decorated
 
     Returns
     --------
-    A function
+    Callable
+        A function
+
+    Example
+    -------
+
+    .. code-block:: python
+
+        from astrodata import AstroData, astro_data_descriptor, returns_list, NDAstroData
+
+        class MyAstroData(AstroData):
+            @astro_data_descriptor
+            @returns_list
+            def my_descriptor(self):
+                return 1
+
+        # Create an instance of the class with slices
+        ad = MyAstroData([NDAstroData([1, 2, 3]), NDAstroData([4, 5, 6])])
+
+        # This will print [1, 1] to stdout
+        print(ad.my_descriptor())
+
     """
 
     @wraps(fn)
