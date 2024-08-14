@@ -270,8 +270,33 @@ def header_for_table(table):
     return fits_header
 
 
+@deprecated(
+    "The functionality of this function is now covered by the "
+    "astropy.io.fits.Header class."
+)
 def add_header_to_table(table):
-    """Add a FITS header to a table."""
+    """Add a FITS header to a table's metadata.
+
+    This does not modify the table itself, but adds the header to the table's
+    metadata.  If a header is already present in the table's metadata, it will
+    ensure it's up to date with the table's columns.
+
+    Warning
+    -------
+    This function is deprecated and will be removed in a future version. Its
+    functionality is covered by Tables.
+
+    Arguments
+    ---------
+    table : `astropy.table.Table`
+        The table to add the header to.
+
+    Returns
+    -------
+    header : `astropy.io.fits.Header`
+        The header to add to the table
+
+    """
     header = header_for_table(table)
     table.meta["header"] = header
     return header
