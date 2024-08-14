@@ -140,10 +140,14 @@ def create(*args, **kwargs):
 # Without raising a warning or error.
 @deprecated(
     "Use 'astrodata.from_file'. astrodata.open is deprecated, "
-    "and will be removed in a future version."
+    "and will be removed in a future version. They take the "
+    "same arguments and return the same object.",
 )
 def open(*args, **kwargs):  # pylint: disable=redefined-builtin
-    """Return an |AstroData| object from a file (deprecated, use
-    :func:`~astrodata.from_file`).
+    """Return an |AstroData| object from a file.
+
+    .. warning::
+        This function is deprecated and will be removed in a future version.
+        Use :py:func:`~astrodata.from_file` instead.
     """
     return from_file(*args, **kwargs)
