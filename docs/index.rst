@@ -9,7 +9,6 @@ This is the documentation for astrodata.
 
    quickstart.rst
    manuals/index
-   examples/index
    developer/index
    api_short
 

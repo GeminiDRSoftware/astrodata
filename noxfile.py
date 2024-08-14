@@ -673,7 +673,7 @@ def docs(session: nox.Session) -> None:
     # TODO(teald): Add nitpicky flag to fix warnings. -- Issue #42
     target = Path("_build")
     session.run("rm", "-rf", target, external=True)
-    session.run("sphinx-build", "docs", target)
+    session.run("sphinx-build", "-W", "docs", target)
 
 
 def use_devpi_server(func):
