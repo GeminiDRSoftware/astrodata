@@ -175,11 +175,6 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
 
 def astro_data_descriptor(fn):
     """Decorator that will mark a class method as an AstroData descriptor.
-    Useful to produce list of descriptors, for example.
-
-    If used in combination with other decorators, this one *must* be the
-    one on the top (ie. the last one applying). It doesn't modify the
-    method in any other way.
 
     Args
     -----
@@ -189,6 +184,39 @@ def astro_data_descriptor(fn):
     Returns
     --------
     The tagged method (not a wrapper)
+
+    Warning
+    -------
+
+    If used in combination with other decorators, this one *must* be the one on
+    the top (i.e., the last one being applied). It doesn't modify the method in
+    any other way.
+
+    e.g.,
+
+    .. code-block:: python
+
+            @astro_data_descriptor # This must be above returns_list
+            @returns_list
+            def my_descriptor_method(self):
+                pass
+
+    Notes
+    -----
+    This decorator is exactly equivalent to:
+
+    .. code-block:: python
+
+        class MyClass:
+            def my_descriptor_method(self):
+                pass
+
+            my_descriptor_method.descriptor_method = True
+
+    It is used to mark descriptors for collective operations, such as
+    listing out the descriptors an |AstroData| object has or applying
+    them to a set of extensions. See the documentation for
+    :py:meth:`~astrodata.AstroData.descriptors` for an example.
     """
     fn.descriptor_method = True
     return fn
