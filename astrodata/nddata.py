@@ -1,4 +1,6 @@
-"""This module implements a derivative class based on NDData with some Mixins,
+"""Implementations of NDData-like classes for |AstroData| objects.
+
+This module implements a derivative class based on NDData with some Mixins,
 implementing windowing and on-the-fly data scaling.
 """
 
@@ -239,7 +241,12 @@ class AstroDataMixin:
 
 
 class FakeArray:
-    """A class that pretends to be an array, but is actually a lazy-loaded"""
+    """Fake array class for lazy-loaded data.
+
+    A class that pretends to be an array, but is actually a lazy-loaded.
+    This is used to fool the NDData class into thinking it has an array
+    when it doesn't.
+    """
 
     def __init__(self, very_faked):
         self.data = very_faked
@@ -254,7 +261,9 @@ class FakeArray:
 
 
 class NDWindowing:
-    """A class to allow "windowed" access to some properties of an
+    """Window access to an ``NDAstroData`` instance.
+
+    A class to allow "windowed" access to some properties of an
     ``NDAstroData`` instance. In particular, ``data``, ``uncertainty``,
     ``variance``, and ``mask`` return clipped data.
     """
@@ -269,7 +278,9 @@ class NDWindowing:
 class NDWindowingAstroData(
     AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData
 ):
-    """Provide "windowed" access to some properties of an ``NDAstroData``
+    """Implement windowed access to an ``NDAstroData`` instance.
+
+    Provide "windowed" access to some properties of an ``NDAstroData``
     instance.  In particular, ``data``, ``uncertainty``, ``variance``, and
     ``mask`` return clipped data.
     """
@@ -280,8 +291,11 @@ class NDWindowingAstroData(
         self._window = window
 
     def __getattr__(self, attribute):
-        """Allow access to attributes stored in self.meta['other'], as we do
-        with AstroData objects.
+        """Access attributes stored in self.meta['other'].
+
+        This is required to access attributes like |AstroData| objects. See the
+        documentation for |AstroData|'s ``__getattr__`` method for more
+        information.
         """
         if attribute.isupper():
             try:
@@ -344,7 +358,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     Documentation is provided where our class differs.
 
-    See also
+    See Also
     --------
     NDData
     NDArithmeticMixin
@@ -352,7 +366,6 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     Examples
     --------
-
     The mixins allow operation that are not possible with ``NDData`` or
     ``NDDataBase``, i.e. simple arithmetics::
 
@@ -494,14 +507,13 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         whenever possible.
 
         Returns
-        --------
+        -------
         An instance of ``NDWindowing``, which provides ``__getitem__``,
         to allow the use of square brackets when specifying the window.
         Ultimately, an ``NDWindowingAstrodata`` instance is returned.
 
         Examples
-        ---------
-
+        --------
         >>> ad[0].nddata.window[100:200, 100:200]  # doctest: +SKIP
         <NDWindowingAstrodata .....>
         """
@@ -648,7 +660,6 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
         Examples
         --------
-
         >>> def setup():
         ...     sec = NDData(np.zeros((100,100)))
         ...     ad[0].nddata.set_section(
@@ -668,6 +679,13 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
             self.mask[section] = input_data.mask
 
     def __repr__(self):
+        """Return a string representation of the object.
+
+        If the data is lazy-loaded, the string representation will include
+        the class name and the string "(Memmapped)", representing that this
+        memory may not have been loaded in yet.
+        """
+        # TODO(teald): Check that repr reverts to normal behavior after loading
         if is_lazy(self._data):
             return self.__class__.__name__ + "(Memmapped)"
 
