@@ -39,7 +39,9 @@ class ADVarianceUncertainty(VarianceUncertainty):
 
 
 class AstroDataMixin:
-    """A Mixin for ``NDData``-like classes (such as ``Spectrum1D``) to enable
+    """Mixin with AstroData-like behavior for NDData-like classes.
+
+    Mixin for ``NDData``-like classes (such as ``Spectrum1D``) to enable
     them to behave similarly to ``AstroData`` objects.
 
     These behaviors are:
@@ -53,8 +55,11 @@ class AstroDataMixin:
     """
 
     def __getattr__(self, attribute):
-        """Allow access to attributes stored in self.meta['other'], as we do
-        with AstroData objects.
+        """Access attributes stored in self.meta['other'].
+
+        Required to access attributes like |AstroData| objects. See the
+        documentation for |AstroData|'s ``__getattr__`` method for more
+        information.
         """
         if attribute.isupper():
             try:
@@ -80,8 +85,14 @@ class AstroDataMixin:
         compare_wcs="first_found",
         **kwds,
     ):
-        """Override the NDData method so that "bitwise_or" becomes the default
+        """Perform arithmetic operations on the data.
+
+        Overrides the NDData method so that "bitwise_or" becomes the default
         operation to combine masks, rather than "logical_or"
+
+        .. warning::
+            This method is not intended to be called directly. Use the
+            arithmetic methods of the NDData object instead.
         """
         return super()._arithmetic(
             operation,
@@ -95,9 +106,16 @@ class AstroDataMixin:
         )
 
     def _slice_wcs(self, slices):
-        """The ``__call__()`` method of gWCS doesn't appear to conform to the
+        """Slice the WCS object.
+
+        The ``__call__()`` method of gWCS doesn't appear to conform to the
         APE 14 interface for WCS implementations, and doesn't react to slicing
         properly. We override NDSlicing's method to do what we want.
+
+        Arguments
+        ---------
+        slices : slice or tuple of slices
+            The slice or slices to apply to the WCS.
         """
         if not isinstance(self.wcs, gWCS):
             return self.wcs
@@ -183,7 +201,7 @@ class AstroDataMixin:
 
     @property
     def variance(self):
-        """A convenience property to access the contents of ``uncertainty``."""
+        """Access the contents of ``uncertainty``."""
         return getattr(self.uncertainty, "array", None)
 
     @variance.setter
@@ -194,7 +212,9 @@ class AstroDataMixin:
 
     @property
     def wcs(self):
-        """The WCS of the data. This is a gWCS object, not a FITS WCS object.
+        """Return the WCS of the data as a gWCS object.
+
+        This is a gWCS object, not a FITS WCS object.
 
         This is returning wcs from an inhertited class, see NDData.wcs for more
         details.
@@ -249,7 +269,7 @@ class NDWindowing:
 class NDWindowingAstroData(
     AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData
 ):
-    """Allows "windowed" access to some properties of an ``NDAstroData``
+    """Provide "windowed" access to some properties of an ``NDAstroData``
     instance.  In particular, ``data``, ``uncertainty``, ``variance``, and
     ``mask`` return clipped data.
     """
@@ -281,17 +301,14 @@ class NDWindowingAstroData(
 
     @property
     def wcs(self):
-        # pylint: disable=protected-access
         return self._target._slice_wcs(self._window)
 
     @property
     def data(self):
-        # pylint: disable=protected-access
         return self._target._get_simple("_data", section=self._window)
 
     @property
     def uncertainty(self):
-        # pylint: disable=protected-access
         return self._target._get_uncertainty(section=self._window)
 
     @property
@@ -303,18 +320,18 @@ class NDWindowingAstroData(
 
     @property
     def mask(self):
-        # pylint: disable=protected-access
         return self._target._get_simple("_mask", section=self._window)
 
 
 def is_lazy(item):
-    """Returns True if the item is a lazy-loaded object, False otherwise."""
+    """Return True if the item is a lazy-loaded object, False otherwise."""
     return isinstance(item, ImageHDU) or getattr(item, "lazy", False)
 
 
 class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
-    """Implements ``NDData`` with all Mixins, plus some ``AstroData``
-    specifics.
+    """Primary data class for AstroData objects.
+
+    Implements ``NDData`` with all Mixins, plus some ``AstroData`` specifics.
 
     This class implements an ``NDData``-like container that supports reading
     and writing as implemented in the ``astropy.io.registry`` and also slicing
@@ -449,6 +466,12 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
             self.uncertainty = uncertainty
 
     def __deepcopy__(self, memo):
+        """Implement the deepcopy protocol for this class.
+
+        This implementation accounts for the lazy-loading of the data and
+        uncertainty attributes. It also avoids recursion when copying the
+        uncertainty attribute.
+        """
         new = self.__class__(
             self._data if is_lazy(self._data) else deepcopy(self.data, memo),
             self._uncertainty if is_lazy(self._uncertainty) else None,
@@ -465,7 +488,9 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def window(self):
-        """Interface to access a section of the data, using lazy access
+        """Access a slice of the data.
+
+        Interface to access a section of the data, using lazy access
         whenever possible.
 
         Returns
@@ -483,7 +508,18 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         return NDWindowing(self)
 
     def _get_uncertainty(self, section=None):
-        """Return the ADVarianceUncertainty object, or a slice of it."""
+        """Return the ADVarianceUncertainty object, or a slice of it.
+
+        Arguments
+        ---------
+        section : slice, optional
+            The slice to apply to the uncertainty object.
+
+        Returns
+        -------
+        ADVarianceUncertainty
+            The uncertainty object, or a slice of it if a section is provided.
+        """
         if self._uncertainty is not None:
             if is_lazy(self._uncertainty):
                 if section is None:
@@ -502,8 +538,12 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         return None
 
     def _get_simple(self, target, section=None):
-        """Only use 'section' for image-like objects that have the same shape
-        as the NDAstroData object; otherwise, return the whole object"""
+        """Return the section of image-like objects, or the whole object.
+
+        Only use 'section' for image-like objects that have the same shape
+        as the NDAstroData object; otherwise, return the whole object.
+        """
+        # TODO(teald): Unclear description of what this method does.
         source = getattr(self, target)
         if source is not None:
             if is_lazy(source):
@@ -529,9 +569,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def data(self):
-        """An array representing the raw data stored in this instance. It
-        implements a setter.
-        """
+        """Access the data stored in this instance. It implements a setter."""
         return self._get_simple("_data")
 
     @data.setter
@@ -546,6 +584,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def uncertainty(self):
+        """Get or set the uncertainty of the data."""
         return self._get_uncertainty()
 
     @uncertainty.setter
@@ -571,9 +610,12 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
 
     @property
     def variance(self):
-        """A convenience property to access the contents of ``uncertainty``,
+        """Get and aset the variance of the data.
+
+        A convenience property to access the contents of ``uncertainty``,
         squared (as the uncertainty data is stored as standard deviation).
         """
+        # TODO(teald): Refactor uncertainty and variance implementation.
         arr = self._get_uncertainty()
 
         if arr is not None:
@@ -588,12 +630,14 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         )
 
     def set_section(self, section, input_data):
-        """Sets only a section of the data. This method is meant to prevent
+        """Set a section of the data to the input data.
+
+        Sets only a section of the data. This method is meant to prevent
         fragmentation in the Python heap, by reusing the internal structures
         instead of replacing them with new ones.
 
-        Args
-        -----
+        Arguments
+        ---------
         section : ``slice``
             The area that will be replaced
 
@@ -603,7 +647,7 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
             area defined by ``section``.
 
         Examples
-        ---------
+        --------
 
         >>> def setup():
         ...     sec = NDData(np.zeros((100,100)))
