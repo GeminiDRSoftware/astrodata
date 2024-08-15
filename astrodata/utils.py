@@ -387,7 +387,23 @@ class Section(tuple):
     """A class to handle n-dimensional sections."""
 
     def __new__(cls, *args, **kwargs):
-        """Instantiate a new Section object."""
+        """Instantiate a new Section object.
+
+        Expects a sequence of pairs of start and end coordinates for each axis.
+        This can be passed in order of axis (e.g., x1, x2, y1, y2) or as a
+        set of keyword arguments (e.g., x1=0, x2=10, y1=0, y2=10).
+
+        Arguments
+        ---------
+        x1, x2, y1, y2, ... : int
+            The start and end coordinates for each axis. If passed as
+            positional arguments, they should be in order of axis. Otherwise,
+            they can be passed as keyword arguments, such as:
+
+            .. code-block:: python
+
+                section = Section(x1=0, x2=10, y1=0, y2=10)
+        """
         # Ensure that the order of keys is what we want
         axis_names = [x for axis in "xyzuvw" for x in (f"{axis}1", f"{axis}2")]
 
@@ -415,11 +431,11 @@ class Section(tuple):
         return dict(zip(self._axis_names, self))
 
     def __getnewargs__(self):
-        """Return the arguments needed to create a new instance of the object."""
+        """Return the arguments needed to create a new instance of this object."""
         return tuple(self)
 
     def __getattr__(self, attr):
-        """Check for attrs in the axis_dict."""
+        """Check for attrs in the axis_dict (axis names)."""
         if attr in self._axis_names:
             return self.axis_dict[attr]
 
@@ -440,7 +456,15 @@ class Section(tuple):
 
     @staticmethod
     def from_shape(value):
-        """Produce a Section object defining a given shape."""
+        """Produce a Section object defining a given shape.
+
+        Examples
+        --------
+        >>> Section.from_shape((10, 10))
+        Section(x1=0, x2=10, y1=0, y2=10)
+        >>> Section.from_shape((10, 10, 10))
+        Section(x1=0, x2=10, y1=0, y2=10, z1=0, z2=10)
+        """
         return Section(*[y for x in reversed(value) for y in (0, x)])
 
     @staticmethod
@@ -504,7 +528,7 @@ class Section(tuple):
         ---------
 
         add_dims : int
-            The number of dimensions to add to the slice
+            The number of dimensions to add to the slice.
         """
         return (slice(None),) * add_dims + tuple(
             slice(self.axis_dict[axis], self.axis_dict[axis.replace("1", "2")])
@@ -512,7 +536,36 @@ class Section(tuple):
         )
 
     def contains(self, section):
-        """Return True if the section is entirely within this Section."""
+        """Return True if the section is entirely within this Section.
+
+        Arguments
+        ---------
+        section : Section
+            The Section to check for containment.
+
+        Returns
+        -------
+        bool
+            True if the Section is entirely within this Section, otherwise False.
+
+        Raises
+        ------
+        ValueError
+            If the Sections have different dimensionality.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).contains(Section(1, 9, 1, 9))
+        True
+        >>> Section(0, 10, 0, 10).contains(Section(1, 11, 1, 9))
+        False
+        >>> Section(0, 10, 0, 10).contains(Section(1, 9, 1, 11))
+        False
+        >>> Section(0, 10, 0, 10).contains(Section(1, 3, 1, 7))
+        True
+        >>> Section(0, 10, 0, 10).contains(Section(1, 3, 1, 11))
+        False
+        """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
 
@@ -526,7 +579,15 @@ class Section(tuple):
         return con1 and con2
 
     def is_same_size(self, section):
-        """Return True if the Sections are the same size, otherwise False."""
+        """Return True if the Sections are the same size, otherwise False.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).is_same_size(Section(0, 10, 0, 10))
+        True
+        >>> Section(0, 10, 0, 10).is_same_size(Section(0, 10, 0, 11))
+        False
+        """
         return np.array_equal(np.diff(self)[::2], np.diff(section)[::2])
 
     def overlap(self, section):
@@ -534,6 +595,29 @@ class Section(tuple):
 
         Determine whether the two sections overlap. If so, the Section common
         to both is returned, otherwise None.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 9, 1, 9))
+        Section(x1=1, x2=9, y1=1, y2=9)
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 11, 1, 9))
+        Section(x1=1, x2=10, y1=1, y2=9)
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 9, 1, 11))
+        Section(x1=1, x2=9, y1=1, y2=10)
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 3, 1, 7))
+        Section(x1=1, x2=3, y1=1, y2=7)
+        >>> Section(4, 6, 4, 6).overlap(Section(1, 3, 1, 2))
+        None
+
+        Raises
+        ------
+        ValueError
+            If the Sections have different dimensionality.
+
+        Notes
+        -----
+        If sections do not overlap, a warning is logged when None is returned. This is to
+        help with debugging, as it is often not an error condition.
         """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
@@ -546,6 +630,7 @@ class Section(tuple):
                 *[v for pair in zip(mins, maxs) for v in pair]
             )
 
+        # TODO(teald): Check overlap explicitly instead of catching ValueError
         except ValueError as err:
             logging.warning(
                 "Sections do not overlap, recieved %s: %s",
@@ -556,7 +641,32 @@ class Section(tuple):
             return None
 
     def shift(self, *shifts):
-        """Shift a section in each direction by the specified amount."""
+        """Shift a section in each direction by the specified amount.
+
+        Arguments
+        ---------
+        shifts : positional arguments
+            The amount to shift the section in each direction.
+
+        Returns
+        -------
+        Section
+            The shifted section.
+
+        Raises
+        ------
+        ValueError
+            If the number of shifts is not equal to the number of dimensions.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).shift(1, 1)
+        Section(x1=1, x2=11, y1=1, y2=11)
+        >>> Section(0, 10, 0, 10).shift(1, 1, 1)
+        Traceback (most recent call last):
+        ...
+        ValueError: Number of shifts 3 incompatible with dimensionality 2
+        """
         if len(shifts) != self.ndim:
             raise ValueError(
                 f"Number of shifts {len(shifts)} incompatible "
