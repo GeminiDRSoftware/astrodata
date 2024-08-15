@@ -412,8 +412,8 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
     ):
         """Initialize an ``NDAstroData`` instance.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         data : array-like
             The actual data. This can be a numpy array, a memmap, or a
             ``fits.ImageHDU`` object.
