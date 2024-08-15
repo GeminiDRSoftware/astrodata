@@ -57,8 +57,8 @@ class FitsHeaderCollection:
     It exposes a number of methods (``set``, ``get``, etc.) that operate over
     all the headers at the same time. It can also be iterated.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     headers : list of `astropy.io.fits.Header`
         List of Header objects.
     """
@@ -180,8 +180,8 @@ class FitsHeaderCollection:
 def new_imagehdu(data, header, name=None):
     """Create a new ImageHDU from data and header.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     data : `numpy.ndarray`
         The data array.
 
@@ -212,8 +212,8 @@ def new_imagehdu(data, header, name=None):
 def table_to_bintablehdu(table, extname=None):
     """Convert an astropy Table object to a BinTableHDU before writing to disk.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     table: astropy.table.Table instance
         the table to be converted to a BinTableHDU
 
@@ -361,8 +361,8 @@ def _process_table(table, name=None, header=None):
 def card_filter(cards, include=None, exclude=None):
     """Filter a list of cards, returning only those that match the criteria.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     cards : iterable
         The cards to filter.
 
@@ -463,8 +463,8 @@ class FitsLazyLoadable:
     def __init__(self, obj):
         """Initialize the object.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         obj : `astropy.io.fits.ImageHDU` or `astropy.io.fits.BinTableHDU`
             The HDU to delay loading from.
         """
@@ -547,8 +547,8 @@ class FitsLazyLoadable:
 def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
     """Prepare an HDUList for reading.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     hdulist : `astropy.io.fits.HDUList`
         The HDUList to prepare.
 
@@ -630,8 +630,8 @@ def read_fits(cls, source, extname_parser=None):
     It will raise exceptions if the file is not found, or if there is no match
     for the HDUList, among the registered AstroData classes.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     cls : class
         The class to instantiate.
 
@@ -990,8 +990,8 @@ def _apply_func(func, sequence, boxes, result, **kwargs):
     Apply a given function to a sequence of elements within specified boxes and
     store the result in the result object.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     func : function
         The function to apply to the elements.
     sequence : list
@@ -1044,8 +1044,8 @@ def windowed_operation(
     function to each chunk. The output arrays are then gathered in a new
     NDData object.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     func : callable
         The function to apply.
 
@@ -1148,8 +1148,8 @@ def wcs_to_asdftablehdu(wcs, extver=None):
     Returns None (issuing a warning) if the WCS object cannot be serialized,
     so the rest of the file can still be written.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     wcs : gWCS
         The gWCS object to serialize.
 
