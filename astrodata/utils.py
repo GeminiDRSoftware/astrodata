@@ -32,7 +32,7 @@ warnings.simplefilter("always", AstroDataDeprecationWarning)
 
 
 def deprecated(reason):
-    """Marks a function as deprecated.
+    """Mark a function as deprecated.
 
     Parameters
     ----------
@@ -50,6 +50,7 @@ def deprecated(reason):
     >>> @deprecated("Use another function instead")
     ... def my_function():
     ...     pass
+
     """
 
     def decorator_wrapper(fn):
@@ -97,7 +98,9 @@ def normalize_indices(slc, nitems):
 
 
 class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
-    """Named tuple that is used by tag methods to return which actions should
+    """A named tuple of sets of tag strings.
+
+    Named tuple that is used by tag methods to return which actions should
     be performed on a tag set.
 
     All the attributes are optional, and any combination of them can be used,
@@ -128,7 +131,7 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
         This TagSet will be applied only *all* of these tags are present
 
     Examples
-    ---------
+    --------
     >>> TagSet()  # doctest: +SKIP
     TagSet(
         add=set(),
@@ -153,6 +156,15 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
         blocks=set(),
         if_present=set()
     )
+
+
+    Notes
+    -----
+    If arguments are not provided, the default is an empty set.
+
+    These arguments are not applied within the object, instead they are
+    used when tags are being applied to an AstroData object.
+
     """
 
     def __new__(
@@ -163,6 +175,7 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
         blocks=None,
         if_present=None,
     ):
+        """Instantiate a new TagSet object."""
         return super().__new__(
             cls,
             add or set(),
@@ -182,7 +195,7 @@ def astro_data_descriptor(fn):
         The method to be decorated
 
     Returns
-    --------
+    -------
     The tagged method (not a wrapper)
 
     Warning
@@ -238,7 +251,7 @@ def returns_list(fn):
         The method to be decorated
 
     Returns
-    --------
+    -------
     Callable
         A function
 
@@ -319,7 +332,7 @@ def astro_data_tag(fn):
         The method to be decorated
 
     Returns
-    --------
+    -------
     A wrapper function
 
     Notes
@@ -371,9 +384,10 @@ def astro_data_tag(fn):
 
 
 class Section(tuple):
-    """A class to handle n-dimensional sections"""
+    """A class to handle n-dimensional sections."""
 
     def __new__(cls, *args, **kwargs):
+        """Instantiate a new Section object."""
         # Ensure that the order of keys is what we want
         axis_names = [x for axis in "xyzuvw" for x in (f"{axis}1", f"{axis}2")]
 
@@ -397,18 +411,22 @@ class Section(tuple):
 
     @property
     def axis_dict(self):
+        """Return a dictionary with the axis names as keys."""
         return dict(zip(self._axis_names, self))
 
     def __getnewargs__(self):
+        """Return the arguments needed to create a new instance of the object."""
         return tuple(self)
 
     def __getattr__(self, attr):
+        """Check for attrs in the axis_dict."""
         if attr in self._axis_names:
             return self.axis_dict[attr]
 
         raise AttributeError(f"No such attribute '{attr}'")
 
     def __repr__(self):
+        """Return a string representation of the Section object."""
         return (
             "Section("
             + ", ".join([f"{k}={self.axis_dict[k]}" for k in self._axis_names])
@@ -427,7 +445,7 @@ class Section(tuple):
 
     @staticmethod
     def from_string(value):
-        """The inverse of __str__, produce a Section object from a string."""
+        """Produce a Section object from a string."""
         return Section(
             *[
                 y
@@ -445,12 +463,20 @@ class Section(tuple):
         "and will be removed in a future version."
     )
     def asIRAFsection(self):  # pylint: disable=invalid-name
-        """Deprecated, see as_iraf_section"""
+        """Produce string with '[x1:x2,y1:y2]' 1-indexed and end-inclusive.
+
+        Deprecated, see :py:meth:`~astrodata.Section.as_iraf_section`.
+        """
         return self.as_iraf_section()
 
     def as_iraf_section(self):
-        """Produce string of style '[x1:x2,y1:y2]' that is 1-indexed
-        and end-inclusive
+        """Produce string with '[x1:x2,y1:y2]' 1-indexed and end-inclusive.
+
+        This is the format used by IRAF for sections.
+
+        For example,
+        >>> Section(0, 10, 0, 10).as_iraf_section()
+        '[1:10,1:10]'
         """
         return (
             "["
@@ -468,9 +494,17 @@ class Section(tuple):
             + "]"
         )
 
+    # TODO(teald): Deprecate and rename Section.asslice.
     def asslice(self, add_dims=0):
-        """Return the Section object as a slice/list of slices.  Higher
-        dimensionality can be achieved with the add_dims parameter.
+        """Return the Section object as a slice/list of slices.
+
+        Higher dimensionality can be achieved with the add_dims parameter.
+
+        Arguments
+        ---------
+
+        add_dims : int
+            The number of dimensions to add to the slice
         """
         return (slice(None),) * add_dims + tuple(
             slice(self.axis_dict[axis], self.axis_dict[axis.replace("1", "2")])
@@ -478,7 +512,7 @@ class Section(tuple):
         )
 
     def contains(self, section):
-        """Return True if the supplied section is entirely within self"""
+        """Return True if the section is entirely within this Section."""
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
 
@@ -492,12 +526,14 @@ class Section(tuple):
         return con1 and con2
 
     def is_same_size(self, section):
-        """Return True if the Sections are the same size"""
+        """Return True if the Sections are the same size, otherwise False."""
         return np.array_equal(np.diff(self)[::2], np.diff(section)[::2])
 
     def overlap(self, section):
-        """Determine whether the two sections overlap. If so, the Section
-        common to both is returned, otherwise None
+        """Return the overlap between two sections, or None if no overlap.
+
+        Determine whether the two sections overlap. If so, the Section common
+        to both is returned, otherwise None.
         """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
@@ -520,7 +556,7 @@ class Section(tuple):
             return None
 
     def shift(self, *shifts):
-        """Shift a section in each direction by the specified amount"""
+        """Shift a section in each direction by the specified amount."""
         if len(shifts) != self.ndim:
             raise ValueError(
                 f"Number of shifts {len(shifts)} incompatible "
