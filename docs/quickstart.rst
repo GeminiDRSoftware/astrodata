@@ -350,7 +350,10 @@ class as ``'GMOS'`` and ``'SCIENCE'``:
 
 .. code-block:: python
 
-    class GMOSScienceAstroDataTagged(GMOSScienceAstroData):
+    # Let's remove the GMOSScienceAstroData class from the factory to avoid conflicts.
+    factory.remove_class(GMOSScienceAstroData)
+
+    class GMOSAstroDataTagged(GMOSAstroData):
         """A class for GMOS science data with tags.
 
         Note: This still has all the methods from GMOSScienceAstroData! It is a
@@ -419,7 +422,7 @@ class as ``'GMOS'`` and ``'SCIENCE'``:
             else:
                 return TagSet(['SPECT'])
 
-    factory.add_class(GMOSScienceAstroDataTagged)
+    factory.add_class(GMOSAstroDataTagged)
 
 
 These tags were taken from the |DRAGONS| GMOS package, and exemplify some
