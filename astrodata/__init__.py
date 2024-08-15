@@ -1,8 +1,19 @@
-"""This package adds an abstraction layer to astronomical data by parsing the
+"""Entry point for the |astrodata| package.
+
+This package adds an abstraction layer to astronomical data by parsing the
 information contained in the headers as attributes. To do so, one must subclass
 :class:`astrodata.AstroData` and add parse methods accordingly to the
 :class:`~astrodata.TagSet` received.
 
+For more information, you can build the documentation locally by running
+
+.. code-block:: bash
+
+    nox -s docs
+
+and opening the file ``_build/html/index.html`` in a browser. Alternatively,
+you can check the online documentation at
+`the |astrodata| pages site <https://geminidrsoftware.github.io/astrodata/>`_.
 """
 
 import importlib.metadata
