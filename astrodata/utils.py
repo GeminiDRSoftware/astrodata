@@ -34,8 +34,8 @@ warnings.simplefilter("always", AstroDataDeprecationWarning)
 def deprecated(reason):
     """Mark a function as deprecated.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     reason : str
         The reason why the function is deprecated
 
@@ -260,7 +260,12 @@ def returns_list(fn):
 
     .. code-block:: python
 
-        from astrodata import AstroData, astro_data_descriptor, returns_list, NDAstroData
+        from astrodata import (
+            AstroData,
+            astro_data_descriptor,
+            returns_list,
+            NDAstroData
+        )
 
         class MyAstroData(AstroData):
             @astro_data_descriptor
@@ -431,7 +436,7 @@ class Section(tuple):
         return dict(zip(self._axis_names, self))
 
     def __getnewargs__(self):
-        """Return the arguments needed to create a new instance of this object."""
+        """Return arguments needed to create an equivalent Section instance."""
         return tuple(self)
 
     def __getattr__(self, attr):
@@ -546,7 +551,8 @@ class Section(tuple):
         Returns
         -------
         bool
-            True if the Section is entirely within this Section, otherwise False.
+            True if the Section is entirely within this Section, otherwise
+            False.
 
         Raises
         ------
@@ -616,8 +622,8 @@ class Section(tuple):
 
         Notes
         -----
-        If sections do not overlap, a warning is logged when None is returned. This is to
-        help with debugging, as it is often not an error condition.
+        If sections do not overlap, a warning is logged when None is returned.
+        This is to help with debugging, as it is often not an error condition.
         """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")

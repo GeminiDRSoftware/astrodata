@@ -229,8 +229,8 @@ class AstroDataFactory:
     def create_from_scratch(self, phu, extensions=None):
         """Create an AstroData object from a collection of objects.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         phu : `fits.PrimaryHDU` or `fits.Header` or `dict` or `list`
             FITS primary HDU or header, or something that can be used to create
             a fits.Header (a dict, a list of "cards").

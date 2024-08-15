@@ -165,8 +165,8 @@ def get_corners(shape):
     This is a recursive function to calculate the corner indices
     of an array of the specified shape.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     shape : tuple of ints
         Length of the dimensions of the array
 
@@ -216,8 +216,8 @@ def assert_most_close(
     --------
     :func:`~numpy.testing.assert_allclose`
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     actual : array_like
         Array obtained.
 
@@ -485,8 +485,8 @@ def download_multiple_files(
 ):
     """Download multiple files from the archive and store them at a given path.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     files : list of str
         List of filenames to download.
 
@@ -701,8 +701,8 @@ def get_associated_calibrations(filename, nbias=5):
     This function quieries the Gemini Observatory Archive for calibrations
     associated with a given data file.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     filename : str
         Input file name
     """
@@ -762,8 +762,8 @@ class ADCompare:
     ):
         """Perform a comparison between the two AD objects in this instance.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         max_miss: int
             maximum number of elements in each array that can disagree
 
@@ -1055,10 +1055,11 @@ class ADCompare:
 def ad_compare(ad1, ad2, **kwargs):
     """Compare the tags, headers, and pixel values of two images.
 
-    This is a wrapper for ADCompare.run_comparison() for backward-compatibility.
+    This is a wrapper for ADCompare.run_comparison() for
+    backward-compatibility.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ad1: AstroData
         first AD objects
 
@@ -1254,8 +1255,8 @@ def test_script_file(
     All matches (i.e., stdout_result and stderr_result) can use regular
     expressions.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     script_path : str
         The path to the script to be run.
 
@@ -1358,8 +1359,8 @@ def test_script_file(
 def process_string_to_python_script(string: str) -> str:
     """Format a stirng to be used as a Python script.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     string : str
         The string to be processed.
     """
@@ -1392,8 +1393,8 @@ def get_program_observations():
 def expand_file_range(files: str) -> list[str]:
     """Expand a range of files into a list of file names.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     files : str
         A range of files, e.g., "N20170614S0201-205". This would produce:
 
