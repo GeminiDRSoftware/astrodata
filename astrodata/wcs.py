@@ -38,8 +38,8 @@ re_cd = re.compile(r"^CD(\d+)_\d+$", re.IGNORECASE)
 def pixel_frame(naxes, name="pixels"):
     """Make a CoordinateFrame for pixels.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     naxes: int
         Number of axes
 
@@ -65,8 +65,8 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
     Create and return a gWCS object from a FITS header or NDData object.  If
     it can't construct one, it should quietly return None.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     input_data : `astropy.io.fits.Header` or `astropy.nddata.NDData`
         FITS Header or NDData object with basic FITS WCS keywords.
 
@@ -204,8 +204,8 @@ def gwcs_to_fits(ndd, hdr=None):
     with a dict entry {'FITS-WCS': 'APPROXIMATE'}. If there is no suitable FITS
     representation, then a ValueError or NotImplementedError can be raised.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ndd : `astropy.nddata.NDData`
         The NDData whose wcs attribute we want converted
 
@@ -551,8 +551,8 @@ def calculate_affine_matrices(func, shape, origin=None):
     centre of the region. The matrix and offset are returned in the standard
     python order (i.e., y-first for 2D).
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     func : callable
         function that maps input->output coordinates
 
@@ -615,8 +615,8 @@ def calculate_affine_matrices(func, shape, origin=None):
 def read_wcs_from_header(header):
     """Extract basic FITS WCS keywords from a FITS Header.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header`
         FITS Header with WCS information.
 
@@ -721,8 +721,8 @@ def read_wcs_from_header(header):
 def get_axes(header):
     """Match input with spectral and sky coordinate axes.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header` or dict
         FITS Header (or dict) with basic WCS information.
 
@@ -765,8 +765,8 @@ def get_axes(header):
 def _is_skysys_consistent(ctype, sky_inmap):
     """Determine if the sky axes in CTYPE match a standard celestial system.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ctype : list
         List of CTYPE values.
 
@@ -805,8 +805,8 @@ def _get_contributing_axes(wcs_info, world_axes):
     Returns a tuple indicating which axes in the pixel frame make a
     contribution to an axis or axes in the output frame.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     wcs_info : dict
         dict of WCS information
 
@@ -833,8 +833,8 @@ def _get_contributing_axes(wcs_info, world_axes):
 def make_fitswcs_transform(trans_input):
     """Create a basic FITS WCS transform.  It does not include distortions.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header` or dict
         FITS Header (or dict) with basic WCS information
 
@@ -902,8 +902,8 @@ def fitswcs_image(header):
     from FITS WCS keywords. A Mapping is inserted at the beginning, which may
     be removed later
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header` or dict
         FITS Header or dict with basic FITS WCS keywords.
     """
