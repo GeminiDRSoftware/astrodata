@@ -42,8 +42,8 @@ NO_DEFAULT = object()
 _ARIT_DOC = """
     Performs {name} by evaluating ``self {op} operand``.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     oper : number or object
         The operand to perform the operation  ``self {op} operand``.
 
@@ -54,11 +54,12 @@ _ARIT_DOC = """
 
 
 class AstroData:
-    """Base class for the AstroData software package. It provides an interface
-    to manipulate astronomical data sets.
+    """Base class for the AstroData software package.
 
-    Parameters
-    ----------
+    It provides an interface to manipulate astronomical data sets.
+
+    Arguments
+    ---------
     nddata : `astrodata.NDAstroData` or list of `astrodata.NDAstroData`
         List of NDAstroData objects.
 
@@ -73,7 +74,51 @@ class AstroData:
         object will access to. This is used when slicing an object, then the
         sliced AstroData will have the ``.nddata`` list from its parent and
         access the sliced NDAstroData through this list of indices.
+
+
+    .. warning::
+
+        This class is not meant to be instantiated directly. Instead, use the
+        factory method :py:func:`astrodata.from_file` to create an instance of this
+        class using a file. Alternatively, use the :py:meth:`astrodata.create`
+        function to create a new instance from scratch.
+
+        The documentation here is meant for developers who want to extend the
+        functionality of this class.
+
+    Registering an |AstroData| subclass
+    -----------------------------------
+
+    To create a new subclass of |AstroData|, you need to register it with the
+    factory. This is done by creating a new subclass and using
+    :py:meth:`AstroDataFactory.add_class`:
+
+    .. code-block:: python
+
+        from astrodata import AstroData, factory
+
+        class MyAstroData(AstroData):
+            @classmethod
+            def _matches_data(cls):
+                '''Trivial match for now.'''
+                return True
+
+        factory.add_class(MyAstroData)
+
+    Once the class is registered, the factory will be able to create instances
+    of it when reading files. It will also be able to create instances of it
+    when using the :py:meth:`astrodata.create` function. It uses the special,
+    required method :py:meth:`~astrodata.AstroData._matches_data` to determine
+    if the class matches the data in the file. If there are multiple matches,
+    the factory will try to find one that has the most specific match and is
+    a subclass of the other candidates.
+
+    If There is no match or multiple matches, the factory will raise an
+    exception. See :py:meth:`AstroDataFactory.get_astro_data` for more
+    information.
     """
+
+    # TODO(teald): Docstring for AstroData has a bad lin to AstroDataFactory
 
     # Derived classes may provide their own __keyword_dict. Being a private
     # variable, each class will preserve its own, and there's no risk of
@@ -139,10 +184,10 @@ class AstroData:
         self._path = None
 
     def __deepcopy__(self, memo):
-        """Returns a new instance of this class.
+        """Return a new instance of this class.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         memo : dict
             See the documentation on `deepcopy` for an explanation on how
             this works.
@@ -157,10 +202,10 @@ class AstroData:
         return obj
 
     def _keyword_for(self, name):
-        """Returns the FITS keyword name associated to ``name``.
+        """Return the FITS keyword name associated to ``name``.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         name : str
             The common "key" name for which we want to know the associated
             FITS keyword.
@@ -232,10 +277,10 @@ class AstroData:
 
     @classmethod
     def matches_data(cls, source) -> bool:
-        """Returns True if the class can handle the data in the source.
+        """Return True if the class can handle the data in the source.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         source : list of `astropy.io.fits.HDUList`
             The FITS file to be read.
 
@@ -264,13 +309,39 @@ class AstroData:
 
     @staticmethod
     def _matches_data(source):
+        """Return True if the source matches conditions for this class.
+
+        .. warning::
+
+            The default implementation for the base |AstroData| class is a trivial
+            match (always return True).
+
+        Example
+        -------
+
+        .. code-block:: python
+
+            class MyAstroData(AstroData):
+                @staticmethod
+                def _matches_data(source):
+                    if source[0].header["INSTRUME"] == "MY_INST":
+                        return True
+
+                    return False
+
+        """
         # This one is trivial. Will be more specific for subclasses.
         logging.debug("Using default _matches_data with %s", source)
         return True
 
     @property
     def path(self):
-        """Return the file path."""
+        """Return the file path, if generated from or saved to a file.
+
+        If this is set to a file path, the filename will be updated
+        automatically. The original filename will be stored in the
+        `orig_filename` property.
+        """
         return self._path
 
     @path.setter
@@ -281,7 +352,12 @@ class AstroData:
 
     @property
     def filename(self):
-        """Return the file name."""
+        """Return the filename. This is the basename of the path, or None.
+
+        If the filename is set, the path will be updated automatically.
+
+        If the filename is set to an absolute path, a ValueError will be raised.
+        """
         if self.path is not None:
             return os.path.basename(self.path)
 
@@ -319,9 +395,18 @@ class AstroData:
 
     @property
     def hdr(self):
-        """Return all headers, as a `astrodata.fits.FitsHeaderCollection`."""
+        """Return all headers, as a |fitsheaderc|.
+
+        If this is a single-slice object, the header will be returned as a
+        single :py:class:`~astropy.io.fits.Header` object. Otherwise, it will
+        be returned as a |fitsheaderc| object.
+
+        .. |fitsheaderc| replace:: :class:`astrodata.fits.FitsHeaderCollection`
+        """
         if not self.nddata:
             return None
+
+        # TODO(teald): Inconsistent type with is_single special case.
         headers = [nd.meta["header"] for nd in self._nddata]
         return headers[0] if self.is_single else FitsHeaderCollection(headers)
 
@@ -331,18 +416,33 @@ class AstroData:
         "will be removed in the future. Use '.hdr' instead."
     )
     def header(self):
-        """Deprecated header access. Use ``.hdr`` instead."""
+        """Return the headers for the PHU and each extension.
+
+        .. warning::
+
+            This property is deprecated and will be removed in the future.
+        """
         return [self.phu] + [ndd.meta["header"] for ndd in self._nddata]
 
     @property
     def tags(self):
-        """A set of strings that represent the tags defining this instance."""
+        """Return a set of strings that represent the class' tags.
+
+        It collects the tags from the methods decorated with the
+        :py:func:`~astrodata.astro_data_tag` decorator.
+        """
         return self._process_tags()
 
     @property
     def descriptors(self):
-        """Returns a sequence of names for the methods that have been
-        decorated as descriptors.
+        """Return a sequence of names for descriptor methods.
+
+        These are the methods that are decorated with the
+        :py:func:`~astrodata.astro_data_descriptor` decorator.
+
+        This checks for the existence of the descriptor_method attribute in
+        the class members, so anything with that attribute (regardless of the
+        attribute's value) will be interpreted as a descriptor.
 
         Returns
         --------
@@ -355,8 +455,21 @@ class AstroData:
 
     @property
     def id(self):
-        """Returns the extension identifier (1-based extension number)
-        for sliced objects.
+        """Return the extension identifier.
+
+        The identifier is a 1-based extension number for objects with single
+        slices.
+
+        For objects that are not single slices, a ValueError will be raised.
+
+        Notes
+        -----
+        To get all the id values, use the `indices` property and add 1 to each
+        value:
+
+        .. code-block:: python
+
+            ids = [i + 1 for i in ad.indices]
         """
         if self.is_single:
             return self._indices[0] + 1
@@ -368,13 +481,17 @@ class AstroData:
 
     @property
     def indices(self):
-        """Returns the extensions indices for sliced objects."""
+        """Return the extensions indices for sliced objects."""
         return self._indices if self._indices else list(range(len(self)))
 
     @property
     def is_sliced(self):
-        """If this data provider instance represents the whole dataset, return
-        False. If it represents a slice out of the whole, return True.
+        """Return True if this object is a slice of a dataset.
+
+        If this data provider instance represents a whole dataset, return
+        False. If it represents a slice out of a whole, return True.
+
+        It does this by checking if the ``_indices`` private attribute is set.
         """
         return self._indices is not None
 
@@ -387,8 +504,9 @@ class AstroData:
 
     @property
     def _nddata(self):
-        """Return the list of `astrodata.NDAstroData` objects. Contrary to
-        ``self.nddata`` this always returns a list.
+        """Return the list of `astrodata.NDAstroData` objects.
+
+        Unlike ``self.nddata``, this always returns a list.
         """
         if self._indices is not None:
             return [self._all_nddatas[i] for i in self._indices]
@@ -418,16 +536,12 @@ class AstroData:
 
     @property
     def tables(self):
-        """Return the names of the `astropy.table.Table` objects associated to
-        the top-level object.
-        """
+        """Return the names of the associated `astropy.table.Table` objects."""
         return set(self._tables)
 
     @property
     def ext_tables(self):
-        """Return the names of the `astropy.table.Table` objects associated to
-        an extension.
-        """
+        """Return the names of the extensions' `astropy.table.Table` objects."""
         if not self.is_single:
             raise AttributeError("this is only available for extensions")
 
@@ -440,16 +554,27 @@ class AstroData:
     @property
     @returns_list
     def shape(self):
-        """Return the shape of the data array for each extension as a list of
-        shapes.
+        """Return the shape of the data array for each extension.
+
+        Returns
+        -------
+        list of tuple
         """
         return [nd.shape for nd in self._nddata]
 
     @property
     @returns_list
     def data(self):
-        """A list of the arrays (or single array, if this is a single slice)
-        corresponding to the science data attached to each extension.
+        """Create a list of arrays corresponding to data in extensions.
+
+        This may be a single array, if the data is a single slice.
+
+        If set, it expects the value to be something with a shape, such as a
+        numpy array.
+
+        Notes
+        -----
+        The result will always be a list, even if it's a single slice.
         """
         return [nd.data for nd in self._nddata]
 
@@ -469,8 +594,7 @@ class AstroData:
     @property
     @returns_list
     def uncertainty(self):
-        """A list of the uncertainty objects (or a single object, if this is
-        a single slice) attached to the science data, for each extension.
+        """Create a list of the uncertainty objects for each extension.
 
         The objects are instances of AstroPy's `astropy.nddata.NDUncertainty`,
         or `None` where no information is available.
@@ -479,6 +603,9 @@ class AstroData:
         --------
         variance : The actual array supporting the uncertainty object.
 
+        Notes
+        -----
+        The result will always be a list, even if it's a single slice.
         """
         return [nd.uncertainty for nd in self._nddata]
 
@@ -490,10 +617,16 @@ class AstroData:
     @property
     @returns_list
     def mask(self):
-        """A list of the mask arrays (or a single array, if this is a single
-        slice) attached to the science data, for each extension.
+        """Return a list of the mask arrays for each extension.
+
+        Returns a list of the mask arrays (or a single array, if this is a
+        single slice) attached to the science data, for each extension.
 
         For objects that miss a mask, `None` will be provided instead.
+
+        Notes
+        -----
+        The result will always be a list, even if it's a single slice.
         """
         return [nd.mask for nd in self._nddata]
 
@@ -505,7 +638,9 @@ class AstroData:
     @property
     @returns_list
     def variance(self):
-        """A list of the variance arrays (or a single array, if this is a
+        """Return a list of variance arrays for each extension.
+
+        A list of the variance arrays (or a single array, if this is a
         single slice) attached to the science data, for each extension.
 
         For objects that miss uncertainty information, `None` will be provided
@@ -515,6 +650,9 @@ class AstroData:
         ---------
         uncertainty : The uncertainty objects used under the hood.
 
+        Notes
+        -----
+        The result will always be a list, even if it's a single slice.
         """
         return [nd.variance for nd in self._nddata]
 
@@ -529,7 +667,12 @@ class AstroData:
 
     @property
     def wcs(self):
-        """Returns the list of WCS objects for each extension."""
+        """Return the list of WCS objects for each extension.
+
+        Warning
+        -------
+        This is what is returned by the ``astropy.nddata.NDData.wcs`` property.
+        """
         if self.is_single:
             return self.nddata.wcs
 
@@ -551,11 +694,13 @@ class AstroData:
                 yield self[n]
 
     def __getitem__(self, idx):
-        """Returns a sliced view of the instance. It supports the standard
-        Python indexing syntax.
+        """Get the item at the specified index.
 
-        Parameters
-        ----------
+        Returns a sliced view of the instance. It supports the standard Python
+        indexing syntax.
+
+        Arguments
+        ---------
         slice : int, `slice`
             An integer or an instance of a Python standard `slice` object
 
@@ -595,11 +740,12 @@ class AstroData:
         return obj
 
     def __delitem__(self, idx):
-        """Called to implement deletion of ``self[idx]``.  Supports standard
-        Python syntax (including negative indices).
+        """Delete an item using ``del self[idx]``.
 
-        Parameters
-        ----------
+        Supports standard Python syntax (including negative indices).
+
+        Arguments
+        ---------
         idx : int
             This index represents the order of the element that you want
             to remove.
@@ -611,15 +757,18 @@ class AstroData:
         """
         if self.is_sliced:
             raise TypeError("Can't remove items from a sliced object")
+
         del self._all_nddatas[idx]
 
     def __getattr__(self, attribute):
-        """Called when an attribute lookup has not found the attribute in the
+        """Get the attribute with the specified name.
+
+        Called when an attribute lookup has not found the attribute in the
         usual places (not an instance attribute, and not in the class tree for
         ``self``).
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         attribute : str
             The attribute's name.
 
@@ -627,6 +776,11 @@ class AstroData:
         -------
         AttributeError
             If the attribute could not be found/computed.
+
+        Notes
+        -----
+        For more information, see the documentation on the `__getattr__` method
+        in the Python documentation.
         """
         # If we're working with single slices, let's look some things up
         # in the ND object
@@ -643,11 +797,13 @@ class AstroData:
         )
 
     def __setattr__(self, attribute, value):
-        """Called when an attribute assignment is attempted, instead of the
+        """Set the attribute with the specified name to a given value.
+
+        Called when an attribute assignment is attempted, instead of the
         normal mechanism.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         attribute : str
             The attribute's name.
 
@@ -692,7 +848,7 @@ class AstroData:
         super().__setattr__(attribute, value)
 
     def __delattr__(self, attribute):
-        """Implements attribute removal."""
+        """Delete an attribute."""
         if not attribute.isupper():
             super().__delattr__(attribute)
             return
@@ -718,11 +874,15 @@ class AstroData:
                 )
 
     def __contains__(self, attribute):
-        """Implements the ability to use the ``in`` operator with an
-        `AstroData` object.
+        """Return True if the attribute is exposed in this instance.
 
-        Parameters
-        ----------
+        Implements the ability to use the ``in`` operator with an `AstroData`
+        object.
+
+        This looks for the attribute in :py:meth:``~astrodata.AstroData.exposed``.
+
+        Arguments
+        --------
         attribute : str
             An attribute name.
 
@@ -744,7 +904,9 @@ class AstroData:
 
     @property
     def exposed(self):
-        """A collection of strings with the names of objects that can be
+        """Return a set of attribute names that can be accessed directly.
+
+        A collection of strings with the names of objects that can be
         accessed directly by name as attributes of this instance, and that are
         not part of its standard interface (i.e. data objects that have been
         added dynamically).
@@ -762,6 +924,16 @@ class AstroData:
         return exposed
 
     def _pixel_info(self):
+        """Get the pixel information for each extension.
+
+        This is a generator that yields a dictionary with the information
+        about a single extension, until all extensions have been yielded.
+
+        Yields
+        -------
+        dict
+            A dictionary with the pixel information for an extension.
+        """
         for idx, nd in enumerate(self._nddata):
             other_objects = []
             uncer = nd.uncertainty
@@ -826,7 +998,7 @@ class AstroData:
             yield out_dict
 
     def info(self):
-        """Prints out information about the contents of this instance."""
+        """Print out information about the contents of this instance."""
         unknown_file = "Unknown"
         print(f"Filename: {self.path if self.path else unknown_file}")
 
@@ -885,6 +1057,7 @@ class AstroData:
                 )
 
     def _oper(self, operator, operand):
+        """Perform an operation on the data with the specified operand."""
         ind = self.indices
         ndd = self._all_nddatas
         if isinstance(operand, AstroData):
@@ -916,6 +1089,7 @@ class AstroData:
                 ndd[ind[n]] = operator(ndd[ind[n]], operand)
 
     def _standard_nddata_op(self, fn, operand):
+        """Operate on the data with the specified function and operand."""
         return self._oper(
             partial(fn, handle_mask=np.bitwise_or, handle_meta="first_found"),
             operand,
@@ -978,6 +1152,7 @@ class AstroData:
         return copy
 
     def _rdiv(self, ndd, operand):
+        """Divide the data by the NDData object."""
         # Divide method works with the operand first
         return NDAstroData.divide(operand, ndd)
 
@@ -989,6 +1164,27 @@ class AstroData:
     def _process_pixel_plane(
         self, pixim, name=None, top_level=False, custom_header=None
     ):
+        """Process a pixel plane and return an NDData object.
+
+        Arguments
+        ---------
+        pixim : `astropy.io.fits.ImageHDU` or `numpy.ndarray`
+            The pixel plane to be processed.
+
+        name : str
+            The name of the extension.
+
+        top_level : bool
+            Whether this is a top-level extension.
+
+        custom_header : `astropy.io.fits.Header`
+            A custom header to be used.
+
+        Returns
+        -------
+        `astrodata.NDAstroData`
+            The processed pixel plane.
+        """
         # Assume that we get an ImageHDU or something that can be
         # turned into one
         if isinstance(pixim, fits.ImageHDU):
@@ -1013,6 +1209,27 @@ class AstroData:
         return nd
 
     def _append_array(self, data, name=None, header=None, add_to=None):
+        """Append an array to the AstroData object.
+
+        Arguments
+        ---------
+        data : `numpy.ndarray`
+            The data to be appended.
+
+        name : str
+            The name of the extension.
+
+        header : `astropy.io.fits.Header`
+            The header to be used.
+
+        add_to : `NDAstroData`
+            The NDData object to append to.
+
+        Returns
+        -------
+        `NDAstroData`
+            The NDData object that was appended.
+        """
         if name in {"DQ", "VAR"}:
             raise ValueError(
                 f"'{name}' need to be associated to a "
@@ -1039,6 +1256,27 @@ class AstroData:
         return ret
 
     def _append_imagehdu(self, hdu, name, header, add_to):
+        """Append an ImageHDU to the AstroData object.
+
+        Arguments
+        ---------
+        hdu : `astropy.io.fits.ImageHDU`
+            The ImageHDU to be appended.
+
+        name : str
+            The name of the extension.
+
+        header : `astropy.io.fits.Header`
+            The header to be used.
+
+        add_to : `NDAstroData`
+            The NDData object to append to.
+
+        Returns
+        -------
+        `NDAstroData`
+            The NDData object that was appended.
+        """
         if name in {"DQ", "VAR"} or add_to is not None:
             return self._append_array(hdu.data, name=name, add_to=add_to)
 
@@ -1048,6 +1286,27 @@ class AstroData:
         return self._append_nddata(nd, name, add_to=None)
 
     def _append_raw_nddata(self, raw_nddata, name, header, add_to):
+        """Append an NDData object to the AstroData object.
+
+        Arguments
+        ---------
+        raw_nddata : `astropy.nddata.NDData`
+            The NDData object to be appended.
+
+        name : str
+            The name of the extension.
+
+        header : `astropy.io.fits.Header`
+            The header to be used.
+
+        add_to : `NDAstroData`
+            The NDData object to append to.
+
+        Returns
+        -------
+        `NDAstroData`
+            The NDData object that was appended.
+        """
         logging.debug("Appending data to nddata: %s", name)
 
         # We want to make sure that the instance we add is whatever we specify
@@ -1063,10 +1322,32 @@ class AstroData:
         return self._append_nddata(processed_nddata, name=name, add_to=add_to)
 
     def _append_nddata(self, new_nddata, name, add_to):
-        # NOTE: This method is only used by others that have constructed NDData
-        # according to our internal format. We don't accept new headers at this
-        # point, and that's why it's missing from the signature.  'name' is
-        # ignored. It's there just to comply with the _append_XXX signature.
+        """Append an NDData object to the AstroData object.
+
+        .. warning::
+
+            This method is only used by others that have constructed NDData
+            according to our internal format. We don't accept new headers at
+            this point, and that's why it's missing from the signature.  'name'
+            is ignored. It's there just to comply with the _append_XXX
+            signature.
+
+        Arguments
+        ---------
+        new_nddata : `NDAstroData`
+            The NDData object to be appended.
+
+        name : str
+            The name of the extension.
+
+        add_to : `NDAstroData`
+            The NDData object to append to.
+
+        Returns
+        -------
+        `NDAstroData`
+            The NDData object that was appended.
+        """
         if add_to is not None:
             raise TypeError(
                 "You can only append NDData derived instances "
@@ -1090,6 +1371,27 @@ class AstroData:
         return new_nddata
 
     def _append_table(self, new_table, name, header, add_to):
+        """Append a Table object to the AstroData object.
+
+        Arguments
+        ---------
+        new_table : `astropy.table.Table`
+            The Table object to be appended.
+
+        name : str
+            The name of the extension.
+
+        header : `astropy.io.fits.Header`
+            The header to be used.
+
+        add_to : `NDAstroData`
+            The NDData object to append to.
+
+        Returns
+        -------
+        `NDAstroData`
+            The NDData object that was appended.
+        """
         tb = _process_table(new_table, name, header)
         hname = tb.meta["header"].get("EXTNAME")
 
@@ -1130,6 +1432,27 @@ class AstroData:
         return tb
 
     def _append_astrodata(self, ad, name, header, add_to):
+        """Append an AstroData object to the AstroData object.
+
+        Arguments
+        ---------
+        ad : `AstroData`
+            The AstroData object to be appended.
+
+        name : str
+            The name of the extension.
+
+        header : `astropy.io.fits.Header`
+            The header to be used.
+
+        add_to : `NDAstroData`
+            The NDData object to append to.
+
+        Returns
+        -------
+        `NDAstroData`
+            The NDData object that was appended.
+        """
         logging.debug("Appending astrodata object: %s", name)
 
         if not ad.is_single:
@@ -1150,7 +1473,8 @@ class AstroData:
         return self._append_nddata(new_nddata, name=None, add_to=None)
 
     def _append(self, ext, name=None, header=None, add_to=None):
-        """
+        """Append an extension to the AstroData object.
+
         Internal method to dispatch to the type specific methods. This is
         called either by ``.append`` to append on top-level objects only or
         by ``__setattr__``. In the second case ``name`` cannot be None, so
@@ -1171,17 +1495,17 @@ class AstroData:
         return self._append_array(ext, name=name, header=header, add_to=add_to)
 
     def append(self, ext, name=None, header=None):
-        """
-        Adds a new top-level extension.
+        """Add a new top-level extension.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         ext : array, `astropy.nddata.NDData`, `astropy.table.Table`, other
             The contents for the new extension. The exact accepted types depend
             on the class implementing this interface. Implementations specific
             to certain data formats may accept specialized types (eg. a FITS
             provider will accept an `astropy.io.fits.ImageHDU` and extract the
             array out of it).
+
         name : str, optional
             A name that may be used to access the new object, as an attribute
             of the provider. The name is typically ignored for top-level
@@ -1243,13 +1567,13 @@ class AstroData:
     load = read  # for backward compatibility
 
     def write(self, filename=None, overwrite=False):
-        """
-        Write the object to disk.
+        """Write the object to a file.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         filename : str, optional
             If the filename is not given, ``self.path`` is used.
+
         overwrite : bool
             If True, overwrites existing file.
 
@@ -1262,7 +1586,8 @@ class AstroData:
         write_fits(self, filename, overwrite=overwrite)
 
     def operate(self, operator, *args, **kwargs):
-        """
+        """Apply a function to the data in each extension.
+
         Applies a function to the main data array on each extension, replacing
         the data with the result. The data will be passed as the first argument
         to the function.
@@ -1281,16 +1606,17 @@ class AstroData:
 
         with the additional advantage that it will work on single slices, too.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         operator : callable
             A function that takes an array (and, maybe, other arguments)
             and returns an array.
+
         args, kwargs : optional
             Additional arguments to be passed to the ``operator``.
 
         Examples
-        ---------
+        --------
         >>> import numpy as np
         >>> ad.operate(np.squeeze)  # doctest: +SKIP
 
@@ -1304,28 +1630,33 @@ class AstroData:
                 ext.variance = operator(ext.variance, *args, **kwargs)
 
     def reset(self, data, mask=NO_DEFAULT, variance=NO_DEFAULT, check=True):
-        """
+        """Reset the data, and optionally mask and variance of an extension.
+
         Sets the ``.data``, and optionally ``.mask`` and ``.variance``
         attributes of a single-extension AstroData slice. This function will
         optionally check whether these attributes have the same shape.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         data : ndarray
             The array to assign to the ``.data`` attribute ("SCI").
+
         mask : ndarray, optional
             The array to assign to the ``.mask`` attribute ("DQ").
+
         variance: ndarray, optional
             The array to assign to the ``.variance`` attribute ("VAR").
+
         check: bool
             If set, then the function will check that the mask and variance
             arrays have the same shape as the data array.
 
         Raises
-        -------
+        ------
         TypeError
             if an attempt is made to set the .mask or .variance attributes
             with something other than an array
+
         ValueError
             if the .mask or .variance attributes don't have the same shape as
             .data, OR if this is called on an AD instance that isn't a single
@@ -1399,8 +1730,8 @@ class AstroData:
         Note that, if ``strip=True``, a prefix or suffix will only be stripped
         if '' is specified.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         prefix: str, optional
             New prefix (None => leave alone)
 
@@ -1471,12 +1802,12 @@ class AstroData:
     def _crop_nd(self, nd, x1, y1, x2, y2):
         """Crop the input nd array and its associated attributes.
 
-        Args:
-            nd: The input nd array.
-            x1: The starting x-coordinate of the crop region.
-            y1: The starting y-coordinate of the crop region.
-            x2: The ending x-coordinate of the crop region.
-            y2: The ending y-coordinate of the crop region.
+        Arguments
+        ---------
+        nd: `NDAstroData`
+            The input nd array.
+        x1, y1, x2, y2: int
+            The minimum (1) and maximum (2) indices for the x and y axis.
         """
         y_start, y_end = y1, y2 + 1
         x_start, x_end = x1, x2 + 1
@@ -1492,11 +1823,10 @@ class AstroData:
     def crop(self, x1, y1, x2, y2):
         """Crop the NDData objects given indices.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         x1, y1, x2, y2 : int
             Minimum and maximum indices for the x and y axis.
-
         """
         for nd in self._nddata:
             orig_shape = nd.data.shape
