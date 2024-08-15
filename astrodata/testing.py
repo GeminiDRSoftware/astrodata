@@ -1,5 +1,5 @@
 # pragma: no cover
-"""Fixtures to be used in tests in DRAGONS"""
+"""Define utility functions and classes for testing purposes."""
 
 import enum
 import functools
@@ -38,13 +38,33 @@ log = logging.getLogger(__name__)
 
 
 class DownloadResult(enum.Enum):
+    """Result status for the download_from_archive function.
+
+    Enum class to store the possible states of the download_from_archive
+    function. The states are used to determine if the function was successful
+    in downloading a file from the archive.
+
+    Attributes
+    ----------
+    SUCCESS : int
+        The download was successful.
+
+    NOT_FOUND : int
+        The file was not found in the archive.
+
+    NONE : int
+        The state is not set.
+    """
+
     SUCCESS = 2
     NOT_FOUND = 1
     NONE = 0
 
 
 class DownloadState:
-    """Singleton class to hold the state of the download_from_archive function.
+    """Stores the success state of the download_from_archive function.
+
+    Singleton class to hold the state of the download_from_archive function.
     A bit of an annoying workaround because of conflicts with how ``pytest``'s
     fixtures work.
 
@@ -52,6 +72,27 @@ class DownloadState:
     instantiated directly. Instead, the instance should be accessed via the
     ``_instance`` class attribute. Instantiation using ``DownloadState()`` will
     do this automatically.
+
+    Attributes
+    ----------
+    _state : DownloadResult
+        The state of the download_from_archive function.
+
+    _valid_state : bool
+        Flag to indicate if the state is valid.
+
+    test_result : bool
+        Result of the test download_from_archive function.
+
+    Notes
+    -----
+    To check the state of the download_from_archive function, use the
+    ``check_state`` method. This method will return the state of the function
+    as a :class:`~DownloadResult` enum. If the state is not valid, the method
+    will re-test the function.
+
+    See the :class:`~DownloadResult` enum for the possible states and their
+    documentation.
     """
 
     __slots__ = ["_state", "_valid_state", "test_result"]
@@ -59,6 +100,7 @@ class DownloadState:
     _instance = None
 
     def __new__(cls):
+        """Instantiate or return the singleton class."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._state = None
@@ -97,8 +139,7 @@ class DownloadState:
 
 
 def skip_if_download_none(func):
-    """Skip test if download_from_archive is returning None. Otherwise,
-    continue.
+    """Skip test if download_from_archive is returning None.
 
     Used as a wrapper for testing functions. Works with nose, pynose, and
     pytest.
@@ -119,7 +160,9 @@ def skip_if_download_none(func):
 
 
 def get_corners(shape):
-    """This is a recursive function to calculate the corner indices
+    """Calculate the corner indices of an array of the specified shape.
+
+    This is a recursive function to calculate the corner indices
     of an array of the specified shape.
 
     Parameters
@@ -156,9 +199,17 @@ def get_corners(shape):
 
 
 def assert_most_close(
-    actual, desired, max_miss, rtol=1e-7, atol=0, equal_nan=True, verbose=True
+    actual,
+    desired,
+    max_miss,
+    rtol=1e-7,
+    atol=0,
+    equal_nan=True,
+    verbose=True,
 ):
-    """Raises an AssertionError if the number of elements in two objects that
+    """Assert that two objects are equal up to a specified number of elements.
+
+    Raises an AssertionError if the number of elements in two objects that
     are not equal up to desired tolerance is greater than expected.
 
     See Also
@@ -227,11 +278,13 @@ def assert_most_close(
 
 
 def assert_most_equal(actual, desired, max_miss, verbose=True):
-    """Raises an AssertionError if more than `n` elements in two objects are
-    not equal. For more information, check :func:`numpy.testing.assert_equal`.
+    """Assert that two objects are equal up to a specified number of elements.
 
-    Parameters
-    ----------
+    Raises an AssertionError if more than `n` elements in two objects are not
+    equal. For more information, check :func:`numpy.testing.assert_equal`.
+
+    Arguments
+    ---------
     actual : array_like
         The object to check.
 
@@ -249,6 +302,7 @@ def assert_most_equal(actual, desired, max_miss, verbose=True):
     AssertionError
         If actual and desired are not equal.
     """
+    # TODO(teald): Use importlib to import the necessary modules.
     from numpy.testing import assert_equal
 
     try:
@@ -276,16 +330,19 @@ def assert_most_equal(actual, desired, max_miss, verbose=True):
 
 
 def assert_same_class(ad, ad_ref):
-    """Compare if two :class:`~astrodata.AstroData` (or any subclass) have the
-    same class.
+    """Compare two :class:`~astrodata.AstroData` objects have the same class.
 
-    Parameters
+    This function is used to compare two |AstroData| objects to ensure they are
+    are equivalent classes, i.e., they are both |AstroData| objects or both
+    |AstroData| subclasses.
+
+    Arguments
     ----------
-        ad : :class:`astrodata.AstroData` or any subclass
-            AstroData object to be checked.
+    ad : :class:`astrodata.AstroData` or any subclass
+        AstroData object to be checked.
 
-        ad_ref : :class:`astrodata.AstroData` or any subclass
-            AstroData object used as reference
+    ad_ref : :class:`astrodata.AstroData` or any subclass
+        AstroData object used as reference
     """
     from astrodata import AstroData
 
@@ -295,7 +352,9 @@ def assert_same_class(ad, ad_ref):
 
 
 def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
-    """Check that any two models are the same, within some tolerance on
+    """Compare two models for similarity.
+
+    Check that any two models are the same, within some tolerance on
     parameters (using the same defaults as numpy.assert_allclose()).
 
     This is constructed like a test, rather than returning True/False, in order
@@ -313,7 +372,36 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
     parameters controlling how the array of model `parameters` is interpreted
     (eg. the orders in SIP?), but it does cover our common use of compound
     models involving orthonormal polynomials etc.
+
+    Arguments
+    ---------
+    model1 : `astropy.modeling.Model`
+        First model to compare.
+
+    model2 : `astropy.modeling.Model`
+        Second model to compare.
+
+    rtol : float
+        Relative tolerance.
+
+    atol : float
+        Absolute tolerance.
+
+    check_inverse : bool
+        If True, compare the inverses of the models as well.
+
+    Raises
+    ------
+    AssertionError
+        If the models are not the same.
+
+    Notes
+    -----
+    This function is taken from the `DRAGONS` repository and is used to compare
+    models in the context of the `DRAGONS` project. It is included here for
+    completeness.
     """
+    # TODO(teald): Use importlib to import the necessary modules.
     from astropy.modeling import Model
     from numpy.testing import assert_allclose
 
@@ -493,10 +581,10 @@ def download_from_archive(
     fail_on_error=True,
     suppress_stdout=False,
 ):
-    """Download file from the archive and store it in the local cache.
+    """Download a file from the archive and store it in the local cache.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     filename : str
         The filename, e.g. N20160524S0119.fits
 
@@ -608,8 +696,10 @@ def download_from_archive(
 
 
 def get_associated_calibrations(filename, nbias=5):
-    """Queries Gemini Observatory Archive for associated calibrations to reduce
-    the data that will be used for testing.
+    """Query Gemini Observatory Archive for associated calibrations.
+
+    This function quieries the Gemini Observatory Archive for calibrations
+    associated with a given data file.
 
     Parameters
     ----------
@@ -635,7 +725,9 @@ def get_associated_calibrations(filename, nbias=5):
 
 
 class ADCompare:
-    """Compare two AstroData instances to determine whether they are basically
+    """Compare two |AstroData| instances for near-equality.
+
+    Use this class to determine whether two |AstroData| instances are basically
     the same. Various properties (both data and metadata) can be compared
     """
 
@@ -701,7 +793,7 @@ class ADCompare:
             specific mismatch is permitted
 
         Raises
-        -------
+        ------
         AssertionError if the AD objects do not agree.
         """
         self.max_miss = max_miss
@@ -739,7 +831,7 @@ class ADCompare:
         return errordict
 
     def numext(self):
-        """Check the number of extensions is equal"""
+        """Check the number of extensions is equal."""
         numext1, numext2 = len(self.ad1), len(self.ad2)
         if numext1 != numext2:
             return [f"{numext1} v {numext2}"]
@@ -747,7 +839,7 @@ class ADCompare:
         return []
 
     def filename(self):
-        """Check the filenames are equal"""
+        """Check the filenames are equal."""
         fname1, fname2 = self.ad1.filename, self.ad2.filename
 
         if fname1 != fname2:
@@ -756,7 +848,7 @@ class ADCompare:
         return []
 
     def tags(self):
-        """Check the tags are equal"""
+        """Check the tags are equal."""
         tags1, tags2 = self.ad1.tags, self.ad2.tags
 
         if tags1 != tags2:
@@ -765,7 +857,7 @@ class ADCompare:
         return []
 
     def phu(self):
-        """Check the PHUs agree"""
+        """Check the PHUs agree."""
         # Ignore NEXTEND as only recently added and len(ad) handles it
         errorlist = self._header(
             self.ad1.phu,
@@ -776,7 +868,7 @@ class ADCompare:
         return errorlist
 
     def hdr(self):
-        """Check the extension headers agree"""
+        """Check the extension headers agree."""
         errorlist = []
         for i, (hdr1, hdr2) in enumerate(zip(self.ad1.hdr, self.ad2.hdr)):
             elist = self._header(hdr1, hdr2, ignore=self.ignore_kw)
@@ -785,7 +877,19 @@ class ADCompare:
         return errorlist
 
     def _header(self, hdr1, hdr2, ignore=None):
-        """General method for comparing headers, ignoring some keywords"""
+        """Compare headers, ignoring keywords in ignore.
+
+        Arguments
+        ---------
+        hdr1 : Header
+            First header to compare.
+
+        hdr2 : Header
+            Second header to compare.
+
+        ignore : list
+            List of keywords to ignore during comparison.
+        """
         errorlist = []
         s1 = set(hdr1.keys()) - {"HISTORY", "COMMENT"}
         s2 = set(hdr2.keys()) - {"HISTORY", "COMMENT"}
@@ -832,7 +936,7 @@ class ADCompare:
         return errorlist
 
     def refcat(self):
-        """Check both ADs have REFCATs (or not) and that the lengths agree"""
+        """Check both ADs have REFCATs (or not) and their lengths agree."""
         # REFCAT can be in the PHU or the AD itself, depending on if REFCAT is
         # implemented as a property/attr or not in the parent class.
         refcat1 = getattr(self.ad1.phu, "REFCAT", None)
@@ -854,7 +958,7 @@ class ADCompare:
         return []
 
     def attributes(self):
-        """Check extension-level attributes"""
+        """Check extension-level attributes."""
         errorlist = []
         for i, (ext1, ext2) in enumerate(zip(self.ad1, self.ad2)):
             elist = self._attributes(ext1, ext2)
@@ -863,7 +967,7 @@ class ADCompare:
         return errorlist
 
     def _attributes(self, ext1, ext2):
-        """Helper method for checking attributes"""
+        """Check the attributes of two extensions."""
         errorlist = []
         for attr in ["data", "mask", "variance", "OBJMASK", "OBJCAT"]:
             attr1 = getattr(ext1, attr, None)
@@ -879,10 +983,10 @@ class ADCompare:
         return errorlist
 
     def wcs(self):
-        """Check WCS agrees"""
+        """Check WCS agrees between ad objects."""
 
         def compare_frames(frame1, frame2):
-            """Compare the important stuff of two CoordinateFrame instances"""
+            """Compare the important stuff of two CoordinateFrame instances."""
             for attr in (
                 "naxes",
                 "axes_type",
@@ -937,7 +1041,7 @@ class ADCompare:
         return errorlist
 
     def format_errordict(self, errordict):
-        """Format the errordict into a str for reporting"""
+        """Format the errordict into a str for reporting."""
         errormsg = (
             f"Comparison between {self.ad1.filename} and {self.ad2.filename}"
         )
@@ -949,8 +1053,9 @@ class ADCompare:
 
 
 def ad_compare(ad1, ad2, **kwargs):
-    """Compares the tags, headers, and pixel values of two images. This is
-    simply a wrapper for ADCompare.run_comparison() for backward-compatibility.
+    """Compare the tags, headers, and pixel values of two images.
+
+    This is a wrapper for ADCompare.run_comparison() for backward-compatibility.
 
     Parameters
     ----------
@@ -985,8 +1090,7 @@ def fake_fits_bytes(
     masks: bool = False,
     single_hdu: bool = False,
 ) -> io.BytesIO:
-    """Create a fake FITS file in memory and return a BytesIO object that can
-    access it.
+    """Create a fake FITS file in memory and return readable BytesIO object.
 
     Arguments
     ---------
@@ -1252,8 +1356,7 @@ def test_script_file(
 
 
 def process_string_to_python_script(string: str) -> str:
-    """Takes an input string and performs tasks to make it properly
-    python-formatted.
+    """Format a stirng to be used as a Python script.
 
     Parameters
     ----------
@@ -1277,6 +1380,12 @@ def process_string_to_python_script(string: str) -> str:
 
 
 def get_program_observations():
+    """Get the program and observation IDs for the current test.
+
+    .. warning::
+        This function is not implemented. It will be implemented in a future
+        release.
+    """
     raise NotImplementedError
 
 
