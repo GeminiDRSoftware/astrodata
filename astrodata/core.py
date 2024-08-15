@@ -76,9 +76,10 @@ class AstroData:
     .. warning::
 
         This class is not meant to be instantiated directly. Instead, use the
-        factory method :py:func:`astrodata.from_file` to create an instance of this
-        class using a file. Alternatively, use the :py:meth:`astrodata.create`
-        function to create a new instance from scratch.
+        factory method :py:func:`astrodata.from_file` to create an instance of
+        this class using a file. Alternatively, use the
+        :py:meth:`astrodata.create` function to create a new instance from
+        scratch.
 
         The documentation here is meant for developers who want to extend the
         functionality of this class.
@@ -310,8 +311,8 @@ class AstroData:
 
         .. warning::
 
-            The default implementation for the base |AstroData| class is a trivial
-            match (always return True).
+            The default implementation for the base |AstroData| class is a
+            trivial match (always return True).
 
         Example
         -------
@@ -353,7 +354,8 @@ class AstroData:
 
         If the filename is set, the path will be updated automatically.
 
-        If the filename is set to an absolute path, a ValueError will be raised.
+        If the filename is set to an absolute path, a ValueError will be
+        raised.
         """
         if self.path is not None:
             return os.path.basename(self.path)
@@ -538,7 +540,7 @@ class AstroData:
 
     @property
     def ext_tables(self):
-        """Return the names of the extensions' `astropy.table.Table` objects."""
+        """Return names of the extensions' `astropy.table.Table` objects."""
         if not self.is_single:
             raise AttributeError("this is only available for extensions")
 
@@ -884,7 +886,8 @@ class AstroData:
         Implements the ability to use the ``in`` operator with an `AstroData`
         object.
 
-        This looks for the attribute in :py:meth:``~astrodata.AstroData.exposed``.
+        This looks for the attribute in
+        :py:meth:``~astrodata.AstroData.exposed``.
 
         Arguments
         --------

@@ -986,7 +986,8 @@ def _get_shape(sequence):
 
 
 def _apply_func(func, sequence, boxes, result, **kwargs):
-    """
+    """Call a function on a sequence of elements with specific chunking.
+
     Apply a given function to a sequence of elements within specified boxes and
     store the result in the result object.
 
