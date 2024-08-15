@@ -1,7 +1,4 @@
-"""This is the core module of the AstroData package. It provides the
-`AstroData` class, which is the main interface to manipulate astronomical
-data sets.
-"""
+"""Core module of the AstroData package, containing the |AstroData| class."""
 
 import inspect
 import logging
@@ -445,7 +442,7 @@ class AstroData:
         attribute's value) will be interpreted as a descriptor.
 
         Returns
-        --------
+        -------
         tuple of str
         """
         members = inspect.getmembers(
@@ -599,7 +596,7 @@ class AstroData:
         The objects are instances of AstroPy's `astropy.nddata.NDUncertainty`,
         or `None` where no information is available.
 
-        See also
+        See Also
         --------
         variance : The actual array supporting the uncertainty object.
 
@@ -646,8 +643,8 @@ class AstroData:
         For objects that miss uncertainty information, `None` will be provided
         instead.
 
-        See also
-        ---------
+        See Also
+        --------
         uncertainty : The uncertainty objects used under the hood.
 
         Notes
@@ -687,6 +684,14 @@ class AstroData:
         self.nddata.wcs = value
 
     def __iter__(self):
+        """Iterate over the extensions..
+
+        This generator yields the `AstroData` object for each extension.
+
+        Notes
+        -----
+        This will yield the object, once, if it's a single slice.
+        """
         if self.is_single:
             yield self
         else:
@@ -705,7 +710,7 @@ class AstroData:
             An integer or an instance of a Python standard `slice` object
 
         Raises
-        -------
+        ------
         TypeError
             If trying to slice an object when it doesn't make sense (e.g.
             slicing a single slice)
@@ -751,7 +756,7 @@ class AstroData:
             to remove.
 
         Raises
-        -------
+        ------
         IndexError
             If `idx` is out of range.
         """
@@ -773,7 +778,7 @@ class AstroData:
             The attribute's name.
 
         Raises
-        -------
+        ------
         AttributeError
             If the attribute could not be found/computed.
 
@@ -887,7 +892,7 @@ class AstroData:
             An attribute name.
 
         Returns
-        --------
+        -------
         bool
         """
         return attribute in self.exposed
@@ -912,7 +917,7 @@ class AstroData:
         added dynamically).
 
         Examples
-        ---------
+        --------
         >>> ad[0].exposed  # doctest: +SKIP
         set(['OBJMASK', 'OBJCAT'])
 
@@ -930,7 +935,7 @@ class AstroData:
         about a single extension, until all extensions have been yielded.
 
         Yields
-        -------
+        ------
         dict
             A dictionary with the pixel information for an extension.
         """
@@ -1096,46 +1101,46 @@ class AstroData:
         )
 
     @format_doc(_ARIT_DOC, name="addition", op="+")
-    def __add__(self, oper):
+    def __add__(self, oper):  # noqa
         copy = deepcopy(self)
         copy += oper
         return copy
 
     @format_doc(_ARIT_DOC, name="subtraction", op="-")
-    def __sub__(self, oper):
+    def __sub__(self, oper):  # noqa
         copy = deepcopy(self)
         copy -= oper
         return copy
 
     @format_doc(_ARIT_DOC, name="multiplication", op="*")
-    def __mul__(self, oper):
+    def __mul__(self, oper):  # noqa
         copy = deepcopy(self)
         copy *= oper
         return copy
 
     @format_doc(_ARIT_DOC, name="division", op="/")
-    def __truediv__(self, oper):
+    def __truediv__(self, oper):  # noqa
         copy = deepcopy(self)
         copy /= oper
         return copy
 
     @format_doc(_ARIT_DOC, name="inplace addition", op="+=")
-    def __iadd__(self, oper):
+    def __iadd__(self, oper):  # noqa
         self._standard_nddata_op(NDAstroData.add, oper)
         return self
 
     @format_doc(_ARIT_DOC, name="inplace subtraction", op="-=")
-    def __isub__(self, oper):
+    def __isub__(self, oper):  # noqa
         self._standard_nddata_op(NDAstroData.subtract, oper)
         return self
 
     @format_doc(_ARIT_DOC, name="inplace multiplication", op="*=")
-    def __imul__(self, oper):
+    def __imul__(self, oper):  # noqa
         self._standard_nddata_op(NDAstroData.multiply, oper)
         return self
 
     @format_doc(_ARIT_DOC, name="inplace division", op="/=")
-    def __itruediv__(self, oper):
+    def __itruediv__(self, oper):  # noqa
         self._standard_nddata_op(NDAstroData.divide, oper)
         return self
 
@@ -1148,6 +1153,7 @@ class AstroData:
     __rmul__ = __mul__
 
     def __rsub__(self, oper):
+        """Subtract with the operand on the right, using a copy."""
         copy = (deepcopy(self) - oper) * -1
         return copy
 
@@ -1157,6 +1163,7 @@ class AstroData:
         return NDAstroData.divide(operand, ndd)
 
     def __rtruediv__(self, oper):
+        """Divide (//) with the operand on the right, using a copy."""
         obj = deepcopy(self)
         obj._oper(obj._rdiv, oper)
         return obj
@@ -1517,12 +1524,12 @@ class AstroData:
             character cannot be a number ("[A-Z][A-Z0-9]*").
 
         Returns
-        --------
+        -------
         The same object, or a new one, if it was necessary to convert it to
         a more suitable format for internal use.
 
         Raises
-        -------
+        ------
         TypeError
             If adding the object in an invalid situation (eg. ``name`` is
             `None` when adding to a single slice).
@@ -1846,15 +1853,15 @@ class AstroData:
 
     @astro_data_descriptor
     def instrument(self):
-        """Returns the name of the instrument making the observation."""
+        """Return the name of the instrument making the observation."""
         return self.phu.get(self._keyword_for("instrument"))
 
     @astro_data_descriptor
     def object(self):
-        """Returns the name of the object being observed."""
+        """Return the name of the object being observed."""
         return self.phu.get(self._keyword_for("object"))
 
     @astro_data_descriptor
     def telescope(self):
-        """Returns the name of the telescope."""
+        """Return the name of the telescope."""
         return self.phu.get(self._keyword_for("telescope"))
