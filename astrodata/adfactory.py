@@ -38,13 +38,15 @@ class AstroDataFactory:
         "astrodata.factory.AstroDataFactory._open_file"
     )
     @contextmanager
-    def _openFile(source):  # pylint: disable=invalid-name
+    def _openFile(source):  # noqa
         return AstroDataFactory._open_file(source)
 
     @staticmethod
     @contextmanager
     def _open_file(source):
-        """Internal static method that takes a ``source``, assuming that it is
+        """Open a file and return an appropriate object.
+
+        Internal static method that takes a ``source``, assuming that it is
         a string pointing to a file to be opened.
 
         If this is the case, it will try to open the file and return an
@@ -81,7 +83,7 @@ class AstroDataFactory:
                 except KeyboardInterrupt:
                     raise
 
-                except Exception as err:  # pylint: disable=broad-except
+                except Exception as err:  # noqa
                     LOGGER.error(
                         "Failed to open %s with %s, got error: %s",
                         source,
@@ -109,15 +111,18 @@ class AstroDataFactory:
         "Renamed to add_class, please use that method instead: "
         "astrodata.factory.AstroDataFactory.add_class"
     )
-    def addClass(self, cls):  # pylint: disable=invalid-name
-        """Add a new class to the AstroDataFactory registry. It will be used
-        when instantiating an AstroData class for a FITS file.
+    def addClass(self, cls):  # noqa
+        """Add a new class to the |AstroDataFactory| registry.
+
+        It will be used when instantiating an AstroData class for a FITS file.
         """
         self.add_class(cls)
 
     def add_class(self, cls):
-        """Add a new class to the AstroDataFactory registry. It will be used
-        when instantiating an AstroData class for a FITS file.
+        """Add a new class to the |AstroDataFactory|'s registry.
+
+        Add a new class to the |AstroDataFactory| registry. It will be used
+        when instantiating an |AstroData| class for a FITS file.
         """
         if not hasattr(cls, "_matches_data"):
             raise AttributeError(
@@ -137,12 +142,17 @@ class AstroDataFactory:
         "Renamed to get_astro_data, please use that method instead: "
         "astrodata.factory.AstroDataFactory.get_astro_data"
     )
-    def getAstroData(self, source):  # pylint: disable=invalid-name
-        """Deprecated, see |get_astro_data|."""
+    def getAstroData(self, source):  # noqa
+        """Return an |AstroData| instance from a file or HDUList.
+
+        Deprecated, see |get_astro_data|.
+        """
         self.get_astro_data(source)
 
     def get_astro_data(self, source):
-        """Takes either a string (with the path to a file) or an HDUList as
+        """Return an |AstroData| instance from a file or HDUList.
+
+        Takes either a string (with the path to a file) or an HDUList as
         input, and tries to return an AstroData instance.
 
         It will raise exceptions if the file is not found, or if there is no
@@ -151,10 +161,15 @@ class AstroDataFactory:
         Returns an instantiated object, or raises AstroDataError if it was
         not possible to find a match
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         source : `str` or `pathlib.Path` or `fits.HDUList`
             The file path or HDUList to read.
+
+        Returns
+        -------
+        `astrodata.AstroData`
+            An AstroData instance.
         """
         candidates = []
         with self._open_file(source) as opened:
@@ -204,15 +219,18 @@ class AstroDataFactory:
         self,
         phu,
         extensions=None,
-    ):  # pylint: disable=invalid-name
-        """Deprecated, see |create_from_scratch|."""
+    ):  # noqa
+        """Create an AstroData object from a collection of objects.
+
+        Deprecated, see |create_from_scratch|.
+        """
         self.create_from_scratch(phu=phu, extensions=extensions)
 
     def create_from_scratch(self, phu, extensions=None):
-        """Creates an AstroData object from a collection of objects.
+        """Create an AstroData object from a collection of objects.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         phu : `fits.PrimaryHDU` or `fits.Header` or `dict` or `list`
             FITS primary HDU or header, or something that can be used to create
             a fits.Header (a dict, a list of "cards").

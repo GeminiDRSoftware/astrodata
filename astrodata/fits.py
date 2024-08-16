@@ -57,8 +57,8 @@ class FitsHeaderCollection:
     It exposes a number of methods (``set``, ``get``, etc.) that operate over
     all the headers at the same time. It can also be iterated.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     headers : list of `astropy.io.fits.Header`
         List of Header objects.
     """
@@ -67,23 +67,40 @@ class FitsHeaderCollection:
         self._headers = list(headers)
 
     def _insert(self, idx, header):
+        """Insert a header at a given index.
+
+        Arguments
+        ---------
+        idx : int
+            The index where to insert the header.
+
+        header : `astropy.io.fits.Header`
+            The header to insert.
+
+        Returns
+        -------
+        None
+        """
         self._headers.insert(idx, header)
 
     def __iter__(self):
+        """Iterate over the headers."""
         yield from self._headers
 
     def __setitem__(self, key, value):
+        """Set keyword value in all the headers."""
         if isinstance(value, tuple):
             self.set(key, value=value[0], comment=value[1])
         else:
             self.set(key, value=value)
 
     def set(self, key, value=None, comment=None):
-        """Set a keyword in all the headers."""
+        """Set a keyword value in all the headers."""
         for header in self._headers:
             header.set(key, value=value, comment=comment)
 
     def __getitem__(self, key):
+        """Get item from all the headers by key."""
         missing_at = []
         ret = []
         for n, header in enumerate(self._headers):
@@ -121,6 +138,7 @@ class FitsHeaderCollection:
             return vals
 
     def __delitem__(self, key):
+        """Remove key from all the headers."""
         self.remove(key)
 
     def remove(self, key):
@@ -155,14 +173,15 @@ class FitsHeaderCollection:
                 raise KeyError(f"{err.args[0]} at header {n}") from err
 
     def __contains__(self, key):
+        """Return True if key is present in any of the headers."""
         return any(tuple(key in h for h in self._headers))
 
 
 def new_imagehdu(data, header, name=None):
     """Create a new ImageHDU from data and header.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     data : `numpy.ndarray`
         The data array.
 
@@ -193,8 +212,8 @@ def new_imagehdu(data, header, name=None):
 def table_to_bintablehdu(table, extname=None):
     """Convert an astropy Table object to a BinTableHDU before writing to disk.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     table: astropy.table.Table instance
         the table to be converted to a BinTableHDU
 
@@ -270,8 +289,33 @@ def header_for_table(table):
     return fits_header
 
 
+@deprecated(
+    "The functionality of this function is now covered by the "
+    "astropy.io.fits.Header class."
+)
 def add_header_to_table(table):
-    """Add a FITS header to a table."""
+    """Add a FITS header to a table's metadata. Deprecated.
+
+    This does not modify the table itself, but adds the header to the table's
+    metadata.  If a header is already present in the table's metadata, it will
+    ensure it's up to date with the table's columns.
+
+    Warning
+    -------
+    This function is deprecated and will be removed in a future version. Its
+    functionality is covered by Tables.
+
+    Arguments
+    ---------
+    table : `astropy.table.Table`
+        The table to add the header to.
+
+    Returns
+    -------
+    header : `astropy.io.fits.Header`
+        The header to add to the table
+
+    """
     header = header_for_table(table)
     table.meta["header"] = header
     return header
@@ -315,11 +359,10 @@ def _process_table(table, name=None, header=None):
 
 
 def card_filter(cards, include=None, exclude=None):
-    """Filter a list of cards, lazily returning only those that match the
-    criteria.
+    """Filter a list of cards, returning only those that match the criteria.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     cards : iterable
         The cards to filter.
 
@@ -333,6 +376,7 @@ def card_filter(cards, include=None, exclude=None):
     ------
     card : tuple
         A card that matches the criteria.
+
     """
     for card in cards:
         if include is not None and card[0] not in include:
@@ -345,16 +389,16 @@ def card_filter(cards, include=None, exclude=None):
 
 
 def update_header(headera, headerb):
-    """Update headera with the cards from headerb, but only if they are
-    different.
+    """Update headera with the cards from headerb if they differ.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     headera : `astropy.io.fits.Header`
         The header to update.
 
     headerb : `astropy.io.fits.Header`
         The header to update from.
+
     """
     cardsa = tuple(tuple(cr) for cr in headera.cards)
     cardsb = tuple(tuple(cr) for cr in headerb.cards)
@@ -381,7 +425,7 @@ def update_header(headera, headerb):
 
 
 def fits_ext_comp_key(ext):
-    """Returns a pair (int, str) that will be used to sort extensions."""
+    """Return a pair (int, str) that can be used to sort extensions."""
     if isinstance(ext, PrimaryHDU):
         # This will guarantee that the primary HDU goes first
         ret = (-1, "")
@@ -417,10 +461,10 @@ class FitsLazyLoadable:
     """Class to delay loading of data from a FITS file."""
 
     def __init__(self, obj):
-        """Initializes the object.
+        """Initialize the object.
 
-        Parameters
-        ----------
+        Arguments
+        ---------
         obj : `astropy.io.fits.ImageHDU` or `astropy.io.fits.BinTableHDU`
             The HDU to delay loading from.
         """
@@ -447,6 +491,7 @@ class FitsLazyLoadable:
         return (bscale * data + bzero).astype(self.dtype)
 
     def __getitem__(self, arr_slice):
+        """Get a slice of the data."""
         return self._scale(self._obj.section[arr_slice])
 
     @property
@@ -468,7 +513,9 @@ class FitsLazyLoadable:
 
     @property
     def dtype(self):
-        """Need to to some overriding of astropy.io.fits since it doesn't
+        """Return the dtype for the pixel data.
+
+        Need to to some overriding of astropy.io.fits since it doesn't
         know about BITPIX=8
         """
         # pylint: disable=protected-access
@@ -500,8 +547,8 @@ class FitsLazyLoadable:
 def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
     """Prepare an HDUList for reading.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     hdulist : `astropy.io.fits.HDUList`
         The HDUList to prepare.
 
@@ -575,14 +622,16 @@ def _prepare_hdulist(hdulist, default_extension="SCI", extname_parser=None):
 
 
 def read_fits(cls, source, extname_parser=None):
-    """Takes either a string (with the path to a file) or an HDUList as input,
+    """Read a FITS file and return an AstroData object.
+
+    Takes either a string (with the path to a file) or an HDUList as input,
     and tries to return a populated AstroData (or descendant) instance.
 
     It will raise exceptions if the file is not found, or if there is no match
     for the HDUList, among the registered AstroData classes.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     cls : class
         The class to instantiate.
 
@@ -597,7 +646,6 @@ def read_fits(cls, source, extname_parser=None):
     ad : `astrodata.AstroData` or descendant
         The populated AstroData object. This is of the type specified by cls.
     """
-
     ad = cls()
 
     if isinstance(source, (str, os.PathLike)):
@@ -763,7 +811,7 @@ def read_fits(cls, source, extname_parser=None):
 
 
 def ad_to_hdulist(ad):
-    """Creates an HDUList from an AstroData object."""
+    """Create an HDUList from an AstroData object."""
     hdul = HDUList()
     hdul.append(PrimaryHDU(header=ad.phu, data=DELAYED))
 
@@ -891,7 +939,7 @@ def ad_to_hdulist(ad):
 
 
 def write_fits(ad, filename, overwrite=False):
-    """Writes the AstroData object to a FITS file."""
+    """Write the AstroData object to a FITS file."""
     hdul = ad_to_hdulist(ad)
     hdul.writeto(filename, overwrite=overwrite)
 
@@ -901,7 +949,10 @@ def write_fits(ad, filename, overwrite=False):
     "and will be removed in a future version."
 )
 def windowedOp(*args, **kwargs):  # pylint: disable=invalid-name
-    """Deprecated alias for windowed_operation."""
+    """Perform a windowed operation.
+
+    Deprecated alias for :py:meth:`~astrodata.fits.windowed_operation`.
+    """
     return windowed_operation(*args, **kwargs)
 
 
@@ -935,12 +986,13 @@ def _get_shape(sequence):
 
 
 def _apply_func(func, sequence, boxes, result, **kwargs):
-    """
+    """Call a function on a sequence of elements with specific chunking.
+
     Apply a given function to a sequence of elements within specified boxes and
     store the result in the result object.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     func : function
         The function to apply to the elements.
     sequence : list
@@ -987,11 +1039,14 @@ def windowed_operation(
     with_mask=False,
     **kwargs,
 ):
-    """Apply function on a NDData obbjects, splitting the data in chunks to
-    limit memory usage.
+    """Apply function on a NDData objects by chunks.
 
-    Parameters
-    ----------
+    This splits the input arrays in chunks of size ``kernel`` and applies the
+    function to each chunk. The output arrays are then gathered in a new
+    NDData object.
+
+    Arguments
+    ---------
     func : callable
         The function to apply.
 
@@ -1094,8 +1149,8 @@ def wcs_to_asdftablehdu(wcs, extver=None):
     Returns None (issuing a warning) if the WCS object cannot be serialized,
     so the rest of the file can still be written.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     wcs : gWCS
         The gWCS object to serialize.
 

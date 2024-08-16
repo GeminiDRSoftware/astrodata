@@ -32,10 +32,10 @@ warnings.simplefilter("always", AstroDataDeprecationWarning)
 
 
 def deprecated(reason):
-    """Marks a function as deprecated.
+    """Mark a function as deprecated.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     reason : str
         The reason why the function is deprecated
 
@@ -50,6 +50,7 @@ def deprecated(reason):
     >>> @deprecated("Use another function instead")
     ... def my_function():
     ...     pass
+
     """
 
     def decorator_wrapper(fn):
@@ -97,7 +98,9 @@ def normalize_indices(slc, nitems):
 
 
 class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
-    """Named tuple that is used by tag methods to return which actions should
+    """A named tuple of sets of tag strings.
+
+    Named tuple that is used by tag methods to return which actions should
     be performed on a tag set.
 
     All the attributes are optional, and any combination of them can be used,
@@ -128,7 +131,7 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
         This TagSet will be applied only *all* of these tags are present
 
     Examples
-    ---------
+    --------
     >>> TagSet()  # doctest: +SKIP
     TagSet(
         add=set(),
@@ -153,6 +156,15 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
         blocks=set(),
         if_present=set()
     )
+
+
+    Notes
+    -----
+    If arguments are not provided, the default is an empty set.
+
+    These arguments are not applied within the object, instead they are
+    used when tags are being applied to an AstroData object.
+
     """
 
     def __new__(
@@ -163,6 +175,7 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
         blocks=None,
         if_present=None,
     ):
+        """Instantiate a new TagSet object."""
         return super().__new__(
             cls,
             add or set(),
@@ -174,12 +187,7 @@ class TagSet(namedtuple("TagSet", "add remove blocked_by blocks if_present")):
 
 
 def astro_data_descriptor(fn):
-    """Decorator that will mark a class method as an AstroData descriptor.
-    Useful to produce list of descriptors, for example.
-
-    If used in combination with other decorators, this one *must* be the
-    one on the top (ie. the last one applying). It doesn't modify the
-    method in any other way.
+    """Mark a class method as an AstroData descriptor.
 
     Args
     -----
@@ -187,29 +195,90 @@ def astro_data_descriptor(fn):
         The method to be decorated
 
     Returns
-    --------
+    -------
     The tagged method (not a wrapper)
+
+    Warning
+    -------
+
+    If used in combination with other decorators, this one *must* be the one on
+    the top (i.e., the last one being applied). It doesn't modify the method in
+    any other way.
+
+    e.g.,
+
+    .. code-block:: python
+
+            @astro_data_descriptor # This must be above returns_list
+            @returns_list
+            def my_descriptor_method(self):
+                pass
+
+    Notes
+    -----
+    This decorator is exactly equivalent to:
+
+    .. code-block:: python
+
+        class MyClass:
+            def my_descriptor_method(self):
+                pass
+
+            my_descriptor_method.descriptor_method = True
+
+    It is used to mark descriptors for collective operations, such as
+    listing out the descriptors an |AstroData| object has or applying
+    them to a set of extensions. See the documentation for
+    :py:meth:`~astrodata.AstroData.descriptors` for an example.
     """
     fn.descriptor_method = True
     return fn
 
 
 def returns_list(fn):
-    """Decorator to ensure that descriptors that should return a list (of one
-    value per extension) only returns single values when operating on single
-    slices; and vice versa.
+    """Ensure a function returns a list.
+
+    Decorator to ensure that descriptors returning a list (of one value per
+    extension) only returns single values when operating on single slices; and
+    vice versa.
 
     This is a common case, and you can use the decorator to simplify the
     logic of your descriptors.
 
-    Args
-    -----
-    fn : method
+    Arguments
+    ---------
+    fn : Callable
         The method to be decorated
 
     Returns
-    --------
-    A function
+    -------
+    Callable
+        A function
+
+    Example
+    -------
+
+    .. code-block:: python
+
+        from astrodata import (
+            AstroData,
+            astro_data_descriptor,
+            returns_list,
+            NDAstroData
+        )
+
+        class MyAstroData(AstroData):
+            @astro_data_descriptor
+            @returns_list
+            def my_descriptor(self):
+                return 1
+
+        # Create an instance of the class with slices
+        ad = MyAstroData([NDAstroData([1, 2, 3]), NDAstroData([4, 5, 6])])
+
+        # This will print [1, 1] to stdout
+        print(ad.my_descriptor())
+
     """
 
     @wraps(fn)
@@ -260,13 +329,7 @@ def assign_only_single_slice(fn):
 
 
 def astro_data_tag(fn):
-    """Decorator that marks methods of an `AstroData` derived class as part of
-    the tag-producing system.
-
-    It wraps the method around a function that will ensure a consistent return
-    value: the wrapped method can return any sequence of sequences of strings,
-    and they will be converted to a TagSet. If the wrapped method
-    returns None, it will be turned into an empty TagSet.
+    """Mark a method as a tag-producing method.
 
     Args
     -----
@@ -274,8 +337,33 @@ def astro_data_tag(fn):
         The method to be decorated
 
     Returns
-    --------
+    -------
     A wrapper function
+
+    Notes
+    -----
+    Decorator that marks methods of an `AstroData` derived class as part of
+    the tag-producing system.
+
+    It wraps the method around a function that will ensure a consistent return
+    value: the wrapped method can return any sequence of sequences of strings,
+    and they will be converted to a TagSet. If the wrapped method
+    returns None, it will be turned into an empty TagSet.
+
+    Example
+    -------
+
+    .. code-block:: python
+
+        class MyAstroData(AstroData):
+            @astro_data_tag
+            def my_tag_method(self):
+                # Below are the tags generated by this method based on whether
+                # the instrument is GMOS or not.
+                if self.phu.get('INSTRUME') == 'GMOS':
+                    return {'GMOS'}
+
+                return {'NOT_GMOS'}
     """
 
     @wraps(fn)
@@ -301,9 +389,26 @@ def astro_data_tag(fn):
 
 
 class Section(tuple):
-    """A class to handle n-dimensional sections"""
+    """A class to handle n-dimensional sections."""
 
     def __new__(cls, *args, **kwargs):
+        """Instantiate a new Section object.
+
+        Expects a sequence of pairs of start and end coordinates for each axis.
+        This can be passed in order of axis (e.g., x1, x2, y1, y2) or as a
+        set of keyword arguments (e.g., x1=0, x2=10, y1=0, y2=10).
+
+        Arguments
+        ---------
+        x1, x2, y1, y2, ... : int
+            The start and end coordinates for each axis. If passed as
+            positional arguments, they should be in order of axis. Otherwise,
+            they can be passed as keyword arguments, such as:
+
+            .. code-block:: python
+
+                section = Section(x1=0, x2=10, y1=0, y2=10)
+        """
         # Ensure that the order of keys is what we want
         axis_names = [x for axis in "xyzuvw" for x in (f"{axis}1", f"{axis}2")]
 
@@ -327,18 +432,22 @@ class Section(tuple):
 
     @property
     def axis_dict(self):
+        """Return a dictionary with the axis names as keys."""
         return dict(zip(self._axis_names, self))
 
     def __getnewargs__(self):
+        """Return arguments needed to create an equivalent Section instance."""
         return tuple(self)
 
     def __getattr__(self, attr):
+        """Check for attrs in the axis_dict (axis names)."""
         if attr in self._axis_names:
             return self.axis_dict[attr]
 
         raise AttributeError(f"No such attribute '{attr}'")
 
     def __repr__(self):
+        """Return a string representation of the Section object."""
         return (
             "Section("
             + ", ".join([f"{k}={self.axis_dict[k]}" for k in self._axis_names])
@@ -352,12 +461,20 @@ class Section(tuple):
 
     @staticmethod
     def from_shape(value):
-        """Produce a Section object defining a given shape."""
+        """Produce a Section object defining a given shape.
+
+        Examples
+        --------
+        >>> Section.from_shape((10, 10))
+        Section(x1=0, x2=10, y1=0, y2=10)
+        >>> Section.from_shape((10, 10, 10))
+        Section(x1=0, x2=10, y1=0, y2=10, z1=0, z2=10)
+        """
         return Section(*[y for x in reversed(value) for y in (0, x)])
 
     @staticmethod
     def from_string(value):
-        """The inverse of __str__, produce a Section object from a string."""
+        """Produce a Section object from a string."""
         return Section(
             *[
                 y
@@ -375,12 +492,20 @@ class Section(tuple):
         "and will be removed in a future version."
     )
     def asIRAFsection(self):  # pylint: disable=invalid-name
-        """Deprecated, see as_iraf_section"""
+        """Produce string with '[x1:x2,y1:y2]' 1-indexed and end-inclusive.
+
+        Deprecated, see :py:meth:`~astrodata.Section.as_iraf_section`.
+        """
         return self.as_iraf_section()
 
     def as_iraf_section(self):
-        """Produce string of style '[x1:x2,y1:y2]' that is 1-indexed
-        and end-inclusive
+        """Produce string with '[x1:x2,y1:y2]' 1-indexed and end-inclusive.
+
+        This is the format used by IRAF for sections.
+
+        For example,
+        >>> Section(0, 10, 0, 10).as_iraf_section()
+        '[1:10,1:10]'
         """
         return (
             "["
@@ -398,9 +523,17 @@ class Section(tuple):
             + "]"
         )
 
+    # TODO(teald): Deprecate and rename Section.asslice.
     def asslice(self, add_dims=0):
-        """Return the Section object as a slice/list of slices.  Higher
-        dimensionality can be achieved with the add_dims parameter.
+        """Return the Section object as a slice/list of slices.
+
+        Higher dimensionality can be achieved with the add_dims parameter.
+
+        Arguments
+        ---------
+
+        add_dims : int
+            The number of dimensions to add to the slice.
         """
         return (slice(None),) * add_dims + tuple(
             slice(self.axis_dict[axis], self.axis_dict[axis.replace("1", "2")])
@@ -408,7 +541,37 @@ class Section(tuple):
         )
 
     def contains(self, section):
-        """Return True if the supplied section is entirely within self"""
+        """Return True if the section is entirely within this Section.
+
+        Arguments
+        ---------
+        section : Section
+            The Section to check for containment.
+
+        Returns
+        -------
+        bool
+            True if the Section is entirely within this Section, otherwise
+            False.
+
+        Raises
+        ------
+        ValueError
+            If the Sections have different dimensionality.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).contains(Section(1, 9, 1, 9))
+        True
+        >>> Section(0, 10, 0, 10).contains(Section(1, 11, 1, 9))
+        False
+        >>> Section(0, 10, 0, 10).contains(Section(1, 9, 1, 11))
+        False
+        >>> Section(0, 10, 0, 10).contains(Section(1, 3, 1, 7))
+        True
+        >>> Section(0, 10, 0, 10).contains(Section(1, 3, 1, 11))
+        False
+        """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
 
@@ -422,12 +585,45 @@ class Section(tuple):
         return con1 and con2
 
     def is_same_size(self, section):
-        """Return True if the Sections are the same size"""
+        """Return True if the Sections are the same size, otherwise False.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).is_same_size(Section(0, 10, 0, 10))
+        True
+        >>> Section(0, 10, 0, 10).is_same_size(Section(0, 10, 0, 11))
+        False
+        """
         return np.array_equal(np.diff(self)[::2], np.diff(section)[::2])
 
     def overlap(self, section):
-        """Determine whether the two sections overlap. If so, the Section
-        common to both is returned, otherwise None
+        """Return the overlap between two sections, or None if no overlap.
+
+        Determine whether the two sections overlap. If so, the Section common
+        to both is returned, otherwise None.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 9, 1, 9))
+        Section(x1=1, x2=9, y1=1, y2=9)
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 11, 1, 9))
+        Section(x1=1, x2=10, y1=1, y2=9)
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 9, 1, 11))
+        Section(x1=1, x2=9, y1=1, y2=10)
+        >>> Section(0, 10, 0, 10).overlap(Section(1, 3, 1, 7))
+        Section(x1=1, x2=3, y1=1, y2=7)
+        >>> Section(4, 6, 4, 6).overlap(Section(1, 3, 1, 2))
+        None
+
+        Raises
+        ------
+        ValueError
+            If the Sections have different dimensionality.
+
+        Notes
+        -----
+        If sections do not overlap, a warning is logged when None is returned.
+        This is to help with debugging, as it is often not an error condition.
         """
         if self.ndim != section.ndim:
             raise ValueError("Sections have different dimensionality")
@@ -440,6 +636,7 @@ class Section(tuple):
                 *[v for pair in zip(mins, maxs) for v in pair]
             )
 
+        # TODO(teald): Check overlap explicitly instead of catching ValueError
         except ValueError as err:
             logging.warning(
                 "Sections do not overlap, recieved %s: %s",
@@ -450,7 +647,32 @@ class Section(tuple):
             return None
 
     def shift(self, *shifts):
-        """Shift a section in each direction by the specified amount"""
+        """Shift a section in each direction by the specified amount.
+
+        Arguments
+        ---------
+        shifts : positional arguments
+            The amount to shift the section in each direction.
+
+        Returns
+        -------
+        Section
+            The shifted section.
+
+        Raises
+        ------
+        ValueError
+            If the number of shifts is not equal to the number of dimensions.
+
+        Examples
+        --------
+        >>> Section(0, 10, 0, 10).shift(1, 1)
+        Section(x1=1, x2=11, y1=1, y2=11)
+        >>> Section(0, 10, 0, 10).shift(1, 1, 1)
+        Traceback (most recent call last):
+        ...
+        ValueError: Number of shifts 3 incompatible with dimensionality 2
+        """
         if len(shifts) != self.ndim:
             raise ValueError(
                 f"Number of shifts {len(shifts)} incompatible "
