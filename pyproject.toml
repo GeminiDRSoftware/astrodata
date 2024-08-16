@@ -132,7 +132,7 @@ include = [
 
 [tool.ruff.lint]
 # select = ["ALL"]
-select = ["F", "E", "I"]
+select = ["F", "E", "D", "I"]
 
 # Ruff ignored linting rules:
 # These rules are ignored for the entire project. They should be

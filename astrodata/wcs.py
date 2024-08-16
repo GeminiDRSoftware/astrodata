@@ -36,16 +36,17 @@ re_cd = re.compile(r"^CD(\d+)_\d+$", re.IGNORECASE)
 # FITS-WCS -> gWCS
 # -----------------------------------------------------------------------------
 def pixel_frame(naxes, name="pixels"):
-    """Make a CoordinateFrame for pixels
+    """Make a CoordinateFrame for pixels.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     naxes: int
         Number of axes
 
     Returns
     -------
     CoordinateFrame
+        The pixel frame.
     """
     axes_names = ("x", "y", "z", "u", "v", "w")[:naxes]
     return cf.CoordinateFrame(
@@ -59,11 +60,13 @@ def pixel_frame(naxes, name="pixels"):
 
 
 def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
-    """Create and return a gWCS object from a FITS header or NDData object.  If
+    """Convert a FITS WCS header or NDData object to a gWCS object.
+
+    Create and return a gWCS object from a FITS header or NDData object.  If
     it can't construct one, it should quietly return None.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     input_data : `astropy.io.fits.Header` or `astropy.nddata.NDData`
         FITS Header or NDData object with basic FITS WCS keywords.
 
@@ -194,13 +197,15 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
 # TODO: Rename this and deprecate this function. The name implies it is a
 # gwcs object being passed, but it requires an NDData object.
 def gwcs_to_fits(ndd, hdr=None):
-    """Convert a gWCS object to a collection of FITS WCS keyword/value pairs,
+    """Convert a gWCS object to FITS WCS keyword/value pairs.
+
+    Convert a gWCS object to a collection of FITS WCS keyword/value pairs,
     if possible. If the FITS WCS is only approximate, this should be indicated
     with a dict entry {'FITS-WCS': 'APPROXIMATE'}. If there is no suitable FITS
     representation, then a ValueError or NotImplementedError can be raised.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ndd : `astropy.nddata.NDData`
         The NDData whose wcs attribute we want converted
 
@@ -211,6 +216,11 @@ def gwcs_to_fits(ndd, hdr=None):
     -------
     dict
         values to insert into the FITS header to express this WCS
+
+    Warning
+    -------
+    This function is experimental and may not work for all WCS objects.
+    It is likely to be deprecated in a future release.
     """
     if hdr is None:
         hdr = {}
@@ -502,7 +512,9 @@ def gwcs_to_fits(ndd, hdr=None):
 
 
 def model_is_affine(model):
-    """Test a Model for affinity. This is currently done by checking the name
+    """Return True if the model is a valid affine transformation.
+
+    Test a Model for affinity. This is currently done by checking the name
     of its class (or the class names of all its submodels)
 
     TODO: Is this the right thing to do? We could compute the affine matrices
@@ -530,15 +542,17 @@ def model_is_affine(model):
 
 
 def calculate_affine_matrices(func, shape, origin=None):
-    """Compute the matrix and offset necessary of an affine transform that
+    """Calculate the affine matrices and offset for a function.
+
+    Compute the matrix and offset necessary of an affine transform that
     represents the supplied function. This is done by computing the linear
     matrix along all axes extending from the centre of the region, and then
     calculating the offset such that the transformation is accurate at the
     centre of the region. The matrix and offset are returned in the standard
     python order (i.e., y-first for 2D).
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     func : callable
         function that maps input->output coordinates
 
@@ -601,8 +615,8 @@ def calculate_affine_matrices(func, shape, origin=None):
 def read_wcs_from_header(header):
     """Extract basic FITS WCS keywords from a FITS Header.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header`
         FITS Header with WCS information.
 
@@ -705,10 +719,10 @@ def read_wcs_from_header(header):
 
 
 def get_axes(header):
-    """Matches input with spectral and sky coordinate axes.
+    """Match input with spectral and sky coordinate axes.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header` or dict
         FITS Header (or dict) with basic WCS information.
 
@@ -749,11 +763,10 @@ def get_axes(header):
 
 
 def _is_skysys_consistent(ctype, sky_inmap):
-    """Determine if the sky axes in CTYPE match to form a standard celestial
-    system.
+    """Determine if the sky axes in CTYPE match a standard celestial system.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ctype : list
         List of CTYPE values.
 
@@ -787,11 +800,13 @@ def _is_skysys_consistent(ctype, sky_inmap):
 
 
 def _get_contributing_axes(wcs_info, world_axes):
-    """Returns a tuple indicating which axes in the pixel frame make a
+    """Get the pixel axes that contribute to the output axes.
+
+    Returns a tuple indicating which axes in the pixel frame make a
     contribution to an axis or axes in the output frame.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     wcs_info : dict
         dict of WCS information
 
@@ -802,6 +817,7 @@ def _get_contributing_axes(wcs_info, world_axes):
     -------
     axes : list
         axes whose pixel coordinates affect the output axis/axes
+
     """
     cd = wcs_info["CD"]
     try:
@@ -817,8 +833,8 @@ def _get_contributing_axes(wcs_info, world_axes):
 def make_fitswcs_transform(trans_input):
     """Create a basic FITS WCS transform.  It does not include distortions.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header` or dict
         FITS Header (or dict) with basic WCS information
 
@@ -880,12 +896,14 @@ def make_fitswcs_transform(trans_input):
 
 
 def fitswcs_image(header):
-    """Make a complete transform from CRPIX-shifted pixels to sky coordinates
+    """Create a transorm from pixel to sky coordinates.
+
+    Make a complete transform from CRPIX-shifted pixels to sky coordinates
     from FITS WCS keywords. A Mapping is inserted at the beginning, which may
     be removed later
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header` or dict
         FITS Header or dict with basic FITS WCS keywords.
     """
@@ -960,12 +978,14 @@ def fitswcs_image(header):
 
 
 def fitswcs_other(header, other=None):
-    """Create WCS linear transforms for any axes not associated with celestial
+    """Create appropriate models for unassociated axes in a FITS WCS.
+
+    Create WCS linear transforms for any axes not associated with celestial
     coordinates. We require that each world axis aligns precisely with only a
     single pixel axis.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     header : `astropy.io.fits.Header` or dict
         FITS Header or dict with basic FITS WCS keywords.
     """
@@ -1043,20 +1063,24 @@ def fitswcs_other(header, other=None):
 
 
 def remove_axis_from_frame(frame, axis):
-    """Remove the numbered axis from a CoordinateFrame and return a modified
+    """Remove a pixel axis from a frame.
+
+    Remove the numbered axis from a CoordinateFrame and return a modified
     CoordinateFrame instance.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     frame: CoordinateFrame
-        The frame from which an axis is to be removed
+        The frame from which an axis is to be removed.
 
     axis: int
-        index of the axis to be removed
+        index of the axis to be removed.
 
     Returns
     -------
-    CoordinateFrame: the modified frame
+    CoordinateFrame
+        The modified frame
+
     """
     if axis is None:
         return frame
@@ -1093,13 +1117,15 @@ def remove_axis_from_frame(frame, axis):
 
 
 def remove_axis_from_model(model, axis):
-    """Take a model where one output (axis) is no longer required and try to
+    """Remove an axis from a model that is no longer needed.
+
+    Take a model where one output (axis) is no longer required and try to
     construct a new model whether that output is removed. If the number of
     inputs is reduced as a result, then report which input (axis) needs to be
     removed.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     model: astropy.modeling.Model instance
         model to modify
 
@@ -1108,12 +1134,34 @@ def remove_axis_from_model(model, axis):
 
     Returns
     -------
-    tuple: Modified version of the model and input axis that is no longer
-           needed (input axis == None if completely removed)
+    tuple
+        Modified version of the model and input axis that is no longer needed
+        (input axis == None if completely removed)
+
+    Raises
+    ------
+    ValueError
+        If the model is not recognized or the axis is not found in the model
+
+    Notes
+    -----
+    This function is intended to be used when an output axis is not used in
+    the data, but is present in the WCS. This can happen when a WCS is
+    constructed from a FITS header that has more axes than are present in the
+    data. The function will remove the unused axis from the WCS, and update
+    the WCS object in the AstroData object.
+
+    The function is recursive, so it can handle compound models. It will
+    remove the axis from the rightmost model first, and then work its way
+    leftwards. If the rightmost model is an Identity or Mapping model, it will
+    remove the axis from that model. If the rightmost model is a compound
+    model, it will recursively call itself on the rightmost model. If the
+    rightmost model is an arithmetic model, it will recursively call itself on
+    both the left and right models.
     """
 
     def is_identity(model):
-        """Determine whether a model does nothing and so can be removed"""
+        """Determine whether a model does nothing and can be removed."""
         return (
             isinstance(model, models.Identity)
             or isinstance(model, models.Mapping)
@@ -1234,12 +1282,28 @@ def remove_axis_from_model(model, axis):
 
 
 def remove_unused_world_axis(ext):
-    """Remove a single axis from the output frame of the WCS if it has no
+    """Remove an unused axis from the output frame's WCS.
+
+    Remove a single axis from the output frame of the WCS if it has no
     dependence on input pixel location.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ext: single-slice AstroData object
+        AstroData object with WCS to be modified
+
+    Raises
+    ------
+    ValueError
+        If there is no single degenerate output axis to remove
+
+    Notes
+    -----
+    This function is intended to be used when an output axis is not used in
+    the data, but is present in the WCS. This can happen when a WCS is
+    constructed from a FITS header that has more axes than are present in the
+    data. The function will remove the unused axis from the WCS, and update
+    the WCS object in the AstroData object.
     """
     ndim = len(ext.shape)
     affine = calculate_affine_matrices(ext.wcs.forward_transform, ext.shape)

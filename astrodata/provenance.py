@@ -1,4 +1,6 @@
-"""Provides functions for adding provenance information to
+"""Provence module for managing |AstroData| object provenance information.
+
+Provides functions for adding provenance information to
 `~astrodata.core.AstroData` objects.
 """
 
@@ -9,14 +11,13 @@ from astropy.table import Table
 
 
 def add_provenance(ad, filename, md5, primitive, timestamp=None):
-    """Add the given provenance entry to the full set of provenance records on
-    this object.
+    """Add a provenance entry to the all provenance records in this object.
 
     Provenance is added even if the incoming md5 is None or ''.  This indicates
     source data for the provenance that are not on disk.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ad : `astrodata.AstroData`
         AstroData object to add provenance record to.
 
@@ -67,11 +68,10 @@ def add_provenance(ad, filename, md5, primitive, timestamp=None):
 
 
 def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
-    """Add the given History entry to the full set of history records on this
-    object.
+    """Add history entry to the full set of history records on this object.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ad : `astrodata.AstroData`
         AstroData object to add history record to.
 
@@ -172,15 +172,17 @@ def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
 
 
 def clone_provenance(provenance_data, ad):
-    """For a single input's provenance, copy it into the output
+    """Copy provenance information from one `AstroData` object to another.
+
+    For a single input's provenance, copy it into the output
     `AstroData` object as appropriate.
 
     This takes a dictionary with a source filename, md5 and both its
     original provenance and history information.  It duplicates
     the provenance data into the outgoing `AstroData` ad object.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     provenance_data :
         Pointer to the `~astrodata.AstroData` table with the provenance
         information.  *Note* this may be the output `~astrodata.AstroData`
@@ -195,15 +197,17 @@ def clone_provenance(provenance_data, ad):
 
 
 def clone_history(history_data, ad):
-    """For a single input's history, copy it into the output `AstroData` object
+    """Copy history information from one `AstroData` object to another.
+
+    For a single input's history, copy it into the output `AstroData` object
     as appropriate.
 
     This takes a dictionary with a source filename, md5 and both its original
     provenance and history information.  It duplicates the history data into
     the outgoing `AstroData` ad object.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     history_data :
         pointer to the `AstroData` table with the history information.
         *Note* this may be the output `~astrodata.AstroData` as well, so we
@@ -265,7 +269,9 @@ def find_history_column_indices(ad):
 
 
 def provenance_summary(ad, provenance=True, history=True):
-    """Generate a pretty text display of the provenance information for an
+    """Summarize provenance information for an |AstroData| object as a str.
+
+    Generate a pretty text display of the provenance information for an
     `~astrodata.core.AstroData`.
 
     This pulls the provenance and history information from a
@@ -273,8 +279,8 @@ def provenance_summary(ad, provenance=True, history=True):
     primitive arguments in the history are wrapped across multiple lines to
     keep the overall width manageable.
 
-    Parameters
-    ----------
+    Arguments
+    ---------
     ad : :class:`~astrodata.core.AstroData`
         Input data to read provenance from
 
