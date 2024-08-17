@@ -353,6 +353,8 @@ class as ``'GMOS'`` and ``'SCIENCE'``:
     # Let's remove the GMOSScienceAstroData class from the factory to avoid conflicts.
     factory.remove_class(GMOSScienceAstroData)
 
+    from astrodata import astro_data_tag, TagSet
+
     class GMOSAstroDataTagged(GMOSAstroData):
         """A class for GMOS science data with tags.
 
@@ -374,18 +376,6 @@ class as ``'GMOS'`` and ``'SCIENCE'``:
         def _tag_arc(self):
             if self.phu.get("OBSTYPE") == "ARC":
                 return TagSet(["ARC", "CAL"])
-
-        def _tag_is_bias(self):
-            if self.phu.get("OBSTYPE") == "BIAS":
-                return True
-            else:
-                return False
-
-        def _tag_is_bpm(self):
-            if self.phu.get("OBSTYPE") == "BPM" or "BPMASK" in self.phu:
-                return True
-            else:
-                return False
 
         @astro_data_tag
         def _tag_bias(self):
@@ -422,6 +412,30 @@ class as ``'GMOS'`` and ``'SCIENCE'``:
             else:
                 return TagSet(['SPECT'])
 
+        def _tag_is_bias(self):
+            if self.phu.get("OBSTYPE") == "BIAS":
+                return True
+            else:
+                return False
+
+        def _tag_is_bpm(self):
+            if self.phu.get("OBSTYPE") == "BPM" or "BPMASK" in self.phu:
+                return True
+            else:
+                return False
+
+        def _tag_is_spect(self):
+            pairs = (
+                ('MASKTYP', 0),
+                ('MASKNAME', 'None'),
+                ('GRATING', 'MIRROR')
+            )
+
+            matches = (self.phu.get(kw) == value for (kw, value) in pairs)
+            if any(matches):
+                return False
+            return True
+
     factory.add_class(GMOSAstroDataTagged)
 
 
@@ -436,11 +450,76 @@ Let's make new |AstroData| objects for our files and see what tags they have:
 
 .. code-block:: python
 
+    all_ad_data = []
+
     for f in files:
-        ad = astrodata.from_file(f'quickstart_data/{f}')
+        location = f"quickstart_data/{f}"
+        ad = astrodata.from_file(location)
         print(f"Opened {ad.filename} with class {ad.__class__}")
         print(f"Tags: {ad.tags}")
 
+        all_ad_data.append(ad)
+
+The result:
+
+.. code-block:: text
+
+    Opened N20170614S0201.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0202.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0203.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0204.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0205.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170613S0180.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0181.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0182.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0183.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0184.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0534.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0535.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0536.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0537.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0538.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170702S0178.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0179.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0180.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0181.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0182.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened bpm_20170306_gmos-n_Ham_22_full_12amp.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'SPECT', 'GMOS'}
+
+
+Now, our data is automatically tagged with the appropriate tags when we open
+the files, and we can use these tags to filter data when manipulating files.
+
+.. code-block:: python
+
+    # Filter out all the bias frames.
+    for ad in all_ad_data:
+        if 'BIAS' in ad.tags:
+            print(f"{ad.filename} is a bias frame.")
+
+There are many more features available in |astrodata|, but this should give
+you a good starting point for working with your own data.
 
 Advanced Usage
 ==============
