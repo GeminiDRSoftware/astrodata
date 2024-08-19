@@ -671,9 +671,17 @@ def docs(session: nox.Session) -> None:
 
     # Build the documentation.
     # TODO(teald): Add nitpicky flag to fix warnings. -- Issue #42
-    target = Path("_build")
+    target = Path("_build").absolute()
     session.run("rm", "-rf", target, external=True)
     session.run("sphinx-build", "-W", "docs", target)
+    session.log(f"You can find the documentation at: {str(target)}")
+
+    index_loc = target / "index.html"
+
+    session.log(
+        f"Your index can be opened in a browser with:\n"
+        f"{index_loc.absolute().as_uri()}"
+    )
 
 
 def use_devpi_server(func):
