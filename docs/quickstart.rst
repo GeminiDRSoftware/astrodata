@@ -336,6 +336,208 @@ get all descriptors from a class using the ``.descriptors`` attribute.
 You'll see that our ``airmass`` descriptor is available for the
 ``GMOSScienceAstroData`` class, but not for the ``GMOSAstroData`` class.
 
+Tags
+====
+
+Tags are a way to categorize data in |astrodata|. They are meant to be
+used to identify the type of data in a file, and can be used to filter
+data when opening files.
+
+Tags are stored in the ``.tags`` attribute of an |AstroData| object. You
+can add tags to a class by using the ``@astro_data_tag`` decorator on methods
+that output tags. For example, we want to tag our ``GMOSScienceAstroData``
+class as ``'GMOS'`` and ``'SCIENCE'``:
+
+.. code-block:: python
+
+    # Let's remove the GMOSScienceAstroData class from the factory to avoid conflicts.
+    factory.remove_class(GMOSScienceAstroData)
+
+    from astrodata import astro_data_tag, TagSet
+
+    class GMOSAstroDataTagged(GMOSAstroData):
+        """A class for GMOS science data with tags.
+
+        Note: This still has all the methods from GMOSScienceAstroData! It is a
+        subset of the tags used for the GMOS instrument |AstroData| class.
+        """
+
+        @astro_data_tag
+        def _tag_instrument(self):
+            # tags = ['GMOS', self.instrument().upper().replace('-', '_')]
+            return TagSet(["GMOS"])
+
+        @astro_data_tag
+        def _tag_dark(self):
+            if self.phu.get("OBSTYPE") == "DARK":
+                return TagSet(["DARK", "CAL"], blocks=["IMAGE", "SPECT"])
+
+        @astro_data_tag
+        def _tag_arc(self):
+            if self.phu.get("OBSTYPE") == "ARC":
+                return TagSet(["ARC", "CAL"])
+
+        @astro_data_tag
+        def _tag_bias(self):
+            if self._tag_is_bias():
+                return TagSet(["BIAS", "CAL"], blocks=["IMAGE", "SPECT"])
+
+        @astro_data_tag
+        def _tag_flat(self):
+            if self.phu.get("OBSTYPE") == "FLAT":
+                if self.phu.get("GRATING") == "MIRROR":
+                    f1, f2 = self.phu.get("FILTER1"), self.phu.get("FILTER2")
+                    # This kind of filter prevents imaging to be classified as FLAT
+                    if any(("Hartmann" in f) for f in (f1, f2)):
+                        return None
+                return TagSet(["GCALFLAT", "FLAT", "CAL"])
+
+        @astro_data_tag
+        def _tag_twilight(self):
+            if self.phu.get("OBJECT", "").upper() == "TWILIGHT":
+                # Twilight flats are of OBSTYPE == OBJECT, meaning that the generic
+                # FLAT tag won't be triggered. Add it explicitly.
+                return TagSet(
+                    [
+                        "TWILIGHT",
+                        "CAL",
+                        "SLITILLUM" if self._tag_is_spect() else "FLAT",
+                    ],
+                )
+
+        @astro_data_tag
+        def _tag_image_or_spect(self):
+            if self.phu.get('GRATING') == 'MIRROR':
+                return TagSet(['IMAGE'])
+            else:
+                return TagSet(['SPECT'])
+
+        def _tag_is_bias(self):
+            if self.phu.get("OBSTYPE") == "BIAS":
+                return True
+            else:
+                return False
+
+        def _tag_is_bpm(self):
+            if self.phu.get("OBSTYPE") == "BPM" or "BPMASK" in self.phu:
+                return True
+            else:
+                return False
+
+        def _tag_is_spect(self):
+            pairs = (
+                ('MASKTYP', 0),
+                ('MASKNAME', 'None'),
+                ('GRATING', 'MIRROR')
+            )
+
+            matches = (self.phu.get(kw) == value for (kw, value) in pairs)
+            if any(matches):
+                return False
+            return True
+
+    factory.add_class(GMOSAstroDataTagged)
+
+
+These tags were taken from the |DRAGONS| GMOS package, and exemplify some
+basic and more complex tag usage in |astrodata|. For example, the ``_tag_dark``
+method will tag the data as ``'DARK'`` and ``'CAL'`` if the ``OBSTYPE`` is
+``'DARK'``. The ``blocks`` argument is used to specify that the tags will
+"block" other tags from being applied to the data, in this case the ``'IMAGE'``
+and ``'SPECT'`` tags.
+
++------------------+----------------------------------------------------+
+| Tag group        | Description                                        |
++==================+====================================================+
+| ``add``          | Add the tag to the global set.                     |
++------------------+----------------------------------------------------+
+| ``remove``       | Remove the tag from the global set.                |
++------------------+----------------------------------------------------+
+| ``blocked_by``   | Tags that, if present, will prevent the TagSet     |
+|                  | from being added.                                  |
++------------------+----------------------------------------------------+
+| ``blocks``       | *Other* ``TagSet`` s containing these tags will    |
+|                  | not be added to the global set.                    |
++------------------+----------------------------------------------------+
+| ``if_present``   | This ``TagSet`` will only be added if the          |
+|                  | specified tags are present.                        |
++------------------+----------------------------------------------------+
+
+Let's make new |AstroData| objects for our files and see what tags they have:
+
+.. code-block:: python
+
+    all_ad_data = []
+
+    for f in files:
+        location = f"quickstart_data/{f}"
+        ad = astrodata.from_file(location)
+        print(f"Opened {ad.filename} with class {ad.__class__}")
+        print(f"Tags: {ad.tags}")
+
+        all_ad_data.append(ad)
+
+The result:
+
+.. code-block:: text
+
+    Opened N20170614S0201.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0202.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0203.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0204.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170614S0205.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'IMAGE', 'GMOS'}
+    Opened N20170613S0180.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0181.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0182.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0183.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170613S0184.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0534.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0535.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0536.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0537.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170615S0538.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'BIAS', 'CAL', 'GMOS'}
+    Opened N20170702S0178.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0179.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0180.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0181.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened N20170702S0182.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'FLAT', 'GMOS', 'TWILIGHT', 'IMAGE', 'CAL'}
+    Opened bpm_20170306_gmos-n_Ham_22_full_12amp.fits with class <class '__main__.GMOSAstroDataTagged'>
+    Tags: {'SPECT', 'GMOS'}
+
+
+Now, our data is automatically tagged with the appropriate tags when we open
+the files, and we can use these tags to filter data when manipulating files.
+
+.. code-block:: python
+
+    # Filter out all the bias frames.
+    for ad in all_ad_data:
+        if 'BIAS' in ad.tags:
+            print(f"{ad.filename} is a bias frame.")
+
+There are many more features available in |astrodata|, but this should give
+you a good starting point for working with your own data.
+
 Advanced Usage
 ==============
 
