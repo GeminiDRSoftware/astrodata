@@ -300,13 +300,13 @@ typing = ["typing-extensions (>=4.0.0)"]
 
 [[package]]
 name = "astropy-iers-data"
-version = "0.2024.8.12.0.32.58"
+version = "0.2024.8.19.0.32.16"
 description = "IERS Earth Rotation and Leap Second tables for the astropy core package"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "astropy_iers_data-0.2024.8.12.0.32.58-py3-none-any.whl", hash = "sha256:a4c96a046f8027ae7c7a4ec2c56fe675f90a0774bfd5ffc15f00114e97ff27dd"},
-    {file = "astropy_iers_data-0.2024.8.12.0.32.58.tar.gz", hash = "sha256:e095f5c53c769ce08e80950ee5ebaf2c070959f4d40fbd188b3509eab7d184f7"},
+    {file = "astropy_iers_data-0.2024.8.19.0.32.16-py3-none-any.whl", hash = "sha256:c39d920dfff92c82ef501df066692eb0d546e4885370bd8010ce2ddcc3252d46"},
+    {file = "astropy_iers_data-0.2024.8.19.0.32.16.tar.gz", hash = "sha256:f8bea6abbdc8a3076b67a0941e3c1e6c89e5dffb5582a92c1a6e43e4a2e51c4a"},
 ]
 
 [package.extras]
@@ -1100,13 +1100,13 @@ testing = ["mock", "pytest", "pytest-cov", "watchdog"]
 
 [[package]]
 name = "hypothesis"
-version = "6.111.0"
+version = "6.111.1"
 description = "A library for property-based testing"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "hypothesis-6.111.0-py3-none-any.whl", hash = "sha256:7a51f678da3719a04a3ef61cd241384dd93b49f35d7cce22833745c66ac1d507"},
-    {file = "hypothesis-6.111.0.tar.gz", hash = "sha256:04d0703621d9fdd61c079a4dda07babbe7ebf6d34eee6ad9484a2af0ee721801"},
+    {file = "hypothesis-6.111.1-py3-none-any.whl", hash = "sha256:9422adbac4b2104f6cf92dc6604b5c9df975efc08ffc7145ecc39bc617243835"},
+    {file = "hypothesis-6.111.1.tar.gz", hash = "sha256:6ab6185a858fa692bf125c0d0a936134edc318bee01c05e407c71c9ead0b61c5"},
 ]
 
 [package.dependencies]
@@ -1774,8 +1774,8 @@ files = [
 annotated-types = ">=0.4.0"
 pydantic-core = "2.20.1"
 typing-extensions = [
-    {version = ">=4.6.1", markers = "python_version < \"3.13\""},
     {version = ">=4.12.2", markers = "python_version >= \"3.13\""},
+    {version = ">=4.6.1", markers = "python_version < \"3.13\""},
 ]
 
 [package.extras]
@@ -2634,8 +2634,8 @@ files = [
 
 [package.dependencies]
 astroid = [
-    {version = ">=2.7", markers = "python_version < \"3.12\""},
     {version = ">=3.0.0a1", markers = "python_version >= \"3.12\""},
+    {version = ">=2.7", markers = "python_version < \"3.12\""},
 ]
 Jinja2 = "*"
 PyYAML = "*"
@@ -2661,20 +2661,6 @@ sphinx = ">=4"
 [package.extras]
 rtd = ["sphinx (<7)", "sphinx-rtd-theme"]
 test = ["coverage", "cython", "pytest", "pytest-cov", "setuptools"]
-
-[[package]]
-name = "sphinx-rtd-dark-mode"
-version = "1.3.0"
-description = "Dark mode for the Sphinx Read the Docs theme."
-optional = false
-python-versions = ">=3.4"
-files = [
-    {file = "sphinx_rtd_dark_mode-1.3.0-py3-none-any.whl", hash = "sha256:478da69c72a2a2ed7665c1f633cc612039f5801df416fd5f7c4820c2fe08c9c5"},
-    {file = "sphinx_rtd_dark_mode-1.3.0.tar.gz", hash = "sha256:0272bf3d9ef620921adc67e5634a66969419e744da84ea18830adacfdb160ea8"},
-]
-
-[package.dependencies]
-sphinx-rtd-theme = "*"
 
 [[package]]
 name = "sphinx-rtd-theme"
@@ -3125,4 +3111,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "2db8737ecbbcee720b6d0df9bb80cf176d5bf8996a62ee834134ef89948c78ad"
+content-hash = "6205508f35c0a0c4fa89c94647b35211c91508c3d7141071d945d4a87d43d19e"
