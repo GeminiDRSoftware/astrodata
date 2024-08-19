@@ -6,6 +6,11 @@ authors = ["D. J. Teal <dillon.teal@noirlab.com>", "DRAGONS development team"]
 license = "BSD3"
 readme = "README.md"
 
+[tool.poetry.urls]
+"Homepage" = "https://github.com/GeminiDRSoftware/astrodata/"
+"Documentation" = "https://geminidrsoftware.github.io/astrodata/"
+"Repository" = "https://github.com/GeminiDRSoftware/astrodata/"
+
 [tool.poetry.dependencies]
 python = "^3.10"
 astropy = "^6.0.0"
