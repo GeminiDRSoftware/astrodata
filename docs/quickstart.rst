@@ -446,6 +446,23 @@ method will tag the data as ``'DARK'`` and ``'CAL'`` if the ``OBSTYPE`` is
 "block" other tags from being applied to the data, in this case the ``'IMAGE'``
 and ``'SPECT'`` tags.
 
++------------------+----------------------------------------------------+
+| Tag group        | Description                                        |
++==================+====================================================+
+| ``add``          | Add the tag to the global set.                     |
++------------------+----------------------------------------------------+
+| ``remove``       | Remove the tag from the global set.                |
++------------------+----------------------------------------------------+
+| ``blocked_by``   | Tags that, if present, will prevent the TagSet     |
+|                  | from being added.                                  |
++------------------+----------------------------------------------------+
+| ``blocks``       | *Other* ``TagSet`` s containing these tags will    |
+|                  | not be added to the global set.                    |
++------------------+----------------------------------------------------+
+| ``if_present``   | This ``TagSet`` will only be added if the          |
+|                  | specified tags are present.                        |
++------------------+----------------------------------------------------+
+
 Let's make new |AstroData| objects for our files and see what tags they have:
 
 .. code-block:: python
