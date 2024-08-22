@@ -208,3 +208,5 @@ ccd_dark_subtracted = ccdproc.subtract_dark(
 **5. Would it be possible to provide a small example of how to develop a processing tool with astrodata that goes beyond just adding properties and tags? In otherwords, once I have done those things what does astrodata do for me? I'm not suggesting a full reduction pipeline here (DRAGONS does that) but something that shows a step or two of processing files using would be helpful.**
 
 ### aaryapatil
+
+Thank you for your review and feedback! Let me know if you have any further questions or comments.
