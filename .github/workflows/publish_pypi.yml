@@ -40,6 +40,7 @@ jobs:
           virtualenvs-create: false
 
       - name: Update version (kept at 0.0.0) in pyproject.toml and build
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
           poetry version ${{ github.ref_name }}
           poetry version
@@ -52,7 +53,7 @@ jobs:
       - name: Publish the package with poetry
         # Allow workflow dispatch to trigger this job, but don't allow it
         # to publish the package to PyPI.
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
            echo "PUBLISHING!!!! ✨🚀"
         #  poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
