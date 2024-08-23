@@ -47,6 +47,7 @@ jobs:
           poetry build
 
       - name: Mint token
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         id: mint
         uses: tschm/token-mint-action@v1.0.3
 
