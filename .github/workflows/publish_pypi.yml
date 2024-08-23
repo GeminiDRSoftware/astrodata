@@ -2,9 +2,9 @@ name: PyPI package
 
 on:
   push:
-    tags:
-      # Matches any tags; tags are only used for versioning in this project.
-      - '*'
+    # tags:
+    #   # Matches any tags; tags are only used for versioning in this project.
+    #   - '*'
   workflow_dispatch:
 
 jobs:
