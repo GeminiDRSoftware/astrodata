@@ -56,4 +56,4 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
            echo "PUBLISHING!!!! ✨🚀"
-        #  poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
+           poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
