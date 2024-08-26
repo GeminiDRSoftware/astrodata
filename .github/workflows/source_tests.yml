@@ -6,7 +6,7 @@ on:
         - main
     pull_request:
     schedule:
-        - cron: "20 1 * * sat"
+        - cron: "20 1 * * mon"
     workflow_dispatch:
 
 defaults:
