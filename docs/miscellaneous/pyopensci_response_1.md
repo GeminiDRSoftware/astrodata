@@ -116,7 +116,7 @@ Thank you for your contributions!
 
 **2. Does it make sense to upstream any of this (like the arithmetic handling or allowing for any WCS, not just an astropy.wcs) to astropy.nddata? Or to ccdproc?**
 
-There are plans to upstream some of the work done in the `astrodata.wcs` module to `gwcs`, and then use `gwcs` throughout `astrodata`. But, that work hasn't been started yet and it's not clear when the resources will be available. I think that's probably the better avenue for more generic WCS support than `astropy.nddata`.
+There are plans to upstream some of the work done in the astrodata.wcs module to gwcs, specifically regarding the conversion between gwcs objects and their representation as FITS keywords, and then use gwcs throughout astrodata. But, that work hasn't been started yet and it's not clear when the resources will be available. I think that's probably the better avenue for more generic WCS support than `astropy.nddata`.
 
 As mentioned above, I think there are some good opportunities for taking some of the handling done by `astrodata` and integrating it into, e.g., `CCDData`, where `astrodata.AstroData` objects naturally fit into the existing `NDDataArray` dependencies. I'm sure there are nuances there that would need to be sorted, but I could see `CCDData`/ccdproc using some of the features of `astrodata` to enhance their current functionality.
 
