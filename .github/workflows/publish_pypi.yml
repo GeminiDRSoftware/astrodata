@@ -5,9 +5,20 @@ on:
     tags:
       # Matches any tags; tags are only used for versioning in this project.
       - '*'
+  workflow_dispatch:
 
 jobs:
+  source_test:
+    # This runs the test files on the repository before publishing it.
+    name: Source tests
+    uses: ./.github/workflows/source_tests.yml
+
+  build_test:
+    name: Build tests
+    uses: ./.github/workflows/build_tests.yml
+
   deploy:
+    needs: [source_test, build_test]
     runs-on: ubuntu-latest
 
     permissions:
@@ -29,15 +40,21 @@ jobs:
           virtualenvs-create: false
 
       - name: Update version (kept at 0.0.0) in pyproject.toml and build
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
           poetry version ${{ github.ref_name }}
           poetry version
           poetry build
 
       - name: Mint token
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         id: mint
         uses: tschm/token-mint-action@v1.0.3
 
       - name: Publish the package with poetry
+        # Allow workflow dispatch to trigger this job, but don't allow it
+        # to publish the package to PyPI.
+        if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
-          poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
+           echo "PUBLISHING!!!! ✨🚀"
+           poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
