@@ -112,7 +112,7 @@ Thank you for your contributions!
 
 **1. What is your conception of how this should interact with the rest of the ecosystem (thinking mostly about nddata and ccdproc here)?**
 
-`astrodata` uses `astropy.nddata` for most of its core arithmetic functionality, including a number of the same, or slightly modified mixins. There are likely some points of consolidation (see below) between the two that may happen. As for ccdproc, I think with `CCDData` already inheriting `NDDataArray` (which is similar to `NDAstroData`), there are opportunities for integration there. I would need to spend some more time thinking about that and looking at source, though.
+`astrodata` uses `astropy.nddata` for most of its core arithmetic functionality, including a number of the same, or slightly modified, mixins. There are likely some points of consolidation (see below) between the two that may happen. As for ccdproc, I think with `CCDData` already inheriting `NDDataArray` (which is similar to `NDAstroData`), there are opportunities for integration there. I would need to spend some more time thinking about that and looking at source, though.
 
 **2. Does it make sense to upstream any of this (like the arithmetic handling or allowing for any WCS, not just an astropy.wcs) to astropy.nddata? Or to ccdproc?**
 
@@ -122,34 +122,13 @@ As mentioned above, I think there are some good opportunities for taking some of
 
 **3. Does it make sense for ccdproc to depend on astrodata or try to integrate usage of astrodata into it? ccdproc has never had a good way of handling MEF files, which is faintly ridiculous (I'm the maintainer of ccdproc so I'm looking in the mirror rather throwing stones here).**
 
-I think it makes sense for ccdproc to depend on `astrodata`, either by using `astrodata.AstroData` as a data class instead of `NDData` or by trying to use `CCDData` to define an `AstroData` class used by `astrodata.AstroDataFactory`. This would primarily involve filling in gaps that non-FITS files need to overcome, such as need to be able to access a PHU of some kind.
-
-Most of the functionality should be similar, but `astrodata` is picky about the types it accepts for data. Doing something like the following:
-```python
-from astrodata import AstroData
-from astropy.nddata import CCDData
-import numpy as np
-
-class CCDAstroData(AstroData):
-    @staticmethod
-    def _matches_data(source) -> bool:
-        # Trivial condition.
-        return True
-
-ccd_data = CCDData(data=np.random.random((100, 100)), unit="adu")
-
-# Non-"AstroDataFactory" init
-astro_data = CCDAstroData(ccd_data)
-```
-throws exceptions because `CCDData` is not an `NDAstroData` object. This doesn't include requiring FITS-like header access for the normal `astrodata.AstroDataFactory` methods used to resolve the class and various `AstroData` methods. That's not to say other types couldn't be supported, or that it would be difficult to create a `CCDData` or ccdproc class that inherits from `NDAstroData`.
-
-Beyond the nuances there, though---which I think could be overcome---`astrodata` and ccdproc have a natural relationship in that `astrodata` is useful for abstracting data into interfaces the ccdprod could use/accept as input, even if it's primarily interacting with the raw data and not necessarily using top-level `astrodata` functionality.
+It depends on the goals of ccdproc moving forward. For MEFs it's feasible to break images up from a list into individual images ccdproc can then process (with or without converting them into CCDData, I'm not sure). `astrodata` may, at the end of the day, be a bit excessive for the work ccdproc does.
 
 **4. My take is that astrodata provides a way to abstract images and metadata from the underlying way they are stored, which is something that none of the current tools that I'm aware of provide. It may very well not make sense to upstream any of this.**
 
 I think the biggest consideration is whether resources required to make these changes are worth the benefits themselves. There are natural places where `astrodata`'s abstraction would help generalize/make other Astropy packages more flexible.
 
-Right now, though, the work required to share data between, e.g., `astrodata`, nddata, and ccdproc is straightforward but requires some management between them that could be reduced to utility methods. I wrote up a quick, simple example to see how working with both went:
+Right now, though, the work required to share data between, e.g., `astrodata`, `astropy.nddata`, and ccdproc is straightforward but requires some management between them that could be reduced to utility methods. I wrote up a quick, simple example to see how working with both `astrodata` and `ccdproc` went:
 
 <details>
 
@@ -204,6 +183,8 @@ ccd_dark_subtracted = ccdproc.subtract_dark(
 ```
 
 </details>
+
+This is a pretty minimal example, of course, but I think cases where the two interact can be managed primarily through accessing underlying data and metadata directly, rather than creating outright support for `astrodata` within the other packages.
 
 **5. Would it be possible to provide a small example of how to develop a processing tool with astrodata that goes beyond just adding properties and tags? In otherwords, once I have done those things what does astrodata do for me? I'm not suggesting a full reduction pipeline here (DRAGONS does that) but something that shows a step or two of processing files using would be helpful.**
 
