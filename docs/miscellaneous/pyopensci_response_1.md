@@ -167,7 +167,7 @@ import ccdproc
 hdu = fits.PrimaryHDU(data=np.ones((100, 100)))
 hdu.header["INSTRUME"] = "random_inst"
 hdu.header["MODE"] = "random_mode"
-hdu.header["UNIT"] = "adu"  # Not always present in real data
+hdu.header["UNIT"] = "adu"
 hdu.header["EXPTIME"] = 5.0
 
 # Create an AstroData object from the FITS file object:
