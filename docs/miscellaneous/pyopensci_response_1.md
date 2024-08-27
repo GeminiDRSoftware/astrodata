@@ -14,8 +14,6 @@ These are in order of reading the responses in the checklist above, with the ~se
 [testing docs]: https://geminidrsoftware.github.io/astrodata/developer/index.html#run-the-tests
 [lint workflow]: https://github.com/GeminiDRSoftware/astrodata/blob/main/.github/workflows/lint.yml
 
-<!-- TODO: <details> & <summary> for this section -->
-
 1. (Documentation) Examples missing for user-facing functions
     1. All documentation in the ["Common API for Users"][api_short] now have examples, better explanations, or are deprecated.
     2. Specifically, [`add_header_to_table`][add_header_to_table] has been deprecated, as its functionality is no longer used. It will be removed in version 3.0.0.
@@ -38,7 +36,7 @@ These are in order of reading the responses in the checklist above, with the ~se
     2. [New `lint.yml` workflow][lint workflow] just runs `pre-commit` to keep linting settings in `pyproject.toml`/`.pre-commit-config.yaml`
     3. Also, added `nox -s initialize_pre_commit`, automatically called by `nox -s devshell` and `nox -s devconda` to make it easier to set up the developer environment with `pre-commit`. This is still under testing.
 8. (Documentation) Expanding on utility of `astrodata` in the README
-    1. TKTODO
+    1.
 
 ## Issues
 All issues raised as part of the initial review have been addressed:
@@ -122,7 +120,7 @@ As mentioned above, I think there are some good opportunities for taking some of
 
 **3. Does it make sense for ccdproc to depend on astrodata or try to integrate usage of astrodata into it? ccdproc has never had a good way of handling MEF files, which is faintly ridiculous (I'm the maintainer of ccdproc so I'm looking in the mirror rather throwing stones here).**
 
-It depends on the goals of ccdproc moving forward. For MEFs it's feasible to break images up from a list into individual images ccdproc can then process (with or without converting them into CCDData, I'm not sure). `astrodata` may, at the end of the day, be a bit excessive for the work ccdproc does.
+It depends on the goals of ccdproc moving forward. For MEFs it's feasible to break images up from a list into individual images ccdproc can then process. `astrodata` may, at the end of the day, be excessive for the work ccdproc does in its current scope.
 
 **4. My take is that astrodata provides a way to abstract images and metadata from the underlying way they are stored, which is something that none of the current tools that I'm aware of provide. It may very well not make sense to upstream any of this.**
 
@@ -187,6 +185,12 @@ ccd_dark_subtracted = ccdproc.subtract_dark(
 This is a pretty minimal example, of course, but I think cases where the two interact can be managed primarily through accessing underlying data and metadata directly, rather than creating outright support for `astrodata` within the other packages.
 
 **5. Would it be possible to provide a small example of how to develop a processing tool with astrodata that goes beyond just adding properties and tags? In otherwords, once I have done those things what does astrodata do for me? I'm not suggesting a full reduction pipeline here (DRAGONS does that) but something that shows a step or two of processing files using would be helpful.**
+
+This is still being worked on. I'd like this example to be relatively complete in overview of how `astrodata` works, and I've been taking time coming up with something suitable. I think it's unavoidable to have it be somewhat complex, since `astrodata` and the properties and tags drive much of what users and developers will commonly interact with.
+
+[example issue]: https://github.com/GeminiDRSoftware/astrodata/issues/57
+
+Development is being tracked in [this issue][example issue]. For now, the User Manual and Programmer's manuals have a bit more in-depth explanation, though I agree a more concrete, featureful example would be ideal.
 
 ### aaryapatil
 
