@@ -166,9 +166,21 @@ the filename and path of the file (as it does for `astropy.io.fits` objects).
 `astrodata` is designed to be extensible, so you can add your own methods to
 analyze and process data based on your specific needs and use cases.
 
+`astrodata` also has a number of built in features, including:
+
++ Operator support for arithmetic operations
++ Uncertainty propagation
++ Slicing
++ Windowing (reading and operating on subsets of data)
++ Metadata management and access
+
+[user Manual]: https://geminidrsoftware.github.io/astrodata/manuals/usermanual/index.html
+[prog manual]: https://geminidrsoftware.github.io/astrodata/manuals/progmanual/index.html
+
 For a complete example, see the
 [Quickstart](https://geminidrsoftware.github.io/astrodata/quickstart.html) in
-our documentation.
+our documentation. For more advanced usage, see the [User Manual][user manual]
+or [Programmer's Manual][prog manual].
 
 Installing development dependencies
 -----------------------------------
