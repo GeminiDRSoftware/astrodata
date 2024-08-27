@@ -24,10 +24,10 @@ These are in order of reading the responses in the checklist above, with the ~se
 3. (Documentation/README) Badges in README now have a repostatus and Python version badge
     1. Commit [6537a51](https://github.com/GeminiDRSoftware/astrodata/commit/6537a51)
 4. (Documentation/README) Citation information has been added to the README
-    1. Commit [b057511](https://github.com/GeminiDRSoftware/astrodata/commit/b057511)
+    1. Commit [b057511](https://github.com/geminidrsoftware/astrodata/commit/b057511)
 5. (Functionality/Automated tests) Testing failures
     1. All testing failures encountered were due to intermittent service with the Gemini Archive (which is getting an upgrade!), as well as some issues with Actions and their runner configurations.
-    2. Tracked in [Issue #16](https://github.com/GeminiDRSoftware/astrodata/commit/b057511) until updates complete
+    2. Tracked in [Issue #16](https://github.com/GeminiDRSoftware/astrodata/issues/16) until updates complete
 6. (Functionality/Packaging Instructions) Testing instructions unclear
     1. [Developer documentation][testing docs] has been upgraded to reflect our new testing framework (using `nox`).
     2. Includes instructions for selecting specific tests, which tests are default, and specify python versions tested.
@@ -36,7 +36,7 @@ These are in order of reading the responses in the checklist above, with the ~se
     2. [New `lint.yml` workflow][lint workflow] just runs `pre-commit` to keep linting settings in `pyproject.toml`/`.pre-commit-config.yaml`
     3. Also, added `nox -s initialize_pre_commit`, automatically called by `nox -s devshell` and `nox -s devconda` to make it easier to set up the developer environment with `pre-commit`. This is still under testing.
 8. (Documentation) Expanding on utility of `astrodata` in the README
-    1.
+    1. Include feature list and add references to manuals for futher reading alongside the Quickstart (Commit [246606d](https://github.com/geminidrsoftware/astrodata/commit/246606d)).
 
 ## Issues
 All issues raised as part of the initial review have been addressed:
