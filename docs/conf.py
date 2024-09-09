@@ -16,7 +16,7 @@ release = __version__
 
 project = "astrodata"
 copyright = "2023-present, NOIRLab/Gemini Observatories"
-author = ""
+author = "DRAGONS Team"
 
 # -- General configuration ---------------------------------------------------
 
@@ -142,7 +142,6 @@ rst_prolog = """
 
 
 
-.. _`Anaconda`: https://www.anaconda.com/
 .. _`Astropy`: http://docs.astropy.org/en/stable/
 .. _`Conda`: https://conda.io/docs/
 .. _`Numpy`: https://numpy.org/doc/stable/
