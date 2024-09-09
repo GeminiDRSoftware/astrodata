@@ -449,6 +449,11 @@ def gwcs_to_fits(ndd, hdr=None):
     # except NameError:
     #     pass
 
+    # TODO: Below comment may not apply, from DRAGONS commit 46177cc
+    # This (commented) line fails for un-invertable Tabular2D
+    crpix = np.array(wcs.backward_transform(*crval)) + 1
+    # crpix = np.array(transform.inverse(*crval)) + 1
+
     # Find any world axes that we previous logarithmed and fix the CDij
     # matrix -- we follow FITS-III (Greisen et al. 2006; A&A 446, 747)
     modified_wcs_center = transform(*pix_center)
@@ -465,11 +470,6 @@ def gwcs_to_fits(ndd, hdr=None):
                 )
 
             crval[world_axis - 1] = np.log(crval[world_axis - 1])
-
-    # TODO: Below comment may not apply, from DRAGONS commit 46177cc
-    # This (commented) line fails for un-invertable Tabular2D
-    crpix = np.array(wcs.backward_transform(*crval)) + 1
-    # crpix = np.array(transform.inverse(*crval)) + 1
 
     # Cope with a situation where the sky projection center is not in the slit
     # We may be able to fix this in future, but FITS doesn't handle it well.
