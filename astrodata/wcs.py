@@ -1052,18 +1052,23 @@ def fitswcs_other(header, other=None):
             if other is not None:
                 table_name = header.get(f"PS{ax + 1}_0")
                 table = other.get(table_name)
+
             if table is None:
                 raise ValueError(
                     f"Cannot read table for {ctype} for axis {ax}"
                 )
+
             if isinstance(table, Table):
                 other_model = models.Tabular1D(
-                    lookup_table=table[f"PS{ax + 1}_1"]
+                    lookup_table=table[header[f"PS{ax + 1}_1"]]
                 )
             else:
                 other_model = models.Tabular2D(lookup_table=table.T)
+
             other_model.name = model_name_mapping.get(ctype[:4], ctype[:4])
+
             del other[table_name]
+
         elif len(pixel_axes) == 1:
             pixel_axis = pixel_axes[0]
             m1 = models.Shift(
