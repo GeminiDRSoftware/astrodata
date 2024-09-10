@@ -573,19 +573,20 @@ def calculate_affine_matrices(func, shape, origin=None):
     Arguments
     ---------
     func : callable
-        function that maps input->output coordinates
+        Function that maps input->output coordinates; these coordinates
+        are x-first, because "func" is usually an astropy.modeling.Model.
 
     shape : sequence
-        shape to use for fiducial points
+        Shape to use for fiducial points.
 
     origin : sequence/None
-        if a sequence, then use this as the opposite vertex (it must be
-        the same length as "shape")
+        If a sequence, then use this as the opposite vertex (it must be
+        the same length as "shape").
 
     Returns
     -------
     AffineMatrices(array, array)
-        affine matrix and offset
+        Affine matrix and offset.
     """
     indim = len(shape)
     try:
