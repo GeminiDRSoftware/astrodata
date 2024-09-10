@@ -235,7 +235,7 @@ def test_gwcs_creation(NIRI_IMAGE):
 
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
-def test_loglinear_axis(NIRI_IMAGE):
+def test_loglinear_axis(NIRI_IMAGE, tmp_path, monkeypatch):
     """Test that we can add a log-linear axis and write and read it"""
     ad = astrodata.from_file(NIRI_IMAGE)
     coords = ad[0].wcs(200, 300)
@@ -259,19 +259,25 @@ def test_loglinear_axis(NIRI_IMAGE):
     new_coords = ad[0].wcs(2, 200, 300)
     assert_allclose(coords, new_coords[1:])
 
-    # with change_working_dir():
-    ad.write("test.fits", overwrite=True)
-    ad2 = astrodata.from_file("test.fits")
-    assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
+    with monkeypatch.chdir(tmp_path):
+        ad.write("test.fits", overwrite=True)
+        ad2 = astrodata.from_file("test.fits")
+        assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
 
+@pytest.mark.skip(reason="Requires external test data.")
 @pytest.mark.preprocessed_data
-def test_tabular1D_axis(path_to_inputs, change_working_dir):
+def test_tabular1D_axis(tmp_path, monkeypatch):
     """Check a FITS file with a tabular 1D axis is read correctly and
     then rewritten to disk and read back in"""
+    # Create a FITS file with a WCS tabular 1D axis
+    data = np.random.rand(2048)
+
+    path_to_inputs = tmp_path
     ad = astrodata.open(Path(path_to_inputs) / "tab1dtest.fits")
     assert ad[0].wcs(0) == pytest.approx(3017.51065254)
     assert ad[0].wcs(1021) == pytest.approx(4012.89510727)
-    with change_working_dir():
+
+    with monkeypatch.chdir(tmp_path):
         ad.write("test.fits", overwrite=True)
         ad2 = astrodata.open("test.fits")
         assert ad2[0].wcs(0) == pytest.approx(3017.51065254)
