@@ -350,7 +350,7 @@ def gwcs_to_fits(ndd, hdr=None):
             points = m_this.points
             if not (
                 ndim == 1
-                and np.allclose(points, np.arange(points.size))
+                and np.allclose(points, np.arange(points[0].size))
                 or ndim == 2
                 and np.allclose(points[0], np.arange(points[0].size))
                 and np.allclose(points[1], np.arange(points[1].size))
