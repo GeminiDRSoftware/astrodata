@@ -259,10 +259,11 @@ def test_loglinear_axis(NIRI_IMAGE, tmp_path, monkeypatch):
     new_coords = ad[0].wcs(2, 200, 300)
     assert_allclose(coords, new_coords[1:])
 
-    with monkeypatch.chdir(tmp_path):
-        ad.write("test.fits", overwrite=True)
-        ad2 = astrodata.from_file("test.fits")
-        assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
+    monkeypatch.chdir(tmp_path)
+
+    ad.write("test.fits", overwrite=True)
+    ad2 = astrodata.from_file("test.fits")
+    assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
 
 @pytest.mark.skip(reason="Requires external test data.")
 @pytest.mark.preprocessed_data
@@ -277,8 +278,9 @@ def test_tabular1D_axis(tmp_path, monkeypatch):
     assert ad[0].wcs(0) == pytest.approx(3017.51065254)
     assert ad[0].wcs(1021) == pytest.approx(4012.89510727)
 
-    with monkeypatch.chdir(tmp_path):
-        ad.write("test.fits", overwrite=True)
-        ad2 = astrodata.open("test.fits")
-        assert ad2[0].wcs(0) == pytest.approx(3017.51065254)
-        assert ad2[0].wcs(1021) == pytest.approx(4012.89510727)
+    monkeypatch.chdir(tmp_path)
+
+    ad.write("test.fits", overwrite=True)
+    ad2 = astrodata.open("test.fits")
+    assert ad2[0].wcs(0) == pytest.approx(3017.51065254)
+    assert ad2[0].wcs(1021) == pytest.approx(4012.89510727)
