@@ -564,7 +564,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
 def unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
     install_test_dependencies(session)
-    session.install(".")
+    session.install("-e", ".")
 
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
