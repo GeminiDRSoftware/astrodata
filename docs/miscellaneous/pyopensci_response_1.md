@@ -120,7 +120,7 @@ There are plans to upstream some of the work done in the astrodata.wcs module to
 
 As mentioned above, I think there are some good opportunities for taking some of the handling done by `astrodata` and integrating it into, e.g., `CCDData`, where `astrodata.AstroData` objects naturally fit into the existing `NDDataArray` dependencies. I'm sure there are nuances there that would need to be sorted, but I could see `CCDData`/ccdproc using some of the features of `astrodata` to enhance their current functionality.
 
-We could also consider how `astrodata` might assist/impact the goals of the closed [APE 11](https://github.com/astropy/astropy-APEs/pull/14). However, I think that'd require larger-scale coordination after this review has concluded.
+We could also consider how `astrodata` might assist/impact the goals of the closed [APE 11](https://github.com/astropy/astropy-APEs/pull/14). However, I think that'd require larger-scale coordination after this review has concluded (as part of [APE PR #100](https://github.com/astropy/astropy-APEs/issues/100)).
 
 **3. Does it make sense for ccdproc to depend on astrodata or try to integrate usage of astrodata into it? ccdproc has never had a good way of handling MEF files, which is faintly ridiculous (I'm the maintainer of ccdproc so I'm looking in the mirror rather throwing stones here).**
 
