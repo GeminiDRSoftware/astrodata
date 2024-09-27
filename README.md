@@ -174,7 +174,7 @@ analyze and process data based on your specific needs and use cases.
 + Windowing (reading and operating on subsets of data)
 + Metadata management and access
 
-[user Manual]: https://geminidrsoftware.github.io/astrodata/manuals/usermanual/index.html
+[user manual]: https://geminidrsoftware.github.io/astrodata/manuals/usermanual/index.html
 [prog manual]: https://geminidrsoftware.github.io/astrodata/manuals/progmanual/index.html
 
 For a complete example, see the
