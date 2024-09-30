@@ -618,6 +618,7 @@ def test_download_raise_error_on_fail(tmpdir, bad_filename):
         )
 
 
+@pytest.mark.skip(reason="See: https://github.com/GeminiDRSoftware/astrodata/issues/62")
 def test_get_associated_calibrations(tmpdir, test_file_archive):
     associated_calibrations = testing.get_associated_calibrations(
         test_file_archive
