@@ -306,12 +306,30 @@ def gwcs_to_fits(ndd, hdr=None):
         # Remove projection parts so we can calculate the CD matrix
         if projcode:
             nat2cel.name = "nat2cel"
+            transform_inverse = transform.inverse
+
+            for m in transform_inverse:
+                if isinstance(m, models.RotateCelestial2Native):
+                    m.name = "cel2nat"
+
+                elif isinstance(m, models.Sky2PixProjection):
+                    m.name = "sky2pix"
+
+            transform_inverse = transform_inverse.replace_submodel(
+                "cel2nat", models.Identity(2)
+            )
+            transform_inverse = transform_inverse.replace_submodel(
+                "sky2pix", models.Identity(2)
+            )
+
             transform = transform.replace_submodel(
                 "pix2sky", models.Identity(2)
             )
             transform = transform.replace_submodel(
                 "nat2cel", models.Identity(2)
             )
+
+            transform.inverse = transform_inverse
 
     # Replace a log-linear axis with a linear axis representing the log
     # and a Tabular axis with Identity to ensure the affinity check is passed
@@ -332,7 +350,7 @@ def gwcs_to_fits(ndd, hdr=None):
             points = m_this.points
             if not (
                 ndim == 1
-                and np.allclose(points, np.arange(points.size))
+                and np.allclose(points, np.arange(points[0].size))
                 or ndim == 2
                 and np.allclose(points[0], np.arange(points[0].size))
                 and np.allclose(points[1], np.arange(points[1].size))
@@ -445,6 +463,7 @@ def gwcs_to_fits(ndd, hdr=None):
 
             crval[world_axis - 1] = np.log(crval[world_axis - 1])
 
+    # TODO: Below comment may not apply, from DRAGONS commit 46177cc
     # This (commented) line fails for un-invertable Tabular2D
     # crpix = np.array(wcs.backward_transform(*crval)) + 1
     crpix = np.array(transform.inverse(*crval)) + 1
@@ -554,19 +573,20 @@ def calculate_affine_matrices(func, shape, origin=None):
     Arguments
     ---------
     func : callable
-        function that maps input->output coordinates
+        Function that maps input->output coordinates; these coordinates
+        are x-first, because "func" is usually an astropy.modeling.Model.
 
     shape : sequence
-        shape to use for fiducial points
+        Shape to use for fiducial points.
 
     origin : sequence/None
-        if a sequence, then use this as the opposite vertex (it must be
-        the same length as "shape")
+        If a sequence, then use this as the opposite vertex (it must be
+        the same length as "shape").
 
     Returns
     -------
     AffineMatrices(array, array)
-        affine matrix and offset
+        Affine matrix and offset.
     """
     indim = len(shape)
     try:
@@ -948,9 +968,23 @@ def fitswcs_image(header):
     # create a "ghost" orthogonal axis here so an inverse can be defined
     # Modify the CD matrix in case we have to use a backup Matrix Model later
     if len(pixel_axes) == 1:
-        cd[sky_axes[0], -1] = -cd[sky_axes[1], pixel_axes[0]]
-        cd[sky_axes[1], -1] = cd[sky_axes[0], pixel_axes[0]]
-        sky_cd = cd[np.ix_(sky_axes, pixel_axes + [-1])]
+        # TODO: Below commented code is from DRAGONS commit 46177cc
+        sky_cd = np.array(
+            [
+                [
+                    cd[sky_axes[0], pixel_axes[0]],
+                    -cd[sky_axes[1], pixel_axes[0]],
+                ],
+                [
+                    cd[sky_axes[1], pixel_axes[0]],
+                    cd[sky_axes[0], pixel_axes[0]],
+                ],
+            ]
+        )
+        # cd[sky_axes[0], -1] = -cd[sky_axes[1], pixel_axes[0]]
+        # cd[sky_axes[1], -1] = cd[sky_axes[0], pixel_axes[0]]
+        # sky_cd = cd[np.ix_(sky_axes, pixel_axes + [-1])]
+
         affine = models.AffineTransformation2D(matrix=sky_cd, name="cd_matrix")
         # TODO: replace when PR#10362 is in astropy
         # rotation = models.fix_inputs(affine, {'y': 0})
@@ -1018,18 +1052,23 @@ def fitswcs_other(header, other=None):
             if other is not None:
                 table_name = header.get(f"PS{ax + 1}_0")
                 table = other.get(table_name)
+
             if table is None:
                 raise ValueError(
                     f"Cannot read table for {ctype} for axis {ax}"
                 )
+
             if isinstance(table, Table):
                 other_model = models.Tabular1D(
-                    lookup_table=table[f"PS{ax + 1}_1"]
+                    lookup_table=table[header[f"PS{ax + 1}_1"]]
                 )
             else:
                 other_model = models.Tabular2D(lookup_table=table.T)
+
             other_model.name = model_name_mapping.get(ctype[:4], ctype[:4])
+
             del other[table_name]
+
         elif len(pixel_axes) == 1:
             pixel_axis = pixel_axes[0]
             m1 = models.Shift(
