@@ -1,0 +1,6 @@
+AstroDataError
+==============
+
+.. currentmodule:: astrodata
+
+.. autoexception:: AstroDataError
