@@ -23,6 +23,8 @@ from astropy.io import fits
 from astropy.table import Table
 from astropy.utils.data import download_file
 
+from .utils import deprecated
+
 # Disable pylint import error
 # pylint: disable=import-outside-toplevel
 
@@ -695,6 +697,7 @@ def download_from_archive(
     return local_path
 
 
+@deprecated("No longer supported. Will be removed in 3.0.0.")
 def get_associated_calibrations(filename, nbias=5):
     """Query Gemini Observatory Archive for associated calibrations.
 
