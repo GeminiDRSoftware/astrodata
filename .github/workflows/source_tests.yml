@@ -90,6 +90,9 @@ jobs:
                     3.11
                     3.12
 
+            - name: Add fortran compiler (gfortran) for scipy
+              run: brew install gfortran
+
             - name: "Install dependencies"
               run: |
                   python -m pip install --upgrade pip
