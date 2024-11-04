@@ -36,7 +36,7 @@ jobs:
                 # MacOS extra setup
                 if [[ ${{ matrix.os }} == "macos-latest" ]]; then
                   brew reinstall gcc;
-                  brew reinstall openblas
+                  brew reinstall openblas;
                 fi
 
             - name: "Set up Python"
