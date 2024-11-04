@@ -91,7 +91,10 @@ jobs:
                     3.12
 
             - name: Add fortran compiler (gfortran) for scipy
-              run: brew install gfortran
+              run: |
+                if [[ "$RUNNER_OS" == "maxOS" ]]; then
+                  brew install gfortran
+                fi
 
             - name: "Install dependencies"
               run: |
