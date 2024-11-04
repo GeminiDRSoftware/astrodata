@@ -33,8 +33,10 @@ jobs:
 
             - name: "Install compilers and libraries"
               run: |
+                # MacOS extra setup
                 if [[ ${{ matrix.os }} == "macos-latest" ]]; then
                   brew reinstall gcc;
+                  brew reinstall openblas
                 fi
 
             - name: "Set up Python"
