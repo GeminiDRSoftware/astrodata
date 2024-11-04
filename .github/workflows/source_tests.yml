@@ -39,6 +39,12 @@ jobs:
                     3.11
                     3.12
 
+            - name: Add fortran compiler (gfortran) for scipy
+              run: |
+                if [[ "$RUNNER_OS" == "maxOS" ]]; then
+                  brew install gfortran
+                fi
+
             - name: "Install dependencies"
               run: |
                   python -m pip install --upgrade pip
@@ -89,12 +95,6 @@ jobs:
                     3.10
                     3.11
                     3.12
-
-            - name: Add fortran compiler (gfortran) for scipy
-              run: |
-                if [[ "$RUNNER_OS" == "maxOS" ]]; then
-                  brew install gfortran
-                fi
 
             - name: "Install dependencies"
               run: |
