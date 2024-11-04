@@ -42,7 +42,7 @@ jobs:
             - name: Add fortran compiler (gfortran) for scipy
               run: |
                 if [[ "$RUNNER_OS" == "maxOS" ]]; then
-                  brew install gfortran
+                  export gfortran=gfortran-14
                 fi
 
             - name: "Install dependencies"
