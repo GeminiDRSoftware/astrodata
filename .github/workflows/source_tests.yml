@@ -43,8 +43,8 @@ jobs:
               run: |
                 # Needed because of issues outlined in
                 # https://github.com/actions/runner-images/issues/3371
-      #         echo "gfortran=gfortran-14" >> "$GITHUB_ENV"
-        #       gfortran --version
+                echo "gfortran=gfortran-14" >> "$GITHUB_ENV"
+                gfortran --version
 
             - name: "Install dependencies"
               run: |
