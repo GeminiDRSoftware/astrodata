@@ -39,6 +39,15 @@ jobs:
                     3.11
                     3.12
 
+            - name: "Configure gfortran (for scipy)"
+              run: |
+                # Needed because of issues outlined in
+                # https://github.com/actions/runner-images/issues/3371
+                sudo ln -s /usr/local/bin/gfortran-14 /usr/local/bin/gfortran
+                sudo mkdir /usr/local/gfortran
+                sudo ln -s /usr/local/Cellar/gcc@14/*/lib/gcc/14 /usr/local/gfortran/lib
+                gfortran --version
+
             - name: "Install dependencies"
               run: |
                   python -m pip install --upgrade pip
