@@ -33,7 +33,9 @@ jobs:
 
             - name: "Install compilers and libraries"
               run: |
-                sudo apt install gcc gfortran -y
+                if [[ ${{ matrix.os }} == "macos-latest" ]]; then
+                  brew install gcc gfortran;
+                fi
 
             - name: "Set up Python"
               uses: "actions/setup-python@v5"
