@@ -24,7 +24,7 @@ jobs:
             matrix:
                 os:
                     - ubuntu-latest
-                    - macos-latest
+                    - macos-13
                     - windows-latest
 
         steps:
@@ -38,14 +38,6 @@ jobs:
                     3.10
                     3.11
                     3.12
-
-            - name: "Configure gfortran (for scipy)"
-              run: |
-                # Needed because of issues outlined in
-                # https://github.com/actions/runner-images/issues/3371
-                echo "FC=gfortran-13" >> "$GITHUB_ENV"
-                echo "F77=gfortran-13" >> "$GITHUB_ENV"
-                echo "F90=gfortran-13" >> "$GITHUB_ENV"
 
             - name: "Install dependencies"
               run: |
