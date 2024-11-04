@@ -39,13 +39,6 @@ jobs:
                     3.11
                     3.12
 
-            - name: Add fortran compiler (gfortran) for scipy
-              run: |
-                if [[ "$RUNNER_OS" == "macOS" ]]; then
-                  alias gfortran=gfortran-14
-                  gfortran -V
-                fi
-
             - name: "Install dependencies"
               run: |
                   python -m pip install --upgrade pip
