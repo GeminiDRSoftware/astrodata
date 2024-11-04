@@ -34,7 +34,8 @@ jobs:
             - name: "Install compilers and libraries"
               run: |
                 if [[ ${{ matrix.os }} == "macos-latest" ]]; then
-                  brew install gcc gfortran;
+                  brew reinstall gcc;
+                  brew reinstall gfortran;  # Redundant
                 fi
 
             - name: "Set up Python"
