@@ -43,11 +43,12 @@ jobs:
               run: |
                 # Needed because of issues outlined in
                 # https://github.com/actions/runner-images/issues/3371
-                echo "gfortran=/usr/local/bin/gfortran-14" >> "$GITHUB_ENV"
+                echo "FC=gfortran-13" >> "$GITHUB_ENV"
+                echo "F77=gfortran-13" >> "$GITHUB_ENV"
+                echo "F90=gfortran-13" >> "$GITHUB_ENV"
 
             - name: "Install dependencies"
               run: |
-                  gfortran --version
                   python -m pip install --upgrade pip
                   python -m pip install nox poetry
 
