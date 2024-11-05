@@ -31,14 +31,6 @@ jobs:
             - name: "Check out the repo"
               uses: "actions/checkout@v4"
 
-            - name: "Install compilers and libraries"
-              run: |
-                # MacOS extra setup
-                if [[ ${{ matrix.os }} == "macos-latest" ]]; then
-                  brew reinstall gcc;
-                  brew reinstall openblas;
-                fi
-
             - name: "Set up Python"
               uses: "actions/setup-python@v5"
               with:
