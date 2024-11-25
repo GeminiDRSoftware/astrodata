@@ -14,7 +14,7 @@ body:
     id: contact
     attributes:
       label: Contact Details
-      description: How can we get in touch with you if we need more info?
+      description: How can we get in touch with you if we need more info? If you get notification for GitHub Issues, you can ignore this part.
       placeholder: ex. email@example.com
     validations:
       required: false
