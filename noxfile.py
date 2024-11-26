@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import nox
+import tomllib
 
 # Nox configuration
 # Default nox sessions to run when executing "nox" without session
@@ -361,7 +362,12 @@ def get_poetry_dependencies(
     ]
 
     if all_deps:
-        command.pop(2)
+        with Path("pyproject.toml").open("rb") as infile:
+            toml_contents = tomllib.load(infile)
+
+        groups = list(toml_contents["tool"]["poetry"]["group"].keys())
+
+        command[2] = f"--with={','.join(groups)}"
 
     session.run(
         *command,
@@ -807,9 +813,12 @@ def linting(session: nox.Session) -> None:
     session.run("ruff", "check", ".")
 
 
-@nox.session(venv_backend="none")
+@nox.session
 def devshell(session: nox.Session) -> None:
     """Create a venv for development."""
+    # Installing poetry within this isolated env to avoid having devs manage
+    # installing a plugin...
+    session.install("poetry", "poetry-plugin-export")
     session.env["POETRY_PREFER_ACTIVE_PYTHON"] = "true"
     session.env["POETRY_VIRTUALENVS_CREATE"] = "false"
 
@@ -833,7 +842,7 @@ def devshell(session: nox.Session) -> None:
 
     # Remove any existing venv
     if venv_path.exists():
-        session.run("rm", "-rf", str(venv_path))
+        session.run("rm", "-rf", str(venv_path), external=True)
 
     # Create the venv
     session.run(
@@ -844,7 +853,13 @@ def devshell(session: nox.Session) -> None:
     venv_python_bin = venv_path / "bin" / "python"
 
     session.run(
-        str(venv_python_bin), "-m", "pip", "install", "--upgrade", "pip"
+        str(venv_python_bin),
+        "-m",
+        "pip",
+        "install",
+        "--upgrade",
+        "pip",
+        external=True,
     )
 
     session.run(
@@ -854,6 +869,7 @@ def devshell(session: nox.Session) -> None:
         "install",
         "--requirement",
         str(req_file_path),
+        external=True,
     )
 
     # Install the package in editable mode
@@ -865,6 +881,7 @@ def devshell(session: nox.Session) -> None:
         "-e",
         ".",
         "--no-deps",
+        external=True,
     )
 
     session.log("Virtual environment created.")
