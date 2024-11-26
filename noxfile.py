@@ -13,7 +13,23 @@ from pathlib import Path
 from typing import ClassVar
 
 import nox
-import tomllib
+
+# Logic required because tomllib was introduced to the standard library in
+# python version 3.11.
+if sys.version_info[1] > 11:
+    import tomllib
+
+elif sys.version_info[1] < 10:
+    major, minor = sys.version_info[0], sys.version_info[1]
+    py_version = f"{major}.{minor}"
+    raise Exception(f"Python version below 3.10 (using {py_version})")
+
+else:
+    # Only for python 3.10 support
+    from pip._vendor import tomli
+
+    tomllib = tomli
+
 
 # Nox configuration
 # Default nox sessions to run when executing "nox" without session
