@@ -818,7 +818,6 @@ def devshell(session: nox.Session) -> None:
     """Create a venv for development."""
     # Installing poetry within this isolated env to avoid having devs manage
     # installing a plugin...
-    session.install("poetry", "poetry-plugin-export")
     session.env["POETRY_PREFER_ACTIVE_PYTHON"] = "true"
     session.env["POETRY_VIRTUALENVS_CREATE"] = "false"
 
@@ -827,7 +826,7 @@ def devshell(session: nox.Session) -> None:
 
     # Check that poetry is installed
     try:
-        session.run("poetry", "--version", silent=True)
+        session.run("poetry", "--version", silent=True, external=True)
 
     except nox.command.CommandFailed as err:
         message_lines = (
@@ -892,7 +891,7 @@ def devshell(session: nox.Session) -> None:
     session.notify("initialize_pre_commit")
 
 
-@nox.session(venv_backend="none")
+@nox.session(venv_backend="conda")
 def devconda(session: nox.Session) -> None:
     """Create a new conda environment for development."""
     conda_venv_name = "astrodata"
@@ -952,7 +951,15 @@ def devconda(session: nox.Session) -> None:
     session.run("conda", "update", "-n", conda_venv_name, "--all", "--yes")
 
     conda_python = conda_envs_loc / conda_venv_name / "bin" / "python"
-    session.run(str(conda_python), "-m", "pip", "install", "--upgrade", "pip")
+    session.run(
+        str(conda_python),
+        "-m",
+        "pip",
+        "install",
+        "--upgrade",
+        "pip",
+        external=True,
+    )
 
     session.run(
         str(conda_python),
@@ -961,6 +968,7 @@ def devconda(session: nox.Session) -> None:
         "install",
         "--requirement",
         str(req_file_path),
+        external=True,
     )
 
     # Install the package in editable mode
@@ -972,6 +980,7 @@ def devconda(session: nox.Session) -> None:
         "-e",
         ".",
         "--no-deps",
+        external=True,
     )
 
     session.log("Conda environment created.")
