@@ -52,6 +52,7 @@ To install |astrodata|, you will need the following:
 
 - Python 3.10, 3.11, or 3.12
 - Poetry_ in some flavor
+- ``poetry-plugin-export``, installed into the same environment as Poetry_
 - Nox_ (optional, see note below)
 
 Please see the Poetry_ and nox_ documentation for installation instructions.
@@ -62,7 +63,15 @@ their documentation.
 .. _pipx: https://pipx.pypa.io/stable/
 
 We recommend using pipx_ to install Poetry and nox, as it will install them in
-isolated environments and make them easier to manage.
+isolated environments and make them easier to manage. If you're using `pipx`,
+you only need to copy/paste the following lines to ensure you have everything
+installed properly:
+
+.. code-block:: shell
+
+   pipx install poetry
+   poetry self add poetry-plugin-export
+   pipx install nox
 
 .. note::
 
