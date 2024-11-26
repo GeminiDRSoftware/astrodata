@@ -19,13 +19,14 @@ import nox
 if sys.version_info[1] > 11:
     import tomllib
 
-elif sys.version_info[1] < 10:
+elif sys.version_info[0] < 3 or sys.version_info[1] < 10:
     major, minor = sys.version_info[0], sys.version_info[1]
     py_version = f"{major}.{minor}"
     raise Exception(f"Python version below 3.10 (using {py_version})")
 
 else:
-    # Only for python 3.10 support
+    # Only for python 3.10 support, which wont' be maintained much longer.
+    # To be removed when we drop support for python 3.10 (see: ISSUE)
     from pip._vendor import tomli
 
     tomllib = tomli
