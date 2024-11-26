@@ -116,7 +116,7 @@ jobs:
 
             - name: "Install and update pip"
               run: |
-                  conda install -c conda-forge pip
+                  conda install -c conda-forge pip python=${{ matrix.python-version }} -y
                   pip install --upgrade pip poetry
 
             - name: "Integration tests"
