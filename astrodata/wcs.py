@@ -690,8 +690,17 @@ def read_wcs_from_header(header):
     crval = []
     cdelt = []
 
+    # Handle more than 1 undefined (i.e., not CTYPEi) axis
+    untyped_axes = 0
     for i in range(1, wcsaxes + 1):
-        ctype.append(header.get(f"CTYPE{i}", "LINEAR"))
+        try:
+            this_ctype = header[f"CTYPE{i}"]
+
+        except KeyError:
+            this_ctype = f"LINEAR{untyped_axes+1 if untyped_axes else ''}"
+            untyped_axes += 1
+
+        ctype.append(this_ctype)
         cunit.append(header.get(f"CUNIT{i}", None))
         crpix.append(header.get(f"CRPIX{i}", 0.0))
         crval.append(header.get(f"CRVAL{i}", 0.0))
