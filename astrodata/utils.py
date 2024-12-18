@@ -475,6 +475,9 @@ class Section(tuple):
     @staticmethod
     def from_string(value):
         """Produce a Section object from a string."""
+        if value is None:
+            return None
+
         return Section(
             *[
                 y
