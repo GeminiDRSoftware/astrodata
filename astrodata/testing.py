@@ -897,14 +897,23 @@ class ADCompare:
         errorlist = []
         s1 = set(hdr1.keys()) - {"HISTORY", "COMMENT"}
         s2 = set(hdr2.keys()) - {"HISTORY", "COMMENT"}
+
         if ignore:
             s1 -= set(ignore)
             s2 -= set(ignore)
+
         if s1 != s2:
             if s1 - s2:
                 errorlist.append(f"Header 1 contains keywords {s1 - s2}")
+
             if s2 - s1:
                 errorlist.append(f"Header 2 contains keywords {s2 - s1}")
+
+        ignore_list = ["GEM-TLM", "HISTORY", "COMMENT", ""]
+
+        # Include keywords from `ignore` parameter.
+        if ignore:
+            ignore_list.extend(ignore)
 
         # If present, import timestamp_keys from geminidr.gemini.lookups
         # to compare the timestamps in the headers.
@@ -920,7 +929,7 @@ class ADCompare:
             # GEM-TLM is "time last modified"
             if (
                 kw not in timestamp_keys.values()
-                and kw not in ["GEM-TLM", "HISTORY", "COMMENT", ""]
+                and kw not in ignore_list
                 and kw not in self.ignore_kw
             ):
                 try:
