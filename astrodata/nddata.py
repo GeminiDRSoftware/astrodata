@@ -713,5 +713,16 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
             uncertainty=None if unc is None else unc.__class__(unc.array.T),
             mask=None if self.mask is None else self.mask.T,
             wcs=new_wcs,
+            meta=self.meta,
             copy=False,
         )
+
+    def _slice(self, item):
+        """Slice metadata like OBJMASK."""
+        kwargs = super()._slice(item)
+        if "other" in kwargs["meta"]:
+            kwargs["meta"] = deepcopy(self.meta)
+            for k, v in kwargs["meta"]["other"].items():
+                if isinstance(v, np.ndarray) and v.shape == self.shape:
+                    kwargs["meta"]["other"][k] = v[item]
+        return kwargs
