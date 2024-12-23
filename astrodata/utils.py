@@ -502,14 +502,14 @@ class Section(tuple):
         "Renamed to 'as_iraf_section', this is just an alias for now "
         "and will be removed in a future version."
     )
-    def asIRAFsection(self):  # pylint: disable=invalid-name
+    def asIRAFsection(self, binning=None):  # pylint: disable=invalid-name
         """Produce string with '[x1:x2,y1:y2]' 1-indexed and end-inclusive.
 
         Deprecated, see :py:meth:`~astrodata.Section.as_iraf_section`.
         """
         return self.as_iraf_section()
 
-    def as_iraf_section(self):
+    def as_iraf_section(self, binning=None):
         """Produce string with '[x1:x2,y1:y2]' 1-indexed and end-inclusive.
 
         This is the format used by IRAF for sections.
@@ -518,17 +518,19 @@ class Section(tuple):
         >>> Section(0, 10, 0, 10).as_iraf_section()
         '[1:10,1:10]'
         """
+        if binning is None:
+            binning = [1] * len(self._axis_names)
         return (
             "["
             + ",".join(
                 [
                     ":".join(
                         [
-                            str(self.axis_dict[axis] + 1),
-                            str(self.axis_dict[axis.replace("1", "2")]),
+                            str(bin_ * self.__dict__[axis] + 1),
+                            str(bin_ * self.__dict__[axis.replace("1", "2")]),
                         ]
                     )
-                    for axis in self._axis_names[::2]
+                    for axis, bin_ in zip(self._axis_names[::2], binning)
                 ]
             )
             + "]"
