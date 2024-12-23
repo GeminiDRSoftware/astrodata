@@ -517,6 +517,13 @@ class Section(tuple):
         For example,
         >>> Section(0, 10, 0, 10).as_iraf_section()
         '[1:10,1:10]'
+
+        Arguments
+        ---------
+        binning : iterable
+            A length-2 iterable of (x_binning, y_binning). Binning is assumed
+            to be 1 for all axes if not given.
+
         """
         if binning is None:
             binning = [1] * len(self._axis_names)
