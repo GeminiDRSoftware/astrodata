@@ -375,6 +375,18 @@ def test__get_uncertainty(testnd):
     assert isinstance(result, ADVarianceUncertainty)
     assert_array_equal(result.array, testnd.variance[:2, 0])
 
+# Basically the same test as above but using slicing.
+def test_access_to_other_planes_when_sliced(testnd):
+    ndwindow = testnd[1:, 1:]
+    assert ndwindow.data.shape == (4, 4)
+    assert ndwindow.data[0, 0] == testnd.shape[1] + 1
+    assert ndwindow.OBJMASK.shape == (4, 4)
+    assert ndwindow.OBJMASK[0, 0] == testnd.shape[1] + 1
+    assert isinstance(ndwindow.OBJCAT, Table)
+    assert len(ndwindow.OBJCAT) == 3
+
+
+
 
 if __name__ == "__main__":
     pytest.main()
