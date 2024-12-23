@@ -8,7 +8,7 @@ import textwrap
 import warnings
 from collections import OrderedDict
 from contextlib import suppress
-from copy import deepcopy
+from copy import copy, deepcopy
 from functools import partial
 
 import numpy as np
@@ -134,6 +134,9 @@ class AstroData:
         if nddata is None:
             nddata = []
 
+        elif not isinstance(nddata, (list, tuple)):
+            nddata = [nddata]
+
         # Check that nddata is either a single or iterable of NDAstroData
         # objects
         is_nddata = isinstance(nddata, NDAstroData)
@@ -180,6 +183,24 @@ class AstroData:
         self._logger = logging.getLogger(__name__)
         self._orig_filename = None
         self._path = None
+
+    def __copy__(self):
+        """Return a shallow copy of this instance."""
+        obj = self.__class__()
+
+        for attr in ("_phu", "_path", "_orig_filename", "_tables"):
+            obj.__dict__[attr] = self.__dict__[attr]
+
+        # A new list containing references (rather than a reference to the
+        # list).
+        obj.__dict__["_all_nddatas"] = [nd for nd in self._nddata]
+
+        # If we're copying a single-slice AD, then make its NDAstroData a copy
+        # so attributes can be modified without affecting the original
+        if self.is_single:
+            obj.__dict__["_all_nddatas"][self._indices[0]] = copy(self.nddata)
+
+        return obj
 
     def __deepcopy__(self, memo):
         """Return a new instance of this class.
