@@ -527,14 +527,15 @@ class Section(tuple):
         """
         if binning is None:
             binning = [1] * len(self._axis_names)
+
         return (
             "["
             + ",".join(
                 [
                     ":".join(
                         [
-                            str(bin_ * self.__dict__[axis] + 1),
-                            str(bin_ * self.__dict__[axis.replace("1", "2")]),
+                            str(bin_ * self.axis_dict[axis] + 1),
+                            str(bin_ * self.axis_dict[axis.replace("1", "2")]),
                         ]
                     )
                     for axis, bin_ in zip(self._axis_names[::2], binning)
