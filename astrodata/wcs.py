@@ -1008,13 +1008,11 @@ def fitswcs_image(header):
         rotation = models.AffineTransformation2D(
             matrix=sky_cd, name="cd_matrix"
         )
-    transforms.append(rotation)
 
     # Do it this way so the whole CD matrix + projection is separable
     projection = gwutils.fitswcs_nonlinear(wcs_info)
 
     if projection:
-        transforms.append(projection)
         rotation |= projection
 
     transforms.append(rotation)
