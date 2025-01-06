@@ -20,6 +20,7 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install poetry nox
+          poetry self add poetry-plugin-export
       - name: Sphinx build
         run: |
           nox -s docs
