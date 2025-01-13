@@ -266,7 +266,6 @@ def test_loglinear_axis(NIRI_IMAGE, tmp_path, monkeypatch):
     assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
 
 @pytest.mark.skip(reason="Requires external test data.")
-@pytest.mark.preprocessed_data
 def test_tabular1D_axis(tmp_path, monkeypatch):
     """Check a FITS file with a tabular 1D axis is read correctly and
     then rewritten to disk and read back in"""
