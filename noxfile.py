@@ -657,7 +657,7 @@ def integration_test_build(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy<2")
+    session.run("conda", "install", "numpy<2", "-y")
 
     session.install("astrodata")
 
