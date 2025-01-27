@@ -111,6 +111,7 @@ jobs:
 
         steps:
             - uses: "actions/checkout@v4"
+
             - name: "Set up Python"
               uses: "actions/setup-python@v5"
               with:
@@ -129,7 +130,7 @@ jobs:
 
             - name: "Install and update pip"
               run: |
-                  conda install -c conda-forge pip "python=${{ matrix.python-version }}" -y
+                  conda install -c conda-forge pip "python=${{ matrix.python-version }}" -y --quiet
 
             - name: "Integration tests"
               run: nox -s build_tests_integration -x -- -vv
