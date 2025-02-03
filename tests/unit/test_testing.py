@@ -773,100 +773,83 @@ def test_ADCompare_numext(ad1, ad2):
 
     assert not compare.numext()
 
+def test_ADCompare_unequal_tags(tmp_path):
+    ad1_file_path = tmp_path / "file_1.fits"
+    ad2_file_path = tmp_path / "file_2.fits"
+    ad3_file_path = tmp_path / "file_3.fits"
+    file_paths = [
+        ad1_file_path,
+        ad2_file_path,
+        ad3_file_path,
+    ]
 
-def test_ADCompare_unequal_tags(ad1, tmp_path):
-    # Get a file of a different type
-    all_cals = testing.get_associated_calibrations("N20180304S0126.fits")
+    for file_path in file_paths:
+        data = np.random.random((100,100)).astype(np.float32)
+        hdu = fits.PrimaryHDU()
 
-    # TODO this could just be a bias fixture and used elsewhere.
-    all_cals = [cal for cal in all_cals if cal["caltype"] == "bias"]
+        hdu.writeto(file_path)
 
-    # Create two test classes that have different astrodata tags
-    class TestAD1(astrodata.AstroData):
+    class ADClass1(astrodata.AstroData):
         @astrodata.astro_data_tag
         def tag1(self):
             return astrodata.TagSet(["TAG1"])
 
         @staticmethod
         def _matches_data(source):
-            source = source.filename()
-            source = os.path.basename(source)
-
-            if source == all_cals[0]["filename"]:
+            if source.filename() == str(ad1_file_path):
                 return True
 
             return False
 
-    class TestAD2(astrodata.AstroData):
+    class ADClass2(astrodata.AstroData):
         @astrodata.astro_data_tag
         def tag2(self):
             return astrodata.TagSet(["TAG2"])
 
         @staticmethod
         def _matches_data(source):
-            source = source.filename()
-            source = os.path.basename(source)
-
-            if source == all_cals[1]["filename"]:
+            if source.filename() == str(ad2_file_path):
                 return True
 
             return False
 
-    # Register our test classes
-    astrodata.factory.add_class(TestAD1)
-    astrodata.factory.add_class(TestAD2)
+    class ADClass3(astrodata.AstroData):
+        @astrodata.astro_data_tag
+        def tag3(self):
+            return astrodata.TagSet(["TAG3"])
 
-    # Downlaod the files
-    file1 = download_from_archive(
-        all_cals[0]["filename"],
-        path=tmp_path,
-        sub_path="",
-        cache=False,
-    )
+        @staticmethod
+        def _matches_data(source):
+            if source.filename() == str(ad3_file_path):
+                return True
 
-    file2 = download_from_archive(
-        all_cals[1]["filename"],
-        path=tmp_path,
-        sub_path="",
-        cache=False,
-    )
+            return False
 
-    # Load the two files
-    ad1 = astrodata.from_file(file1)
-    ad2 = astrodata.from_file(file2)
 
-    assert all(isinstance(ad, astrodata.AstroData) for ad in (ad1, ad2))
-    assert isinstance(ad1, TestAD1)
-    assert isinstance(ad2, TestAD2)
+    astrodata.factory.add_class(ADClass1)
+    astrodata.factory.add_class(ADClass2)
+    astrodata.factory.add_class(ADClass3)
+
+    # Create AD objects
+
+    ad1 = astrodata.from_file(ad1_file_path)
+    ad2 = astrodata.from_file(ad2_file_path)
+    ad3 = astrodata.from_file(ad3_file_path)
+
+    assert all(isinstance(ad, astrodata.AstroData) for ad in (ad1, ad2, ad3))
+    assert isinstance(ad1, ADClass1)
+    assert isinstance(ad2, ADClass2)
+    assert isinstance(ad3, ADClass3)
 
     assert ad1.tags == {"TAG1"}
     assert ad2.tags == {"TAG2"}
+    assert ad3.tags == {"TAG3"}
 
-    compare = testing.ADCompare(ad1, ad2)
+    for _ad1, _ad2 in itertools.permutations([ad1, ad2, ad3], 2):
+        compare_obj = testing.ADCompare(_ad1, _ad2)
 
-    with pytest.raises(AssertionError):
-        compare.run_comparison()
+        assert compare_obj.tags()
 
-    assert compare.tags()
-
-    # Create a third class that has the same tags as the first class, but
-    # accepts the second file
-    class TestAD3(astrodata.AstroData):
-        @astrodata.astro_data_tag
-        def tag2(self):
-            return astrodata.TagSet(["TAG1"])
-
-    astrodata.factory.remove_class(TestAD2)
-    astrodata.factory.add_class(TestAD3)
-
-    ad2 = astrodata.from_file(file2)
-
-    assert isinstance(ad2, TestAD3)
-    assert ad2.tags == {"TAG1"}
-
-    compare = testing.ADCompare(ad1, ad2)
-
-    assert not compare.tags()
 
 
 def test_ADCompare_header_matching(ad1, ad2):
