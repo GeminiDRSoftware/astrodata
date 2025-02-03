@@ -63,7 +63,7 @@ jobs:
                   python -m nox -r -vv
 
             - name: "Upload coverage data"
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: covdata
                   path: .coverage.*
@@ -115,7 +115,7 @@ jobs:
                   python -m nox -s script_tests --verbose -x -- -xvv
 
             # - name: "Upload coverage data"
-            #   uses: actions/upload-artifact@v3
+            #   uses: actions/upload-artifact@v4
             #   with:
             #       name: covdata
             #       path: .coverage.*
@@ -179,7 +179,7 @@ jobs:
                 echo "immediately."
 
             - name: "Upload coverage data"
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: covdata
                   path: .coverage.*
