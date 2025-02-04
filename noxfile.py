@@ -474,6 +474,15 @@ def apply_macos_config(session: nox.Session) -> None:
         session.log("Setting CONDA_SUBDIR to osx-64.")
 
 
+def apply_data_caching_environment_variable(session: nox.Session) -> None:
+    """Add a test caching env var to the session's environment."""
+    default_test_cache_path = str(Path(os.getcwd()) / "_test_cache")
+
+    session.env["ASTRODATA_TEST"] = (
+        os.getenv("ASTRODATA_TEST") or default_test_cache_path
+    )
+
+
 @nox.session(
     venv_backend="conda",
     venv_params=SessionVariables.dragons_venv_params,
@@ -481,6 +490,7 @@ def apply_macos_config(session: nox.Session) -> None:
 )
 def dragons_release_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
+    apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
     # Fetch test dependencies from the poetry.lock file.
@@ -512,6 +522,7 @@ def dragons_release_tests(session: nox.Session) -> None:
 @nox.session(venv_backend="conda", python="3.10", tags=["dragons"])
 def dragons_dev_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
+    apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
     # Fetch test dependencies from the poetry.lock file.
@@ -586,6 +597,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
 @nox.session(python=SessionVariables.python_versions)
 def unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
+    apply_data_caching_environment_variable(session)
     install_test_dependencies(session)
     session.install("-e", ".", "--no-deps")
 
@@ -600,6 +612,7 @@ def unit_tests(session: nox.Session) -> None:
 def conda_unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
     # Configure session channels.
+    apply_data_caching_environment_variable(session)
     session.run(
         "conda",
         "config",
@@ -623,6 +636,8 @@ def unit_test_build(session: nox.Session) -> None:
 
     This is meant to be called from the `build_tests` session.
     """
+    apply_data_caching_environment_variable(session)
+
     # Install the package from the devpi server
     install_test_dependencies(session, poetry_groups=["test"])
 
@@ -643,6 +658,7 @@ def integration_test_build(session: nox.Session) -> None:
 
     This is meant to be called from the `build_tests` session.
     """
+    apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
     # Fetch test dependencies from the poetry.lock file.
@@ -674,6 +690,8 @@ def integration_test_build(session: nox.Session) -> None:
 @nox.session
 def coverage(session: nox.Session) -> None:
     """Run the tests and generate a coverage report."""
+    apply_data_caching_environment_variable(session)
+
     # Install the test dependencies.
     install_test_dependencies(session)
 
@@ -766,6 +784,7 @@ def build_tests_unit(session: nox.Session) -> None:
     This session will build the package, upload it to an isolated devpi server,
     and run the tests using the build version of the package.
     """
+    apply_data_caching_environment_variable(session)
     build_and_publish_to_devpi(session)
 
     working_dir = Path(session.create_tmp())
@@ -782,6 +801,7 @@ def build_tests_integration(session):
     This session will build the package, upload it to an isolated devpi server,
     and run the tests using the build version of the package.
     """
+    apply_data_caching_environment_variable(session)
     build_and_publish_to_devpi(session)
 
     working_dir = Path(session.create_tmp())
@@ -793,6 +813,7 @@ def build_tests_integration(session):
 @nox.session(python=SessionVariables.python_versions)
 def script_tests(session: nox.Session) -> None:
     """Run the script tests."""
+    apply_data_caching_environment_variable(session)
     install_test_dependencies(session)
     session.install("-e", ".", "--no-deps")
 
@@ -804,6 +825,7 @@ def script_tests(session: nox.Session) -> None:
 @use_devpi_server
 def build_tests_scripts(session: nox.Session) -> None:
     """Run the script tests using the build version of the package."""
+    apply_data_caching_environment_variable(session)
     build_and_publish_to_devpi(session)
 
     working_dir = Path(session.create_tmp())
