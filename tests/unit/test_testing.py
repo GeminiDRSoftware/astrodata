@@ -26,7 +26,7 @@ from astropy.modeling import models, Model, Parameter
 
 @pytest.fixture
 def test_file_archive():
-    return "N20180304S0126.fits"
+    return "test.fits"
 
 
 @pytest.fixture
