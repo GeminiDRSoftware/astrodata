@@ -460,7 +460,7 @@ def install_test_dependencies(
         session.install("-r", str(req_file_path))
 
     else:
-        session.conda_install("--file", str(req_file_path))
+        session.conda_install("--quiet", "--file", str(req_file_path))
 
 
 def apply_macos_config(session: nox.Session) -> None:
@@ -650,6 +650,7 @@ def integration_test_build(session: nox.Session) -> None:
 
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
+        "--quiet",
         "dragons==3.2",
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
@@ -657,7 +658,7 @@ def integration_test_build(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy=1.26")
+    session.conda_install("--quiet", "numpy=1.26")
     session.install("astrodata")
 
     # Positional arguments after -- are passed to pytest.
@@ -1029,6 +1030,7 @@ def dragons_calibration(
 ) -> None:
     """Run the calibration tests."""
     session.conda_install(
+        "--quiet",
         "dragons==3.2",
         channel=SessionVariables.dragons_conda_channels,
     )
