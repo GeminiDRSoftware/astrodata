@@ -850,6 +850,10 @@ def test_ADCompare_unequal_tags(tmp_path):
 
         assert compare_obj.tags()
 
+    for _ad in [ad1, ad2, ad3]:
+        compare_obj = testing.ADCompare(_ad, _ad)
+
+        assert not compare_obj.tags()
 
 
 def test_ADCompare_header_matching(ad1, ad2):
