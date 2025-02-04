@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 import os
 
@@ -31,7 +31,7 @@ def ad2():
 
 
 def test_add_get_provenance(ad):
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     filename = "filename"
     md5 = "md5"
     primitive = "provenance_added_by"
@@ -58,7 +58,7 @@ def test_add_get_provenance(ad):
 
 
 def test_add_duplicate_provenance(ad):
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     filename = "filename"
     md5 = "md5"
     primitive = "provenance_added_by"
@@ -71,7 +71,7 @@ def test_add_duplicate_provenance(ad):
 
 
 def test_add_get_history(ad):
-    timestamp_start = datetime.utcnow()
+    timestamp_start = datetime.now(timezone.utc).replace(tzinfo=None)
     timestamp_end = (timestamp_start + timedelta(days=1)).isoformat()
     timestamp_start = timestamp_start.isoformat()
     primitive = "primitive"
@@ -103,7 +103,7 @@ def test_add_get_history(ad):
 
 
 def test_add_dupe_history(ad):
-    timestamp_start = datetime.utcnow()
+    timestamp_start = datetime.now(timezone.utc).replace(tzinfo=None)
     timestamp_end = (timestamp_start + timedelta(days=1)).isoformat()
     timestamp_start = timestamp_start.isoformat()
     primitive = "primitive"
@@ -117,7 +117,7 @@ def test_add_dupe_history(ad):
 
 
 def test_clone_provenance(ad, ad2):
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     filename = "filename"
     md5 = "md5"
     primitive = "provenance_added_by"
@@ -131,7 +131,7 @@ def test_clone_provenance(ad, ad2):
 
 
 def test_clone_history(ad, ad2):
-    timestamp_start = datetime.utcnow()
+    timestamp_start = datetime.now(timezone.utc).replace(tzinfo=None)
     timestamp_end = (timestamp_start + timedelta(days=1)).isoformat()
     timestamp_start = timestamp_start.isoformat()
     primitive = "primitive"
@@ -167,7 +167,7 @@ def test_convert_provhistory(tmp_path, BPM_PROVHISTORY):
     assert hasattr(ad, "PROVHISTORY")
 
     # When we add history, that should get converted to HISTORY
-    now = datetime.utcnow().isoformat()
+    now = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     add_history(ad, now, now, "primitive", "args")
     assert not hasattr(ad, "PROVHISTORY")
     assert hasattr(ad, "HISTORY")
@@ -195,26 +195,26 @@ def test_provenance_summary(ad):
     summary = astrodata.provenance.provenance_summary(ad).casefold()
     assert "no provenance" in summary
 
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     filename = "filename"
     md5 = "md5"
     primitive = "primitive_name"
 
     add_provenance(ad, filename, md5, primitive, timestamp=timestamp)
 
-    timestamp_end = datetime.utcnow().isoformat()
+    timestamp_end = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     args = json.dumps({"arg1": 1, "arg2": 3})
 
     add_history(ad, timestamp, timestamp_end, primitive, args)
 
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     filename = "filename"
     md5 = "md5"
     primitive = "snudder_primitive_name"
 
     add_provenance(ad, filename, md5, primitive, timestamp=timestamp)
 
-    timestamp_end = datetime.utcnow().isoformat()
+    timestamp_end = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
     args = json.dumps({"arg1": 1, "arg2": 2})
 
     add_history(ad, timestamp, timestamp_end, primitive, args)
