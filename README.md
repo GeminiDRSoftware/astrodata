@@ -6,6 +6,7 @@
 [citation link]: https://github.com/GeminiDRSoftware/astrodata/blob/main/CITATION.md
 [DRAGONS citation]: https://zenodo.org/records/10841622
 [zenodo DOI link]: https://doi.org/10.5281/zenodo.14804282
+[pyopensci review link]: https://github.com/pyOpenSci/software-review/issues/181
 
 [coverage badge]: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teald/d2f3af2a279efc1f6e90d457a3c50e47/raw/covbadge.json
 [docs build badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/documentation.yml/badge.svg
@@ -14,6 +15,7 @@
 [source test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/source_tests.yml/badge.svg
 [build test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/build_tests.yml/badge.svg
 [zenodo DOI badge]: https://zenodo.org/badge/DOI/10.5281/zenodo.14804282.svg
+[pyopensci peer review badge]: https://pyopensci.org/badges/peer-reviewed.svg
 
 <p align="center">
   <source media="(prefers-color-scheme: dark)" srcset="docs/static/logo.svg">
@@ -30,6 +32,7 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![Supported python versions -- 3.10, 3.11, and 3.12](https://img.shields.io/badge/3.10|3.11|3.12-%234b8bbe?logo=Python&logoColor=%234b8bbe&label=For%20Python%3A)
 [![DOI Badge][zenodo DOI badge]][zenodo DOI link]
+[![pyOpenSci Peer Reviewed][pyopensci peer review badge]][pyopensci review link]
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
