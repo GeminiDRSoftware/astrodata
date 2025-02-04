@@ -569,7 +569,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy<2")
+    session.conda_install("numpy==1.7")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
