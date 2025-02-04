@@ -57,7 +57,7 @@ class SessionVariables:
         "astropy>=6",
         "astroquery",
         "matplotlib",
-        "numpy==1.6",
+        "numpy==1.26.*",
         "psutil",
     ]
 
@@ -495,7 +495,7 @@ def dragons_release_tests(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy<2")
+    session.conda_install("numpy=1.26")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
@@ -569,7 +569,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy=1.6")
+    session.conda_install("numpy=1.26")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
@@ -657,7 +657,7 @@ def integration_test_build(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy=1.6")
+    session.conda_install("numpy=1.26")
     session.install("astrodata")
 
     # Positional arguments after -- are passed to pytest.
