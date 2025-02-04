@@ -498,6 +498,7 @@ def dragons_release_tests(session: nox.Session) -> None:
 
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
+        "--quiet",
         "dragons==3.2",
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
@@ -505,7 +506,7 @@ def dragons_release_tests(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy=1.26")
+    session.conda_install("--quiet", "numpy=1.26")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
