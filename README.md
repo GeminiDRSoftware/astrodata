@@ -5,6 +5,7 @@
 [pypi link]: https://pypi.org/project/astrodata
 [citation link]: https://github.com/GeminiDRSoftware/astrodata/blob/main/CITATION.md
 [DRAGONS citation]: https://zenodo.org/records/10841622
+[zenodo DOI link]: https://doi.org/10.5281/zenodo.14804282
 
 [coverage badge]: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teald/d2f3af2a279efc1f6e90d457a3c50e47/raw/covbadge.json
 [docs build badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/documentation.yml/badge.svg
@@ -12,33 +13,38 @@
 [pypi package version badge]: https://badge.fury.io/py/astrodata.svg
 [source test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/source_tests.yml/badge.svg
 [build test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/build_tests.yml/badge.svg
+[zenodo DOI badge]: https://zenodo.org/badge/DOI/10.5281/zenodo.14804282.svg
 
-`astrodata`
-=============
-
-<picture>
+<p align="center">
   <source media="(prefers-color-scheme: dark)" srcset="docs/static/logo.svg">
   <img
   alt="A logo of a stylized blue dragon inside a similarly blue shell. A yellow star lies at the center, together with the dragon shape forming a stylized letter A."
   src="docs/static/logo_dark.svg"
-  align="left"
-  height=200
-  style="padding-right: 10; padding-bottom: 10; border: none;"
+  style="display: block; width: 20%; height: auto; float: center"
   >
-</picture>
+</p>
 
+
+`astrodata`
+=============
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![Supported python versions -- 3.10, 3.11, and 3.12](https://img.shields.io/badge/3.10|3.11|3.12-%234b8bbe?logo=Python&logoColor=%234b8bbe&label=For%20Python%3A)
-[![PyPI version badge][pypi package version badge]](https://badge.fury.io/py/astrodata)
+[![DOI Badge][zenodo DOI badge]][zenodo DOI link]
 
 ### Tests
 ![A badge displaying the testing coverage percentage of this repository.][coverage badge]
 ![Source test status badge][source test status badge]
 ![Build/Release test status badge][build test status badge]
 
+
 ### Building & Publishing
 ![Documentation build status badge][docs build badge]
 ![pypi packaging status badge][pypi packaging badge]
+[![PyPI version badge][pypi package version badge]](https://badge.fury.io/py/astrodata)
+
+
+
+
 
 <!-- Clearing the logo for the next header -->
 <br clear="left">
