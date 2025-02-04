@@ -38,7 +38,7 @@ def add_provenance(ad, filename, md5, primitive, timestamp=None):
     md5 = "" if md5 is None else md5
 
     if timestamp is None:
-        timestamp = datetime.now(timezone.utc).isoformat()
+        timestamp = datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
 
     if hasattr(ad, "PROVENANCE"):
         existing_provenance = ad.PROVENANCE
