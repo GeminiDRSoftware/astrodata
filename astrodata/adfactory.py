@@ -75,6 +75,7 @@ class AstroDataFactory:
                 )
 
             # try vs all handlers
+            exception_list = []
             for func in AstroDataFactory._file_openers:
                 try:
                     fp = func(source)
@@ -88,11 +89,17 @@ class AstroDataFactory:
                     raise
 
                 except Exception as err:  # noqa
-                    LOGGER.error(
-                        "Failed to open %s with %s, got error: %s",
-                        source,
-                        func,
-                        err,
+                    exception_list.append(
+                        (
+                            func.__name__,
+                            type(err),
+                            err,
+                            "".join(
+                                traceback.format_exception(
+                                    None, err, err.__traceback__
+                                )
+                            ).splitlines(),
+                        )
                     )
 
                 else:
@@ -101,9 +108,23 @@ class AstroDataFactory:
 
                     return
 
-            raise AstroDataError(
+            message_lines = [
                 f"No access, or not supported format for: {source}"
-            )
+            ]
+
+            if exception_list:
+                n_err = len(exception_list)
+                message_lines.append(f"Got {n_err} exceptions while opening:")
+
+                for adclass, errname, err, trace_lines in exception_list:
+                    message_lines.append(f"+ {adclass}: {errname}: {str(err)}")
+                    message_lines.extend(
+                        f"    {trace_line}" for trace_line in trace_lines
+                    )
+
+            message = "\n".join(message_lines)
+
+            raise AstroDataError(message)
 
         yield source
 
