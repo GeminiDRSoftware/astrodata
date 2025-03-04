@@ -1,14 +1,13 @@
-# Disable pylint
-# pylint: skip-file
-
-import pytest
-
+from copy import deepcopy
 import os
 
 import astrodata
 from astrodata import adfactory
+from astrodata import AstroData
 
 from astropy.io import fits
+
+import pytest
 
 
 factory = adfactory.AstroDataFactory
@@ -58,7 +57,6 @@ def example_dir(tmp_path) -> str:
         os.remove(dirname)
 
     os.mkdir(dirname)
-
     return dirname
 
 
@@ -77,3 +75,50 @@ def test__open_file_file_not_found(nonexistent_file, example_dir):
     with pytest.raises(FileNotFoundError):
         with factory._open_file(example_dir) as _:
             pass
+
+def test_report_all_exceptions_on_failure_get_astro_data(example_fits_file, monkeypatch, capfd,):
+    """Tests that all exceptions are reported if file fails to open.
+
+    This test tries to capture errors that were previously discarded. It does
+    this by checking what is sent to stderr/stdout.
+
+    In the future, when support for python 3.10 is dropped, exception groups
+    would vastly simplify this.
+    """
+    # Use local adfactory to avoid spoiling the main one.
+    factory = astrodata.adfactory.AstroDataFactory()
+    monkeypatch.setattr(astrodata, "factory", factory)
+
+    class AD1(AstroData):
+        _message = "This_is_exception_1"
+        @staticmethod
+        def _matches_data(source):
+            raise ValueError(AD1._message)
+
+    class AD2(AstroData):
+        _message = "This_is_exception_2"
+        @staticmethod
+        def _matches_data(source):
+            raise IndexError(AD2._message)
+
+    class AD3(AstroData):
+        _message = "This_is_exception_3"
+        @staticmethod
+        def _matches_data(source):
+            raise Exception(AD3._message)
+
+    classes = (AD1, AD2, AD3)
+
+    for _cls in classes:
+        astrodata.factory.add_class(_cls)
+
+    with pytest.raises(astrodata.AstroDataError) as exception_info:
+        astrodata.from_file(example_fits_file)
+
+
+    caught_err = exception_info.value
+    assert str(caught_err)
+    assert "No class matches this dataset" in str(caught_err)
+
+    for message in (_cls._message for _cls in classes):
+        assert message in str(caught_err), str(caught_err)
