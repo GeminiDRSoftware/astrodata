@@ -89,6 +89,12 @@ class AstroDataFactory:
                     raise
 
                 except Exception as err:  # noqa
+                    LOGGER.debug(
+                        "Failed to open %s with %s, got error: %s",
+                        source,
+                        func,
+                        err,
+                    )
                     exception_list.append(
                         (
                             func.__name__,
@@ -204,6 +210,13 @@ class AstroDataFactory:
                     raise
 
                 except Exception as err:
+                    LOGGER.debug(
+                        "Failed to open %s with %s, got error: %s",
+                        source,
+                        adclass,
+                        err,
+                    )
+
                     exception_list.append(
                         (
                             adclass.__name__,
