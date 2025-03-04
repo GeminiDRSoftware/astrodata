@@ -84,6 +84,9 @@ class AstroDataFactory:
                 except KeyboardInterrupt:
                     raise
 
+                except FileNotFoundError:
+                    raise
+
                 except Exception as err:  # noqa
                     LOGGER.error(
                         "Failed to open %s with %s, got error: %s",
@@ -91,13 +94,6 @@ class AstroDataFactory:
                         func,
                         err,
                     )
-
-                    # Handle nonexistent files.
-                    # TODO: Factor this out into a higher except statement.
-                    if isinstance(err, FileNotFoundError):
-                        raise err
-
-                    print(type(err), err)
 
                 else:
                     if hasattr(fp, "close"):
