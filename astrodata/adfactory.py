@@ -3,6 +3,7 @@
 import copy
 import logging
 import os
+import traceback
 from contextlib import contextmanager
 from copy import deepcopy
 
@@ -92,8 +93,11 @@ class AstroDataFactory:
                     )
 
                     # Handle nonexistent files.
+                    # TODO: Factor this out into a higher except statement.
                     if isinstance(err, FileNotFoundError):
                         raise err
+
+                    print(type(err), err)
 
                 else:
                     if hasattr(fp, "close"):
@@ -172,6 +176,7 @@ class AstroDataFactory:
             An AstroData instance.
         """
         candidates = []
+        exception_list = []
         with self._open_file(source) as opened:
             for adclass in self._registry:
                 try:
@@ -182,11 +187,17 @@ class AstroDataFactory:
                     raise
 
                 except Exception as err:
-                    LOGGER.error(
-                        "Failed to open %s with %s, got error: %s",
-                        source,
-                        adclass,
-                        err,
+                    exception_list.append(
+                        (
+                            adclass.__name__,
+                            type(err),
+                            err,
+                            "".join(
+                                traceback.format_exception(
+                                    None, err, err.__traceback__
+                                )
+                            ).splitlines(),
+                        )
                     )
 
         # For every candidate in the list, remove the ones that are base
@@ -207,7 +218,20 @@ class AstroDataFactory:
             )
 
         if not final_candidates:
-            raise AstroDataError("No class matches this dataset")
+            message_lines = ["No class matches this dataset"]
+            if exception_list:
+                n_err = len(exception_list)
+                message_lines.append(f"Got {n_err} exceptions while matching:")
+
+                for adclass, errname, err, trace_lines in exception_list:
+                    message_lines.append(f"+ {adclass}: {errname}: {str(err)}")
+                    message_lines.extend(
+                        f"    {trace_line}" for trace_line in trace_lines
+                    )
+
+            message = "\n".join(message_lines)
+
+            raise AstroDataError(message)
 
         return final_candidates[0].read(source)
 
@@ -215,11 +239,7 @@ class AstroDataFactory:
         "Renamed to create_from_scratch, please use that method instead: "
         "astrodata.factory.AstroDataFactory.create_from_scratch"
     )
-    def createFromScratch(
-        self,
-        phu,
-        extensions=None,
-    ):  # noqa
+    def createFromScratch(self, phu, extensions=None):  # noqa
         """Create an AstroData object from a collection of objects.
 
         Deprecated, see |create_from_scratch|.
