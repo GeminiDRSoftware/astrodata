@@ -306,7 +306,7 @@ def gwcs_to_fits(ndd, hdr=None):
         # Remove projection parts so we can calculate the CD matrix
         if projcode:
             nat2cel.name = "nat2cel"
-            transform_inverse = transform.inverse
+            transform_inverse = transform.inverse.copy()
 
             for m in transform_inverse:
                 if isinstance(m, models.RotateCelestial2Native):
@@ -316,10 +316,10 @@ def gwcs_to_fits(ndd, hdr=None):
                     m.name = "sky2pix"
 
             transform_inverse = transform_inverse.replace_submodel(
-                "cel2nat", models.Identity(2)
+                "sky2pix", models.Identity(2)
             )
             transform_inverse = transform_inverse.replace_submodel(
-                "sky2pix", models.Identity(2)
+                "cel2nat", models.Identity(2)
             )
 
             transform = transform.replace_submodel(
@@ -958,7 +958,7 @@ def fitswcs_image(header):
     sky_axes, _, _ = get_axes(wcs_info)
 
     if not sky_axes:
-        return None
+        return
         # if len(unknown) == 2:
         #    sky_axes = unknown
         # else:  # No sky here
@@ -1056,7 +1056,7 @@ def fitswcs_other(header, other=None):
     crpix = wcs_info["CRPIX"]
     crval = wcs_info["CRVAL"]
     # get the part of the CD matrix corresponding to the imaging axes
-    _, spec_axes, unknown = get_axes(wcs_info)
+    sky_axes, spec_axes, unknown = get_axes(wcs_info)
 
     # if not sky_axes and len(unknown) == 2:
     #    unknown = []
