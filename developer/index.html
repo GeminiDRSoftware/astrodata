@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developer Installation &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/logo_variables.css?v=947f2b5d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Creating Documentation" href="documentation.html" />
+    <link rel="prev" title="List of Gemini Standard Descriptors" href="../manuals/appendix_descriptors.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            astrodata
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developer Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#developer-documentation-overview">Developer Documentation Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="documentation.html">Creating Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="testing.html">Testing in <code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#developer-environment-setup">Developer environment setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instructions">Instructions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#install-the-dependencies">Install the dependencies</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run-the-tests">Run the tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#other-development-commands">Other development commands</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#development-without-a-virtual-environment">Development without a Virtual Environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#copy-paste-to-create-and-enter-a-developer-environment">Copy/Paste to create and enter a developer environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Developer Installation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/developer/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developer-installation">
+<h1>Developer Installation<a class="headerlink" href="#developer-installation" title="Link to this heading"></a></h1>
+<p>This guide will walk you through setting up a development environment for
+<a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>. If you are a user looking to install <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> for personal use,
+either as a developer or as a user, and are just looking to install the package
+as a dependency, see the <a class="reference internal" href="../quickstart.html"><span class="doc">Quick Start</span></a>.</p>
+<section id="developer-documentation-overview">
+<h2>Developer Documentation Overview<a class="headerlink" href="#developer-documentation-overview" title="Link to this heading"></a></h2>
+<p>This page specifically helps with setting up a development environment and
+running the unit tests.</p>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="documentation.html">Creating Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#generating-documentation">Generating Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#customizing-sphinx-configuration">Customizing Sphinx Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html#writing-documentation">Writing Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Testing in <code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#core-concepts">Core Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#running-tests">Running Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#writing-tests">Writing Tests</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="developer-environment-setup">
+<span id="dev-environment-setup"></span><h2>Developer environment setup<a class="headerlink" href="#developer-environment-setup" title="Link to this heading"></a></h2>
+<p>This guide will walk you through setting up a development environment for
+<a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>. If you are a user looking to install <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> for personal use,
+and are just looking to install the package as a dependency, see the
+<a class="reference internal" href="../quickstart.html"><span class="doc">Quick Start</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This guide assumes you are familiar with the basics of Python development,
+including virtual environments, package management, and testing. It focuses
+on setting up your development environment, not why or how these things
+work.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This guide only applies to development on UNIX-like systems, like linux
+distributions and macOS. If you’re developing on Windows, you may need to
+adapt some of the commands and instructions to work with your system.</p>
+</div>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h3>
+<p>To install <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>, you will need the following:</p>
+<ul class="simple">
+<li><p>Python 3.10, 3.11, or 3.12</p></li>
+<li><p><a class="reference external" href="https://python-poetry.org/docs/">Poetry</a> in some flavor</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">poetry-plugin-export</span></code>, installed into the same environment as <a class="reference external" href="https://python-poetry.org/docs/">Poetry</a></p></li>
+<li><p><a class="reference external" href="https://nox.thea.codes/en/stable/">Nox</a> (optional, see note below)</p></li>
+</ul>
+<p>Please see the <a class="reference external" href="https://python-poetry.org/docs/">Poetry</a> and <a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a> documentation for installation instructions.
+Note that it is <em>not recommended to install Poetry with pip, especially in your
+working directory for the project</em>.  There are several solutions to this in
+their documentation.</p>
+<p>We recommend using <a class="reference external" href="https://pipx.pypa.io/stable/">pipx</a> to install Poetry and nox, as it will install them in
+isolated environments and make them easier to manage. If you’re using <cite>pipx</cite>,
+you only need to copy/paste the following lines to ensure you have everything
+installed properly:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pipx<span class="w"> </span>install<span class="w"> </span>poetry
+poetry<span class="w"> </span>self<span class="w"> </span>add<span class="w"> </span>poetry-plugin-export
+pipx<span class="w"> </span>install<span class="w"> </span>nox
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you’d prefer not to install <a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a>, you can invoke it using Poetry:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">run</span> <span class="n">nox</span> <span class="p">[</span><span class="o">...</span><span class="n">arguments</span><span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="instructions">
+<h3>Instructions<a class="headerlink" href="#instructions" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="clone-the-repository">
+<h2>Clone the repository<a class="headerlink" href="#clone-the-repository" title="Link to this heading"></a></h2>
+<p>First, clone the repository from GitHub. Using the command line:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:GeminiDRSoftware/astrodata.git
+</pre></div>
+</div>
+<p>Or use your preferred method for cloning a repository.</p>
+</section>
+<section id="install-the-dependencies">
+<h2>Install the dependencies<a class="headerlink" href="#install-the-dependencies" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">cd</span></code> into the repository directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>astrodata
+</pre></div>
+</div>
+<p>If you are not already inside a virtual environment of some flavor, such as a
+<code class="docutils literal notranslate"><span class="pre">conda</span></code> or <code class="docutils literal notranslate"><span class="pre">venv</span></code> environment, you can have <code class="docutils literal notranslate"><span class="pre">nox</span></code> create one for you:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>devshell<span class="w">  </span><span class="c1"># Creates a virtual environment</span>
+nox<span class="w"> </span>-s<span class="w"> </span>devconda<span class="w">  </span><span class="c1"># Creates a conda environment</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We recommend using the <code class="docutils literal notranslate"><span class="pre">devshell</span></code> session, as <code class="docutils literal notranslate"><span class="pre">venv</span></code> environments are
+more flexible and allow for more pythonic automation in the development
+process. The <code class="docutils literal notranslate"><span class="pre">devconda</span></code> session is provided for users who prefer to use
+conda environments, but it’s not as flexible as the <code class="docutils literal notranslate"><span class="pre">devshell</span></code> session and
+may require manual tweaking.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Both of these sessions will create a new environment, either located at
+<code class="docutils literal notranslate"><span class="pre">.astrodata_venv</span></code> or in the <code class="docutils literal notranslate"><span class="pre">astrodata</span></code> conda environment. It will
+remove any environments found there (for consistency when resetting the
+environment).</p>
+</div>
+<p>Otherwise, to install the dependencies in the current environment–or one
+you’ve set up and activate yourself–navigate to the root of the repository and
+run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install
+</pre></div>
+</div>
+<p>This will install all the dependencies needed to run <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> within your
+virtual environment, including all test, development, and documentation
+dependencies. This installs <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> in a way that’s equivalent to
+installing with
+<cite>pip in editable mode &lt;editable_pip&gt;</cite>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can install specific dependency groups by running <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span>
+<span class="pre">--only</span></code>. For example, to install the <code class="docutils literal notranslate"><span class="pre">main</span></code> and <code class="docutils literal notranslate"><span class="pre">test</span></code> dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install<span class="w"> </span>--only<span class="w"> </span>main,test
+</pre></div>
+</div>
+<p>The groups must be separated by commas, and the groups are defined in the
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> file.</p>
+<p>Unless you are working on the documentation or testing specifically, you
+will likely never need to isolate dependencies in this way. This is
+primarily used for optimizing CI/CD workflows.</p>
+</div>
+<section id="run-the-tests">
+<h3>Run the tests<a class="headerlink" href="#run-the-tests" title="Link to this heading"></a></h3>
+<p><a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> uses <a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a> for running tests. To run the tests, simply run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox
+</pre></div>
+</div>
+<p>This will run all linting checks and unit tests for any supported Python
+distributions it can find, reporting on the coverage at the end of the run.</p>
+<p>You can see the available sessions by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-l
+</pre></div>
+</div>
+<p>This will output information about available session to run. To select a
+specific session, use the <code class="docutils literal notranslate"><span class="pre">-s</span></code> flag. For example, to run the unit tests on a
+Python 3.10 build of <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;build_tests-3.10(unit)&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Or, to run the normal unit tests and not the linter:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;unit_tests&quot;</span>
+</pre></div>
+</div>
+<p>All tests will be run in isolated environments based on specifications in the
+<code class="docutils literal notranslate"><span class="pre">noxfile.py</span></code> file in the main project directory. Those environments, by
+default, are re-created each time you run the tests. To avoid that, you can
+pass the <code class="docutils literal notranslate"><span class="pre">--reuse-existing-virtualenvs</span></code>/<code class="docutils literal notranslate"><span class="pre">-r</span></code> flag to <a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a>, which will
+reuse any existing virtual environments it finds. If the environment isn’t
+found, it will be made.</p>
+</section>
+<section id="other-development-commands">
+<h3>Other development commands<a class="headerlink" href="#other-development-commands" title="Link to this heading"></a></h3>
+</section>
+</section>
+<section id="development-without-a-virtual-environment">
+<h2>Development without a Virtual Environment<a class="headerlink" href="#development-without-a-virtual-environment" title="Link to this heading"></a></h2>
+<p>If you don’t need a virtual environment, you can use the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">run</span></code> command
+to run commands in the environment without activating it. For example, to run
+the tests without activating the environment, you can run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>nox
+</pre></div>
+</div>
+<section id="copy-paste-to-create-and-enter-a-developer-environment">
+<h3>Copy/Paste to create and enter a developer environment<a class="headerlink" href="#copy-paste-to-create-and-enter-a-developer-environment" title="Link to this heading"></a></h3>
+<p>This is for convenience to copy/paste the above commands required to create and
+enter a developer shell.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Start in the directory you&#39;d like to keep astrodata in.</span>
+git<span class="w"> </span>clone<span class="w"> </span>git@github.com:GeminiDRSoftware/astrodata.git
+<span class="nb">cd</span><span class="w"> </span>astrodata
+nox<span class="w"> </span>-s<span class="w"> </span>devshell
+<span class="nb">source</span><span class="w"> </span>.astrodata_venv/bin/activate
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../manuals/appendix_descriptors.html" class="btn btn-neutral float-left" title="List of Gemini Standard Descriptors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="documentation.html" class="btn btn-neutral float-right" title="Creating Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
