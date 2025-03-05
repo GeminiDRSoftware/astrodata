@@ -1157,10 +1157,12 @@ def remove_axis_from_frame(frame, axis):
             new_frames.append(remove_axis_from_frame(f, axis))
 
         else:
-            new_frames.append(deepcopy(f))
-            f._axes_order = tuple(
+            new_frame = deepcopy(f)
+            new_frame._axes_order = tuple(
                 x if x < axis else x - 1 for x in f.axes_order
             )
+
+            new_frames.append(new_frame)
 
     if len(new_frames) == 1:
         ret_frame = deepcopy(new_frames[0])
@@ -1364,8 +1366,9 @@ def remove_unused_world_axis(ext):
     """
     ndim = len(ext.shape)
     affine = calculate_affine_matrices(ext.wcs.forward_transform, ext.shape)
+
     # Check whether there's a single output that isn't affected by the input
-    removable_axes = np.all(affine.matrix[:, ndim - 1 :] == 0, axis=1)
+    removable_axes = np.all(affine.matrix == 0, axis=1)
     removable_axes = removable_axes[::-1]  # xyz order
 
     if removable_axes.sum() == 1:
