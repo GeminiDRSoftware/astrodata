@@ -657,7 +657,13 @@ def read_wcs_from_header(header):
     try:
         wcsaxes = header["WCSAXES"]
 
-    except KeyError:
+    except KeyError as err:
+        logging.debug(
+            "No WCSAXES in header; trying CTYPE/CD (exception: %s: %s)",
+            type(err),
+            err,
+        )
+
         wcsaxes = 0
 
         for kw in header["CTYPE*"]:
@@ -864,7 +870,7 @@ def make_fitswcs_transform(trans_input):
 
     Arguments
     ---------
-    header : `astropy.io.fits.Header` or dict
+    header : `astropy.io.fits.Header`, dict, or NDData
         FITS Header (or dict) with basic WCS information
 
     Raises
@@ -889,7 +895,8 @@ def make_fitswcs_transform(trans_input):
             wcs_info = read_wcs_from_header(trans_input.meta["header"])
 
         except AttributeError as err:
-            msg = "Expected a FITS Header, dict, or NDData object"
+            input_type = type(trans_input)
+            msg = f"Expected a FITS Header, dict, or NDData, not {input_type}"
             raise TypeError(msg) from err
 
         other = trans_input.meta["other"]
