@@ -1170,7 +1170,7 @@ def wcs_to_asdftablehdu(wcs, extver=None):
     except jsonschema.exceptions.ValidationError as err:
         # (The original traceback also gets printed here)
         raise TypeError(
-            f"Cannot serialize model(s) for 'WCS' extension " f"{extver or ''}"
+            f"Cannot serialize model(s) for 'WCS' extension {extver or ''}"
         ) from err
 
     # ASDF can only dump YAML to a binary file object, so do that and read
@@ -1277,8 +1277,9 @@ def asdftablehdu_to_wcs(hdu):
                 except KeyError as err:
                     LOGGER.warning(
                         "Ignoring 'WCS' extension %s: missing "
-                        "'wcs' dict entry. Error was %s",
+                        "'wcs' dict entry. (got exception: %s: %s)",
                         ver,
+                        type(err),
                         err,
                     )
 
