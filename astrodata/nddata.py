@@ -154,15 +154,25 @@ class AstroDataMixin:
                 if slice_.start:
                     start = (
                         length + slice_.start
-                        if slice_.start < 1
+                        if slice_.start < 0
                         else slice_.start
                     )
                     if start > 0:
                         model.append(models.Shift(start))
                 mapped_axes.append(max(mapped_axes) + 1 if mapped_axes else 0)
+
             elif isinstance(slice_, INTEGER_TYPES):
-                model.append(models.Const1D(slice_))
+                model.append(
+                    models.Const1D((length + slice_) if slice_ < 0 else slice_)
+                )
                 mapped_axes.append(-1)
+
+            # Equivalent to slice(None, None, None)
+            elif slice is None:
+                mapped_axes.append(
+                    max(mapped_axes) + 1 if mapped_axes else None
+                )
+
             else:
                 raise IndexError("Slice not an integer or range")
             if model:
