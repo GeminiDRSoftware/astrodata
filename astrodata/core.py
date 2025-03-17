@@ -859,13 +859,12 @@ class AstroData:
 
             if attribute == DEFAULT_EXTENSION:
                 raise AttributeError(
-                    f"{attribute} extensions should be "
-                    "appended with .append"
+                    f"{attribute} extensions should be appended with .append"
                 )
 
             if attribute in {"DQ", "VAR"}:
                 raise AttributeError(
-                    f"{attribute} should be set on the " "nddata object"
+                    f"{attribute} should be set on the nddata object"
                 )
 
             add_to = self.nddata if self.is_single else None
@@ -898,7 +897,7 @@ class AstroData:
                 del self._tables[attribute]
             else:
                 raise AttributeError(
-                    f"'{attribute}' is not a global table " "for this instance"
+                    f"'{attribute}' is not a global table for this instance"
                 )
 
     def __contains__(self, attribute):
@@ -1381,8 +1380,7 @@ class AstroData:
         """
         if add_to is not None:
             raise TypeError(
-                "You can only append NDData derived instances "
-                "at the top level"
+                "You can only append NDData derived instances at the top level"
             )
 
         hd = new_nddata.meta["header"]
@@ -1488,8 +1486,7 @@ class AstroData:
 
         if not ad.is_single:
             raise ValueError(
-                "Cannot append AstroData instances that are "
-                "not single slices"
+                "Cannot append AstroData instances that are not single slices"
             )
 
         if add_to is not None:
@@ -1564,8 +1561,7 @@ class AstroData:
         """
         if self.is_sliced:
             raise TypeError(
-                "Can't append objects to slices, use "
-                "'ext.NAME = obj' instead"
+                "Can't append objects to slices, use 'ext.NAME = obj' instead"
             )
 
         # NOTE: Most probably, if we want to copy the input argument, we
