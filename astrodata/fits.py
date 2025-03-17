@@ -1270,20 +1270,21 @@ def asdftablehdu_to_wcs(hdu):
 
                 return None
 
-            with af:
-                try:
-                    wcs = af.tree["wcs"]
+            else:
+                with af:
+                    try:
+                        wcs = af.tree["wcs"]
 
-                except KeyError as err:
-                    LOGGER.warning(
-                        "Ignoring 'WCS' extension %s: missing "
-                        "'wcs' dict entry. (got exception: %s: %s)",
-                        ver,
-                        type(err),
-                        err,
-                    )
+                    except KeyError as err:
+                        LOGGER.warning(
+                            "Ignoring 'WCS' extension %s: missing "
+                            "'wcs' dict entry. (got exception: %s: %s)",
+                            ver,
+                            type(err),
+                            err,
+                        )
 
-                    return None
+                        return None
 
     else:
         LOGGER.warning("Ignoring non-FITS-table 'WCS' extension %s", ver)
