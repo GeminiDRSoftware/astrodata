@@ -101,6 +101,8 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
                 err,
             )
 
+            raise
+
             return None
 
         raise
@@ -306,7 +308,7 @@ def gwcs_to_fits(ndd, hdr=None):
         # Remove projection parts so we can calculate the CD matrix
         if projcode:
             nat2cel.name = "nat2cel"
-            transform_inverse = transform.inverse.copy()
+            transform_inverse = transform.inverse
 
             for m in transform_inverse:
                 if isinstance(m, models.RotateCelestial2Native):
@@ -607,25 +609,29 @@ def calculate_affine_matrices(func, shape, origin=None):
 
     if ndim > 1:
         transformed = list(
-            zip(*list(func(*point[:indim]) for point in points.T))
+            zip(*list(func(*point[indim - 1 :: -1]) for point in points.T))
         )
 
         transformed = np.array(transformed).T
 
     else:
         transformed = np.array([func(*points)]).T
+
+    # Matrix of wcs derivatives wrt input coordiantes in Python order
     matrix = np.array(
         [
             [
                 0.5
                 * (transformed[j + 1, i] - transformed[indim + j + 1, i])
                 / halfsize[j]
-                for j in range(indim)
+                for j in range(indim - 1, -1, -1)
             ]
             for i in range(ndim)
         ]
     )
-    offset = transformed[0] - np.dot(matrix, halfsize)
+
+    offset = transformed[0] - np.dot(matrix, halfsize[::-1])
+
     return AffineMatrices(matrix[::-1, ::-1], offset[::-1])
 
 
