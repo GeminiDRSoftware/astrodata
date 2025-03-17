@@ -1037,7 +1037,7 @@ class ADCompare:
 
                 except AssertionError:
                     errorlist.compare(
-                        f"Slice {i} {frame} differs: " f"{frame1} v {frame2}"
+                        f"Slice {i} {frame} differs: {frame1} v {frame2}"
                     )
 
             corners = get_corners(ext1.shape)
