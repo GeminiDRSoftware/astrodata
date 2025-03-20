@@ -990,7 +990,9 @@ def test_ADCompare_wcs(ad1, ad2):
 
 def test_ad_compare(ad1, ad2):
     assert testing.ad_compare(ad1, ad1)
-    assert not testing.ad_compare(ad1, ad2)
+
+    with pytest.raises(AssertionError, match="Comparison between N20180304S0126.fits and N20180305S0001.fits"):
+        assert not testing.ad_compare(ad1, ad2)
 
 
 @pytest.fixture
