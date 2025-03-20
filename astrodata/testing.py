@@ -1083,13 +1083,9 @@ def ad_compare(ad1, ad2, **kwargs):
     -------
     bool: are the two AD instances basically the same?
     """
-    try:
-        ADCompare(ad1, ad2).run_comparison(**kwargs)
+    compare = ADCompare(ad1, ad2).run_comparison(**kwargs)
 
-    except AssertionError:
-        return False
-
-    return True
+    return compare == {}
 
 
 _HDUL_LIKE_TYPE = fits.HDUList | list[fits.hdu.FitsHDU]
