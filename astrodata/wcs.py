@@ -101,8 +101,6 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
                 err,
             )
 
-            raise
-
             return None
 
         raise
@@ -308,7 +306,7 @@ def gwcs_to_fits(ndd, hdr=None):
         # Remove projection parts so we can calculate the CD matrix
         if projcode:
             nat2cel.name = "nat2cel"
-            transform_inverse = transform.inverse
+            transform_inverse = transform.inverse.copy()
 
             for m in transform_inverse:
                 if isinstance(m, models.RotateCelestial2Native):
