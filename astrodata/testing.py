@@ -744,7 +744,7 @@ class ADCompare:
     fits_keys.update([f"CD{i}_{j}" for i in range(1, 6) for j in range(1, 6)])
 
     # Add PROCSVER and PROCSOFT (DRAGONS processing version/software kws)
-    fits_keys.update(["PROCSVER", "PROCSOFT"])
+    fits_keys.update(["PROCSVER", "PROCSOFT", "PROCMODE"])
 
     def __init__(self, ad1, ad2):
         self.ad1 = ad1
