@@ -26,7 +26,7 @@ elif sys.version_info[0] < 3 or sys.version_info[1] < 10:
 
 else:
     # Only for python 3.10 support, which wont' be maintained much longer.
-    # To be removed when we drop support for python 3.10 (see: ISSUE)
+    # To be removed when we drop support for python 3.10 (see: ISSUE #73)
     from pip._vendor import tomli
 
     tomllib = tomli
