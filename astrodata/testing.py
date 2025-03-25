@@ -299,7 +299,7 @@ def assert_most_equal(actual, desired, max_miss, verbose=True):
     verbose : bool, optional
         If True, the conflicting values are appended to the error message.
 
-    Raises
+    Raiseqs
     ------
     AssertionError
         If actual and desired are not equal.
@@ -743,6 +743,9 @@ class ADCompare:
         )
     fits_keys.update([f"CD{i}_{j}" for i in range(1, 6) for j in range(1, 6)])
 
+    # Add PROCSVER and PROCSOFT (DRAGONS processing version/software kws)
+    fits_keys.update(["PROCSVER", "PROCSOFT"])
+
     def __init__(self, ad1, ad2):
         self.ad1 = ad1
         self.ad2 = ad2
@@ -980,19 +983,64 @@ class ADCompare:
         return errorlist
 
     def _attributes(self, ext1, ext2):
-        """Check the attributes of two extensions."""
+        """Check and compare attributes."""
         errorlist = []
         for attr in ["data", "mask", "variance", "OBJMASK", "OBJCAT"]:
             attr1 = getattr(ext1, attr, None)
             attr2 = getattr(ext2, attr, None)
 
-            if all(attr is None for attr in [attr1, attr2]):
-                continue
+            if hasattr(attr1, "shape") and hasattr(attr2, "shape"):
+                if attr1.shape != attr2.shape:
+                    errorlist.append(
+                        f"Attribute error for {attr}: "
+                        f"Mismatching {attr}.shape values: {attr1} v {attr2}"
+                    )
 
-            if not np.array_equal(attr1, attr2):
-                errorlist.append(f"{attr} mismatch: {attr1} v {attr2}")
-                continue
+                    continue
 
+            if (attr1 is None) ^ (attr2 is None):
+                errorlist.append(
+                    f"Attribute error for {attr}: "
+                    f"{attr1 is not None} v {attr2 is not None}"
+                )
+
+            elif attr1 is not None:
+                if isinstance(attr1, Table):
+                    if len(attr1) != len(attr2):
+                        errorlist.append(
+                            f"attr lengths differ: {len(attr1)} v {len(attr2)}"
+                        )
+                else:  # everything else is pixel-like
+                    if attr1.dtype.name != attr2.dtype.name:
+                        errorlist.append(
+                            f"Datatype mismatch for {attr}: "
+                            f"{attr1.dtype} v {attr2.dtype}"
+                        )
+                    if attr1.shape != attr2.shape:
+                        errorlist.append(
+                            f"Shape mismatch for {attr}: {attr1.shape} "
+                            f"v {attr2.shape}"
+                        )
+                    if "int" in attr1.dtype.name:
+                        try:
+                            assert_most_equal(
+                                attr1, attr2, max_miss=self.max_miss
+                            )
+                        except AssertionError as e:
+                            errorlist.append(
+                                f"Inequality for {attr}: " + str(e)
+                            )
+                    else:
+                        try:
+                            assert_most_close(
+                                attr1,
+                                attr2,
+                                max_miss=self.max_miss,
+                                rtol=self.rtol,
+                                atol=self.atol,
+                            )
+                        except AssertionError as e:
+                            errorlist.append(f"Mismatch for {attr}: " + str(e))
         return errorlist
 
     def wcs(self):
