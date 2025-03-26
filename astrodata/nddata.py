@@ -138,9 +138,9 @@ class AstroDataMixin:
                     "Only one ellipsis can be specified in a slice"
                 )
 
-            ell_index = slices.index(Ellipsis) + 1
+            ell_index = slices.index(Ellipsis)
             slice_fill = [slice(None)] * (ndim - len(slices) + 1)
-            slices[ell_index:ell_index] = slice_fill
+            slices[ell_index : ell_index + 1] = slice_fill
 
         slices.extend([slice(None)] * (ndim - len(slices)))
 
