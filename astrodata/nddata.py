@@ -168,7 +168,7 @@ class AstroDataMixin:
                 mapped_axes.append(-1)
 
             # Equivalent to slice(None, None, None)
-            elif slice is None:
+            elif slice_ is None:
                 mapped_axes.append(
                     max(mapped_axes) + 1 if mapped_axes else None
                 )
