@@ -296,9 +296,7 @@ class RandomFitsFile:
             # This is dumb, should probably just make an ID at the front or
             # something.
             while not filename or cls.check_if_file_exists(filename, path):
-                filename = cls.generate_random_file_name(
-                    max_length, fixed_length
-                )
+                filename = cls.generate_random_file_name(max_length, fixed_length)
 
             data = cls.generate_random_data()
 
@@ -310,9 +308,7 @@ class RandomFitsFile:
 
     @classmethod
     @contextmanager
-    def temp_files_context(
-        cls, count, max_length=50, fixed_length=-1, path="."
-    ):
+    def temp_files_context(cls, count, max_length=50, fixed_length=-1, path="."):
         """Creates temporary files using a context manager, and cleans up those
         files once the run is finished.
 

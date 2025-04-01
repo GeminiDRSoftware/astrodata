@@ -1,6 +1,7 @@
 """Tests for the `astrodata.testing` module."""
 
 import copy
+import gc
 import io
 import itertools
 import os
@@ -8,9 +9,11 @@ import pathlib
 import warnings
 
 import numpy as np
+import objgraph
 import pytest
 import unittest
 from hypothesis import given, strategies as st
+from pathlib import Path
 
 import astrodata
 import astrodata.testing as testing
@@ -85,6 +88,48 @@ def test_download_from_archive(monkeypatch, tmp_path):
             os.remove(fname)
 
 
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "test.fits",
+        "bpm_20220601_ghost_blue_11_full_4amp.fits",
+    ],
+)
+def test_download_memory_leaks(tmp_path, monkeypatch, filename):
+    """Test for memory leaks when downloading data and not saving to an ad."""
+    path = tmp_path
+    sub_path = "."
+    monkeypatch.setenv("ASTRODATA_TEST", str(path.absolute()))
+
+    initial_ndad = len(objgraph.by_type("NDAstroData"))
+
+    assert initial_ndad == 0
+
+    path_to_data = download_from_archive(filename, path, sub_path)
+
+    final_ndad = len(objgraph.by_type("NDAstroData"))
+
+    assert Path(path_to_data).exists()
+    assert final_ndad == initial_ndad
+
+    # Open the file and then remove ad refs and garbage collect.
+    n_pre_open_ndad = len(objgraph.by_type("NDAstroData"))
+
+    ad = astrodata.from_file(path_to_data)
+
+    del ad
+    gc.collect()
+
+    post_objects = objgraph.by_type("NDAstroData")
+
+    all_referrers =  [
+        ref for ref in itertools.chain(gc.get_referrers(o) for o in post_objects) if ref is not post_objects
+    ]
+
+
+    assert n_pre_open_ndad == len(post_objects)
+
+
 @pytest.mark.skipif(os.name == "nt", reason="Test only works on unix/osx")
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
@@ -128,9 +173,7 @@ def test_download_from_archive_cannot_download_file(monkeypatch):
     assert result is None
 
     with pytest.raises(IOError):
-        download_from_archive(
-            "N20180304S0126.fits", cache=False, fail_on_error=True
-        )
+        download_from_archive("N20180304S0126.fits", cache=False, fail_on_error=True)
 
     testing.DownloadState().invalidate_cache()
 
@@ -504,9 +547,7 @@ def test_warning_if_no_cache_path(monkeypatch):
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
 
-        testing.download_from_archive(
-            "N20180304S0126.fits", env_var="ASTRODATA_TEST"
-        )
+        testing.download_from_archive("N20180304S0126.fits", env_var="ASTRODATA_TEST")
 
         assert len(w) == 1
         assert issubclass(w[-1].category, UserWarning)
@@ -553,9 +594,7 @@ def test_download_file_path_subpath(
         )
 
     else:
-        file_path = download_from_archive(
-            test_file_archive, path=path, cache=False
-        )
+        file_path = download_from_archive(test_file_archive, path=path, cache=False)
 
     assert file_path == os.path.join(tmpdir, expected_path, test_file_archive)
 
@@ -620,9 +659,7 @@ def test_download_raise_error_on_fail(tmpdir, bad_filename):
 
 @pytest.mark.skip(reason="See: https://github.com/GeminiDRSoftware/astrodata/issues/62")
 def test_get_associated_calibrations(tmpdir, test_file_archive):
-    associated_calibrations = testing.get_associated_calibrations(
-        test_file_archive
-    )
+    associated_calibrations = testing.get_associated_calibrations(test_file_archive)
 
     results = associated_calibrations
 
@@ -702,9 +739,7 @@ def test_ADCompare_run_comparison(ad1, ad2):
         compare.run_comparison()
 
     # Check that ad1 and ad3 are equal when ignoring keywords.
-    keywords = {key for key in ad1.phu.keys()} | {
-        key for key in ad3.phu.keys()
-    }
+    keywords = {key for key in ad1.phu.keys()} | {key for key in ad3.phu.keys()}
     compare.run_comparison(ignore_kw=list(keywords))
 
     # Check that ad1 and ad2 are not equal.
@@ -773,6 +808,7 @@ def test_ADCompare_numext(ad1, ad2):
 
     assert not compare.numext()
 
+
 def test_ADCompare_unequal_tags(tmp_path):
     ad1_file_path = tmp_path / "file_1.fits"
     ad2_file_path = tmp_path / "file_2.fits"
@@ -784,7 +820,7 @@ def test_ADCompare_unequal_tags(tmp_path):
     ]
 
     for file_path in file_paths:
-        data = np.random.random((100,100)).astype(np.float32)
+        data = np.random.random((100, 100)).astype(np.float32)
         hdu = fits.PrimaryHDU()
 
         hdu.writeto(file_path)
@@ -824,7 +860,6 @@ def test_ADCompare_unequal_tags(tmp_path):
                 return True
 
             return False
-
 
     astrodata.factory.add_class(ADClass1)
     astrodata.factory.add_class(ADClass2)
@@ -991,7 +1026,10 @@ def test_ADCompare_wcs(ad1, ad2):
 def test_ad_compare(ad1, ad2):
     assert testing.ad_compare(ad1, ad1)
 
-    with pytest.raises(AssertionError, match="Comparison between N20180304S0126.fits and N20180305S0001.fits"):
+    with pytest.raises(
+        AssertionError,
+        match="Comparison between N20180304S0126.fits and N20180305S0001.fits",
+    ):
         assert not testing.ad_compare(ad1, ad2)
 
 

@@ -111,9 +111,7 @@ def test_append_image_hdu():
 
 def test_append_lowercase_name():
     ad = astrodata.create({})
-    with pytest.warns(
-        UserWarning, match="extension name 'sci' should be uppercase"
-    ):
+    with pytest.warns(UserWarning, match="extension name 'sci' should be uppercase"):
         ad.append(NDData(np.zeros((4, 5))), name="sci")
 
 
@@ -131,10 +129,7 @@ def test_append_arrays(tmp_path):
     with pytest.raises(AttributeError):
         ad[0].DQ = np.arange(5)
 
-    match = (
-        "Arbitrary image extensions can only be added in association "
-        "to a 'SCI'"
-    )
+    match = "Arbitrary image extensions can only be added in association " "to a 'SCI'"
     with pytest.raises(ValueError, match=match):
         ad.append(np.zeros(10), name="FOO")
 
@@ -283,10 +278,7 @@ def test_append_table_to_extensions(tmp_path):
 
     assert ad[2].hdr["FOO"] == "BAR"
 
-    match = (
-        "Cannot append table 'TABLE1' because it would hide an "
-        "extension table"
-    )
+    match = "Cannot append table 'TABLE1' because it would hide an " "extension table"
     with pytest.raises(ValueError, match=match):
         ad.TABLE1 = Table([[1]])
 
@@ -401,9 +393,7 @@ def test_append_slice_to_extension(testfile1, testfile2):
 @pytest.mark.dragons_remote_data
 def test_delete_named_associated_extension(testfile2):
     ad = astrodata.from_file(testfile2)
-    ad[0].MYTABLE = Table(
-        ([1, 2, 3], [4, 5, 6], [7, 8, 9]), names=("a", "b", "c")
-    )
+    ad[0].MYTABLE = Table(([1, 2, 3], [4, 5, 6], [7, 8, 9]), names=("a", "b", "c"))
     assert "MYTABLE" in ad[0]
     del ad[0].MYTABLE
     assert "MYTABLE" not in ad[0]

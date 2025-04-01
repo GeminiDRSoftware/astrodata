@@ -180,10 +180,7 @@ def test_create_class_with_tags(
 
         @staticmethod
         def _matches_data(source):
-            return (
-                source[0].header.get("INSTRUME", "").upper()
-                == "TEST_INSTRUMENT"
-            )
+            return source[0].header.get("INSTRUME", "").upper() == "TEST_INSTRUMENT"
 
         @astro_data_tag
         def tag1(self):
@@ -229,10 +226,7 @@ def test_create_class_with_descriptors(
 
         @staticmethod
         def _matches_data(source):
-            return (
-                source[0].header.get("INSTRUME", "").upper()
-                == "TEST_INSTRUMENT"
-            )
+            return source[0].header.get("INSTRUME", "").upper() == "TEST_INSTRUMENT"
 
         @astro_data_descriptor
         def descriptor1(self):
