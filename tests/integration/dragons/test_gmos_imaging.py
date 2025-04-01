@@ -56,9 +56,7 @@ def _downloaded_gmos_imaging_data_star_field(
 
 
 @pytest.fixture
-def gmos_imaging_data_star_field(
-    tmp_path, _downloaded_gmos_imaging_data_star_field
-):
+def gmos_imaging_data_star_field(tmp_path, _downloaded_gmos_imaging_data_star_field):
     """This copies files from another fixture
     (_downloaded_gmos_imaging_data_star_field), and copies those into a path
     for the current test.
@@ -112,9 +110,7 @@ def test_gmos_imaging_tutorial_star_field(
     # Import required modules
     # ruff: noqa: F841
     gemini_instruments = importlib.import_module("gemini_instruments")
-    Reduce = importlib.import_module(
-        "recipe_system.reduction.coreReduce"
-    ).Reduce
+    Reduce = importlib.import_module("recipe_system.reduction.coreReduce").Reduce
     dataselect = importlib.import_module("gempy.adlibrary.dataselect")
     cal_service = importlib.import_module("recipe_system.cal_service")
 
@@ -140,9 +136,7 @@ def test_gmos_imaging_tutorial_star_field(
         all_files,
         [],
         ["CAL"],
-        dataselect.expr_parser(
-            '(observation_class=="science" and filter_name=="i")'
-        ),
+        dataselect.expr_parser('(observation_class=="science" and filter_name=="i")'),
     )
 
     # Initialize calibration service

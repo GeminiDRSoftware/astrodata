@@ -122,9 +122,7 @@ def register_test_class(doctest_namespace, setup_doctest):
             return [1.5] * len(self)
 
     factory = doctest_namespace["astrodata"].factory
-    if not any(
-        DocTestAstroData.__name__ in cls.__name__ for cls in factory.registry
-    ):
+    if not any(DocTestAstroData.__name__ in cls.__name__ for cls in factory.registry):
         factory.add_class(DocTestAstroData)
 
     return DocTestAstroData

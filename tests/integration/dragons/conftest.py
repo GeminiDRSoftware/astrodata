@@ -84,9 +84,7 @@ def setup_logging():
 
 
 @pytest.fixture
-def calibration_service(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> LocalDB:
+def calibration_service(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> LocalDB:
     """Fixture to set up the calibration service."""
     # 1) Create a dragonsrc file and assign it to the session environment.
     dragonsrc = tmp_path / ".dragonsrc"

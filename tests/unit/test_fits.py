@@ -289,9 +289,7 @@ def test_slice_multiple(GMOSN_SPECT):
     with pytest.raises(TypeError, match=match):
         slc.FOO = 1
 
-    with pytest.raises(
-        TypeError, match="Can't delete attributes on non-single slices"
-    ):
+    with pytest.raises(TypeError, match="Can't delete attributes on non-single slices"):
         del slc.FOO
 
     ext.bar = 1
@@ -305,9 +303,7 @@ def test_slice_data(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
 
     slc = ad[1, 2]
-    match = (
-        "Trying to assign to an AstroData object that is not a single slice"
-    )
+    match = "Trying to assign to an AstroData object that is not a single slice"
     with pytest.raises(ValueError, match=match):
         slc.data = 1
     with pytest.raises(ValueError, match=match):
@@ -450,9 +446,7 @@ def test_from_hdulist2():
         ]
     )
 
-    with pytest.warns(
-        UserWarning, match="Skip HDU .* because it has no EXTNAME"
-    ):
+    with pytest.warns(UserWarning, match="Skip HDU .* because it has no EXTNAME"):
         ad = astrodata.from_file(hdul)
 
     assert len(ad) == 1
@@ -508,9 +502,7 @@ def test_can_append_table_and_access_data(capsys, tmp_path):
     phu = fits.PrimaryHDU()
     ad = astrodata.create(phu)
 
-    with pytest.raises(
-        ValueError, match="Tables should be set directly as attribute"
-    ):
+    with pytest.raises(ValueError, match="Tables should be set directly as attribute"):
         ad.append(tbl, name="BOB")
 
     ad.BOB = tbl
@@ -556,9 +548,7 @@ def test_attributes(GSAOI_DARK):
     assert all(isinstance(nd, NDAstroData) for nd in ad.nddata)
     assert [nd.shape for nd in ad.nddata] == [(2048, 2048)] * 4
 
-    match = (
-        "Trying to assign to an AstroData object that is not a single slice"
-    )
+    match = "Trying to assign to an AstroData object that is not a single slice"
     with pytest.raises(ValueError, match=match):
         ad.data = 1
     with pytest.raises(ValueError, match=match):
@@ -752,9 +742,7 @@ def test_header_collection(GMOSN_SPECT):
     assert ad.hdr.get_comment("DATATYPE") == ["Hello!"] * 12
     ad.hdr["RDNOISE"] = (2.0, "New comment")
     assert ad.hdr.get_comment("RDNOISE") == ["New comment"] * 12
-    with pytest.raises(
-        KeyError, match="Keyword 'FOO' not available at header 0"
-    ):
+    with pytest.raises(KeyError, match="Keyword 'FOO' not available at header 0"):
         ad.hdr.set_comment("FOO", "A comment")
 
     ad = astrodata.from_file(GMOSN_SPECT)
@@ -811,9 +799,7 @@ def test_add_var_and_dq():
     ):
         ad.append(np.zeros(shape), name="FOO")
 
-    with pytest.raises(
-        ValueError, match="'VAR' need to be associated to a 'SCI' one"
-    ):
+    with pytest.raises(ValueError, match="'VAR' need to be associated to a 'SCI' one"):
         ad.append(np.ones(shape), name="VAR")
 
     with pytest.raises(

@@ -283,7 +283,13 @@ class DevpiServerManager:
         devpi_server_path = result.strip()
 
         self.server_process = subprocess.Popen(
-            [devpi_server_path, "--serverdir", tmp_dir, "--port", str(port)],  # noqa: S603
+            [
+                devpi_server_path,
+                "--serverdir",
+                tmp_dir,
+                "--port",
+                str(port),
+            ],  # noqa: S603
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )

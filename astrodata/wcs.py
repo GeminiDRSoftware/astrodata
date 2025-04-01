@@ -95,7 +95,7 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
 
     except (IndexError, TypeError, ValueError) as err:
         if not raise_errors:
-            logging.warning(
+            logging.debug(
                 "Could not create gWCS: %s: %s",
                 err.__class__.__name__,
                 err,

@@ -21,9 +21,7 @@ def assign_test_cache(tmp_path_factory):
     tmpdir = tmp_path_factory.mktemp(".testing_cache")
 
     if not (result := os.environ.get("ASTRODATA_TEST")):
-        os.environ["ASTRODATA_TEST"] = os.path.join(
-            tmpdir, "archive_downloads"
-        )
+        os.environ["ASTRODATA_TEST"] = os.path.join(tmpdir, "archive_downloads")
 
     yield
 

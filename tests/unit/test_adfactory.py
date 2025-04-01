@@ -76,7 +76,11 @@ def test__open_file_file_not_found(nonexistent_file, example_dir):
         with factory._open_file(example_dir) as _:
             pass
 
-def test_report_all_exceptions_on_failure_get_astro_data(example_fits_file, monkeypatch,):
+
+def test_report_all_exceptions_on_failure_get_astro_data(
+    example_fits_file,
+    monkeypatch,
+):
     """Tests that all exceptions are reported if file fails to open.
 
     This test tries to capture errors that were previously discarded. It does
@@ -91,18 +95,21 @@ def test_report_all_exceptions_on_failure_get_astro_data(example_fits_file, monk
 
     class AD1(AstroData):
         _message = "This_is_exception_1"
+
         @staticmethod
         def _matches_data(source):
             raise ValueError(AD1._message)
 
     class AD2(AstroData):
         _message = "This_is_exception_2"
+
         @staticmethod
         def _matches_data(source):
             raise IndexError(AD2._message)
 
     class AD3(AstroData):
         _message = "This_is_exception_3"
+
         @staticmethod
         def _matches_data(source):
             raise Exception(AD3._message)
@@ -115,7 +122,6 @@ def test_report_all_exceptions_on_failure_get_astro_data(example_fits_file, monk
     with pytest.raises(astrodata.AstroDataError) as exception_info:
         astrodata.from_file(example_fits_file)
 
-
     caught_err = exception_info.value
     assert str(caught_err)
     assert "No class matches this dataset" in str(caught_err)
@@ -123,7 +129,11 @@ def test_report_all_exceptions_on_failure_get_astro_data(example_fits_file, monk
     for message in (_cls._message for _cls in classes):
         assert message in str(caught_err), str(caught_err)
 
-def test_report_all_exceptions_on_failure__open_file(example_fits_file, monkeypatch, ):
+
+def test_report_all_exceptions_on_failure__open_file(
+    example_fits_file,
+    monkeypatch,
+):
     """Tests that all exceptions are reported if file fails to open.
 
     This test tries to capture errors that were previously discarded. It does
@@ -152,17 +162,17 @@ def test_report_all_exceptions_on_failure__open_file(example_fits_file, monkeypa
             return True
 
     monkeypatch.setattr(astrodata, "factory", factory)
-    monkeypatch.setattr(astrodata.adfactory.AstroDataFactory, "_file_openers", factory._file_openers)
-
+    monkeypatch.setattr(
+        astrodata.adfactory.AstroDataFactory, "_file_openers", factory._file_openers
+    )
 
     with pytest.raises(astrodata.AstroDataError) as exception_info:
         astrodata.from_file(example_fits_file)
-
 
     caught_err = exception_info.value
     assert str(caught_err)
     assert "No access, or not supported format for: " in str(caught_err)
 
     n_openers = len(factory._file_openers)
-    for message in (f"Exception_{i}" for i in range(1, n_openers+1)):
+    for message in (f"Exception_{i}" for i in range(1, n_openers + 1)):
         assert message in str(caught_err)

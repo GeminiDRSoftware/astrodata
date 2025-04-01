@@ -534,7 +534,7 @@ def download_multiple_files(
                 "testing cache."
             )
 
-            # This is cleaned up once the program finishes.
+            # This is does not persist the Python session finishes.
             os.environ[env_var] = str(path)
 
     if not os.path.isdir(path) and os.path.exists(path):
@@ -621,7 +621,7 @@ def download_from_archive(
         warnings.warn(
             "sub_path is None, so the file will be saved to the root of the "
             "cache directory. To suppress this warning, set sub_path to a "
-            "valid path (e.g., empty string instead of None)."
+            "valid path (e.g., empty string/'.' instead of None)."
         )
 
     # Check that the environment variable is a valid name.
