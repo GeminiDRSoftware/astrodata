@@ -56,7 +56,9 @@ def create_rst_extract_command(script: str, options: str | list[str]) -> str:
 
 
 @pytest.mark.parametrize("script, options", tuple(scripts().items()))
-def test_script_executes(script: str, options: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_script_executes(
+    script: str, options: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Test the script."""
     # Use temporary directory as the working directory
     command = create_rst_extract_command(script, options)

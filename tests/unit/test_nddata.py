@@ -103,9 +103,7 @@ def test_windowedOp(testnd):
         result = windowed_operation(stack, [testnd, nd2], kernel=(3, 3))
 
     with pytest.raises(AssertionError, match=r"Incompatible shape.*"):
-        result = windowed_operation(
-            stack, [testnd, testnd], kernel=[3], shape=(5, 5)
-        )
+        result = windowed_operation(stack, [testnd, testnd], kernel=[3], shape=(5, 5))
 
 
 @pytest.mark.skip(
@@ -126,9 +124,7 @@ def test_transpose(testnd):
 
 
 def test_set_section(testnd):
-    sec = NDData(
-        np.zeros((2, 2)), uncertainty=VarianceUncertainty(np.ones((2, 2)))
-    )
+    sec = NDData(np.zeros((2, 2)), uncertainty=VarianceUncertainty(np.ones((2, 2))))
     testnd.set_section((slice(0, 2), slice(1, 3)), sec)
     assert_array_equal(testnd[:2, 1:3].data, 0)
     assert_array_equal(testnd[:2, 1:3].variance, 1)
@@ -253,9 +249,7 @@ def test_variance_uncertainty_AstroDataMixin(testnd):
 
     assert isinstance(testclass_testnd.uncertainty, ADVarianceUncertainty)
 
-    assert_array_equal(
-        testclass_testnd.uncertainty.array, testclass_testnd.variance
-    )
+    assert_array_equal(testclass_testnd.uncertainty.array, testclass_testnd.variance)
 
     # Test setting the variance
     testclass_testnd.variance = 2
@@ -375,6 +369,7 @@ def test__get_uncertainty(testnd):
     assert isinstance(result, ADVarianceUncertainty)
     assert_array_equal(result.array, testnd.variance[:2, 0])
 
+
 # Basically the same test as above but using slicing.
 def test_access_to_other_planes_when_sliced(testnd):
     ndwindow = testnd[1:, 1:]
@@ -384,8 +379,6 @@ def test_access_to_other_planes_when_sliced(testnd):
     assert ndwindow.OBJMASK[0, 0] == testnd.shape[1] + 1
     assert isinstance(ndwindow.OBJCAT, Table)
     assert len(ndwindow.OBJCAT) == 3
-
-
 
 
 if __name__ == "__main__":

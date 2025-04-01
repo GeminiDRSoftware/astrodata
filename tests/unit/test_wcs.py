@@ -252,9 +252,7 @@ def test_loglinear_axis(NIRI_IMAGE, tmp_path, monkeypatch):
     new_output_frame = cf.CompositeFrame(
         [loglinear_frame, celestial_frame], name="world"
     )
-    new_wcs = (
-        models.Exponential1D(amplitude=1, tau=2) & ad[0].wcs.forward_transform
-    )
+    new_wcs = models.Exponential1D(amplitude=1, tau=2) & ad[0].wcs.forward_transform
     ad[0].wcs = gWCS([(new_input_frame, new_wcs), (new_output_frame, None)])
     new_coords = ad[0].wcs(2, 200, 300)
     assert_allclose(coords, new_coords[1:])
@@ -264,6 +262,7 @@ def test_loglinear_axis(NIRI_IMAGE, tmp_path, monkeypatch):
     ad.write("test.fits", overwrite=True)
     ad2 = astrodata.from_file("test.fits")
     assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
+
 
 @pytest.mark.skip(reason="Requires external test data.")
 def test_tabular1D_axis(tmp_path, monkeypatch):
@@ -284,10 +283,12 @@ def test_tabular1D_axis(tmp_path, monkeypatch):
     assert ad2[0].wcs(0) == pytest.approx(3017.51065254)
     assert ad2[0].wcs(1021) == pytest.approx(4012.89510727)
 
+
 # Coordinates of projection center and new projection center
-@pytest.mark.parametrize("coords", ([(0, 0), (0.1, -0.1)],
-                                    [(120, -50), (119.5, -49.5)],
-                                    [(270, 89.9), (0, 89)]))
+@pytest.mark.parametrize(
+    "coords",
+    ([(0, 0), (0.1, -0.1)], [(120, -50), (119.5, -49.5)], [(270, 89.9), (0, 89)]),
+)
 @pytest.mark.parametrize("flip", (True, False))
 def test_create_new_image_projection(flip, coords):
     shifts = (100, 200)
@@ -298,13 +299,15 @@ def test_create_new_image_projection(flip, coords):
     if not flip:
         matrix[0] *= -1
     lon, lat = coords[0]
-    projection = (models.AffineTransformation2D(matrix=matrix) |
-                  models.Pix2Sky_Gnomonic() |
-                  models.RotateNative2Celestial(lon=lon, lat=lat, lon_pole=180))
+    projection = (
+        models.AffineTransformation2D(matrix=matrix)
+        | models.Pix2Sky_Gnomonic()
+        | models.RotateNative2Celestial(lon=lon, lat=lat, lon_pole=180)
+    )
     transform = shifts | projection
     new_transform = adwcs.create_new_image_projection(transform, coords[1])
     for x in (0, 1000):
         for y in (0, 1000):
-            c1 = SkyCoord(*transform(x, y), unit='deg')
-            c2 = SkyCoord(*new_transform(x, y), unit='deg')
+            c1 = SkyCoord(*transform(x, y), unit="deg")
+            c2 = SkyCoord(*new_transform(x, y), unit="deg")
             assert c1.separation(c2).arcsec < 0.5

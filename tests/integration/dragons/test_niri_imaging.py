@@ -58,9 +58,7 @@ def _downloaded_niri_imaging_data_star_field(
 
 
 @pytest.fixture
-def niri_imaging_data_star_field(
-    tmp_path, _downloaded_niri_imaging_data_star_field
-):
+def niri_imaging_data_star_field(tmp_path, _downloaded_niri_imaging_data_star_field):
     """This copies files from another fixture
     (_downloaded_niri_imaging_data_star_field), and copies those into a path
     for the current test.
@@ -244,9 +242,7 @@ def test_niri_imaging_tutorial_star_field(
     processed_std_image = glob.glob("*image*")
 
     assert len(processed_std_image) == 1, "Multiple standard star images."
-    assert (
-        "crash" not in processed_std_image[0]
-    ), "Standard star reduction failed."
+    assert "crash" not in processed_std_image[0], "Standard star reduction failed."
 
     # Science
     reduce_target = Reduce()
@@ -260,6 +256,4 @@ def test_niri_imaging_tutorial_star_field(
     ]
 
     assert len(processed_target_image) == 1, "Multiple science images created."
-    assert (
-        "crash" not in processed_target_image[0]
-    ), "Science reduction failed."
+    assert "crash" not in processed_target_image[0], "Science reduction failed."

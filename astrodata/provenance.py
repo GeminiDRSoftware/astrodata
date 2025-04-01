@@ -123,9 +123,11 @@ def add_history(ad, timestamp_start, timestamp_stop, primitive, args):
     if hasattr(ad, "HISTORY"):
         colsize = max(
             colsize,
-            (max(len(ph[args_col_idx]) for ph in ad.HISTORY) + 1)
-            if args_col_idx is not None
-            else 16,
+            (
+                (max(len(ph[args_col_idx]) for ph in ad.HISTORY) + 1)
+                if args_col_idx is not None
+                else 16
+            ),
         )
 
         timestamp_start_arr = [
@@ -335,16 +337,16 @@ def provenance_summary(ad, provenance=True, history=True):
 
             # Titles
             retval += (
-                f'{"Primitive":<{primitive_col_size}} '
-                f'{"Args":<{args_col_size}} '
-                f'{"Start":<{timestamp_start_col_size}} {"Stop"}\n'
+                f"{'Primitive':<{primitive_col_size}} "
+                f"{'Args':<{args_col_size}} "
+                f"{'Start':<{timestamp_start_col_size}} {'Stop'}\n"
             )
             # now the lines
             retval += (
-                f'{"":{"-"}<{primitive_col_size}} '
-                f'{"":{"-"}<{args_col_size}} '
-                f'{"":{"-"}<{timestamp_start_col_size}} '
-                f'{"":{"-"}<{timestamp_stop_col_size}}\n'
+                f"{'':{'-'}<{primitive_col_size}} "
+                f"{'':{'-'}<{args_col_size}} "
+                f"{'':{'-'}<{timestamp_start_col_size}} "
+                f"{'':{'-'}<{timestamp_stop_col_size}}\n"
             )
 
             # Rows, looping over args lines
@@ -368,7 +370,7 @@ def provenance_summary(ad, provenance=True, history=True):
                         )
 
                     else:
-                        retval += f'{"":<{primitive_col_size}} {argrow}\n'
+                        retval += f"{'':<{primitive_col_size}} {argrow}\n"
                     # prep for additional arg rows without duplicating the
                     # other values
                     first = False

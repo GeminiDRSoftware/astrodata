@@ -69,8 +69,6 @@ def test_deprecated_astrodatafactory_getAstroData(example_fits_file):
         astrodata.factory.getAstroData(example_fits_file)
 
 
-def test_deprecated_astrodatafactory_createFromScratch(
-    example_phu, example_extensions
-):
+def test_deprecated_astrodatafactory_createFromScratch(example_phu, example_extensions):
     with pytest.warns(AstroDataDeprecationWarning):
         astrodata.factory.createFromScratch(example_phu, example_extensions)
