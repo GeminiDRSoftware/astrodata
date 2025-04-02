@@ -11,7 +11,12 @@ import sys
 from pathlib import Path
 
 import pytest
-import tomli
+
+if int(sys.version_info[0]) == 3 and int(sys.version_info[1]) >= 12:
+    from tomllib import load as toml_load
+
+else:
+    from tomli import load as toml_load
 
 
 @functools.cache
@@ -21,7 +26,7 @@ def scripts() -> dict[str, str]:
     root_dir = pyproject.parent
 
     with open(pyproject, "rb") as file:
-        data = tomli.load(file)
+        data = toml_load(file)
 
     scripts = data["tool"]["script_tests"]
 
