@@ -1,0 +1,6 @@
+from_file
+=========
+
+.. currentmodule:: astrodata
+
+.. autofunction:: from_file

@@ -1,0 +1,45 @@
+Section
+=======
+
+.. currentmodule:: astrodata
+
+.. autoclass:: Section
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~Section.axis_dict
+      ~Section.ndim
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Section.asIRAFsection
+      ~Section.as_iraf_section
+      ~Section.asslice
+      ~Section.contains
+      ~Section.from_shape
+      ~Section.from_string
+      ~Section.is_same_size
+      ~Section.overlap
+      ~Section.shift
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: axis_dict
+   .. autoattribute:: ndim
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: asIRAFsection
+   .. automethod:: as_iraf_section
+   .. automethod:: asslice
+   .. automethod:: contains
+   .. automethod:: from_shape
+   .. automethod:: from_string
+   .. automethod:: is_same_size
+   .. automethod:: overlap
+   .. automethod:: shift

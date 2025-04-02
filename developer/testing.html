@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Testing in astrodata &mdash; astrodata 0.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/../manuals/_static/color_styles.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/logo_variables.css?v=947f2b5d" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=7026087e"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Common API for Users" href="../api_short.html" />
+    <link rel="prev" title="Creating Documentation" href="documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            astrodata
+              <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manuals/index.html">Astrodata Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer Installation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#developer-documentation-overview">Developer Documentation Overview</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="documentation.html">Creating Documentation</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Testing in <code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core-concepts">Core Concepts</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-tests">Running Tests</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#writing-tests">Writing Tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#developer-environment-setup">Developer environment setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#clone-the-repository">Clone the repository</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#install-the-dependencies">Install the dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#development-without-a-virtual-environment">Development without a Virtual Environment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_short.html">Common API for Users</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">astrodata</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer Installation</a></li>
+      <li class="breadcrumb-item active">Testing in <code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/developer/testing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="testing-in-astrodata">
+<h1>Testing in <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a><a class="headerlink" href="#testing-in-astrodata" title="Link to this heading"></a></h1>
+<nav class="contents local" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#core-concepts" id="id1">Core Concepts</a></p></li>
+<li><p><a class="reference internal" href="#running-tests" id="id2">Running Tests</a></p></li>
+<li><p><a class="reference internal" href="#writing-tests" id="id3">Writing Tests</a></p>
+<ul>
+<li><p><a class="reference internal" href="#unit-tests" id="id4">Unit Tests</a></p></li>
+<li><p><a class="reference internal" href="#integration-tests" id="id5">Integration Tests</a></p></li>
+<li><p><a class="reference internal" href="#script-tests" id="id6">Script Tests</a></p></li>
+<li><p><a class="reference internal" href="#build-release-tests" id="id7">Build/Release Tests</a></p></li>
+</ul>
+</li>
+</ul>
+</nav>
+<section id="core-concepts">
+<h2><a class="toc-backref" href="#id1" role="doc-backlink">Core Concepts</a><a class="headerlink" href="#core-concepts" title="Link to this heading"></a></h2>
+<p>Astrodata uses a combination of <a class="reference external" href="https://docs.pytest.org/en/stable/"><a class="reference external" href="https://docs.pytest.org/en/stable/">pytest</a></a> and <a class="reference external" href="https://nox.thea.codes/en/stable/"><a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a></a> for running tests in
+isolated, reproducible environments. <a class="reference external" href="https://nox.thea.codes/en/stable/"><a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a></a> is also used for other automation
+tasks.</p>
+<p><a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> implements different kinds of tests targeting different aspects of
+the codebase. These tests are run in isolated environments to ensure that the
+tests are reproducible and that the code is tested in a clean environment.</p>
+<p>These tests include:</p>
+<ul class="simple">
+<li><p><strong>Unit tests</strong>: These tests are used to test individual units of code, such as
+functions or classes. They are used to ensure that the code behaves as
+expected when given specific inputs.</p></li>
+<li><p><strong>Integration tests</strong>: These tests are used to test how different parts of the
+codebase interact with each other. They are used to ensure that the code
+behaves as expected when different parts of the codebase are combined.</p></li>
+<li><p><strong>Script tests</strong>: These tests are used to test the scripts in the codebase.
+They are used to ensure that the scripts behave as expected when run. these
+primarily test example scripts within the documentation.</p></li>
+<li><p><strong>Build/Release tests</strong>: These tests are used to test the build and release
+process, and the integrity of the package being released. They are used to
+ensure that the code can be built and released correctly.</p></li>
+</ul>
+<p>There is some cross-pollination between these tests, but they are generally
+separated to ensure ease of finding specific tests, and organizing tests to
+make understanding and interpretting test results easier.</p>
+</section>
+<section id="running-tests">
+<h2><a class="toc-backref" href="#id2" role="doc-backlink">Running Tests</a><a class="headerlink" href="#running-tests" title="Link to this heading"></a></h2>
+<p>Running the tests involves some setup. It’s assumed you have already installed
+and setup <a class="reference external" href="https://python-poetry.org/">Poetry</a> as per the <a class="reference internal" href="index.html"><span class="doc">Developer Installation</span></a>, or are prepared to
+work with the <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a> source code in some other way.</p>
+<p>If you’d like to run the test in your local environment, you can do so by
+running the following command from the root of the repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest
+</pre></div>
+</div>
+<p>This is discouraged, but can be useful for runnin spcific tests or debugging.
+To Isolate a test, use a keyword and/or point to a file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pytest<span class="w"> </span>-k<span class="w"> </span><span class="s2">&quot;test_foo&quot;</span><span class="w"> </span>tests/test_foo.py
+</pre></div>
+</div>
+<p>The above command will run all tests that match the keyword “test_foo” in their
+names in the file <code class="docutils literal notranslate"><span class="pre">tests/test_foo.py</span></code>.</p>
+<p><a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a> is the preferred way to run tests, as it ensures that the tests are run in
+clean and isolated environments. Simply run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox
+</pre></div>
+</div>
+<p>This will run a subset of the tests recommended for local development, the unit
+tests, and their coverage. To see all possible tests, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-l
+</pre></div>
+</div>
+<p>This will output information about sessions you can select with <code class="docutils literal notranslate"><span class="pre">nox</span> <span class="pre">-s</span></code>. For
+more information about using <a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a>, see the <a class="reference external" href="nox_documentation">Nox CLI Documentation</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<dl class="simple">
+<dt><a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a> is also used for other automation tasks, such as:</dt><dd><ul class="simple">
+<li><p>building the documentation (<code class="docutils literal notranslate"><span class="pre">nox</span> <span class="pre">-s</span> <span class="pre">docs</span></code>)</p></li>
+<li><p>linting &amp; formatting (<code class="docutils literal notranslate"><span class="pre">nox</span> <span class="pre">-s</span> <span class="pre">linting</span></code>)</p></li>
+<li><p>creating development environments (<code class="docutils literal notranslate"><span class="pre">nox</span> <span class="pre">-s</span> <span class="pre">devshell</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+</div>
+</section>
+<section id="writing-tests">
+<h2><a class="toc-backref" href="#id3" role="doc-backlink">Writing Tests</a><a class="headerlink" href="#writing-tests" title="Link to this heading"></a></h2>
+<p>Writing tests is an important part of contributing to <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>. Tests help
+ensure that the code behaves as expected, and that changes to the code don’t
+break existing functionality.</p>
+<p>When writing tests, it’s important to follow the <a class="reference external" href="https://docs.pytest.org/en/stable/goodpractices.html">testing best practices</a> outlined in the
+<a class="reference external" href="https://docs.pytest.org/en/stable/"><a class="reference external" href="https://docs.pytest.org/en/stable/">pytest</a></a>.</p>
+<p>Tests are located in the <code class="docutils literal notranslate"><span class="pre">tests/</span></code> directory, and are organized by the
+type of test they are. For example, unit tests are located in the
+<code class="docutils literal notranslate"><span class="pre">tests/unit/</span></code> directory, integration tests are located in the
+<code class="docutils literal notranslate"><span class="pre">tests/integration/</span></code> directory, and so on.</p>
+<section id="unit-tests">
+<h3><a class="toc-backref" href="#id4" role="doc-backlink">Unit Tests</a><a class="headerlink" href="#unit-tests" title="Link to this heading"></a></h3>
+<p>Unit tests are used to test individual units of code, such as functions or
+classes. They are used to ensure that the code behaves as expected when given
+specific inputs. They are also the most common type of test in <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>,
+and likely the most common type of test you will write.</p>
+<p>Unit tests are in the <code class="docutils literal notranslate"><span class="pre">tests/unit</span></code> directory. Testing for specific modules
+are collected in individual files. For example, a test for a function in the
+<code class="docutils literal notranslate"><span class="pre">astrodata/utils.py</span></code> module would be located in <code class="docutils literal notranslate"><span class="pre">tests/unit/test_utils.py</span></code>.</p>
+<p>You can run all unit tests (and nothing else) with <a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a> by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>unit
+</pre></div>
+</div>
+<p>Unit tests require that coverage increases if new code is added. It is highly
+encouraged to write tests for contributions before writing new code. If you get
+stuck on how to test your idea, feel free to ask for help in the issue or pull
+request! Testing is a critical part of the development process, and sometimes
+it’s trickier than we expect.</p>
+</section>
+<section id="integration-tests">
+<h3><a class="toc-backref" href="#id5" role="doc-backlink">Integration Tests</a><a class="headerlink" href="#integration-tests" title="Link to this heading"></a></h3>
+<p>Integration tests are used to test how different parts of the codebase interact
+with each other in a more hollistic way.</p>
+<p>Presently, these test uses <a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a> to test astrodata. This is a work in
+progress, and will be updated as the testing framework is updated. <a class="reference external" href="https://dragons.readthedocs.io/">DRAGONS</a>
+just happens to be the most convenient way to run this level of testing at the
+moment.</p>
+</section>
+<section id="script-tests">
+<h3><a class="toc-backref" href="#id6" role="doc-backlink">Script Tests</a><a class="headerlink" href="#script-tests" title="Link to this heading"></a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Script tests are not yet fully implemented. This section is a placeholder
+for future development.</p>
+</div>
+<p>Script tests are used to test the scripts in the codebase. They are used to
+ensure that the scripts behave as expected when run. These tests are primarily
+used to test example scripts within the documentation.</p>
+<p>To run script tests, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-s<span class="w"> </span>scripts
+</pre></div>
+</div>
+<p>This will go through a list of scripts in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> (see the
+<code class="docutils literal notranslate"><span class="pre">[tool.nox.scripts]</span></code> section) and run them. If you add a new script to the
+project, you will need to add it to this list to ensure it is tested.</p>
+<p>The process for adding a script to be tested is as follows:</p>
+<ol class="arabic">
+<li><p>Add the script to the <code class="docutils literal notranslate"><span class="pre">[tool.nox.scripts]</span></code> section of
+<code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>. The key (before the equals sign) should be the path to
+the <code class="docutils literal notranslate"><span class="pre">.rst</span></code> file with the example to be run, and the value (after the
+equals sign) should be any arguments to be passed to <code class="docutils literal notranslate"><span class="pre">rst_extract</span></code>.</p>
+<blockquote>
+<div><div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.nox.scripts]</span>
+<span class="s2">&quot;path/to/script.rst&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;--some-argument&quot;</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">nox</span> <span class="pre">-s</span> <span class="pre">scripts</span> <span class="pre">--</span> <span class="pre">path/to/script.rst</span></code> to test the script
+individually. Once you’re happy with the script, you can run
+<code class="docutils literal notranslate"><span class="pre">nox</span> <span class="pre">-s</span> <span class="pre">scripts</span></code> to test all scripts.</p></li>
+</ol>
+</section>
+<section id="build-release-tests">
+<h3><a class="toc-backref" href="#id7" role="doc-backlink">Build/Release Tests</a><a class="headerlink" href="#build-release-tests" title="Link to this heading"></a></h3>
+<p>Build/release tests test the package being built and sent to, e.g., PyPI. These
+tests require a <a class="reference external" href="devpi_docs">devpi server</a> to be running. This is managed by
+classes in <code class="docutils literal notranslate"><span class="pre">noxfile.py</span></code> and <a class="reference external" href="https://nox.thea.codes/en/stable/">nox</a>, and is something you should be aware of
+(though, hopefully, it will not be an issue).</p>
+<p>To run all build/release tests, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nox<span class="w"> </span>-t<span class="w"> </span>build_tests
+</pre></div>
+</div>
+<p>This will run all unit tests and integrations tests using the fresh <a class="reference internal" href="../api_short.html#module-astrodata" title="astrodata"><code class="xref py py-mod docutils literal notranslate"><span class="pre">astrodata</span></code></a>
+build.</p>
+<p>These tests take a while, and are readily handled by our GitHub Actions
+workflows (see <code class="docutils literal notranslate"><span class="pre">build_tests.yml</span></code>). If you’re working on the build/release
+process, you may want to run these tests locally, though.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="documentation.html" class="btn btn-neutral float-left" title="Creating Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api_short.html" class="btn btn-neutral float-right" title="Common API for Users" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023-present, NOIRLab/Gemini Observatories.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
