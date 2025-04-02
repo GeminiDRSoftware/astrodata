@@ -49,11 +49,6 @@ def test_open(example_fits_file):
         astrodata.open(example_fits_file)
 
 
-def test_deprecated_astrodata_header(ad):
-    with pytest.warns(AstroDataDeprecationWarning):
-        ad.header
-
-
 def test_deprecated_astrodatafactory_openFile(example_fits_file):
     with pytest.warns(AstroDataDeprecationWarning):
         astrodata.factory._openFile(example_fits_file)

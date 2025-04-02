@@ -28,7 +28,6 @@ from .nddata import ADVarianceUncertainty, NDAstroData
 from .utils import (
     assign_only_single_slice,
     astro_data_descriptor,
-    deprecated,
     normalize_indices,
     returns_list,
 )
@@ -431,17 +430,8 @@ class AstroData:
         return headers[0] if self.is_single else FitsHeaderCollection(headers)
 
     @property
-    @deprecated(
-        "Access to headers through this property is deprecated and "
-        "will be removed in the future. Use '.hdr' instead."
-    )
     def header(self):
-        """Return the headers for the PHU and each extension.
-
-        .. warning::
-
-            This property is deprecated and will be removed in the future.
-        """
+        """Return the headers for the PHU and each extension."""
         return [self.phu] + [ndd.meta["header"] for ndd in self._nddata]
 
     @property
