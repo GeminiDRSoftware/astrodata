@@ -754,18 +754,13 @@ def test_header_collection(GMOSN_SPECT):
 
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
-def test_header_deprecated(GMOSN_SPECT):
+def test_header_attr(GMOSN_SPECT):
     ad = astrodata.from_file(GMOSN_SPECT)
-    with pytest.warns(AstroDataDeprecationWarning):
-        warnings.simplefilter("always", AstroDataDeprecationWarning)
-        header = ad.header
+
     assert header[0]["ORIGNAME"] == "N20170529S0168.fits"
     assert header[1]["EXTNAME"] == "SCI"
     assert header[1]["EXTVER"] == 1
 
-    with pytest.warns(AstroDataDeprecationWarning):
-        warnings.simplefilter("always", AstroDataDeprecationWarning)
-        header = ad[0].header
     assert header[0]["ORIGNAME"] == "N20170529S0168.fits"
 
 
