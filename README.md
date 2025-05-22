@@ -206,6 +206,38 @@ See [our contributing guidelines](CONTRIBUTING.md) for information on
 contributing. If you're worried about contributing, or feel intimidated, please
 remember that your contribution is immensely appreciated---no matter how small!
 
+Contributors
+------------
+
+This is a list of contributors to the astrodata project throughout the history
+of its development, in alphabetical order.
+
++ Aarya Patil
++ Brian Cole
++ Bruno Quint
++ Craig Allen
++ Daniel Berke
++ Emma Hogan
++ Ivan Sharankov
++ James E.H. Turner
++ Kaniela Dement
++ Kathleen Labrie
++ Ken Anderson
++ Kyle Mede
++ Mark Simpson
++ Matt Craig
++ Melanie Clarke
++ Nelson Zarate
++ Olesja Smirnova
++ Oliver Oberdorf
++ Paul Hirst
++ Ricardo Cardenes
++ River Allen
++ Simon Conseil
++ Chris Simpson
++ D. J. Teal
+
+
 License
 -------
 
