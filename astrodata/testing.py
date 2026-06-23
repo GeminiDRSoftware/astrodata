@@ -1467,7 +1467,7 @@ def expand_file_range(files: str) -> list[str]:
         file_prep, start = file_prep[: -len(end)], file_prep[-len(end) :]
         start, end = int(start), int(end)
         files = [
-            f"{file_prep}{str(i).zfill(len(str(end)))}"
+            f"{file_prep}{str(i).zfill(len(str(end)))}.fits"
             for i in range(start, end + 1)
         ]
 
