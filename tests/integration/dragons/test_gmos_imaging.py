@@ -31,7 +31,7 @@ def gmos_imaging_data_star_field_files():
 
     for file in files:
         if not file.startswith("bpm"):
-            expanded_files += expand_file_range(file)
+            expanded_files += expand_file_range(file, ".fits")
             continue
 
         expanded_files += [file]

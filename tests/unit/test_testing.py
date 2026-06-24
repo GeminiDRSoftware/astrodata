@@ -1034,39 +1034,47 @@ def test_ad_compare(ad1, ad2):
 
 
 @pytest.fixture
-def file_ranges():
+def file_ranges_fits():
     """File ranges have the form "N3948493-503", for example."""
     range_expected = [
         (
             "N20170614S0201-205",
             [
-                "N20170614S0201",
-                "N20170614S0202",
-                "N20170614S0203",
-                "N20170614S0204",
-                "N20170614S0205",
+                "N20170614S0201.fits",
+                "N20170614S0202.fits",
+                "N20170614S0203.fits",
+                "N20170614S0204.fits",
+                "N20170614S0205.fits",
             ],
         ),
         (
             "N20170615S0534-538",
             [
-                "N20170615S0534",
-                "N20170615S0535",
-                "N20170615S0536",
-                "N20170615S0537",
-                "N20170615S0538",
+                "N20170615S0534.fits",
+                "N20170615S0535.fits",
+                "N20170615S0536.fits",
+                "N20170615S0537.fits",
+                "N20170615S0538.fits",
             ],
         ),
         (
             "N20170702S0178-182",
             [
-                "N20170702S0178",
-                "N20170702S0179",
-                "N20170702S0180",
-                "N20170702S0181",
-                "N20170702S0182",
+                "N20170702S0178.fits",
+                "N20170702S0179.fits",
+                "N20170702S0180.fits",
+                "N20170702S0181.fits",
+                "N20170702S0182.fits",
             ],
         ),
+    ]
+
+    return range_expected
+
+@pytest.fixture
+def file_ranges():
+    """File ranges have the form "N3948493-503", for example."""
+    range_expected = [
         (
             "N2093-2095",
             ["N2093", "N2094", "N2095"],
@@ -1091,6 +1099,10 @@ def file_ranges():
 
     return range_expected
 
+
+def test_expand_file_range_fits(file_ranges_fits):
+    for file_range, expected in file_ranges_fits:
+        assert testing.expand_file_range(file_range, ".fits") == expected
 
 def test_expand_file_range(file_ranges):
     for file_range, expected in file_ranges:
