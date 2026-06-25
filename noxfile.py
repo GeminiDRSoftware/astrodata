@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import fileinput
 import functools
 import os
 import socket
@@ -466,6 +467,21 @@ def install_test_dependencies(
         session.install("-r", str(req_file_path))
 
     else:
+        # The poetry exports a python_version range.  conda cannot parse that.
+        # Remove it.
+        with fileinput.input(files=str(req_file_path), inplace=True) as file:
+            for line in file:
+                new_line = line.split(";")[0]
+                print(new_line, end="\n")
+
+        # In the poetry.lock, pip asdf requires 'semantic-veersion'.
+        # semantic-version is non available as conda package, so clearly
+        # cannot be installed and asdf cannot require it.  Remove it.
+        with fileinput.input(files=str(req_file_path), inplace=True) as file:
+            for line in file:
+                if "semantic-version" not in line:
+                    print(line, end="")
+
         session.conda_install("--quiet", "--file", str(req_file_path))
 
 
@@ -492,7 +508,7 @@ def apply_data_caching_environment_variable(session: nox.Session) -> None:
 @nox.session(
     venv_backend="conda",
     venv_params=SessionVariables.dragons_venv_params,
-    python="3.10",
+    python="3.12",
 )
 def dragons_release_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
@@ -500,19 +516,38 @@ def dragons_release_tests(session: nox.Session) -> None:
     apply_macos_config(session)
 
     # Fetch test dependencies from the poetry.lock file.
-    install_test_dependencies(session)
+    #
+    # If we install everything with pip, scipy remains a pypi but numpy
+    # is a conda after dragons is installed, no idea why, and that causes
+    # some serious scipy import issues.  (Confirmed by uninstalling
+    # pip scipy, and then conda installing the same version, then it works.)
+    # So, we will install the astrodata dependencies with conda to match
+    # dragons, and then install the test dependencies with pip (since not
+    # all of them are available in conda.
+
+    install_test_dependencies(
+        session, poetry_groups=["main"], conda_install=True
+    )
+    install_test_dependencies(session, poetry_groups=["test"])
+    # If we install everything with pip, scipy remains a pypi but numpy
+    # is a conda after dragons is installed, no idea why, and that causes
+    # some serious scipy import issues.  (Confirmed by uninstalling
+    # pip scipy, and then conda installing the same version, then it works.)
+    # So, we will install the astrodata dependencies with conda to match
+    # dragons, and then install the test dependencies with pip (since not
+    # all of them are available in conda.
 
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
         "--quiet",
-        "dragons==3.2",
+        "dragons==4.0",
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
     )
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("--quiet", "numpy=1.26")
+    # session.conda_install("--quiet", "numpy=1.26")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
@@ -526,7 +561,7 @@ def dragons_release_tests(session: nox.Session) -> None:
     )
 
 
-@nox.session(venv_backend="conda", python="3.10", tags=["dragons"])
+@nox.session(venv_backend="conda", python="3.12", tags=["dragons"])
 def dragons_dev_tests(session: nox.Session) -> None:
     """Run the tests for the DRAGONS conda package."""
     apply_data_caching_environment_variable(session)
@@ -534,12 +569,12 @@ def dragons_dev_tests(session: nox.Session) -> None:
 
     # Fetch test dependencies from the poetry.lock file.
     install_test_dependencies(session)
-    install_test_dependencies(
-        session,
-        packages=SessionVariables.dragons_dev_packages,
-    )
+    # install_test_dependencies(
+    #     session,
+    #     packages=SessionVariables.dragons_dev_packages,
+    # )
 
-    # Need to install sectractor as a conda package. Everything else in this
+    # Need to install sextractor as a conda package. Everything else in this
     # install should be via pip, not conda.
     session.conda_install(
         "astromatic-source-extractor",
@@ -550,15 +585,20 @@ def dragons_dev_tests(session: nox.Session) -> None:
     # Install the DRAGONS package, and ds9 for completeness.
     tmp_dir = Path(session.create_tmp())
 
-    # Get cal_manager and obs_db_manager. GeminiObsDB is a dependency of
-    # GeminiCalMgr, and must be installed first.
+    # Get FitsStorage
     session.install(
-        "git+https://github.com/GeminiDRSoftware/GeminiObsDB@v1.0.29",
+        "git+https://github.com/GeminiDRSoftware/FitsStorage.git@v3.6.2"
     )
 
-    session.install(
-        "git+https://github.com/GeminiDRSoftware/GeminiCalMgr@v1.1.24",
-    )
+    # # Get cal_manager and obs_db_manager. GeminiObsDB is a dependency of
+    # # GeminiCalMgr, and must be installed first.
+    # session.install(
+    #     "git+https://github.com/GeminiDRSoftware/GeminiObsDB@v1.0.29",
+    # )
+    #
+    # session.install(
+    #     "git+https://github.com/GeminiDRSoftware/GeminiCalMgr@v1.1.24",
+    # )
 
     with session.cd(tmp_dir):
         # Clone the DRAGONS repository
@@ -582,12 +622,13 @@ def dragons_dev_tests(session: nox.Session) -> None:
             session.log("DRAGONS repository already exists. Skipping clone.")
 
         with session.cd("dragons"):
+            session.run("git", "checkout", "v4.0.0", external=True)
             # Install the DRAGONS package
-            session.install("-e", ".")
+            session.install("-e", ".", "numpy<2")
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("numpy=1.26")
+    # session.conda_install("numpy=1.26")
 
     session.install("-e", f"{SessionVariables.noxfile_dir()}", "--no-deps")
 
@@ -628,8 +669,18 @@ def conda_unit_tests(session: nox.Session) -> None:
         "channels",
         "conda-forge",
     )
-    install_test_dependencies(session, conda_install=True)
-    session.conda_install(".")
+    # Conda-install the dependencies required to *run* astrodata since
+    # this is a conda test.  Then install the dependencies to run the *tests*
+    # with pip since they are not all available from conda.
+    install_test_dependencies(
+        session, poetry_groups=["main"], conda_install=True
+    )
+    install_test_dependencies(session, poetry_groups=["test"])
+
+    # One cannot install the current checkout as a conda package.
+    # It has to be a pip install.
+    # session.conda_install(".")
+    session.install(".", "--no-deps")
 
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
@@ -1052,19 +1103,27 @@ def initialize_pre_commit(session: nox.Session) -> None:
 
 # Important note --- these tests should be run as a part of the routine tests
 # above. They are separated here for ease of diagnosis for common problems.
-@nox.session(venv_backend="conda", python="3.10")
+@nox.session(venv_backend="conda", python="3.12")
 def dragons_calibration(
     session: nox.Session,
     dragonsrc_path: Path | None = None,
 ) -> None:
     """Run the calibration tests."""
+    apply_data_caching_environment_variable(session)
+    apply_macos_config(session)
+
+    # We install the poetry dependency first, otherwise they will
+    # wipe clean the dragons conda dependencies.
+    install_test_dependencies(
+        session, poetry_groups=["main"], conda_install=True
+    )
+    install_test_dependencies(session, poetry_groups=["test"])
+
     session.conda_install(
         "--quiet",
-        "dragons==3.2",
+        "dragons==4.0",
         channel=SessionVariables.dragons_conda_channels,
     )
-
-    install_test_dependencies(session)
 
     session.install("-e", ".", "--no-deps")
 
