@@ -126,7 +126,8 @@ intersphinx_mapping = {
     "astropy": ("http://docs.astropy.org/en/stable/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     # "gemini_instruments": ("https://dragons.readthedocs.io/en/latest/", None),
-    "DRAGONS": ("https://dragons.readthedocs.io/en/stable/", None),
+#    "DRAGONS": ("https://dragons.readthedocs.io/en/stable/", None),
+    "DRAGONS": ("https://dragons.readthedocs.io/en/v4.0.0/", None),
 }
 
 intersphinx_disabled_reftypes = ["*"]
