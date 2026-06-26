@@ -1447,7 +1447,7 @@ def get_program_observations():
     raise NotImplementedError
 
 
-def expand_file_range(files: str) -> list[str]:
+def expand_file_range(files: str, extn="") -> list[str]:
     """Expand a range of files into a list of file names.
 
     Arguments
@@ -1456,6 +1456,9 @@ def expand_file_range(files: str) -> list[str]:
         A range of files, e.g., "N20170614S0201-205". This would produce:
 
         ["N20170614S0201", "N20170614S0202", ..., "N20170614S0205"]
+
+    extn : str
+        Extension to add to the filename.  Eg ".fits"
 
     Returns
     -------
@@ -1467,7 +1470,7 @@ def expand_file_range(files: str) -> list[str]:
         file_prep, start = file_prep[: -len(end)], file_prep[-len(end) :]
         start, end = int(start), int(end)
         files = [
-            f"{file_prep}{str(i).zfill(len(str(end)))}"
+            f"{file_prep}{str(i).zfill(len(str(end)))}{extn}"
             for i in range(start, end + 1)
         ]
 

@@ -6,6 +6,64 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+# -- Import sanity check ----------------------------------------------------
+# Guard against a stale or duplicate copy of the package being picked up
+# from PYTHONPATH (or any other entry on sys.path ahead of the repo itself).
+# A stray second copy previously caused a confusing failure deep in
+# sphinx.ext.autodoc.importer.get_class_members:
+#   TypeError: argument of type 'property' is not iterable
+# triggered by sphinx_automodapi's custom `type` attrgetter operating on
+# the wrong/stale `Section` class. Fail fast and clearly instead.
+
+import os
+import sys
+
+_PACKAGE_NAME = "astrodata"
+_EXPECTED_REPO_ROOT = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..")  # adjust if conf.py moves
+)
+
+
+def _check_import_path():
+    """Verify the package being documented is loaded from this repo.
+
+    Raises
+    ------
+    RuntimeError
+        If the imported package resolves to a location outside the
+        expected repository root, which usually means a stray
+        PYTHONPATH entry (or another sys.path entry) is shadowing the
+        local checkout with a different copy of the package.
+    """
+    try:
+        module = __import__(_PACKAGE_NAME)
+    except ImportError as err:
+        raise RuntimeError(
+            f"Could not import '{_PACKAGE_NAME}' while building docs. "
+            f"Check that it is installed/importable in this environment."
+        ) from err
+
+    module_path = os.path.abspath(module.__file__)
+
+    if not module_path.startswith(_EXPECTED_REPO_ROOT):
+        pythonpath = os.environ.get("PYTHONPATH", "<not set>")
+        raise RuntimeError(
+            f"'{_PACKAGE_NAME}' was imported from an unexpected location:\n"
+            f"    {module_path}\n"
+            f"Expected it to be under:\n"
+            f"    {_EXPECTED_REPO_ROOT}\n"
+            f"This usually means PYTHONPATH (or another sys.path entry) "
+            f"is pointing at a different checkout.\n"
+            f"    PYTHONPATH = {pythonpath}\n"
+            f"    sys.path   = {sys.path}\n"
+            f"Unset PYTHONPATH or remove the offending entry and retry."
+        )
+
+_check_import_path()
+
+# --- End of PYTHONPATH check ------------
+
+
 # The full version, including alpha/beta/rc tags
 from astrodata import __version__
 
@@ -15,7 +73,7 @@ release = __version__
 # -- Project information -----------------------------------------------------
 
 project = "astrodata"
-copyright = "2023-present, NOIRLab/Gemini Observatories"
+copyright = "2026, Association of Universities for Research in Astronomy"
 author = "DRAGONS Team"
 
 # -- General configuration ---------------------------------------------------
@@ -37,7 +95,6 @@ extensions = [
     "sphinx_automodapi.automodapi",
     "sphinx_automodapi.smart_resolver",
 ]
-
 
 # Run doctest when building the docs
 doctest_test_doctest_blocks = "True"
@@ -69,7 +126,8 @@ intersphinx_mapping = {
     "astropy": ("http://docs.astropy.org/en/stable/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
     # "gemini_instruments": ("https://dragons.readthedocs.io/en/latest/", None),
-    "DRAGONS": ("https://dragons.readthedocs.io/en/stable/", None),
+#    "DRAGONS": ("https://dragons.readthedocs.io/en/stable/", None),
+    "DRAGONS": ("https://dragons.readthedocs.io/en/v4.0.0/", None),
 }
 
 intersphinx_disabled_reftypes = ["*"]
