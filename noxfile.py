@@ -89,7 +89,7 @@ class SessionVariables:
         "3.10",
         "3.11",
         "3.12",
-    ]
+    ]  # fmt: skip
 
     # devpi server information
     devpi_host = "localhost"
@@ -162,9 +162,7 @@ class DevpiServerManager:
     url: ClassVar[str] = SessionVariables.devpi_url()
 
     def __init__(
-        self,
-        session: nox.Session,
-        tmp_dir: Path | None = None,
+        self, session: nox.Session, tmp_dir: Path | None = None
     ) -> None:
         """Initialize the context manager."""
         self.session = session
@@ -214,11 +212,7 @@ class DevpiServerManager:
         with session.cd(tmp_dir):
             session.run("devpi-init", "--serverdir", ".")
             session.run(
-                "devpi-gen-config",
-                "--serverdir",
-                tmp_dir,
-                "--port",
-                str(port),
+                "devpi-gen-config", "--serverdir", tmp_dir, "--port", str(port)
             )
 
     def wait_for_devpi_startup(self, session: nox.Session) -> bool:
@@ -275,22 +269,13 @@ class DevpiServerManager:
 
         # Check that the server is available.abs
         result = session.run(
-            "which",
-            "devpi-server",
-            silent=True,
-            external=True,
+            "which", "devpi-server", silent=True, external=True
         )
 
         devpi_server_path = result.strip()
 
         self.server_process = subprocess.Popen(
-            [
-                devpi_server_path,
-                "--serverdir",
-                tmp_dir,
-                "--port",
-                str(port),
-            ],  # noqa: S603
+            [devpi_server_path, "--serverdir", tmp_dir, "--port", str(port)],  # noqa: S603
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -393,11 +378,7 @@ def get_poetry_dependencies(
 
         command[2] = f"--with={','.join(groups)}"
 
-    session.run(
-        *command,
-        external=True,
-        silent=True,
-    )
+    session.run(*command, external=True, silent=True)
 
     log_message = f"Poetry dependencies written to {req_file_path}"
 
@@ -554,11 +535,7 @@ def dragons_release_tests(session: nox.Session) -> None:
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
 
-    session.run(
-        "pytest",
-        *SessionVariables.dragons_pytest_options,
-        *pos_args,
-    )
+    session.run("pytest", *SessionVariables.dragons_pytest_options, *pos_args)
 
 
 @nox.session(venv_backend="conda", python="3.12", tags=["dragons"])
@@ -635,11 +612,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
 
-    session.run(
-        "pytest",
-        *SessionVariables.dragons_pytest_options,
-        *pos_args,
-    )
+    session.run("pytest", *SessionVariables.dragons_pytest_options, *pos_args)
 
 
 @nox.session(python=SessionVariables.python_versions)
@@ -661,14 +634,8 @@ def conda_unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
     # Configure session channels.
     apply_data_caching_environment_variable(session)
-    session.run(
-        "conda",
-        "config",
-        "--env",
-        "--add",
-        "channels",
-        "conda-forge",
-    )
+    session.run("conda", "config", "--env", "--add", "channels", "conda-forge")
+
     # Conda-install the dependencies required to *run* astrodata since
     # this is a conda test.  Then install the dependencies to run the *tests*
     # with pip since they are not all available from conda.
@@ -700,9 +667,7 @@ def unit_test_build(session: nox.Session) -> None:
     install_test_dependencies(session, poetry_groups=["test"])
 
     # Install the package from the devpi server
-    session.install(
-        "astrodata",
-    )
+    session.install("astrodata")
 
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
@@ -738,11 +703,7 @@ def integration_test_build(session: nox.Session) -> None:
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
 
-    session.run(
-        "pytest",
-        *SessionVariables.dragons_pytest_options,
-        *pos_args,
-    )
+    session.run("pytest", *SessionVariables.dragons_pytest_options, *pos_args)
 
 
 @nox.session
@@ -808,12 +769,7 @@ def build_and_publish_to_devpi(session: nox.Session):
     tmp_build_dir = Path(session.create_tmp()) / "build"
     tmp_build_dir.mkdir()
 
-    session.run(
-        "poetry",
-        "build",
-        f"--output={tmp_build_dir}",
-        external=True,
-    )
+    session.run("poetry", "build", f"--output={tmp_build_dir}", external=True)
 
     # Shows available indexes
     poetry_config_env_vars = {
@@ -1105,8 +1061,7 @@ def initialize_pre_commit(session: nox.Session) -> None:
 # above. They are separated here for ease of diagnosis for common problems.
 @nox.session(venv_backend="conda", python="3.12")
 def dragons_calibration(
-    session: nox.Session,
-    dragonsrc_path: Path | None = None,
+    session: nox.Session, dragonsrc_path: Path | None = None
 ) -> None:
     """Run the calibration tests."""
     apply_data_caching_environment_variable(session)

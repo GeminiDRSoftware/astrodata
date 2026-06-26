@@ -99,7 +99,7 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
                 "Could not create gWCS: %s: %s",
                 err.__class__.__name__,
                 err,
-            )
+            )  # fmt: skip
 
             return None
 
@@ -474,9 +474,7 @@ def gwcs_to_fits(ndd, hdr=None):
         crval2 = wcs(*(crpix - 1))
         try:
             sky_center = coord.SkyCoord(
-                nat2cel.lon.value,
-                nat2cel.lat.value,
-                unit=u.deg,
+                nat2cel.lon.value, nat2cel.lat.value, unit=u.deg
             )
 
         except NameError:
@@ -484,9 +482,7 @@ def gwcs_to_fits(ndd, hdr=None):
 
         else:
             sky_center2 = coord.SkyCoord(
-                crval2[lon_axis],
-                crval2[lat_axis],
-                unit=u.deg,
+                crval2[lon_axis], crval2[lat_axis], unit=u.deg
             )
 
             if sky_center.separation(sky_center2).arcsec > 0.01:

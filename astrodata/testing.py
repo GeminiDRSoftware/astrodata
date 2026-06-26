@@ -201,13 +201,7 @@ def get_corners(shape):
 
 
 def assert_most_close(
-    actual,
-    desired,
-    max_miss,
-    rtol=1e-7,
-    atol=0,
-    equal_nan=True,
-    verbose=True,
+    actual, desired, max_miss, rtol=1e-7, atol=0, equal_nan=True, verbose=True
 ):
     """Assert that two objects are equal up to a specified number of elements.
 
@@ -478,12 +472,7 @@ def compare_models(model1, model2, rtol=1e-7, atol=0.0, check_inverse=True):
 
 
 def download_multiple_files(
-    files,
-    path=None,
-    sub_path="",
-    use_threads=True,
-    sequential=False,
-    **kwargs,
+    files, path=None, sub_path="", use_threads=True, sequential=False, **kwargs
 ):
     """Download multiple files from the archive and store them at a given path.
 
@@ -1202,10 +1191,7 @@ def fake_fits_bytes(
         min_choice, max_choice = 0, 64
 
         mask = _RANDOM_NUMBER_GEN.integers(
-            min_choice,
-            max_choice,
-            size=image_shape,
-            dtype=np.uint16,
+            min_choice, max_choice, size=image_shape, dtype=np.uint16
         )
 
         # Setting some random pixels to zero on the mask
@@ -1381,10 +1367,7 @@ def test_script_file(
 
     command = [x for x in itertools.chain(*command_components)]
 
-    process = subprocess.run(
-        command,
-        capture_output=True,
-    )
+    process = subprocess.run(command, capture_output=True)
 
     stdout = process.stdout
     stderr = process.stderr

@@ -218,6 +218,9 @@ ignore = [
 [tool.ruff.format]
 skip-magic-trailing-comma = true
 
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 

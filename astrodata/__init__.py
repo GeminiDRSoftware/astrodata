@@ -152,7 +152,7 @@ def create(*args, **kwargs):
 @deprecated(
     "Use 'astrodata.from_file'. astrodata.open is deprecated, "
     "and will be removed in a future version. They take the "
-    "same arguments and return the same object.",
+    "same arguments and return the same object."
 )
 def open(*args, **kwargs):  # pylint: disable=redefined-builtin
     """Return an |AstroData| object from a file.
