@@ -568,6 +568,7 @@ def download_from_archive(
     path=None,
     sub_path="raw_files",
     env_var="ASTRODATA_TEST",
+    url=None,
     cache=True,
     fail_on_error=True,
     suppress_stdout=False,
@@ -590,6 +591,12 @@ def download_from_archive(
 
     env_var: str
         Environment variable containing the path to the cache directory.
+
+    url : str, optional
+        Alternative URL of the file to be fetched, if not using the Gemini
+        archive (a full path is required, since the last part of the path
+        component may differ from the nominal `filename` for some services,
+        such as Google Drive).
 
     cache : bool
         If False, the file is downloaded and replaced in the cache directory.
@@ -646,10 +653,12 @@ def download_from_archive(
     if not os.path.exists(cache_path):
         os.makedirs(cache_path)
 
+    if url is None:
+        url = GEMINI_ARCHIVE_URL + filename
+
     # Now check if the local file exists and download if not
     try:
         local_path = os.path.join(cache_path, filename)
-        url = GEMINI_ARCHIVE_URL + filename
 
         if cache and os.path.exists(local_path):
             # Use the cached file
