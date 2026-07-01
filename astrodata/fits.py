@@ -1072,7 +1072,7 @@ def windowed_operation(
         np.empty(shape, dtype=dtype),
         variance=np.zeros(shape, dtype=dtype) if with_uncertainty else None,
         mask=np.empty(shape, dtype=np.uint16) if with_mask else None,
-        meta=sequence[0].meta,
+        meta=deepcopy(sequence[0].meta),
         wcs=sequence[0].wcs,
     )
 
