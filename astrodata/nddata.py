@@ -151,8 +151,10 @@ class AstroDataMixin:
         ):
             model = []
             if isinstance(slice_, slice):
-                if slice_.step and slice_.step > 1:
+                if slice_.step and abs(slice_.step) > 1:
                     raise IndexError("Cannot slice with a step")
+                if slice_.step == -1:
+                    model.append(models.Scale(-1))
                 if slice_.start:
                     start = (
                         length + slice_.start
@@ -161,6 +163,8 @@ class AstroDataMixin:
                     )
                     if start > 0:
                         model.append(models.Shift(start))
+                elif slice_.start is None and slice_.step == -1:
+                    model.append(models.Shift(length - 1))
                 mapped_axes.append(max(mapped_axes) + 1 if mapped_axes else 0)
 
             elif isinstance(slice_, INTEGER_TYPES):
