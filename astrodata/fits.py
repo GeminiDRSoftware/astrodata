@@ -479,7 +479,9 @@ class FitsLazyLoadable:
         if bscale == 1 and bzero == 0:
             return data
 
-        return (bscale * data + bzero).astype(self.dtype)
+        return (bscale * data + np.array(bzero, dtype=self.dtype)).astype(
+            self.dtype
+        )
 
     def __getitem__(self, arr_slice):
         """Get a slice of the data."""
