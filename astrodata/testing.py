@@ -266,7 +266,7 @@ def assert_most_close(
         if n_miss > max_miss:
             error_message = (
                 f"{n_miss} mismatching elements are more than the "
-                + f"expected {max_miss}."
+                + f"expected {max_miss}.\n"
                 + "\n".join(err.args[0].split("\n")[3:])
             )
 
@@ -318,7 +318,7 @@ def assert_most_equal(actual, desired, max_miss, verbose=True):
         if n_miss > max_miss:
             error_message = (
                 f"{n_miss} mismatching elements are more than the "
-                + f"expected {max_miss}."
+                + f"expected {max_miss}.\n"
                 + "\n".join(err.args[0].split("\n")[3:])
             )
 
