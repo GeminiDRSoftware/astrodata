@@ -253,7 +253,10 @@ class AstroDataMixin:
     @property
     def size(self):
         """The size of the data."""
-        return self._data.size
+        try:
+            return self._data.size
+        except AttributeError:  # for LazyLoadable
+            return np.multiply.reduce(self.shape)
 
 
 class FakeArray:
