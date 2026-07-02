@@ -1077,14 +1077,15 @@ def windowed_operation(
     if result is None:
         result = NDAstroData(
             np.empty(shape, dtype=dtype),
-            variance=np.zeros(shape, dtype=dtype) if with_uncertainty else None,
+            variance=np.zeros(shape, dtype=dtype) if with_uncertainty else None, # noqa: E501
             mask=np.empty(shape, dtype=np.uint16) if with_mask else None,
             meta=deepcopy(sequence[0].meta),
             wcs=sequence[0].wcs,
         )  # fmt: skip
-    elif result.shape != shape:
+    elif any(inlen > reslen for inlen, reslen in zip(shape, result.shape)):
         raise ValueError(
-            "Object 'result' has a different shape than the inputs"
+            "Object 'result' has a smaller shape ({}) than the "
+            "inputs ({})".format(result.shape, shape)
         )
     else:  # Don't update these things if they already exist
         if result.meta is None:
