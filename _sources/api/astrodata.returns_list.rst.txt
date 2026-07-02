@@ -1,0 +1,6 @@
+returns_list
+============
+
+.. currentmodule:: astrodata
+
+.. autofunction:: returns_list

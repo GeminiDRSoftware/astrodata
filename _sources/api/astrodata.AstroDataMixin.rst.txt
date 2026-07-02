@@ -1,0 +1,23 @@
+AstroDataMixin
+==============
+
+.. currentmodule:: astrodata
+
+.. autoclass:: AstroDataMixin
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~AstroDataMixin.shape
+      ~AstroDataMixin.size
+      ~AstroDataMixin.variance
+      ~AstroDataMixin.wcs
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: shape
+   .. autoattribute:: size
+   .. autoattribute:: variance
+   .. autoattribute:: wcs
