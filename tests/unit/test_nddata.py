@@ -60,6 +60,12 @@ def test_getattr(testnd):
     with pytest.raises(AttributeError):
         testnd.BAD_ATTR
 
+def _stack(arrays):
+    arrays = [x for x in arrays]
+    data = np.array([arr.data for arr in arrays]).sum(axis=0)
+    unc = np.array([arr.uncertainty.array for arr in arrays]).sum(axis=0)
+    mask = np.array([arr.mask for arr in arrays]).sum(axis=0)
+    return NDAstroData(data=data, variance=unc, mask=mask)
 
 def test_var(testnd):
     data = np.zeros(5)
@@ -80,15 +86,8 @@ def test_window(testnd):
 
 
 def test_windowedOp(testnd):
-    def stack(arrays):
-        arrays = [x for x in arrays]
-        data = np.array([arr.data for arr in arrays]).sum(axis=0)
-        unc = np.array([arr.uncertainty.array for arr in arrays]).sum(axis=0)
-        mask = np.array([arr.mask for arr in arrays]).sum(axis=0)
-        return NDAstroData(data=data, variance=unc, mask=mask)
-
     result = windowed_operation(
-        stack,
+        _stack,
         [testnd, testnd],
         kernel=(3, 3),
         with_uncertainty=True,
@@ -100,11 +99,33 @@ def test_windowedOp(testnd):
 
     nd2 = NDAstroData(data=np.zeros((4, 4)))
     with pytest.raises(ValueError, match=r"Can't calculate final shape.*"):
-        result = windowed_operation(stack, [testnd, nd2], kernel=(3, 3))
+        result = windowed_operation(_stack, [testnd, nd2], kernel=(3, 3))
 
     with pytest.raises(AssertionError, match=r"Incompatible shape.*"):
-        result = windowed_operation(stack, [testnd, testnd], kernel=[3], shape=(5, 5))
+        result = windowed_operation(_stack, [testnd, testnd], kernel=[3],
+                                    shape=(5, 5))
 
+def test_windowedOp_with_result(testnd):
+    result = NDAstroData(data=np.empty_like(testnd.data),
+                         variance=np.empty_like(testnd.data),
+                         mask=np.empty_like(testnd.data, dtype=np.uint16))
+    windowed_operation(_stack, [testnd, testnd],
+               kernel=(3, 3),
+               result=result,
+               with_uncertainty=True,
+               with_mask=True)
+
+    assert_array_equal(result.data, testnd.data * 2)
+    assert_array_equal(result.uncertainty.array, testnd.uncertainty.array * 2)
+    assert result.mask[3, 4] == 2
+
+    nd2 = NDAstroData(data=np.zeros((4, 4)))
+    with pytest.raises(ValueError, match=r"Can't calculate final shape.*"):
+        result = windowed_operation(_stack, [testnd, nd2], kernel=(3, 3))
+
+    with pytest.raises(AssertionError, match=r"Incompatible shape.*"):
+        result = windowed_operation(_stack, [testnd, testnd], kernel=[3],
+                                    shape=(5, 5))
 
 @pytest.mark.skip(
     "This is tested elsewhere, not explicitly. Not entirely "
