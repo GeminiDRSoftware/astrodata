@@ -688,10 +688,16 @@ class NDAstroData(AstroDataMixin, NDArithmeticMixin, NDSlicingMixin, NDData):
         """
         self.data[section] = input_data.data
 
-        if self.uncertainty is not None:
+        if (
+            self.uncertainty is not None
+            and getattr(input_data, "uncertainty", None) is not None
+        ):
             self.uncertainty.array[section] = input_data.uncertainty.array
 
-        if self.mask is not None:
+        if (
+            self.mask is not None
+            and getattr(input_data, "mask", None) is not None
+        ):
             self.mask[section] = input_data.mask
 
     def __repr__(self):
