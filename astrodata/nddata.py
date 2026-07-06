@@ -255,7 +255,6 @@ class AstroDataMixin:
         """The size of the data."""
         return np.multiply.reduce(self.shape)
 
-    @property
     def has_mask(self):
         """
         Check if there is mask.
@@ -264,7 +263,6 @@ class AstroDataMixin:
         """
         return self.window[(slice(0, 1),) * len(self.shape)].mask is not None
 
-    @property
     def has_variance(self):
         """
         Check if there is a variance array.
