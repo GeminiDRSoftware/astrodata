@@ -10,7 +10,13 @@ import numpy as np
 from astropy import coordinates as coord
 from astropy import units as u
 from astropy.io import fits
-from astropy.modeling import CompoundModel, core, models, projections
+from astropy.modeling import (
+    CompoundModel,
+    core,
+    models,
+    projections,
+    bind_bounding_box,
+)
 from astropy.table import Table
 from gwcs import coordinate_frames as cf
 from gwcs import utils as gwutils
@@ -1089,6 +1095,11 @@ def fitswcs_other(header, other=None):
                 )
             else:
                 other_model = models.Tabular2D(lookup_table=table.T)
+                bind_bounding_box(
+                    other_model,
+                    other_model.bounding_box.bounding_box(order="F"),
+                    order="F",
+                )
 
             other_model.name = model_name_mapping.get(ctype[:4], ctype[:4])
 
