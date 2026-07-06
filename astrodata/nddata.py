@@ -253,10 +253,28 @@ class AstroDataMixin:
     @property
     def size(self):
         """The size of the data."""
-        try:
-            return self._data.size
-        except AttributeError:  # for LazyLoadable
-            return np.multiply.reduce(self.shape)
+        return np.multiply.reduce(self.shape)
+
+    @property
+    def has_mask(self):
+        """
+        Check if there is mask.
+
+        Returns True if the mask is not None without loading the whole array.
+        """
+        return self.window[(slice(0, 1),) * len(self.shape)].mask is not None
+
+    @property
+    def has_variance(self):
+        """
+        Check if there is a variance array.
+
+        Returns True if the variance is not None without loading the whole
+        array.
+        """
+        return (
+            self.window[(slice(0, 1),) * len(self.shape)].variance is not None
+        )
 
 
 class FakeArray:
