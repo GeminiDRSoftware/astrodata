@@ -1019,6 +1019,7 @@ def _apply_func(func, sequence, boxes, result, **kwargs):
                 else:
                     result.meta["other"][k] = v
 
+        del out
         gc.collect()
 
 
@@ -1072,7 +1073,7 @@ def windowed_operation(
         shape = _get_shape(sequence)
 
     if dtype is None:
-        dtype = sequence[0].window[:1, :1].data.dtype
+        dtype = sequence[0].window[(slice(0, 1),) * len(shape)].data.dtype
 
     if result is None:
         result = NDAstroData(
