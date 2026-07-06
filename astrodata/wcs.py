@@ -12,10 +12,10 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.modeling import (
     CompoundModel,
+    bind_bounding_box,
     core,
     models,
     projections,
-    bind_bounding_box,
 )
 from astropy.table import Table
 from gwcs import coordinate_frames as cf
