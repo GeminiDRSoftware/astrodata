@@ -664,17 +664,20 @@ def download_from_archive(
         local_path = os.path.join(cache_path, filename)
 
         if cache and os.path.exists(local_path):
-            # Get the md5 of the file on disk
-            with open(local_path, "rb") as filep:
-                digest = hashlib.file_digest(filep, "md5")
-            file_md5 = digest.hexdigest()
-            # Get the md5 from GOA
-            fileinfourl = url.replace("/file/", "/jsonfilelist/present/")
-            fileinfo = requests.get(
-                fileinfourl, headers={"User-Agent": "astropy"}
-            ).json()
-            goa_md5 = fileinfo[0].get("data_md5")
-            download_it = file_md5 != goa_md5
+            if url.startswith(GEMINI_ARCHIVE_URL):
+                # Get the md5 of the file on disk
+                with open(local_path, "rb") as filep:
+                    digest = hashlib.file_digest(filep, "md5")
+                file_md5 = digest.hexdigest()
+                # Get the md5 from GOA
+                fileinfourl = url.replace("/file/", "/jsonfilelist/present/")
+                fileinfo = requests.get(
+                    fileinfourl, headers={"User-Agent": "astropy"}
+                ).json()
+                goa_md5 = fileinfo[0].get("data_md5")
+                download_it = file_md5 != goa_md5
+            else:
+                download_it = False
 
         if download_it:
             # Use a context that suppresses the output of the download command
