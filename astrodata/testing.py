@@ -3,6 +3,7 @@
 
 import enum
 import functools
+import hashlib
 import io
 import itertools
 import logging
@@ -19,6 +20,7 @@ from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from typing import Iterable
 
 import numpy as np
+import requests
 from astropy.io import fits
 from astropy.table import Table
 from astropy.utils.data import download_file
@@ -658,29 +660,40 @@ def download_from_archive(
 
     # Now check if the local file exists and download if not
     try:
+        download_it = True
         local_path = os.path.join(cache_path, filename)
 
         if cache and os.path.exists(local_path):
-            # Use the cached file
-            return local_path
+            # Get the md5 of the file on disk
+            with open(local_path, "rb") as filep:
+                digest = hashlib.file_digest(filep, "md5")
+            file_md5 = digest.hexdigest()
+            # Get the md5 from GOA
+            fileinfourl = url.replace("/file/", "/jsonfilelist/present/")
+            fileinfo = requests.get(
+                fileinfourl, headers={"User-Agent": "astropy"}
+            ).json()
+            goa_md5 = fileinfo[0].get("data_md5")
+            download_it = file_md5 != goa_md5
 
-        # Use a context that suppresses the output of the download command
-        with open(os.devnull, "w") as devnull:
-            stdout_prev = sys.stdout
+        if download_it:
+            # Use a context that suppresses the output of the download command
+            with open(os.devnull, "w") as devnull:
+                stdout_prev = sys.stdout
 
-            if suppress_stdout:
-                sys.stdout = devnull
+                if suppress_stdout:
+                    sys.stdout = devnull
 
-            try:
-                tmp_path = download_file(url, cache=False)
+                try:
+                    tmp_path = download_file(url, cache=False)
 
-            finally:
-                sys.stdout = stdout_prev
+                finally:
+                    sys.stdout = stdout_prev
 
-        shutil.move(tmp_path, local_path)
+            shutil.move(tmp_path, local_path)
 
-        # `download_file` ignores Access Control List - fixing it
-        os.chmod(local_path, 0o664)
+            # `download_file` ignores Access Control List - fixing it
+            os.chmod(local_path, 0o664)
 
     except Exception as err:
         if not fail_on_error:
