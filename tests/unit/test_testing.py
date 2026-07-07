@@ -23,6 +23,7 @@ from astrodata.testing import (
     skip_if_download_none,
 )
 
+import astropy
 from astropy.io import fits
 from astropy.modeling import models, Model, Parameter
 
@@ -53,32 +54,26 @@ def test_download_from_archive(monkeypatch, tmp_path):
 
     def mock_download(remote_url, **kwargs):
         nonlocal ncall
-        ncall += 1
-        fname = remote_url.split("/")[-1]
-        # Create a fake file
-        with open(os.path.join(tmp_path, fname), "w+") as _:
-            pass
 
-        return str(os.path.join(tmp_path, fname))
+        # We have to download *something* to check the md5, even if the file
+        # is on disk. So we only do that if the *file* download is requested
+        if "file" in remote_url:
+            ncall += 1
+            return astropy.utils.data.download_file(remote_url, cache=False)
 
-    env_var = "TEST_NEW_CACHE"
+    env_var = "ASTRODATA_TEST"
     monkeypatch.setenv(env_var, str(tmp_path))
     monkeypatch.setattr("astrodata.testing.download_file", mock_download)
 
-    archive_filename = "THIS_IS_A_TEST.fits"
-
-    # In case fname is not set, we need to set it to something that will fail
-    fname = ".this_does_not_exist.fits"
-
     try:
         # first call will use our mock function above
-        fname = astrodata.testing.download_from_archive(archive_filename)
+        fname = download_from_archive('N20170529S0168.fits')
         assert os.path.exists(fname)
         assert ncall == 1
 
         # second call will use the cache so we check that our mock function is not
         # called twice
-        fname = astrodata.testing.download_from_archive(archive_filename)
+        fname = download_from_archive('N20170529S0168.fits')
         assert os.path.exists(fname)
         assert ncall == 1
 
