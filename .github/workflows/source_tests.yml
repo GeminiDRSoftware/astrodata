@@ -43,24 +43,24 @@ jobs:
                   if [[ "$RUNNER_OS" == "macOS" ]]; then
                     brew install gcc
                     echo "FC=gfortran" >> $GITHUB_ENV
-                    brew install openblas
+                    brew install openblas pkgconfig
                   else
                     echo "No action needed for Fortran compiler on $RUNNER_OS"
                   fi
 
-            - name: Build project with OpenBLAS paths
+            - name: Set OpenBLAS paths
               run: |
                 if [[ "$RUNNER_OS" == "macOS" ]]; then
-                  # Dynamically determine the Homebrew prefix (supports both Intel and Apple Silicon runners)
+                  # Dynamically determine the Homebrew prefix
                   BREW_PREFIX=$(brew --prefix openblas)
-                  
+
                   # Inject paths into the environment for compilers/linkers
-                  echo 'LDFLAGS="-L${BREW_PREFIX}/lib"' >> $GITHUB_ENV
-                  echo 'CPPFLAGS="-I${BREW_PREFIX}/include"' >> $GITHUB_ENV
-                  echo 'PKG_CONFIG_PATH="${BREW_PREFIX}/lib/pkgconfig"' >> $GITHUB_ENV
+                  echo "LDFLAGS=-L${BREW_PREFIX}/lib" >> $GITHUB_ENV
+                  echo "CPPFLAGS=-I${BREW_PREFIX}/include" >> $GITHUB_ENV
+                  echo "PKG_CONFIG_PATH=${BREW_PREFIX}/lib/pkgconfig" >> $GITHUB_ENV
 
                   # Also useful if your build relies on CMake
-                  echo 'OpenBLAS_DIR="${BREW_PREFIX}"' >> $GITHUB_ENV
+                  echo "OpenBLAS_DIR=${BREW_PREFIX}" >> $GITHUB_ENV
                 else
                   echo "No additional OpenBLAS build steps needed for $RUNNER_OS"
                 fi
