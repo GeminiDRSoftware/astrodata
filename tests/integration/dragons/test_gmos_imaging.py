@@ -140,20 +140,21 @@ def test_gmos_imaging_tutorial_star_field(
     )
 
     # Initialize calibration service
-    if os.path.exists("calibration.db"):
-        os.remove("calibration.db")
-
-    caldb = cal_service.set_local_database()
-    caldb.init(wipe=True)
+    caldb = calibration_service
 
     for bpm in dataselect.select_data(all_files, ["BPM"]):
         caldb.add_cal(bpm)
 
     assert caldb.list_files()
 
+    # Passing the location of the dragonsrc directly to the Reduce
+    # instance because the DRAGONSRC environment variable does not seem
+    # to be picked up when reduce is run.  (Not a DRAGONS bug.)
+
     # Primary/"Master" bias
     reduce_bias = Reduce()
     reduce_bias.files.extend(biases)
+    reduce_bias.config_file = ".dragonsrc"
     reduce_bias.runr()
 
     bias_files = glob.glob("*bias*")
@@ -165,6 +166,7 @@ def test_gmos_imaging_tutorial_star_field(
     # Primary/"Master" flat
     reduce_flats = Reduce()
     reduce_flats.files.extend(flats)
+    reduce_flats.config_file = ".dragonsrc"
     reduce_flats.runr()
 
     flat_files = glob.glob("*flat*")
@@ -176,6 +178,7 @@ def test_gmos_imaging_tutorial_star_field(
     # Science images
     reduce_science = Reduce()
     reduce_science.files.extend(science)
+    reduce_science.config_file = ".dragonsrc"
     reduce_science.runr()
 
     science_files = glob.glob("*image*")

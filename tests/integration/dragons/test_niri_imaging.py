@@ -123,11 +123,7 @@ def test_niri_imaging_tutorial_star_field(
     cal_service = importlib.import_module("recipe_system.cal_service")
 
     # Initialize calibration service
-    if os.path.exists("calibration.db"):
-        os.remove("calibration.db")
-
-    caldb = cal_service.LocalDB("./calibration.db")
-    caldb.init()
+    caldb = calibration_service
 
     # Use dataselect to sort data for reduction.
     all_files = sorted([str(path) for path in data.values()])
@@ -190,6 +186,7 @@ def test_niri_imaging_tutorial_star_field(
     # Darks
     reduce_darks = Reduce()
     reduce_darks.files.extend(darks_20_sec)
+    reduce_darks.config_file = ".dragonsrc"
     reduce_darks.runr()
 
     # Using glob to ignore the metadata stuff in case of changes.
@@ -206,6 +203,7 @@ def test_niri_imaging_tutorial_star_field(
         caldb.add_cal(bpm)
 
     reduce_bpm = Reduce()
+    reduce_bpm.config_file = ".dragonsrc"
     reduce_bpm.files.extend(flats)
     reduce_bpm.files.extend(darks_1_sec)
     reduce_bpm.recipename = "makeProcessedBPM"
@@ -220,6 +218,7 @@ def test_niri_imaging_tutorial_star_field(
 
     # Flats
     reduce_flats = Reduce()
+    reduce_flats.config_file = ".dragonsrc"
     reduce_flats.files.extend(flats)
     reduce_flats.uparms = [("addDQ:user_bpm", bpm)]
     reduce_flats.runr()
@@ -233,6 +232,7 @@ def test_niri_imaging_tutorial_star_field(
 
     # Standard star
     reduce_std = Reduce()
+    reduce_std.config_file = ".dragonsrc"
     reduce_std.files.extend(standard_stars)
     reduce_std.uparms = [("addDQ:user_bpm", bpm)]
     reduce_std.uparms.append(("darkCorrect:do_cal", "skip"))
@@ -246,6 +246,7 @@ def test_niri_imaging_tutorial_star_field(
 
     # Science
     reduce_target = Reduce()
+    reduce_target.config_file = ".dragonsrc"
     reduce_target.files.extend(science)
     reduce_target.uparms = [("addDQ:user_bpm", bpm)]
     reduce_target.uparms.append(("skyCorrect:scale_sky", False))

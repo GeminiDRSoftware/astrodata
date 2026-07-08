@@ -17,21 +17,13 @@ import nox
 
 # Logic required because tomllib was introduced to the standard library in
 # python version 3.11.
-if sys.version_info[1] > 11:
+if sys.version_info[1] >= 11:
     import tomllib
 
-elif sys.version_info[0] < 3 or sys.version_info[1] < 10:
+elif sys.version_info[0] < 3 or sys.version_info[1] < 11:
     major, minor = sys.version_info[0], sys.version_info[1]
     py_version = f"{major}.{minor}"
-    raise Exception(f"Python version below 3.10 (using {py_version})")
-
-else:
-    # Only for python 3.10 support, which wont' be maintained much longer.
-    # To be removed when we drop support for python 3.10 (see: ISSUE #73)
-    from pip._vendor import tomli
-
-    tomllib = tomli
-
+    raise Exception(f"Python version below 3.11 (using {py_version})")
 
 # Nox configuration
 # Default nox sessions to run when executing "nox" without session
@@ -86,7 +78,6 @@ class SessionVariables:
 
     # Python versions
     python_versions: ClassVar[list[str]] = [
-        "3.10",
         "3.11",
         "3.12",
     ]  # fmt: skip
@@ -521,7 +512,7 @@ def dragons_release_tests(session: nox.Session) -> None:
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
         "--quiet",
-        "dragons==4.0",
+        "dragons==4.2",
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
     )
@@ -599,7 +590,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
             session.log("DRAGONS repository already exists. Skipping clone.")
 
         with session.cd("dragons"):
-            session.run("git", "checkout", "v4.0.0", external=True)
+            session.run("git", "checkout", "master", external=True)
             # Install the DRAGONS package
             session.install("-e", ".", "numpy<2")
 
@@ -684,13 +675,19 @@ def integration_test_build(session: nox.Session) -> None:
     apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
-    # Fetch test dependencies from the poetry.lock file.
-    install_test_dependencies(session)
+    # We install the poetry dependency first, otherwise they will
+    # wipe clean the dragons conda dependencies.  Also install the
+    # core dependencies with conda to ensure that numpy and scipy
+    # match each other.  (one conda and one pip does not work)
+    install_test_dependencies(
+        session, poetry_groups=["main"], conda_install=True
+    )
+    install_test_dependencies(session, poetry_groups=["test"])
 
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
         "--quiet",
-        "dragons==3.2",
+        "dragons==4.2",
         "ds9",
         channel=SessionVariables.dragons_conda_channels,
     )
@@ -807,7 +804,7 @@ def build_tests_unit(session: nox.Session) -> None:
         unit_test_build(session)
 
 
-@nox.session(venv_backend="conda", python="3.10", tags=["build_tests"])
+@nox.session(venv_backend="conda", python="3.12", tags=["build_tests"])
 @use_devpi_server
 def build_tests_integration(session):
     """Build tests using the devpi server.
@@ -1068,7 +1065,9 @@ def dragons_calibration(
     apply_macos_config(session)
 
     # We install the poetry dependency first, otherwise they will
-    # wipe clean the dragons conda dependencies.
+    # wipe clean the dragons conda dependencies. Also install the
+    # core dependencies with conda to ensure that numpy and scipy
+    # match each other.  (one conda and one pip does not work)
     install_test_dependencies(
         session, poetry_groups=["main"], conda_install=True
     )

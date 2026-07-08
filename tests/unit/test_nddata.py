@@ -196,11 +196,12 @@ def test_wcs_slicing():
     assert nd[:, ::-1].wcs(10, 10) == (39, 10)
 
     # Test when two identity models are used
+    inter_frame = Frame2D(name="inter_frame")
     i_gwcs = gWCS(
         [
             (in_frame, models.Identity(2)),
-            (out_frame, models.Identity(2)),
-            (in_frame, models.Identity(2)),
+            (inter_frame, models.Identity(2)),
+            (out_frame, None),
         ]
     )
 
