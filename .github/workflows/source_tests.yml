@@ -38,12 +38,14 @@ jobs:
                     3.11
                     3.12
 
-            -name: "Install Fortran Compiler"
-             run: |
-                 if [[ "$RUNNER_OS" == "macOS" ]]; then
-                     brew install gcc
-                     echo "FC=gfortran" >> $GITHUB_ENV
-                 fi
+            - name: "Install Fortran Compiler"
+              run: |
+                  if [[ "$RUNNER_OS" == "macOS" ]]; then
+                    brew install gcc
+                    echo "FC=gfortran" >> $GITHUB_ENV
+                  else
+                    echo "No action needed for Fortran compiler on $RUNNER_OS"
+                  fi
 
             - name: "Install dependencies"
               run: |
