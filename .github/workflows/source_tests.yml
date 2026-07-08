@@ -53,7 +53,7 @@ jobs:
                 if [[ "$RUNNER_OS" == "macOS" ]]; then
                   # Dynamically determine the Homebrew prefix (supports both Intel and Apple Silicon runners)
                   BREW_PREFIX=$(brew --prefix openblas)
-                  
+
                   # Inject paths into the environment for compilers/linkers
                   echo 'LDFLAGS="-L${BREW_PREFIX}/lib"' >> $GITHUB_ENV
                   echo 'CPPFLAGS="-I${BREW_PREFIX}/include"' >> $GITHUB_ENV
