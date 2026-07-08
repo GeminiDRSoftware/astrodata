@@ -43,6 +43,7 @@ jobs:
                  if [[ "$RUNNER_OS" == "macOS" ]]; then
                      brew install gcc
                      echo "FC=gfortran" >> $GITHUB_ENV
+                 fi
 
             - name: "Install dependencies"
               run: |
