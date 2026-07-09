@@ -804,10 +804,12 @@ def build_tests_unit(session: nox.Session) -> None:
         unit_test_build(session)
 
 
-@nox.session(venv_backend="conda",
-             venv_params=SessionVariables.dragons_venv_params,
-             python="3.12",
-             tags=["build_tests"])
+@nox.session(
+    venv_backend="conda",
+    venv_params=SessionVariables.dragons_venv_params,
+    python="3.12",
+    tags=["build_tests"],
+)
 @use_devpi_server
 def build_tests_integration(session):
     """Build tests using the devpi server.
