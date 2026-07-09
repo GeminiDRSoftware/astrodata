@@ -703,7 +703,7 @@ def integration_test_build(session: nox.Session) -> None:
     session.run("pytest", *SessionVariables.dragons_pytest_options, *pos_args)
 
 
-@nox.session
+@nox.session(python="3.12")
 def coverage(session: nox.Session) -> None:
     """Run the tests and generate a coverage report."""
     apply_data_caching_environment_variable(session)
@@ -804,7 +804,10 @@ def build_tests_unit(session: nox.Session) -> None:
         unit_test_build(session)
 
 
-@nox.session(venv_backend="conda", python="3.12", tags=["build_tests"])
+@nox.session(venv_backend="conda",
+             venv_params=SessionVariables.dragons_venv_params,
+             python="3.12",
+             tags=["build_tests"])
 @use_devpi_server
 def build_tests_integration(session):
     """Build tests using the devpi server.
