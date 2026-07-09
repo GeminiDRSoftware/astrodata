@@ -35,9 +35,35 @@ jobs:
               uses: "actions/setup-python@v5"
               with:
                   python-version: |
-                    3.10
                     3.11
                     3.12
+
+            - name: "Install Fortran Compiler and OpenBLAS"
+              run: |
+                  if [[ "$RUNNER_OS" == "macOS" ]]; then
+                    brew install gcc
+                    echo "FC=gfortran" >> $GITHUB_ENV
+                    brew install openblas pkgconfig
+                  else
+                    echo "No action needed for Fortran compiler on $RUNNER_OS"
+                  fi
+
+            - name: Set OpenBLAS paths
+              run: |
+                if [[ "$RUNNER_OS" == "macOS" ]]; then
+                  # Dynamically determine the Homebrew prefix
+                  BREW_PREFIX=$(brew --prefix openblas)
+
+                  # Inject paths into the environment for compilers/linkers
+                  echo "LDFLAGS=-L${BREW_PREFIX}/lib" >> $GITHUB_ENV
+                  echo "CPPFLAGS=-I${BREW_PREFIX}/include" >> $GITHUB_ENV
+                  echo "PKG_CONFIG_PATH=${BREW_PREFIX}/lib/pkgconfig" >> $GITHUB_ENV
+
+                  # Also useful if your build relies on CMake
+                  echo "OpenBLAS_DIR=${BREW_PREFIX}" >> $GITHUB_ENV
+                else
+                  echo "No additional OpenBLAS build steps needed for $RUNNER_OS"
+                fi
 
             - name: "Install dependencies"
               run: |
@@ -87,7 +113,6 @@ jobs:
 #              uses: "actions/setup-python@v5"
 #              with:
 #                  python-version: |
-#                    3.10
 #                    3.11
 #                    3.12
 #
@@ -139,7 +164,7 @@ jobs:
             - name: "Setup Python"
               uses: actions/setup-python@v5
               with:
-                  python-version: "3.10"
+                  python-version: "3.12"
 
             - uses: conda-incubator/setup-miniconda@v3
 

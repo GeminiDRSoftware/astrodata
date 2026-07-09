@@ -12,10 +12,10 @@ readme = "README.md"
 "Repository" = "https://github.com/GeminiDRSoftware/astrodata/"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 astropy = "^6.0.0"
 asdf = "^3.1.0"
-gwcs = "^0.21.0"
+gwcs = ">=0.25,<=1.0.0a0"
 jsonschema = "^4.21.1"
 numpy = "^1.26.4"
 requests = "^2.34.0"
