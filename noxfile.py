@@ -454,7 +454,12 @@ def install_test_dependencies(
                 if "semantic-version" not in line:
                     print(line, end="")
 
-        session.conda_install("--quiet", "--file", str(req_file_path))
+        session.conda_install(
+            "--quiet",
+            "--file",
+            str(req_file_path),
+            channel=SessionVariables.dragons_conda_channels,
+        )
 
 
 def apply_macos_config(session: nox.Session) -> None:
