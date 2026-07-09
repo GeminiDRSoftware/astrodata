@@ -28,10 +28,10 @@ jobs:
 
         steps:
             - name: "Check out the repo"
-              uses: "actions/checkout@v4"
+              uses: "actions/checkout@v7"
 
             - name: "Set up Python"
-              uses: "actions/setup-python@v5"
+              uses: "actions/setup-python@v6"
               with:
                   python-version: |
                     3.11
@@ -60,10 +60,10 @@ jobs:
 #
 #        steps:
 #            - name: "Check out the repo"
-#              uses: "actions/checkout@v4"
+#              uses: "actions/checkout@v7"
 #
 #            - name: "Set up Python"
-#              uses: "actions/setup-python@v5"
+#              uses: "actions/setup-python@v6"
 #              with:
 #                  python-version: |
 #                    3.11
@@ -108,10 +108,10 @@ jobs:
                     - "3.12"
 
         steps:
-            - uses: "actions/checkout@v4"
+            - uses: "actions/checkout@v7"
 
             - name: "Set up Python"
-              uses: "actions/setup-python@v5"
+              uses: "actions/setup-python@v6"
               with:
                   python-version: ${{ matrix.python-version }}
 
@@ -121,7 +121,7 @@ jobs:
                   python -m pip install nox poetry
                   poetry self add poetry-plugin-export
 
-            - uses: conda-incubator/setup-miniconda@v3
+            - uses: conda-incubator/setup-miniconda@v4
               with:
                 python-version: "${{ matrix.python-version }}"
                 conda-remove-defaults: "true"
