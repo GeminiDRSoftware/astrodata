@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import nox
+from packaging.markers import Marker
 
 # Logic required because tomllib was introduced to the standard library in
 # python version 3.11.
@@ -46,13 +47,13 @@ class SessionVariables:
         dragons_channel,
     ]
     dragons_github_url = "https://github.com/GeminiDRSoftware/DRAGONS.git"
-    dragons_dev_packages = [
-        "astropy>=6",
-        "astroquery",
-        "matplotlib",
-        "numpy==1.26.*",
-        "psutil",
-    ]
+    # dragons_dev_packages = [
+    #     "astropy>=7.1.2,
+    #     "astroquery",
+    #     "matplotlib",
+    #     "numpy==1.26.*",
+    #     "psutil",
+    # ]
 
     dragons_venv_params = [
         v for channel in dragons_conda_channels for v in ("-c", channel)
@@ -297,9 +298,11 @@ class DevpiServerManager:
         # Set the pip index URL
         session.env["PIP_INDEX_URL"] = (
             f"http://localhost:{port}/testuser/dev/+simple/"
+            # f"http://localhost:{port}/testuser/dev/"
         )
 
         self.index_url = f"http://localhost:{port}/testuser/dev/+simple/"
+        # self.index_url = f"http://localhost:{port}/testuser/dev/"
 
     def stop_devpi_server(self):
         """Stop the devpi server."""
@@ -443,8 +446,11 @@ def install_test_dependencies(
         # Remove it.
         with fileinput.input(files=str(req_file_path), inplace=True) as file:
             for line in file:
-                new_line = line.split(";")[0]
-                print(new_line, end="\n")
+                line_components = line.split(";")
+                marker = Marker(line_components[1].strip())
+                if marker.evaluate():
+                    new_line = line_components[0].strip()
+                    print(new_line, end="\n")
 
         # In the poetry.lock, pip asdf requires 'semantic-veersion'.
         # semantic-version is non available as conda package, so clearly
@@ -597,7 +603,8 @@ def dragons_dev_tests(session: nox.Session) -> None:
         with session.cd("dragons"):
             session.run("git", "checkout", "master", external=True)
             # Install the DRAGONS package
-            session.install("-e", ".", "numpy<2")
+            # session.install("-e", ".", "numpy<2")
+            session.install("-e", ".")
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
@@ -699,7 +706,7 @@ def integration_test_build(session: nox.Session) -> None:
 
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
-    session.conda_install("--quiet", "numpy=1.26")
+    # session.conda_install("--quiet", "numpy=1.26")
     session.install("astrodata")
 
     # Positional arguments after -- are passed to pytest.
@@ -1085,7 +1092,7 @@ def dragons_calibration(
 
     session.conda_install(
         "--quiet",
-        "dragons==4.0",
+        "dragons==4.2",
         channel=SessionVariables.dragons_conda_channels,
     )
 
