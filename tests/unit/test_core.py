@@ -238,10 +238,14 @@ def test_write_and_read(tmp_path, capsys):
     ad.info()
     captured = capsys.readouterr()
 
-    # Windows uses int32, linux/OSX uses int64
+    # In numpy < 2, Windows uses int32, linux/OSX uses int64
     if os.name == "nt":
-        scifmt = "int32"
-        valfmt = "int32"
+        if np.__version__ < "2":
+            scifmt = "int32"
+            valfmt = "int32"
+        else:
+            scifmt = "int64"
+            valfmt = "int64"
 
     elif os.name == "posix":
         scifmt = "int64"

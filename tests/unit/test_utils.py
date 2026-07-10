@@ -26,8 +26,8 @@ def test_header_for_table():
 
     hdr = header_for_table(tbl)
 
-    # Windows uses int32 (J), unix uses int64 (K)
-    if os.name == "nt":
+    # In numpy < 2, Windows uses int32 (J), unix uses int64 (K)
+    if os.name == "nt" and np.__version__ < "2":
         tform_value = "8J"
 
     else:
