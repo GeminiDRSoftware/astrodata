@@ -30,7 +30,7 @@
 `astrodata`
 =============
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-![Supported python versions -- 3.10, 3.11, and 3.12](https://img.shields.io/badge/3.10|3.11|3.12-%234b8bbe?logo=Python&logoColor=%234b8bbe&label=For%20Python%3A)
+![Supported python versions -- 3.11 and 3.12](https://img.shields.io/badge/3.11|3.12-%234b8bbe?logo=Python&logoColor=%234b8bbe&label=For%20Python%3A)
 [![DOI Badge][zenodo DOI badge]][zenodo DOI link]
 [![pyOpenSci Peer Reviewed][pyopensci peer review badge]][pyopensci review link]
 
