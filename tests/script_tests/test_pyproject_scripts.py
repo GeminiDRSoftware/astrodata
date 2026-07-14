@@ -9,14 +9,13 @@ import shlex
 import subprocess
 import sys
 from pathlib import Path
+import tempfile
 
 import pytest
 
-if int(sys.version_info[0]) == 3 and int(sys.version_info[1]) >= 12:
-    from tomllib import load as toml_load
+from tomllib import load as toml_load
 
-else:
-    from tomli import load as toml_load
+from . import extract_python_code
 
 
 @functools.cache
@@ -39,45 +38,41 @@ def scripts() -> dict[str, str]:
     return scripts
 
 
-def create_rst_extract_command(script: str, options: str | list[str]) -> str:
-    """If the script is a Python script, use ``rst-extract``."""
-    python_binary = sys.executable
-    command = [
-        python_binary,
-        "-m",
-        "rst_extract",
-        str(script),
-        "--execute",
-        "--python-bin",
-        str(python_binary),
-    ]
-
-    if isinstance(options, str):
-        options = shlex.split(options)
-
-    command += options
-
-    return command
-
-
 @pytest.mark.parametrize("script, options", tuple(scripts().items()))
 def test_script_executes(
     script: str, options: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Test the script."""
-    # Use temporary directory as the working directory
-    command = create_rst_extract_command(script, options)
 
+    # Read the RST file.
+    with open(script, "r") as file:
+        rst_content = file.read()
+
+    # Extract the Python code blocks from the RST content and write them
+    # to a temporary Python file.
+    extracted_code_blocks = extract_python_code(rst_content)
+    with tempfile.NamedTemporaryFile(suffix=".py", mode="w", delete=False) as temp_file:
+        temp_file.write("\n\n".join(extracted_code_blocks))
+        temp_file_path = Path(temp_file.name)
+
+    # Use temporary directory as the working directory
     monkeypatch.chdir(tmp_path)
-    result = subprocess.run(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
+
+    # Run the temporary Python file using subprocess and capture the output.
+    try:
+        result = subprocess.run(
+                ['python', temp_file_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+    finally:
+        # Clean up the temporary file
+        temp_file_path.unlink()
 
     return_code = result.returncode
     stdout = result.stdout.decode()
     stderr = result.stderr.decode()
+
+    print(f"STDERR for {script}:\n{stderr}")
 
     assert return_code == 0
     assert not stderr

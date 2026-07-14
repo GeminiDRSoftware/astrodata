@@ -53,7 +53,7 @@ pytest-doctestplus = "^1.2.1"
 hypothesis = "^6.99.13"
 nox = ">=2024.4.15"
 watchdog = "^6.0.0"
-#rst-extract = {git = "https://github.com/teald/rst_extract/"}
+docutils = "^0.20.1"
 objgraph = "^3.6.2"
 
 
@@ -233,6 +233,6 @@ convention = "numpy"
 [tool.ruff.lint.flake8-pytest-style]
 mark-parentheses = false
 
-#[tool.script_tests]
-#"docs/quickstart.rst" = ""
-#"docs/manuals/usermanual/intro.rst" = ""
+[tool.script_tests]
+"docs/quickstart.rst" = ""
+"docs/manuals/usermanual/intro.rst" = ""
