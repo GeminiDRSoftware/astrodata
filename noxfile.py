@@ -675,11 +675,11 @@ def unit_test_build(session: nox.Session) -> None:
 
     # Install the package from the devpi server
     session.install(
-            "--trusted-host",
-            "localhost",
-            "--index-url",
-            session.env["PIP_INDEX_URL"],
-            "astrodata==0.0.0",
+        "--trusted-host",
+        "localhost",
+        "--index-url",
+        session.env["PIP_INDEX_URL"],
+        "astrodata==0.0.0",
     )
 
     # Positional arguments after -- are passed to pytest.
@@ -718,11 +718,11 @@ def integration_test_build(session: nox.Session) -> None:
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
     # session.conda_install("--quiet", "numpy=1.26")
     session.install(
-            "--trusted-host",
-            "localhost",
-            "--index-url",
-            session.env["PIP_INDEX_URL"],
-            "astrodata==0.0.0",
+        "--trusted-host",
+        "localhost",
+        "--index-url",
+        session.env["PIP_INDEX_URL"],
+        "astrodata==0.0.0",
     )
 
     # Positional arguments after -- are passed to pytest.
