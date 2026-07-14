@@ -1,5 +1,5 @@
-from docutils.core import publish_doctree
 from docutils import nodes
+from docutils.core import publish_doctree
 
 
 class PythonCodeBlockExtractor(nodes.NodeVisitor):
