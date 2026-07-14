@@ -294,15 +294,19 @@ class DevpiServerManager:
         session.run("devpi", "index", "-c", "dev", "bases=root/pypi")
         session.run("devpi", "use", "-l")
         session.run("devpi", "use", "testuser/dev")
+        session.run(
+            "devpi", "index", "testuser/dev", "mirror_whitelist=astrodata"
+        )
 
         # Set the pip index URL
+        session.env["DEVPI_INDEX_URL"] = (
+            f"http://localhost:{port}/testuser/dev/"
+        )
         session.env["PIP_INDEX_URL"] = (
             f"http://localhost:{port}/testuser/dev/+simple/"
-            # f"http://localhost:{port}/testuser/dev/"
         )
 
         self.index_url = f"http://localhost:{port}/testuser/dev/+simple/"
-        # self.index_url = f"http://localhost:{port}/testuser/dev/"
 
     def stop_devpi_server(self):
         """Stop the devpi server."""
@@ -670,7 +674,13 @@ def unit_test_build(session: nox.Session) -> None:
     install_test_dependencies(session, poetry_groups=["test"])
 
     # Install the package from the devpi server
-    session.install("astrodata")
+    session.install(
+            "--trusted-host",
+            "localhost",
+            "--index-url",
+            session.env["PIP_INDEX_URL"],
+            "astrodata==0.0.0",
+    )
 
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
@@ -707,7 +717,13 @@ def integration_test_build(session: nox.Session) -> None:
     # Need to downgrade numpy because of DRAGONS issue 464
     # https://github.com/GeminiDRSoftware/DRAGONS/issues/464
     # session.conda_install("--quiet", "numpy=1.26")
-    session.install("astrodata")
+    session.install(
+            "--trusted-host",
+            "localhost",
+            "--index-url",
+            session.env["PIP_INDEX_URL"],
+            "astrodata==0.0.0",
+    )
 
     # Positional arguments after -- are passed to pytest.
     pos_args = session.posargs
@@ -780,23 +796,46 @@ def build_and_publish_to_devpi(session: nox.Session):
 
     session.run("poetry", "build", f"--output={tmp_build_dir}", external=True)
 
+    _DEBUG = False
+    if _DEBUG:
+        session.run(
+            "curl",
+            "-u",
+            "testuser:123",
+            "-I",
+            "http://localhost:1420/testuser/dev/",
+            external=True,
+        )
+        session.run(
+            "curl",
+            "-u",
+            "testuser:123",
+            "http://localhost:1420/testuser/dev/astrodata",
+            external=True,
+        )
+
     # Shows available indexes
     poetry_config_env_vars = {
-        "POETRY_REPOSITORIES_BUILD_TEST_URL": session.env["PIP_INDEX_URL"],
-        "POETRY_REPOSITORIES_BUILD_TEST_USERNAME": "testuser",
-        "POETRY_REPOSITORIES_BUILD_TEST_PASSWORD": "123",
+        "POETRY_REPOSITORIES_BUILD_TEST_URL": session.env["DEVPI_INDEX_URL"],
+        # "POETRY_HTTP_BASIC_BUILD_TEST_USERNAME": "testuser",
+        # "POETRY_HTTP_BASIC_BUILD_TEST_PASSWORD": "123",
+        "PYTHON_KEYRING_BACKEND": "keyring.backends.null.Keyring",
     }
 
+    # poetry is not picking up the authentication from the environment
+    # variables, so we will pass them as arguments.
     _result = session.run(
         "poetry",
         "publish",
         "--repository",
         "build_test",
+        "--username", "testuser",
+        "--password", "123",
         f"--dist-dir={tmp_build_dir.absolute()}",
         "--no-cache",
         external=True,
         env=poetry_config_env_vars,
-    )
+    )  # fmt: skip
 
 
 @nox.session(python=SessionVariables.python_versions, tags=["build_tests"])
@@ -856,6 +895,30 @@ def build_tests_scripts(session: nox.Session) -> None:
     apply_data_caching_environment_variable(session)
     build_and_publish_to_devpi(session)
 
+    # This debug block proved useful in debugging the devpi server.
+    _DEBUG = False
+    if _DEBUG:
+        session.run(
+            "devpi",
+            "use",
+            f"http://localhost:{SessionVariables.devpi_port()}/testuser/dev",
+        )
+        session.run("devpi", "list", "--all", "astrodata")
+        session.run("devpi", "use")
+
+        # session.run(
+        #     "curl",
+        #     "http://localhost:1420/testuser/dev",
+        #     silent=False,
+        #     external=True
+        # )
+        # session.run(
+        #     "curl",
+        #     "http://localhost:1420/testuser/dev/+simple/astrodata/",
+        #     silent=False,
+        #     external=True
+        # )
+
     working_dir = Path(session.create_tmp())
 
     with session.chdir(working_dir):
@@ -863,7 +926,13 @@ def build_tests_scripts(session: nox.Session) -> None:
         install_test_dependencies(session, poetry_groups=["test"])
 
         # Install the package from the devpi server
-        session.install("astrodata")
+        session.install(
+            "--trusted-host",
+            "localhost",
+            "--index-url",
+            session.env["PIP_INDEX_URL"],
+            "astrodata==0.0.0",
+        )
 
         # Run the tests. Need to pass arguments to pytest.
         test_dir = Path(__file__).parent / "tests" / "script_tests"
