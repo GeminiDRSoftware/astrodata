@@ -266,11 +266,17 @@ class DevpiServerManager:
 
         devpi_server_path = result.strip()
 
+        # The request-timeout helps when using a conda environment.
         self.server_process = subprocess.Popen(
-            [devpi_server_path, "--serverdir", tmp_dir, "--port", str(port)],  # noqa: S603
+            [
+                devpi_server_path,
+                "--serverdir", tmp_dir,
+                "--port", str(port),
+                "--request-timeout", "30",
+            ],  # noqa: S603
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-        )
+        )  # fmt: skip
 
         # Wait for the server to start
         session.log("Waiting for devpi server to start...")
@@ -443,7 +449,9 @@ def install_test_dependencies(
         req_file_path.write_text("\n".join(packages))
 
     if not conda_install:
-        session.install("-r", str(req_file_path))
+        # Raising the timeout helps when devpi is used with a
+        # conda environment.  (eg. build_tests_integration session)
+        session.install("-r", str(req_file_path), "--timeout=30")
 
     else:
         # The poetry exports a python_version range.  conda cannot parse that.
