@@ -671,7 +671,7 @@ def conda_unit_tests(session: nox.Session) -> None:
     session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
-def unit_test_build(session: nox.Session) -> None:
+def unit_test_build(session: nox.Session, version: str) -> None:
     """Run the unit tests using the build version of the package.
 
     This is meant to be called from the `build_tests` session.
@@ -687,7 +687,7 @@ def unit_test_build(session: nox.Session) -> None:
         "localhost",
         "--index-url",
         session.env["PIP_INDEX_URL"],
-        "astrodata==0.0.0",
+        f"astrodata=={version}",
     )
 
     # Positional arguments after -- are passed to pytest.
@@ -697,7 +697,7 @@ def unit_test_build(session: nox.Session) -> None:
     session.run("pytest", *SessionVariables.unit_pytest_options, *pos_args)
 
 
-def integration_test_build(session: nox.Session) -> None:
+def integration_test_build(session: nox.Session, version: str) -> None:
     """Run the integration tests using the build version of the package.
 
     This is meant to be called from the `build_tests` session.
@@ -730,7 +730,7 @@ def integration_test_build(session: nox.Session) -> None:
         "localhost",
         "--index-url",
         session.env["PIP_INDEX_URL"],
-        "astrodata==0.0.0",
+        f"astrodata=={version}",
     )
 
     # Positional arguments after -- are passed to pytest.
@@ -793,7 +793,7 @@ def use_devpi_server(func):
     return wrapper
 
 
-def build_and_publish_to_devpi(session: nox.Session):
+def build_and_publish_to_devpi(session: nox.Session) -> str:
     """Build the astrodata package and publish it.
 
     If the devpi server is not running, this will raise an error.
@@ -803,6 +803,9 @@ def build_and_publish_to_devpi(session: nox.Session):
     tmp_build_dir.mkdir()
 
     session.run("poetry", "build", f"--output={tmp_build_dir}", external=True)
+
+    sdist = next(Path(tmp_build_dir).glob("astrodata-*.tar.gz"))
+    version = sdist.stem.removeprefix("astrodata-").removesuffix(".tar")
 
     _DEBUG = False
     if _DEBUG:
@@ -845,6 +848,8 @@ def build_and_publish_to_devpi(session: nox.Session):
         env=poetry_config_env_vars,
     )  # fmt: skip
 
+    return version
+
 
 @nox.session(python=SessionVariables.python_versions, tags=["build_tests"])
 @use_devpi_server
@@ -855,12 +860,12 @@ def build_tests_unit(session: nox.Session) -> None:
     and run the tests using the build version of the package.
     """
     apply_data_caching_environment_variable(session)
-    build_and_publish_to_devpi(session)
+    version = build_and_publish_to_devpi(session)
 
     working_dir = Path(session.create_tmp())
 
     with session.chdir(working_dir):
-        unit_test_build(session)
+        unit_test_build(session, version)
 
 
 @nox.session(
@@ -877,12 +882,12 @@ def build_tests_integration(session):
     and run the tests using the build version of the package.
     """
     apply_data_caching_environment_variable(session)
-    build_and_publish_to_devpi(session)
+    version = build_and_publish_to_devpi(session)
 
     working_dir = Path(session.create_tmp())
 
     with session.chdir(working_dir):
-        integration_test_build(session)
+        integration_test_build(session, version)
 
 
 @nox.session(python=SessionVariables.python_versions)
@@ -901,7 +906,7 @@ def script_tests(session: nox.Session) -> None:
 def build_tests_scripts(session: nox.Session) -> None:
     """Run the script tests using the build version of the package."""
     apply_data_caching_environment_variable(session)
-    build_and_publish_to_devpi(session)
+    version = build_and_publish_to_devpi(session)
 
     # This debug block proved useful in debugging the devpi server.
     _DEBUG = False
@@ -939,8 +944,14 @@ def build_tests_scripts(session: nox.Session) -> None:
             "localhost",
             "--index-url",
             session.env["PIP_INDEX_URL"],
-            "astrodata==0.0.0",
+            f"astrodata=={version}",
         )
+        if _DEBUG:
+            session.run(
+                "python",
+                "-c",
+                "import astrodata; print(astrodata.__version__)",
+            )
 
         # Run the tests. Need to pass arguments to pytest.
         test_dir = Path(__file__).parent / "tests" / "script_tests"
