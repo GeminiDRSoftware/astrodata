@@ -12,8 +12,7 @@ enable = true
 vcs = "git"
 style = "pep440"
 # your tags are plain "1.2.3", not "v1.2.3", so drop the v from the pattern:
-pattern = "^(?P<base>\\d+\\.\\d+\\.\\d+)"
-
+pattern = "^(?P<base>\\d+\\.\\d+\\.\\d+)(\\.?(?P<stage>[a-zA-Z]+)\\.?(?P<revision>\\d+)?)?"
 
 [tool.poetry.urls]
 "Homepage" = "https://github.com/GeminiDRSoftware/astrodata/"
