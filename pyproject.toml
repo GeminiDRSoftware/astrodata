@@ -6,6 +6,15 @@ authors = ["D. J. Teal <dillon.teal@noirlab.com>", "DRAGONS development team"]
 license = "BSD3"
 readme = "README.md"
 
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+# your tags are plain "1.2.3", not "v1.2.3", so drop the v from the pattern:
+pattern = "^(?P<base>\\d+\\.\\d+\\.\\d+)"
+
+
 [tool.poetry.urls]
 "Homepage" = "https://github.com/GeminiDRSoftware/astrodata/"
 "Documentation" = "https://geminidrsoftware.github.io/astrodata/"
@@ -62,8 +71,8 @@ devpi-server = "^6.14.0"
 devpi-client = "^7.2.0"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.pytest.ini_options]
 testpaths = [
