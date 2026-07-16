@@ -5,6 +5,7 @@ on:
     tags:
       # Matches any tags; tags are only used for versioning in this project.
       - '*'
+      - '!*dev*'
   workflow_dispatch:
 
 jobs:
@@ -17,44 +18,35 @@ jobs:
     name: Build tests
     uses: ./.github/workflows/build_tests.yml
 
-  deploy:
+  build:
+    name: Build package
     needs: [source_test, build_test]
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish_pure_python.yml@v2
+    with:
+      python-version: '3.12'
+      save_artifacts: true
+      upload_to_pypi: false   # never let this workflow attempt the upload itself
+
+  upload:
+    name: Upload to PyPI
+    if: ${{ github.event_name != 'workflow_dispatch' }}
+    needs: [build]
     runs-on: ubuntu-latest
 
+    environment:
+      name: pypi
+      url: https://pypi.org/project/astrodata/
+
     permissions:
-      # This permission is required for trusted publishing.
-      id-token: write
-      contents: read
+      id-token: write   # required for trusted publishing
 
     steps:
-      - uses: actions/checkout@v7
-
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v6
+      - name: Download built dists
+        uses: actions/download-artifact@v7
         with:
-          python-version: '3.10'
+          merge-multiple: true
+          pattern: dist-*
+          path: dist
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-create: false
-
-      - name: Update version (kept at 0.0.0) in pyproject.toml and build
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        run: |
-          poetry version ${{ github.ref_name }}
-          poetry version
-          poetry build
-
-      - name: Mint token
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        id: mint
-        uses: tschm/token-mint-action@v1.0.3
-
-      - name: Publish the package with poetry
-        # Allow workflow dispatch to trigger this job, but don't allow it
-        # to publish the package to PyPI.
-        if: ${{ github.event_name != 'workflow_dispatch' }}
-        run: |
-           echo "PUBLISHING!!!! ✨🚀"
-           poetry publish -u __token__ -p '${{ steps.mint.outputs.api-token }}'
+      - name: Publish the package
+        uses: pypa/gh-action-pypi-publish@release/v1
