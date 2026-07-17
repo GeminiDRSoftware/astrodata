@@ -35,7 +35,7 @@ jobs:
             - name: "Check git tags"
               run: |
                 git fetch --tags
-                git describe --tags
+                git describe --tags --always
 
             - name: "Set up Python"
               uses: "actions/setup-python@v6"
@@ -122,7 +122,7 @@ jobs:
             - name: "Check git tags"
               run: |
                 git fetch --tags
-                git describe --tags
+                git describe --tags --always
 
             - name: "Set up Python"
               uses: "actions/setup-python@v6"
