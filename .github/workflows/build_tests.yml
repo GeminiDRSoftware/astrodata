@@ -29,6 +29,13 @@ jobs:
         steps:
             - name: "Check out the repo"
               uses: "actions/checkout@v7"
+              with:
+                fetch-depth: 0
+
+            - name: "Check git tags"
+              run: |
+                git fetch --tags
+                git describe --tags
 
             - name: "Set up Python"
               uses: "actions/setup-python@v6"
@@ -109,6 +116,13 @@ jobs:
 
         steps:
             - uses: "actions/checkout@v7"
+              with:
+                fetch-depth: 0
+
+            - name: "Check git tags"
+              run: |
+                git fetch --tags
+                git describe --tags
 
             - name: "Set up Python"
               uses: "actions/setup-python@v6"
