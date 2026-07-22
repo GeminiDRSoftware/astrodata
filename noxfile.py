@@ -81,6 +81,8 @@ class SessionVariables:
     python_versions: ClassVar[list[str]] = [
         "3.11",
         "3.12",
+        "3.13",
+        "3.14",
     ]  # fmt: skip
 
     # devpi server information
@@ -454,13 +456,26 @@ def install_test_dependencies(
         session.install("-r", str(req_file_path), "--timeout=30")
 
     else:
+        # Get the session's python version.
+        cmd = [
+            "python",
+            "-c",
+            (
+                "import sys;"
+                "print(f'{sys.version_info.major}.{sys.version_info.minor}')"
+            ),
+        ]
+        session_python_version = session.run(*cmd, silent=True).strip()
+
         # The poetry exports a python_version range.  conda cannot parse that.
         # Remove it.
         with fileinput.input(files=str(req_file_path), inplace=True) as file:
             for line in file:
                 line_components = line.split(";")
                 marker = Marker(line_components[1].strip())
-                if marker.evaluate():
+                if marker.evaluate(
+                    environment={"python_version": session_python_version}
+                ):
                     new_line = line_components[0].strip()
                     print(new_line, end="\n")
 
