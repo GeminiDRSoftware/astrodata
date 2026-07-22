@@ -13,7 +13,6 @@ vcs = "git"
 style = "pep440"
 # your tags are plain "1.2.3", not "v1.2.3", so drop the v from the pattern:
 pattern = "^(?P<base>\\d+\\.\\d+\\.\\d+)(\\.?(?P<stage>[a-zA-Z]+)\\.?(?P<revision>\\d+)?)?"
-fallback-version = "0.0.0.dev0"
 
 [tool.poetry.urls]
 "Homepage" = "https://github.com/GeminiDRSoftware/astrodata/"
@@ -26,7 +25,10 @@ astropy = ">=7.1.2"
 asdf = ">=4.0.0"
 gwcs = ">=0.25,<=1.0.0a0"
 jsonschema = "^4.21.1"
-numpy = ">=1.26"
+numpy = [
+    {version = "<2.5.0", python = "<3.12"},
+    {version = ">=2.0.0", python = "^3.12"},
+]
 requests = "^2.34.0"
 
 
