@@ -689,7 +689,7 @@ def download_from_archive(
                     sys.stdout = devnull
 
                 try:
-                    tmp_path = download_file(url, cache=False)
+                    tmp_path = download_file(url, cache=False, timeout=30.0)
 
                 finally:
                     sys.stdout = stdout_prev
