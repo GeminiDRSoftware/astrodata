@@ -59,7 +59,9 @@ def test_download_from_archive(monkeypatch, tmp_path):
         # is on disk. So we only do that if the *file* download is requested
         if "file" in remote_url:
             ncall += 1
-            return astropy.utils.data.download_file(remote_url, cache=False)
+            return astropy.utils.data.download_file(
+                remote_url, cache=False, timeout=30.0
+            )
 
     env_var = "ASTRODATA_TEST"
     monkeypatch.setenv(env_var, str(tmp_path))
