@@ -50,9 +50,10 @@ Requirements
 
 To install |astrodata|, you will need the following:
 
-- Python 3.10, 3.11, or 3.12
+- Python 3.11, 3.12, 3.13 or 3.14
 - Poetry_ in some flavor
-- ``poetry-plugin-export``, installed into the same environment as Poetry_
+- ``poetry-plugin-export`` and ``poetry-dynamic-versioning[plugin]``,
+  installed into the same environment as Poetry_
 - Nox_ (optional, see note below)
 
 Please see the Poetry_ and nox_ documentation for installation instructions.
@@ -71,6 +72,9 @@ installed properly:
 
    pipx install poetry
    poetry self add poetry-plugin-export
+   poetry self add "poetry-dynamic-versioning[plugin]"
+   poetry self add "poetry-dynamic-versioning[plugin]"
+
    pipx install nox
 
 .. note::
@@ -177,11 +181,11 @@ You can see the available sessions by running:
 
 This will output information about available session to run. To select a
 specific session, use the ``-s`` flag. For example, to run the unit tests on a
-Python 3.10 build of |astrodata|:
+Python 3.12 build of |astrodata|:
 
 .. code-block:: bash
 
-   nox -s "build_tests-3.10(unit)""
+   nox -s "build_tests-3.12(unit)""
 
 Or, to run the normal unit tests and not the linter:
 

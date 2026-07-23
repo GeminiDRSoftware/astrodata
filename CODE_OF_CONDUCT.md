@@ -80,9 +80,10 @@ Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement.  All complaints
 will be reviewed and investigated promptly and fairly.  Presently, this is
 through the primary maintainer of `astrodata`
-([teald](https://github.com/teald), email: teal.dillon@gmail.com) and [GitHub
-Issues](https://github.com/GeminiDRSoftware/astrodata/issues) for situations where anonymity/urgency is required, but we are working on a better, anonymized means of accepting feedback,
-concerns, and complaints alongside these avenues.
+([Kathleen Labrie](https://github.com/KathleenLabrie),
+email: kathleen.labrie@noirlab.edu) and [GitHub
+Issues](https://github.com/GeminiDRSoftware/astrodata/issues) for situations
+where urgency is required.
 
 All community leaders are obligated to respect the privacy and security of the
 reporter of any incident.

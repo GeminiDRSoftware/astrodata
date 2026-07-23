@@ -28,7 +28,7 @@ Submit an issue to [our GitHub
 issues](https://github.com/GeminiDRSoftware/astrodata/issues) for problems you
 are unsure you have a solution to, or do not currently have the time to work on
 yourself. Even if you may plan to work on it sometime in the future, it's
-useful to log the issue in case someone else is already working on it!
+useful to log the issue in case someone else is already working on it.
 
 We include several issue templates with fill-in-the-answer style formatting to
 make your submission as quick and easy as possible. Ideally, you will provide a
@@ -42,17 +42,12 @@ external dependencies---are better than none!
 Pull request are also managed on the `astrodata` [GitHub
 page](https://github.com/GeminiDRSoftware/astrodata/issues). Pull requests
 (PR's) let you contribute directly to the `astrodata` codebase with code,
-documentation, or anything else _you've_ written! These may seem more
-intimidating than an issue, but the only real difference is that you are
-contributing code.
+documentation, or anything else _you've_ written.
 
 Otherwise, the process is basically the same; contributers weigh in, the
 situation is discussed as needed, and at the end of the discussion the code
 is improved. There's no "finality" to a PR. There is always time to dicuss
 the changes as carefully as with an issue.
-
-If this still feels too complicated or intimidating, feel free to raise an
-issue or contact a maintainer directly.
 
 **See [GitHub's guide to contributing through PRs](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request)** for more information about how to start a PR.
 
@@ -64,4 +59,6 @@ reach out to one of the core maintainers directly:
 
 ### Maintainers
 
-+ Teal (dillon.teal@noirlab.edu)
++ Kathleen Labrie (kathleen.labrie@noirlab.edu)
++ Chris Simpson (chris.simpson@noirlab.edu)
++ James Turner (james.turner@noirlab.edu)

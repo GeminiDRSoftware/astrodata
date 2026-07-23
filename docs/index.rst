@@ -1,8 +1,6 @@
 astrodata Documentation
 -----------------------
 
-This is the documentation for astrodata.
-
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
