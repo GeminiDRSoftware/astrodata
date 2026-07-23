@@ -14,7 +14,7 @@
 [pypi package version badge]: https://badge.fury.io/py/astrodata.svg
 [source test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/source_tests.yml/badge.svg
 [build test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/build_tests.yml/badge.svg
-[zenodo DOI badge]: https://zenodo.org/badge/DOI/10.5281/zenodo.14804282.svg
+[zenodo DOI badge]: https://img.shields.io/badge/DOI-10.5281%2Fzenodo.14804282-blue.svg
 [pyopensci peer review badge]: https://pyopensci.org/badges/peer-reviewed.svg
 
 <p align="center">
@@ -30,7 +30,7 @@
 `astrodata`
 =============
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-![Supported python versions -- 3.11 and 3.12](https://img.shields.io/badge/3.11|3.12-%234b8bbe?logo=Python&logoColor=%234b8bbe&label=For%20Python%3A)
+![Supported python versions -- 3.11, 3.12, 3.13, and 3.14](https://img.shields.io/badge/3.11|3.12|3.13|3.14-%234b8bbe?logo=Python&logoColor=%234b8bbe&label=For%20Python%3A)
 [![DOI Badge][zenodo DOI badge]][zenodo DOI link]
 [![pyOpenSci Peer Reviewed][pyopensci peer review badge]][pyopensci review link]
 
@@ -58,9 +58,9 @@ Making astronomical data consistent and approachable
 `astrodata` is a package for managing astronomical data through a uniform
 interface. It is designed to be used with the
 [Astropy package][astropy link]. `astrodata` was created
-for use as part of the [`DRAGONS`][DRAGONS link] data reduction pipeline, but it is now
-implemented to be useful for any astronomical data reduction or analysis
-project.
+for use as part of the [`DRAGONS`][DRAGONS link] data reduction pipeline. It
+is now distributed as a standalone package.  With an added data mapping
+module, it can be used for any astronomical data reduction or analysis project.
 
 Unlike managing files using the ``astropy.io.fits`` package alone, ``astrodata``
 is designed to be extendible to any data format, and to parse, respond to, and
@@ -68,7 +68,8 @@ store metadata in a consistent, intentional way. This makes it especially
 useful for managing data from multiple instruments, telescopes, and data
 generation utilities.
 
-**Note:** If you are trying to reduce Gemini data, please use [`DRAGONS`][DRAGONS link].
+**Note:** If you are trying to reduce Gemini data, please use
+[`DRAGONS`][DRAGONS link].
 Interaction with this package directly is primarily suited for developers, and
 does not come with any tools for data reduction on any specific instrument or
 data.
@@ -86,7 +87,8 @@ python -m pip install astrodata
 Documentation
 -------------
 
-Documentation for ``astrodata`` is available on our [GitHub pages site][astrodata docs]. This documentation includes a
+Documentation for ``astrodata`` is available on our
+[GitHub pages site][astrodata docs]. This documentation includes a
 user and programmer's guide, as well as a full API reference.
 
 
@@ -209,7 +211,7 @@ remember that your contribution is immensely appreciated---no matter how small!
 License
 -------
 
-This project is Copyright 2024 (c)  and licensed under the terms of a modified
+This project is Copyright 2026 (c)  and licensed under the terms of a modified
 BSD 3-clause license through AURA astronomy. This package is based upon the
 [Openastronomy packaging
 guide](https://github.com/OpenAstronomy/packaging-guide) which is licensed
@@ -221,6 +223,3 @@ Citations
 
 To cite `astrodata` in your work, please see [CITATION.md][citation link]
 for complete information, including a `bibtex` example.
-
-For ease of reference, the current citation to use is:
-[Simpson et al. 2024][DRAGONS citation].
