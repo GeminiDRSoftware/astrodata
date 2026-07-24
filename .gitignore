@@ -50,6 +50,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+_badges/
+coverage-badge.svg
 
 # Translations
 *.mo
