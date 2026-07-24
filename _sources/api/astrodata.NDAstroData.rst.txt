@@ -1,0 +1,39 @@
+NDAstroData
+===========
+
+.. currentmodule:: astrodata
+
+.. autoclass:: NDAstroData
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~NDAstroData.T
+      ~NDAstroData.data
+      ~NDAstroData.mask
+      ~NDAstroData.uncertainty
+      ~NDAstroData.variance
+      ~NDAstroData.window
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~NDAstroData.set_section
+      ~NDAstroData.transpose
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: T
+   .. autoattribute:: data
+   .. autoattribute:: mask
+   .. autoattribute:: uncertainty
+   .. autoattribute:: variance
+   .. autoattribute:: window
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: set_section
+   .. automethod:: transpose

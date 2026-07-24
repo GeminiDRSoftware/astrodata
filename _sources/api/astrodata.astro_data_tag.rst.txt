@@ -1,0 +1,6 @@
+astro_data_tag
+==============
+
+.. currentmodule:: astrodata
+
+.. autofunction:: astro_data_tag
