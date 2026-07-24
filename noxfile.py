@@ -791,6 +791,14 @@ def docs(session: nox.Session) -> None:
         f"{index_loc.absolute().as_uri()}"
     )
 
+    session.run("coverage", "xml")
+    session.run(
+        "genbadge",
+        "coverage",
+        "-i", "./coverage.xml",
+        "-o", "_build/coverage.svg"
+    )  # fmt: skip
+
 
 def use_devpi_server(func):
     """Start and stop a devpi server for the session.

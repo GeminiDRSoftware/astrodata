@@ -53,6 +53,8 @@ sphinx-rtd-theme = "^3.0.0"
 #myst-parser = "^2.0.0"
 #tomli = "^2.0.1"
 #pygments = "^2.17.2"
+coverage = "^7.10.6"
+genbadge = { extras = ["coverage"], version = "^1.1.3" }
 
 [tool.poetry.group.test]
 
@@ -130,6 +132,7 @@ exclude_lines = [
   # Don't worry about breakpoints (from testing file)
   "breakpoint",
 ]
+precision = 1
 
 
 # TODO: Expand ruff settings
