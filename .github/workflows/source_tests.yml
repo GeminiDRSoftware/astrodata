@@ -10,6 +10,9 @@ on:
     workflow_dispatch:
     workflow_call:
 
+permissions:
+  contents: write
+
 defaults:
     run:
         shell: bash -l {0} # Login shell for conda
