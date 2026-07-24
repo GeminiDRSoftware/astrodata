@@ -210,3 +210,11 @@ jobs:
                   name: coverage-data
                   path: .coverage
                   include-hidden-files: true
+
+            - name: "Publish badge (own subfolder, clean overwrite of just this file)"
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: ./_badges
+                destination_dir: badges
+                keep_files: true
