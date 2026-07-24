@@ -768,6 +768,16 @@ def coverage(session: nox.Session) -> None:
     # Generate the HTML report.
     session.run("coverage", "html")
 
+    # Create a coverage badge
+    session.run("coverage", "xml")
+    session.run("mkdir", "-p", "_badges", external=True)
+    session.run(
+        "genbadge",
+        "coverage",
+        "-i", "./coverage.xml",
+        "-o", "_badges/coverage.svg"
+    )  # fmt: skip
+
 
 @nox.session
 def docs(session: nox.Session) -> None:

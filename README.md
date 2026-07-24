@@ -8,7 +8,7 @@
 [zenodo DOI link]: https://doi.org/10.5281/zenodo.14804282
 [pyopensci review link]: https://github.com/pyOpenSci/software-review/issues/181
 
-[coverage badge]: https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/teald/d2f3af2a279efc1f6e90d457a3c50e47/raw/covbadge.json
+[coverage badge]: https://geminidrsoftware.github.io/astrodata/badges/coverage.svg
 [docs build badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/documentation.yml/badge.svg
 [pypi packaging badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/publish_pypi.yml/badge.svg
 [pypi package version badge]: https://badge.fury.io/py/astrodata.svg

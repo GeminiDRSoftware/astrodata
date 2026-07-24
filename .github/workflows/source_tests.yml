@@ -10,6 +10,9 @@ on:
     workflow_dispatch:
     workflow_call:
 
+permissions:
+  contents: write
+
 defaults:
     run:
         shell: bash -l {0} # Login shell for conda
@@ -91,8 +94,17 @@ jobs:
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v7
               with:
-                  name: covdata
-                  path: .coverage.*
+                  name: coverage-data
+                  path: .coverage
+                  include-hidden-files: true
+
+            - name: "Publish badge (own subfolder, clean overwrite of just this file)"
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                github_token: ${{ secrets.GITHUB_TOKEN }}
+                publish_dir: ./_badges
+                destination_dir: badges
+                keep_files: true
 
 #    documentation_tests:
 #        name: "Documentation testing on ${{ matrix.os }}"
@@ -206,5 +218,6 @@ jobs:
             - name: "Upload coverage data"
               uses: actions/upload-artifact@v7
               with:
-                  name: covdata
-                  path: .coverage.*
+                  name: coverage-data
+                  path: .coverage
+                  include-hidden-files: true
