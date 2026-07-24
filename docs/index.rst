@@ -11,6 +11,12 @@ astrodata Documentation
    api_short
 
 
+.. toctree::
+   :maxdepth: 1
+
+   credits.rst
+
+
 Indices and tables
 ==================
 
