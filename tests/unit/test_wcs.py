@@ -65,7 +65,7 @@ def test_calculate_affine_matrices(angle, scale, xoffset, yoffset):
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_reading_and_writing_sliced_image(F2_IMAGE, tmp_path):
-    ad = astrodata.from_file(F2_IMAGE)
+    ad = astrodata.open(F2_IMAGE)
     result = ad[0].wcs(100, 100, 0)
 
     ad[0].reset(ad[0].nddata[0])
@@ -74,11 +74,11 @@ def test_reading_and_writing_sliced_image(F2_IMAGE, tmp_path):
     test_file_loc = os.path.join(tmp_path, "test.fits")
 
     ad.write(test_file_loc, overwrite=True)
-    ad2 = astrodata.from_file(test_file_loc)
+    ad2 = astrodata.open(test_file_loc)
     assert_allclose(ad2[0].wcs(100, 100), result)
 
     ad2.write(test_file_loc, overwrite=True)
-    ad2 = astrodata.from_file(test_file_loc)
+    ad2 = astrodata.open(test_file_loc)
     assert_allclose(ad2[0].wcs(100, 100), result)
 
 
@@ -160,7 +160,7 @@ def test_remove_axis_from_model_5():
 @pytest.mark.dragons_remote_data
 def test_remove_unused_world_axis(F2_IMAGE):
     """A test with an intermediate frame"""
-    ad = astrodata.from_file(F2_IMAGE)
+    ad = astrodata.open(F2_IMAGE)
     result = ad[0].wcs(1000, 1000, 0)
     new_frame = cf.Frame2D(name="intermediate")
     new_model = models.Shift(100) & models.Shift(200) & models.Identity(1)
@@ -179,7 +179,7 @@ def test_remove_unused_world_axis(F2_IMAGE):
 @pytest.mark.dragons_remote_data
 def test_gwcs_creation(NIRI_IMAGE):
     """Test that the gWCS object for an image agrees with the FITS WCS"""
-    ad = astrodata.from_file(NIRI_IMAGE)
+    ad = astrodata.open(NIRI_IMAGE)
     w = WCS(ad[0].hdr)
     for y in range(0, 1024, 200):
         for x in range(0, 1024, 200):
@@ -196,7 +196,7 @@ def test_gwcs_creation(NIRI_IMAGE):
 # def test_adding_longslit_wcs(GMOS_LONGSLIT):
 #     """Test that adding the longslit WCS doesn't interfere with the sky
 #     coordinates of the WCS"""
-#     ad = astrodata.from_file(GMOS_LONGSLIT)
+#     ad = astrodata.open(GMOS_LONGSLIT)
 #     frame_name = ad[4].hdr.get("RADESYS", ad[4].hdr["RADECSYS"]).lower()
 #     crpix1 = ad[4].hdr["CRPIX1"] - 1
 #     crpix2 = ad[4].hdr["CRPIX2"] - 1
@@ -237,7 +237,7 @@ def test_gwcs_creation(NIRI_IMAGE):
 @pytest.mark.dragons_remote_data
 def test_loglinear_axis(NIRI_IMAGE, tmp_path, monkeypatch):
     """Test that we can add a log-linear axis and write and read it"""
-    ad = astrodata.from_file(NIRI_IMAGE)
+    ad = astrodata.open(NIRI_IMAGE)
     coords = ad[0].wcs(200, 300)
     ad[0].data = np.repeat(ad[0].data[:, :, np.newaxis], 5, axis=2)
     new_input_frame = adwcs.pixel_frame(3)
@@ -260,7 +260,7 @@ def test_loglinear_axis(NIRI_IMAGE, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
     ad.write("test.fits", overwrite=True)
-    ad2 = astrodata.from_file("test.fits")
+    ad2 = astrodata.open("test.fits")
     assert_allclose(ad2[0].wcs(2, 200, 300), new_coords)
 
 

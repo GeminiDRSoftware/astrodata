@@ -234,7 +234,7 @@ def test_write_and_read(tmp_path, capsys):
     testfile = str(os.path.join(tmp_path, "testfile.fits"))
     ad.write(testfile)
 
-    ad = astrodata.from_file(testfile)
+    ad = astrodata.open(testfile)
     ad.info()
     captured = capsys.readouterr()
 

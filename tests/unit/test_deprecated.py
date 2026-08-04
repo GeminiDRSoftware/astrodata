@@ -44,9 +44,9 @@ def ad(example_fits_file):
     return astrodata.from_file(example_fits_file)
 
 
-def test_open(example_fits_file):
+def test_from_file(example_fits_file):
     with pytest.warns(AstroDataDeprecationWarning):
-        astrodata.open(example_fits_file)
+        astrodata.from_file(example_fits_file)
 
 
 def test_deprecated_astrodatafactory_openFile(example_fits_file):

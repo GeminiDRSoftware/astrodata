@@ -75,7 +75,7 @@ class AstroData:
     .. warning::
 
         This class is not meant to be instantiated directly. Instead, use the
-        factory method :py:func:`astrodata.from_file` to create an instance of
+        factory method :py:func:`astrodata.open` to create an instance of
         this class using a file. Alternatively, use the
         :py:meth:`astrodata.create` function to create a new instance from
         scratch.

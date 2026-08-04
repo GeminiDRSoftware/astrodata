@@ -161,7 +161,7 @@ def BPM_PROVHISTORY():
 @skip_if_download_none
 @pytest.mark.dragons_remote_data
 def test_convert_provhistory(tmp_path, BPM_PROVHISTORY):
-    ad = astrodata.from_file(BPM_PROVHISTORY)
+    ad = astrodata.open(BPM_PROVHISTORY)
 
     # This file (should) use the old PROVHISTORY extname
     assert hasattr(ad, "PROVHISTORY")
@@ -179,7 +179,7 @@ def test_convert_provhistory(tmp_path, BPM_PROVHISTORY):
     ad.write()
     assert os.path.exists(testfile)
 
-    ad2 = astrodata.from_file(testfile)
+    ad2 = astrodata.open(testfile)
     assert hasattr(ad2, "HISTORY")
     assert not hasattr(ad2, "PROVHISTORY")
 

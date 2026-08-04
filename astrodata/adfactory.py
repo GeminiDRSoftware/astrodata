@@ -166,17 +166,17 @@ class AstroDataFactory:
         self._registry.remove(cls)
 
     @deprecated(
-        "Renamed to get_astro_data, please use that method instead: "
-        "astrodata.factory.AstroDataFactory.get_astro_data"
+        "Renamed to get_astrodata, please use that method instead: "
+        "astrodata.factory.AstroDataFactory.get_astrodata"
     )
     def getAstroData(self, source):  # noqa
         """Return an |AstroData| instance from a file or HDUList.
 
-        Deprecated, see |get_astro_data|.
+        Deprecated, see |get_astrodata|.
         """
-        self.get_astro_data(source)
+        self.get_astrodata(source)
 
-    def get_astro_data(self, source):
+    def get_astrodata(self, source):
         """Return an |AstroData| instance from a file or HDUList.
 
         Takes either a string (with the path to a file) or an HDUList as
@@ -190,13 +190,14 @@ class AstroDataFactory:
 
         Arguments
         ---------
-        source : `str` or `pathlib.Path` or `fits.HDUList`
-            The file path or HDUList to read.
+        source : `str`, `os.PathLike` or `fits.HDUList`
+            The path to the file or the HDUList object. If a string is passed,
+            it will be treated as a path to a file.
 
         Returns
         -------
-        `astrodata.AstroData`
-            An AstroData instance.
+        AstroData
+            An instantiated object. It will be a subclass of |AstroData|.
         """
         candidates = []
         exception_list = []
@@ -320,4 +321,4 @@ class AstroDataFactory:
             for ext in extensions:
                 lst.append(ext)
 
-        return self.get_astro_data(lst)
+        return self.get_astrodata(lst)

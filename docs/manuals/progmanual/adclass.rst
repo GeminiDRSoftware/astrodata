@@ -465,7 +465,7 @@ Finally, you need to include your class in the **AstroData Registry**. This is
 an internal structure with a list of all the |AstroData|\-derived classes that
 we want to make available for our programs. Including the classes in this
 registry is an important step, because a file should be opened using
-`astrodata.from_file` or `astrodata.create_from_scratch`, which uses the
+`astrodata.open` or `astrodata.create_from_scratch`, which uses the
 registry to identify the appropriate class (via the ``_matches_data`` methods),
 instead of having the user specify it explicitly.
 
