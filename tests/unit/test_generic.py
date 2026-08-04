@@ -66,7 +66,7 @@ def test_create_and_register_class(
     factory = fresh_ad_factory
     factory.add_class(TestClass)
 
-    ad = factory.get_astro_data(temporary_fits_file)
+    ad = factory.get_astrodata(temporary_fits_file)
 
     assert isinstance(ad, TestClass)
 
@@ -74,11 +74,11 @@ def test_create_and_register_class(
     factory = fresh_factory
 
     with pytest.raises(astrodata.AstroDataError):
-        factory.get_astro_data(temporary_fits_file)
+        factory.get_astrodata(temporary_fits_file)
 
     factory.add_class(TestClass)
 
-    ad = factory.get_astro_data(temporary_fits_file)
+    ad = factory.get_astrodata(temporary_fits_file)
 
     assert isinstance(ad, TestClass)
 
@@ -116,7 +116,7 @@ def test_create_and_register_conflicting_classes(
     factory.add_class(TestClass2)
 
     with pytest.raises(astrodata.AstroDataError):
-        factory.get_astro_data(temporary_fits_file)
+        factory.get_astrodata(temporary_fits_file)
 
     factory.remove_class("TestClass2")
     factory.add_class(TestClass3)
@@ -128,7 +128,7 @@ def test_create_and_register_conflicting_classes(
     factory.add_class(TestClass2)
 
     with pytest.raises(astrodata.AstroDataError):
-        factory.get_astro_data(temporary_fits_file)
+        factory.get_astrodata(temporary_fits_file)
 
     factory.remove_class(TestClass2)
     factory.add_class(TestClass3)
@@ -152,7 +152,7 @@ def test_create_and_register_class_with_no_matches(
     factory.add_class(TestClass)
 
     # Defaults to AstroData object in the pre-initialized factory.
-    ad = factory.get_astro_data(temporary_fits_file)
+    ad = factory.get_astrodata(temporary_fits_file)
 
     assert isinstance(ad, astrodata.AstroData)
 
@@ -160,12 +160,12 @@ def test_create_and_register_class_with_no_matches(
     factory = fresh_factory
 
     with pytest.raises(astrodata.AstroDataError):
-        factory.get_astro_data(temporary_fits_file)
+        factory.get_astrodata(temporary_fits_file)
 
     factory.add_class(TestClass)
 
     with pytest.raises(astrodata.AstroDataError):
-        factory.get_astro_data(temporary_fits_file)
+        factory.get_astrodata(temporary_fits_file)
 
 
 def test_create_class_with_tags(
@@ -193,7 +193,7 @@ def test_create_class_with_tags(
     factory = fresh_ad_factory
     factory.add_class(TestClass)
 
-    ad = factory.get_astro_data(temporary_fits_file)
+    ad = factory.get_astrodata(temporary_fits_file)
 
     assert isinstance(ad, TestClass)
 
@@ -201,11 +201,11 @@ def test_create_class_with_tags(
     factory = fresh_factory
 
     with pytest.raises(astrodata.AstroDataError):
-        factory.get_astro_data(temporary_fits_file)
+        factory.get_astrodata(temporary_fits_file)
 
     factory.add_class(TestClass)
 
-    ad = factory.get_astro_data(temporary_fits_file)
+    ad = factory.get_astrodata(temporary_fits_file)
 
     assert isinstance(ad, TestClass)
 
@@ -239,7 +239,7 @@ def test_create_class_with_descriptors(
     factory = fresh_ad_factory
     factory.add_class(TestClass)
 
-    ad = factory.get_astro_data(temporary_fits_file)
+    ad = factory.get_astrodata(temporary_fits_file)
 
     assert isinstance(ad, TestClass)
 
@@ -251,11 +251,11 @@ def test_create_class_with_descriptors(
     factory = fresh_factory
 
     with pytest.raises(astrodata.AstroDataError):
-        factory.get_astro_data(temporary_fits_file)
+        factory.get_astrodata(temporary_fits_file)
 
     factory.add_class(TestClass)
 
-    ad = factory.get_astro_data(temporary_fits_file)
+    ad = factory.get_astrodata(temporary_fits_file)
 
     assert isinstance(ad, TestClass)
 

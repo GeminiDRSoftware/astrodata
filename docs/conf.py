@@ -185,8 +185,8 @@ rst_prolog = """
 .. |astro_data_descriptor| replace:: :func:`~astrodata.astro_data_descriptor`
 .. |astro_data_tag| replace:: :func:`~astrodata.astro_data_tag`
 .. |create| replace:: :func:`~astrodata.create`
-.. |open| replace:: :func:`~astrodata.from_file`
-.. |from_file| replace:: :func:`~astrodata.from_file`
+.. |open| replace:: :func:`~astrodata.open`
+.. |from_file| replace:: :func:`~astrodata.open`
 .. |return_list| replace:: :func:`~astrodata.return_list`
 .. |version| replace:: :func:`~astrodata.version`
 .. |UserGuide| replace:: :doc:`User Guide </manuals/usermanual/index>`

@@ -54,7 +54,7 @@ method.
     >>> import astrodata
 
     # You can find the example file in the examples/data directory.
-    >>> ad = astrodata.from_file(example_fits_file)
+    >>> ad = astrodata.open(example_fits_file)
     >>> ad.info()
 
     Filename: example_mef_file.fits

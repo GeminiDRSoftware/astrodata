@@ -102,7 +102,7 @@ def testfile(tmp_path):
 
 
 def test_tags(testfile):
-    ad = astrodata.from_file(testfile)
+    ad = astrodata.open(testfile)
     assert ad.descriptors == (
         "amp_read_area",
         "array_name",
@@ -119,14 +119,14 @@ def test_tags(testfile):
 
 
 def test_keyword_for(testfile):
-    ad = astrodata.from_file(testfile)
+    ad = astrodata.open(testfile)
     assert ad._keyword_for("array_name") == "AMPNAME"
     with pytest.raises(AttributeError, match="No match for 'foobar'"):
         ad._keyword_for("foobar")
 
 
 def test_returns_list(testfile):
-    ad = astrodata.from_file(testfile)
+    ad = astrodata.open(testfile)
     assert ad.dispersion_axis() == [1, 1]
     assert ad[0].dispersion_axis() == 1
 
@@ -138,7 +138,7 @@ def test_returns_list(testfile):
 
 
 def test_info(testfile, capsys):
-    ad = astrodata.from_file(testfile)
+    ad = astrodata.open(testfile)
     ad.info()
     captured = capsys.readouterr()
     out = captured.out.splitlines()

@@ -72,7 +72,7 @@ Opening Files
 =============
 
 The primary way to interact with |astrodata| is through the
-:func:`~astrodata.from_file` function. This function will open a file and
+:func:`~astrodata.open` function. This function will open a file and
 create an |AstroData| object from it. You can then use this object to access
 the data and metadata in the file.
 
@@ -82,7 +82,7 @@ Let's just open one of the files without any other setup and see what happens:
 
     import astrodata
 
-    ad = astrodata.from_file('quickstart_data/N20170614S0201.fits')
+    ad = astrodata.open('quickstart_data/N20170614S0201.fits')
 
     ad.info()
 
@@ -213,7 +213,7 @@ all the files we downloaded:
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'quickstart_data/{f}')
+        ad = astrodata.open(f'quickstart_data/{f}')
         print(f"Opened {ad.filename} with class {ad.__class__}")
 
 The result:
@@ -258,7 +258,7 @@ Let's see what the data looks like for one of the files:
 .. code-block:: python
 
     # Get the first science extension.
-    for ad in (astrodata.from_file(f'quickstart_data/{f}') for f in files):
+    for ad in (astrodata.open(f'quickstart_data/{f}') for f in files):
         if isinstance(ad, GMOSScienceAstroData):
             break
 
@@ -316,7 +316,7 @@ Now, when we open a file, we can access the airmass like this:
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'quickstart_data/{f}')
+        ad = astrodata.open(f'quickstart_data/{f}')
         if isinstance(ad, GMOSScienceAstroData):
             print(f"Opened {ad.filename} with class {ad.__class__})")
             print(f"Airmass: {ad.airmass()}")
@@ -329,7 +329,7 @@ get all descriptors from a class using the ``.descriptors`` attribute.
 .. code-block:: python
 
     for f in files:
-        ad = astrodata.from_file(f'quickstart_data/{f}')
+        ad = astrodata.open(f'quickstart_data/{f}')
         print(f"{ad.filename} descriptors:")
         print(' + ' + ', '.join(ad.descriptors))
 
@@ -471,7 +471,7 @@ Let's make new |AstroData| objects for our files and see what tags they have:
 
     for f in files:
         location = f"quickstart_data/{f}"
-        ad = astrodata.from_file(location)
+        ad = astrodata.open(location)
         print(f"Opened {ad.filename} with class {ad.__class__}")
         print(f"Tags: {ad.tags}")
 

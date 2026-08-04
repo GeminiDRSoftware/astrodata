@@ -84,7 +84,7 @@ One can already slice |NDAstroData| objects as with |NDData|, as normal Python a
 
 .. code-block:: python
 
-      >>> ad = astrodata.from_file(some_fits_file)
+      >>> ad = astrodata.open(some_fits_file)
       >>> ad.shape
       [(2048, 2048)]
 

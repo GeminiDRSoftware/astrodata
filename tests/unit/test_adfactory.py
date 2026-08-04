@@ -35,7 +35,7 @@ def example_extensions(example_phu):
 
 @pytest.fixture
 def ad(example_fits_file) -> astrodata.AstroData:
-    return astrodata.from_file(example_fits_file)
+    return astrodata.open(example_fits_file)
 
 
 @pytest.fixture
@@ -77,7 +77,7 @@ def test__open_file_file_not_found(nonexistent_file, example_dir):
             pass
 
 
-def test_report_all_exceptions_on_failure_get_astro_data(
+def test_report_all_exceptions_on_failure_get_astrodata(
     example_fits_file,
     monkeypatch,
 ):
@@ -120,7 +120,7 @@ def test_report_all_exceptions_on_failure_get_astro_data(
         astrodata.factory.add_class(_cls)
 
     with pytest.raises(astrodata.AstroDataError) as exception_info:
-        astrodata.from_file(example_fits_file)
+        astrodata.open(example_fits_file)
 
     caught_err = exception_info.value
     assert str(caught_err)
@@ -167,7 +167,7 @@ def test_report_all_exceptions_on_failure__open_file(
     )
 
     with pytest.raises(astrodata.AstroDataError) as exception_info:
-        astrodata.from_file(example_fits_file)
+        astrodata.open(example_fits_file)
 
     caught_err = exception_info.value
     assert str(caught_err)

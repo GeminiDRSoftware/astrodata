@@ -78,10 +78,10 @@ def gmos_imaging_data_star_field(tmp_path, _downloaded_gmos_imaging_data_star_fi
 @pytest.mark.dragons
 def test_correct_astrodata():
     """Test if the astrodata package is being tested."""
-    assert astrodata.from_file
+    assert astrodata.open
 
 
-@pytest.mark.filterwarnings("ignore:use 'astrodata.from_file'")
+@pytest.mark.filterwarnings("ignore:use 'astrodata.open'")
 @pytest.mark.filterwarnings("ignore:Renamed to 'as_iraf_section'")
 @pytest.mark.filterwarnings("ignore:Renamed to add_class")
 @pytest.mark.filterwarnings("ignore:Renamed to 'windowed_operation'")

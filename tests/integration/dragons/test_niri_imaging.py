@@ -85,10 +85,10 @@ def test_correct_astrodata():
     # Importing astrodata as if used with DRAGONS, instead of the top
     # import, for clarity/to test it explicitly.
     astrodata = importlib.import_module("astrodata")  # noqa: F811
-    assert astrodata.from_file
+    assert astrodata.open
 
 
-@pytest.mark.filterwarnings("ignore:use 'astrodata.from_file'")
+@pytest.mark.filterwarnings("ignore:use 'astrodata.open'")
 @pytest.mark.filterwarnings("ignore:Renamed to 'as_iraf_section'")
 @pytest.mark.filterwarnings("ignore:Renamed to add_class")
 @pytest.mark.filterwarnings("ignore:Renamed to 'windowed_operation'")

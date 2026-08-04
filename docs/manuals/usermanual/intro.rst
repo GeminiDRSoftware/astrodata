@@ -41,11 +41,11 @@ What is |astrodata|?
 astronomical datasets stored on disks and to properly parse their metadata
 using the |AstroData| and the |TagSet| classes. |astrodata| provides uniform
 interfaces for working on datasets from different instruments. Once a dataset
-has been opened with |from_file|, the object assesses metadata to determine the
+has been opened with |open|, the object assesses metadata to determine the
 appropriate class and methods to use for reading and processing the data.
 Information like instrument, observation mode, and how to access headers, is
 readily available through the |AstroData| uniform interface returned by
-|from_file|. All the details are coded inside the class associated with the
+|open|. All the details are coded inside the class associated with the
 instrument, that class then provides the interface. The appropriate class is
 selected automatically when the file is opened and inspected by |astrodata|.
 
@@ -105,7 +105,7 @@ its metadata using an |AstroData| object
 
     # We can create a fake file to use for this example:
     path = create_test_file(include_header_keys=['INSTRUME', 'EXPTIME', 'DATE-OBS'])
-    ad = astrodata.from_file(path)
+    ad = astrodata.open(path)
     print(ad.phu['INSTRUME'])
 
 .. code-block::

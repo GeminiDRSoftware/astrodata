@@ -27,7 +27,7 @@ a property of the |NDAstroData| object, and it is the pixel data itself.
 
 .. code-block:: python
 
-    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
+    >>> ad = astrodata.open(some_fits_file_with_extensions)
     >>> the_data = ad[1].data
     >>> type(the_data)
     <class 'numpy.ndarray'>
@@ -90,7 +90,7 @@ Here are a few examples of arithmetics on |AstroData| objects.
 
 .. code-block:: python
 
-    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
+    >>> ad = astrodata.open(some_fits_file_with_extensions)
 
     >>> # Addition
     >>> ad.add(50.)
@@ -231,7 +231,7 @@ extensions.
 
 .. code-block:: python
 
-    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
+    >>> ad = astrodata.open(some_fits_file_with_extensions)
     >>> for (extension, gain) in zip(ad, ad.gain()):
     ...    extension.variance = extension.data / gain
 
@@ -258,7 +258,7 @@ Let's look into an example.
 
     >>> #     output = x * x
     >>> # var_output = var * x^2 + var * x^2
-    >>> ad = astrodata.from_file(some_fits_file_with_extensions)
+    >>> ad = astrodata.open(some_fits_file_with_extensions)
     >>> ad *= 1.5
     >>> ad[1].data[50,50]
     1.5
@@ -616,7 +616,7 @@ find most readable.
 .. code-block:: python
 
     >>> # For clarity...
-    >>> ad = astrodata.from_file(some_fits_file_with_mask)
+    >>> ad = astrodata.open(some_fits_file_with_mask)
     >>> data = ad[0].data
     >>> mask = ad[0].mask
 

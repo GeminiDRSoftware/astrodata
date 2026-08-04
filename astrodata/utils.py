@@ -544,8 +544,18 @@ class Section(tuple):
             + "]"
         )
 
-    # TODO(teald): Deprecate and rename Section.asslice.
-    def asslice(self, add_dims=0):
+    @deprecated(
+        "Renamed to 'as_slice', this is just an alias for now "
+        "and will be removed in a future version."
+    )
+    def asslice(self, add_dims=0):  # noqa
+        """Return the Section object as a slice/list of slices.
+
+        Deprecated, see astrodata.Section.as_slice`.
+        """
+        return self.as_slice(add_dims=add_dims)
+
+    def as_slice(self, add_dims=0):
         """Return the Section object as a slice/list of slices.
 
         Higher dimensionality can be achieved with the add_dims parameter.

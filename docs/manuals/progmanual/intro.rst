@@ -27,13 +27,13 @@ methods to access the data in a consistent manner, regardless of the
 underlying data format.
 
 The |AstroData| class is not intended to be used directly by the user. Instead,
-the user should use the :func:`~astrodata.from_file` function, which will return an
-|AstroData| object. The :func:`~astrodata.from_file` function will determine the type of
+the user should use the :func:`~astrodata.open` function, which will return an
+|AstroData| object. The :func:`~astrodata.open` function will determine the type of
 data file being opened and return the appropriate subclass of |AstroData|.
 
 For the programmer using |AstroData| to develop a data reduction pipeline, the
 |AstroData| class should be subclassed to provide the functionality required
-and to register the new class with the :func:`~astrodata.from_file` function.
+and to register the new class with the :func:`~astrodata.open` function.
 
 Several examples may be found throughout the documentation. A
 simple example is shown below as a complete, executable introduction.
@@ -52,7 +52,7 @@ simple example is shown below as a complete, executable introduction.
     >>> class MyAstroData(AstroData):
     ...     @staticmethod
     ...     def _matches_data(source):
-    ...         # This method is used by astrodata.from_file to determine if this
+    ...         # This method is used by astrodata.open to determine if this
     ...         # class should be used to open the data. It should return True
     ...         # if the data is of the correct type, False otherwise.
     ...
@@ -104,7 +104,7 @@ simple example is shown below as a complete, executable introduction.
     >>> astrodata.factory.add_class(MyAstroData)
 
     >>> # Now, if we give it a file that has the MY_TAG keyword in the Primary HDU,
-    >>> # we can open it with astrodata.from_file and it will return an instance of
+    >>> # we can open it with astrodata.open and it will return an instance of
     >>> # MyAstroData.
     >>> # Defining an example FITS file
     >>> from astropy.io import fits
@@ -127,8 +127,8 @@ simple example is shown below as a complete, executable introduction.
     >>> with tempfile.NamedTemporaryFile(suffix='.fits') as f:
     ...     hdu.writeto(f, overwrite=True)
     ...
-    ...     # Open the file with astrodata.from_file
-    ...     ad = astrodata.from_file(f.name)
+    ...     # Open the file with astrodata.open
+    ...     ad = astrodata.open(f.name)
     ...
     ...     # Check that the tag and descriptor are present
     ...     assert 'MY_TAG' in ad.tags, f"Tag 'my_tag' not found in {ad.tags}"

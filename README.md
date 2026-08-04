@@ -99,7 +99,7 @@ The most basic usage of ``astrodata`` is to extend the ``astrodata.AstroData``
 class, which includes some basic FITS file handling methods by default:
 
 ```python
-from astrodata import AstroData, astro_data_descriptor, factory, from_file
+from astrodata import AstroData, astro_data_descriptor, factory, open
 
 
 class MyData(AstroData):
@@ -155,7 +155,7 @@ for cls in [MyInstrument1, MyInstrument2, MyInstrument3]:
 
 # my_file.fits has some color data depending on the instrument it comes from,
 # but now we can access it and handle a single value.
-data = from_file("README_example.fits")
+data = open("README_example.fits")
 
 # the astrodata factory has already resolved the correct class for us.
 print(f"File used to create class: {data.__class__.__name__}")

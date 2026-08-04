@@ -35,7 +35,7 @@ def test_file_archive():
 
 @pytest.fixture
 def ad1():
-    file = astrodata.from_file(download_from_archive("N20180304S0126.fits"))
+    file = astrodata.open(download_from_archive("N20180304S0126.fits"))
 
     assert file
     return file
@@ -43,7 +43,7 @@ def ad1():
 
 @pytest.fixture
 def ad2():
-    file = astrodata.from_file(download_from_archive("N20180305S0001.fits"))
+    file = astrodata.open(download_from_archive("N20180305S0001.fits"))
 
     assert file
     return file
@@ -112,7 +112,7 @@ def test_download_memory_leaks(tmp_path, monkeypatch, filename):
     # Open the file and then remove ad refs and garbage collect.
     n_pre_open_ndad = len(objgraph.by_type("NDAstroData"))
 
-    ad = astrodata.from_file(path_to_data)
+    ad = astrodata.open(path_to_data)
 
     del ad
     gc.collect()
@@ -364,7 +364,7 @@ def _generate_permutations_with_strict_placement(
 
 @pytest.mark.parametrize(
     "shape,corners_expected",
-    (
+    list(
         [
             tuple(x for x in shape),
             _generate_permutations_with_strict_placement(shape),
@@ -864,9 +864,9 @@ def test_ADCompare_unequal_tags(tmp_path):
 
     # Create AD objects
 
-    ad1 = astrodata.from_file(ad1_file_path)
-    ad2 = astrodata.from_file(ad2_file_path)
-    ad3 = astrodata.from_file(ad3_file_path)
+    ad1 = astrodata.open(ad1_file_path)
+    ad2 = astrodata.open(ad2_file_path)
+    ad3 = astrodata.open(ad3_file_path)
 
     assert all(isinstance(ad, astrodata.AstroData) for ad in (ad1, ad2, ad3))
     assert isinstance(ad1, ADClass1)

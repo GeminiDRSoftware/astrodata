@@ -200,8 +200,9 @@ def fitswcs_to_gwcs(input_data, *, raise_errors: bool = False):
 # -----------------------------------------------------------------------------
 
 
-# TODO: Rename this and deprecate this function. The name implies it is a
-# gwcs object being passed, but it requires an NDData object.
+# TODO: This should be refactored to more cleanly separate the encoding of
+#  spectral and sky axes as FITS keywords via separate functions, and ideally
+#  such code should be contributed to the gwcs package.
 def gwcs_to_fits(ndd, hdr=None):
     """Convert a gWCS object to FITS WCS keyword/value pairs.
 

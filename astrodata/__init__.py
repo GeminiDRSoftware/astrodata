@@ -16,6 +16,7 @@ you can check the online documentation at
 `the |astrodata| pages site <https://geminidrsoftware.github.io/astrodata/>`_.
 """
 
+import functools
 import importlib.metadata
 
 from . import testing
@@ -51,13 +52,13 @@ __all__ = [
     "add_header_to_table",
     "astro_data_descriptor",
     "astro_data_tag",
-    "from_file",
+    "open",
     "create",
     "returns_list",
     "version",
     "testing",
     # Below this are deprecated
-    "open",
+    "from_file",
 ]
 
 # Make sure __all__does not have duplicates
@@ -72,8 +73,18 @@ factory = AstroDataFactory()
 factory.add_class(AstroData)
 
 
+# Without raising a warning or error.
+@deprecated(
+    "Use 'astrodata.open'. astrodata.from_file is deprecated, "
+    "and will be removed in a future version. They take the "
+    "same arguments and return the same object."
+)
 def from_file(*args, **kwargs):
     """Return an |AstroData| object from a file.
+
+    .. warning::
+        This function is deprecated and will be removed in a future version.
+        Use :py:func:`~astrodata.open` instead.
 
     Arguments
     ---------
@@ -108,57 +119,20 @@ def from_file(*args, **kwargs):
 
     >>> from astropy.io import fits
     >>> hdulist = fits.open("path/to/file.fits")
-    >>> ad = from_file(hdulist)
+    >>> ad = open(hdulist)
 
     Which can be useful for inspecting input before creating the |AstroData|
     object. This will not use the normal |AstroData| lazy-loading mechanism,
     however.
     """
-    return factory.get_astro_data(*args, **kwargs)
+    return open(*args, **kwargs)
 
 
-def create(*args, **kwargs):
-    """Return an |AstroData| object from data.
-
-    Arguments
-    ---------
-    phu : `fits.PrimaryHDU` or `fits.Header` or `dict` or `list`
-        FITS primary HDU or header, or something that can be used to create
-        a fits.Header (a dict, a list of "cards").
-
-    extensions : list of HDUs
-        List of HDU objects.
-
-    Returns
-    -------
-    `astrodata.AstroData`
-        An AstroData instance.
-
-    Raises
-    ------
-    ValueError
-        If ``phu`` is not a valid object.
-
-    Example
-    -------
-
-    >>> from astrodata import create
-    >>> ad = create(phu=fits.PrimaryHDU(), extensions=[fits.ImageHDU()])
-    """
+@functools.wraps(factory.create_from_scratch)
+def create(*args, **kwargs):  # noqa: D103
     return factory.create_from_scratch(*args, **kwargs)
 
 
-# Without raising a warning or error.
-@deprecated(
-    "Use 'astrodata.from_file'. astrodata.open is deprecated, "
-    "and will be removed in a future version. They take the "
-    "same arguments and return the same object."
-)
-def open(*args, **kwargs):  # pylint: disable=redefined-builtin
-    """Return an |AstroData| object from a file.
-
-    .. warning::
-        This function is deprecated and will be removed in a future version.
-        Use :py:func:`~astrodata.from_file` instead.
-    """
-    return from_file(*args, **kwargs)
+@functools.wraps(factory.get_astrodata)
+def open(*args, **kwargs):  # pylint: disable=redefined-builtin # noqa: D103
+    return factory.get_astrodata(*args, **kwargs)
