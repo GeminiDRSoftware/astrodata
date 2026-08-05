@@ -14,9 +14,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
-import urllib
 import warnings
-import xml.etree.ElementTree as et
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from typing import Iterable
 
@@ -25,8 +23,6 @@ import requests
 from astropy.io import fits
 from astropy.table import Table
 from astropy.utils.data import download_file
-
-from .utils import deprecated
 
 # Disable pylint import error
 # pylint: disable=import-outside-toplevel
@@ -710,36 +706,6 @@ def download_from_archive(
         ) from err
 
     return local_path
-
-
-@deprecated("No longer supported. Will be removed in 3.0.0.")
-def get_associated_calibrations(filename, nbias=5):
-    """Query Gemini Observatory Archive for associated calibrations.
-
-    This function quieries the Gemini Observatory Archive for calibrations
-    associated with a given data file.
-
-    Arguments
-    ---------
-    filename : str
-        Input file name
-    """
-    url = f"https://archive.gemini.edu/calmgr/{filename}"
-    tree = et.parse(urllib.request.urlopen(url))
-    root = tree.getroot()
-    prefix = root.tag[: root.tag.rfind("}") + 1]
-
-    rows = []
-    for node in tree.iter(prefix + "calibration"):
-        cal_type = node.find(prefix + "caltype").text
-        cal_filename = node.find(prefix + "filename").text
-        if not ("processed_" in cal_filename or "specphot" in cal_filename):
-            rows.append((cal_filename, cal_type))
-
-    tbl = Table(rows=rows, names=["filename", "caltype"])
-    tbl.sort("filename")
-    tbl.remove_rows(np.where(tbl["caltype"] == "bias")[0][nbias:])
-    return tbl
 
 
 class ADCompare:
