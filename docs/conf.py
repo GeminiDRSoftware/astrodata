@@ -236,6 +236,7 @@ rst_prolog = """
 .. |RSUserManual| replace:: `Recipe System User Manual <http://dragons-recipe-system-users-manual.readthedocs.io/en/{v}/>`__
 .. |DRAGONS_install| replace:: `DRAGONS Installation <https://dragons.readthedocs.io/projects/recipe-system-users-manual/en/stable/install.html>`__
 .. |DRAGONS_installation| replace:: |DRAGONS_install|
+.. |gemini_instruments_descriptors| replace:: `List of Gemini Standard Descriptors <https://gemini-instruments.readthedocs.io/en/latest/descriptors_api.html>`__
 
 .. |Tags| replace:: :ref:`Tags`
 .. |Tag| replace:: :class:`~astrodata.Tag`
