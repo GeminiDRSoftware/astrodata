@@ -28,20 +28,10 @@ This documentation provides different levels of information:
 
 If you need support related to |astrodata|, see :ref:`ad_support`.
 
-.. raw:: latex
+For an example of a real-world list of descriptors:
 
-   % Set up the appendix mode and modify the LaTeX toc behavior
-   \appendix
-   \noappendicestocpagenum
-   \addappheadtotoc
+- |gemini_instruments_descriptors|
 
-
-.. rubric:: Appendix
-
-.. toctree::
-   :maxdepth: 1
-
-   appendix_descriptors
 ..   api
 
 .. ******************
