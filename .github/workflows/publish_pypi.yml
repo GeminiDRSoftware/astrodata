@@ -8,6 +8,9 @@ on:
       - '!*dev*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   source_test:
     # This runs the test files on the repository before publishing it.
