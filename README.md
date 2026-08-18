@@ -43,7 +43,7 @@
 ### Building & Publishing
 ![Documentation build status badge][docs build badge]
 ![pypi packaging status badge][pypi packaging badge]
-[![PyPI version badge][pypi package version badge]](https://badge.fury.io/py/astrodata)
+[![PyPI version badge][pypi package version badge]][pypi package version badge]
 
 
 
