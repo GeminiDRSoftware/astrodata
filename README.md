@@ -11,17 +11,17 @@
 [coverage badge]: https://geminidrsoftware.github.io/astrodata/badges/coverage.svg
 [docs build badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/documentation.yml/badge.svg
 [pypi packaging badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/publish_pypi.yml/badge.svg
-[pypi package version badge]: https://badge.fury.io/py/astrodata.svg
+[pypi package version badge]: https://img.shields.io/pypi/v/astrodata
 [source test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/source_tests.yml/badge.svg
 [build test status badge]: https://github.com/GeminiDRSoftware/astrodata/actions/workflows/build_tests.yml/badge.svg
 [zenodo DOI badge]: https://img.shields.io/badge/DOI-10.5281%2Fzenodo.14804282-blue.svg
 [pyopensci peer review badge]: https://pyopensci.org/badges/peer-reviewed.svg
 
 <p align="center">
-  <source media="(prefers-color-scheme: dark)" srcset="docs/static/logo.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/GeminiDRSoftware/astrodata/main/docs/static/logo_dark.svg">
   <img
   alt="A logo of a stylized blue dragon inside a similarly blue shell. A yellow star lies at the center, together with the dragon shape forming a stylized letter A."
-  src="docs/static/logo_dark.svg"
+  src="https://raw.githubusercontent.com/GeminiDRSoftware/astrodata/main/docs/static/logo_dark.svg"
   style="display: block; width: 20%; height: auto; float: center"
   >
 </p>
@@ -43,7 +43,7 @@
 ### Building & Publishing
 ![Documentation build status badge][docs build badge]
 ![pypi packaging status badge][pypi packaging badge]
-[![PyPI version badge][pypi package version badge]](https://badge.fury.io/py/astrodata)
+[![PyPI version badge][pypi package version badge]][pypi package version badge]
 
 
 
