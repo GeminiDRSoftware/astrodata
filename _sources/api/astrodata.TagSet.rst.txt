@@ -1,0 +1,7 @@
+TagSet
+======
+
+.. currentmodule:: astrodata
+
+.. autoclass:: TagSet
+   :show-inheritance:
