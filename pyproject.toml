@@ -2,7 +2,7 @@
 name = "astrodata"
 version = "0.0.0"
 description = "A package for managing astronomical data through a uniform interface"
-authors = ["D. J. Teal <dillon.teal@noirlab.com>", "DRAGONS development team"]
+authors = ["DRAGONS development team"]
 license = "BSD3"
 readme = "README.md"
 
