@@ -21,8 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install poetry nox
-          poetry self add poetry-plugin-export
+          pip install nox
       - name: Install OpenBLAS
         run: |
           sudo apt-get update

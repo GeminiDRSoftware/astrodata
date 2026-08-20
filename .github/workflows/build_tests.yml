@@ -49,8 +49,7 @@ jobs:
             - name: "Install dependencies"
               run: |
                   python -m pip install --upgrade pip
-                  python -m pip install nox poetry
-                  poetry self add poetry-plugin-export
+                  python -m pip install nox
 
             - name: "Unit tests"
               run: nox -s build_tests_unit -x -- -vv
@@ -134,8 +133,7 @@ jobs:
             - name: "Install top-level dependencies"
               run: |
                   python -m pip install --upgrade pip
-                  python -m pip install nox poetry
-                  poetry self add poetry-plugin-export
+                  python -m pip install nox
 
             - uses: conda-incubator/setup-miniconda@v4
               with:

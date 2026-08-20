@@ -73,8 +73,7 @@ jobs:
             - name: "Install dependencies"
               run: |
                   python -m pip install --upgrade pip
-                  python -m pip install nox poetry
-                  poetry self add poetry-plugin-export
+                  python -m pip install nox
 
             - name: "Get public IP address of runner"
               # Need to handle this for Windows, MacOS, and linux
@@ -192,11 +191,10 @@ jobs:
                     echo "Linux runner IP: $(curl -s https://ipinfo.io/ip)"
                   fi
 
-            - name: "Install nox, poetry in the base environment"
+            - name: "Install nox in the base environment"
               run: |
                   python -m pip install --upgrade pip
-                  python -m pip install nox poetry
-                  poetry self add poetry-plugin-export
+                  python -m pip install nox
 
             - name: "DRAGONS release tests"
               run: |

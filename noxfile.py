@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import nox
-from packaging.markers import Marker
+from packaging.requirements import Requirement
 
 # Logic required because tomllib was introduced to the standard library in
 # python version 3.11.
@@ -59,14 +59,6 @@ class SessionVariables:
         v for channel in dragons_conda_channels for v in ("-c", channel)
     ]
     dragons_venv_params += ["--override-channels"]
-
-    # Poetry install options
-    poetry_install_options: ClassVar[list[str]] = [
-        "--with",
-        "test",
-        "--without",
-        "dev,docs",
-    ]
 
     # pytest options for sessions
     pytest_options = ["--cov=astrodata", "--cov-report=term-missing"]
@@ -176,7 +168,7 @@ class DevpiServerManager:
         """Start the devpi server."""
         session = self.session
 
-        install_test_dependencies(session, poetry_groups=["build_test"])
+        install_test_dependencies(session, extras=["build_test"])
 
         self.generate_config_file()
         self.start_devpi_server()
@@ -333,60 +325,67 @@ class DevpiServerManager:
         del self.active_servers[self.port]
 
 
-def get_poetry_dependencies(
-    session: nox.Session, only: str = "", *, all_deps: bool = False
-) -> Path:
-    """Create and return path to a requirements file from poetry.
+def _load_pyproject() -> dict:
+    """Load and return the parsed contents of pyproject.toml."""
+    pyproject_path = SessionVariables.noxfile_dir() / "pyproject.toml"
 
-    This assumes poetry is installed in the session.
+    with pyproject_path.open("rb") as infile:
+        return tomllib.load(infile)
+
+
+def get_project_dependencies(
+    session: nox.Session,
+    extras: list[str] | None = None,
+    *,
+    all_deps: bool = False,
+) -> Path:
+    """Create and return path to a requirements file from pyproject.toml.
+
+    This replaces the old poetry-export-based helper. Since setuptools/pip
+    has no lockfile or dependency "groups" concept, this reads the base
+    ``[project.dependencies]`` and any requested
+    ``[project.optional-dependencies]`` extras directly out of
+    ``pyproject.toml`` and writes them, one requirement per line
+    (including any PEP 508 environment markers), to a requirements file.
 
     Arguments
     ---------
     session : nox.sessions.Session
         The nox session object.
 
-    only : str, list, optional
-        If provided, only return the dependencies that match the provided
-        string or strings.
+    extras : list, optional
+        A list of extras (e.g. ``["test"]``, corresponding to what used to
+        be poetry dependency groups) whose dependencies should be included
+        in addition to the base dependencies. Ignored if ``all_deps`` is
+        True.
 
-    all : bool, optional, kw-only
-        If True, return all dependencies. Default is False. If True, the
-        ``only`` argument is ignored.
+    all_deps : bool, optional, kw-only
+        If True, include every extra defined in
+        ``[project.optional-dependencies]``, in addition to the base
+        dependencies. Default is False.
 
     Returns
     -------
     Path
         The path to the requirements file.
-
-    Notes
-    -----
-    This command will not work if the warning about the Poetry export plugin is
-    not supressed. Due to an issue with the poetry export command,
     """
-    temp_dir = Path(session.create_tmp())
-    req_file_path = temp_dir / "requirements.txt"
-    only = only if only else "main,test"
+    toml_contents = _load_pyproject()
+    project_table = toml_contents["project"]
+    optional_deps = project_table.get("optional-dependencies", {})
 
-    command = [
-        "poetry",
-        "export",
-        f"--only={only}",
-        "--without-hashes",
-        "--format=requirements.txt",
-        f"--output={req_file_path}",
-    ]
+    requirements: list[str] = list(project_table.get("dependencies", []))
 
     if all_deps:
-        with Path("pyproject.toml").open("rb") as infile:
-            toml_contents = tomllib.load(infile)
+        extras = list(optional_deps.keys())
 
-        groups = list(toml_contents["tool"]["poetry"]["group"].keys())
+    for extra in extras or []:
+        requirements.extend(optional_deps.get(extra, []))
 
-        command[2] = f"--with={','.join(groups)}"
+    temp_dir = Path(session.create_tmp())
+    req_file_path = temp_dir / "requirements.txt"
+    req_file_path.write_text("\n".join(requirements) + "\n")
 
-    session.run(*command, external=True, silent=True)
-
-    log_message = f"Poetry dependencies written to {req_file_path}"
+    log_message = f"Project dependencies written to {req_file_path}"
 
     with req_file_path.open("r") as file:
         file_contents = "\n".join(
@@ -400,11 +399,11 @@ def get_poetry_dependencies(
 def install_test_dependencies(
     session: nox.Session,
     packages: list[str] | None = None,
-    poetry_groups: list[str] | None = None,
+    extras: list[str] | None = None,
     *,
     conda_install: bool = False,
 ) -> None:
-    """Install the test dependencies from the poetry.lock file.
+    """Install the project's dependencies from pyproject.toml.
 
     Arguments
     ---------
@@ -413,20 +412,19 @@ def install_test_dependencies(
 
     packages : list, optional
         A list of packages to install. If provided, this will be used instead
-        of the poetry.lock file.
+        of reading from pyproject.toml.
 
-    poetry_groups : list, optional
-        A list of poetry groups to install. If provided, this will be used
-        instead of the default groups (main, test). Please note that the
-        main group is ignored if not provided in the list. For example,
+    extras : list, optional
+        A list of extras (equivalent to the old poetry dependency groups) to
+        install in addition to the base dependencies. Note that the base
+        (``[project.dependencies]``) requirements are *always* installed --
+        unlike poetry groups, there is no way to omit them. For example,
 
         .. code-block::python
 
-            poetry_groups = ["test"]
+            extras = ["test"]
 
-        will install only the test dependencies, not |astrodata|.
-
-        Also, an empty list will still install the default groups (main, test).
+        will install the base dependencies plus the ``test`` extra.
 
     conda_install : bool, optional, kw-only
         If True, install the dependencies using conda. Otherwise
@@ -440,11 +438,9 @@ def install_test_dependencies(
         # Report the pip version
         session.run("python", "-m", "pip", "--version")
 
-    # Get the dependencies from the poetry.lock file if no packages are
-    # provided.
+    # Get the dependencies from pyproject.toml if no packages are provided.
     if not packages:
-        groups = poetry_groups if poetry_groups else ["main", "test"]
-        req_file_path = get_poetry_dependencies(session, ",".join(groups))
+        req_file_path = get_project_dependencies(session, extras)
 
     else:
         req_file_path = Path(session.create_tmp()) / "requirements.txt"
@@ -467,25 +463,25 @@ def install_test_dependencies(
         ]
         session_python_version = session.run(*cmd, silent=True).strip()
 
-        # The poetry exports a python_version range.  conda cannot parse that.
-        # Remove it.
+        # The requirements file may contain PEP 508 environment markers
+        # (e.g. numpy's python_version-conditioned pins). conda cannot
+        # parse those. Evaluate each marker for this session's Python
+        # version and strip it, dropping any requirement that doesn't
+        # apply.
         with fileinput.input(files=str(req_file_path), inplace=True) as file:
             for line in file:
-                line_components = line.split(";")
-                marker = Marker(line_components[1].strip())
-                if marker.evaluate(
+                stripped = line.strip()
+
+                if not stripped:
+                    continue
+
+                requirement = Requirement(stripped)
+
+                if requirement.marker is None or requirement.marker.evaluate(
                     environment={"python_version": session_python_version}
                 ):
-                    new_line = line_components[0].strip()
-                    print(new_line, end="\n")
-
-        # In the poetry.lock, pip asdf requires 'semantic-veersion'.
-        # semantic-version is non available as conda package, so clearly
-        # cannot be installed and asdf cannot require it.  Remove it.
-        with fileinput.input(files=str(req_file_path), inplace=True) as file:
-            for line in file:
-                if "semantic-version" not in line:
-                    print(line, end="")
+                    requirement.marker = None
+                    print(str(requirement), end="\n")
 
         session.conda_install(
             "--quiet",
@@ -525,8 +521,6 @@ def dragons_release_tests(session: nox.Session) -> None:
     apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
-    # Fetch test dependencies from the poetry.lock file.
-    #
     # If we install everything with pip, scipy remains a pypi but numpy
     # is a conda after dragons is installed, no idea why, and that causes
     # some serious scipy import issues.  (Confirmed by uninstalling
@@ -535,17 +529,8 @@ def dragons_release_tests(session: nox.Session) -> None:
     # dragons, and then install the test dependencies with pip (since not
     # all of them are available in conda.
 
-    install_test_dependencies(
-        session, poetry_groups=["main"], conda_install=True
-    )
-    install_test_dependencies(session, poetry_groups=["test"])
-    # If we install everything with pip, scipy remains a pypi but numpy
-    # is a conda after dragons is installed, no idea why, and that causes
-    # some serious scipy import issues.  (Confirmed by uninstalling
-    # pip scipy, and then conda installing the same version, then it works.)
-    # So, we will install the astrodata dependencies with conda to match
-    # dragons, and then install the test dependencies with pip (since not
-    # all of them are available in conda.
+    install_test_dependencies(session, conda_install=True)
+    install_test_dependencies(session, extras=["test"])
 
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
@@ -573,8 +558,8 @@ def dragons_dev_tests(session: nox.Session) -> None:
     apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
-    # Fetch test dependencies from the poetry.lock file.
-    install_test_dependencies(session)
+    # Fetch test dependencies from pyproject.toml.
+    install_test_dependencies(session, extras=["test"])
     # install_test_dependencies(
     #     session,
     #     packages=SessionVariables.dragons_dev_packages,
@@ -649,7 +634,7 @@ def dragons_dev_tests(session: nox.Session) -> None:
 def unit_tests(session: nox.Session) -> None:
     """Run the unit tests."""
     apply_data_caching_environment_variable(session)
-    install_test_dependencies(session)
+    install_test_dependencies(session, extras=["test"])
     session.install("-e", ".", "--no-deps")
 
     # Positional arguments after -- are passed to pytest.
@@ -669,10 +654,8 @@ def conda_unit_tests(session: nox.Session) -> None:
     # Conda-install the dependencies required to *run* astrodata since
     # this is a conda test.  Then install the dependencies to run the *tests*
     # with pip since they are not all available from conda.
-    install_test_dependencies(
-        session, poetry_groups=["main"], conda_install=True
-    )
-    install_test_dependencies(session, poetry_groups=["test"])
+    install_test_dependencies(session, conda_install=True)
+    install_test_dependencies(session, extras=["test"])
 
     # One cannot install the current checkout as a conda package.
     # It has to be a pip install.
@@ -694,7 +677,7 @@ def unit_test_build(session: nox.Session, version: str) -> None:
     apply_data_caching_environment_variable(session)
 
     # Install the package from the devpi server
-    install_test_dependencies(session, poetry_groups=["test"])
+    install_test_dependencies(session, extras=["test"])
 
     # Install the package from the devpi server
     session.install(
@@ -720,14 +703,12 @@ def integration_test_build(session: nox.Session, version: str) -> None:
     apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
-    # We install the poetry dependency first, otherwise they will
+    # We install the base dependencies first, otherwise they will
     # wipe clean the dragons conda dependencies.  Also install the
     # core dependencies with conda to ensure that numpy and scipy
     # match each other.  (one conda and one pip does not work)
-    install_test_dependencies(
-        session, poetry_groups=["main"], conda_install=True
-    )
-    install_test_dependencies(session, poetry_groups=["test"])
+    install_test_dependencies(session, conda_install=True)
+    install_test_dependencies(session, extras=["test"])
 
     # Install the DRAGONS package, and ds9 for completeness.
     session.conda_install(
@@ -760,7 +741,7 @@ def coverage(session: nox.Session) -> None:
     apply_data_caching_environment_variable(session)
 
     # Install the test dependencies.
-    install_test_dependencies(session)
+    install_test_dependencies(session, extras=["test"])
 
     # Generate the coverage report.
     session.run("coverage", "report", "--show-missing")
@@ -783,7 +764,7 @@ def coverage(session: nox.Session) -> None:
 def docs(session: nox.Session) -> None:
     """Build the documentation."""
     # Install the documentation dependencies.
-    install_test_dependencies(session, poetry_groups=["main", "docs"])
+    install_test_dependencies(session, extras=["docs"])
 
     session.install("-e", ".", "--no-deps")
 
@@ -822,12 +803,20 @@ def build_and_publish_to_devpi(session: nox.Session) -> str:
     """Build the astrodata package and publish it.
 
     If the devpi server is not running, this will raise an error.
+
+    This uses PyPA's ``build`` (in place of ``poetry build``) and
+    ``twine`` (in place of ``poetry publish``) to build the sdist and
+    upload it, since setuptools has no built-in equivalent of poetry's
+    publish command. Both tools are pulled in via the ``build_test``
+    extra.
     """
     # Build the package and upload it to the devpi server
     tmp_build_dir = Path(session.create_tmp()) / "build"
     tmp_build_dir.mkdir()
 
-    session.run("poetry", "build", f"--output={tmp_build_dir}", external=True)
+    session.run(
+        "python", "-m", "build", "--sdist", f"--outdir={tmp_build_dir}"
+    )
 
     sdist = next(Path(tmp_build_dir).glob("astrodata-*.tar.gz"))
     version = sdist.stem.removeprefix("astrodata-").removesuffix(".tar")
@@ -850,27 +839,17 @@ def build_and_publish_to_devpi(session: nox.Session) -> str:
             external=True,
         )
 
-    # Shows available indexes
-    poetry_config_env_vars = {
-        "POETRY_REPOSITORIES_BUILD_TEST_URL": session.env["DEVPI_INDEX_URL"],
-        # "POETRY_HTTP_BASIC_BUILD_TEST_USERNAME": "testuser",
-        # "POETRY_HTTP_BASIC_BUILD_TEST_PASSWORD": "123",
-        "PYTHON_KEYRING_BACKEND": "keyring.backends.null.Keyring",
-    }
-
-    # poetry is not picking up the authentication from the environment
-    # variables, so we will pass them as arguments.
-    _result = session.run(
-        "poetry",
-        "publish",
-        "--repository",
-        "build_test",
+    # twine reads the repository URL/credentials from either flags or
+    # environment variables; we pass them explicitly so nothing needs to
+    # be pre-configured in a ~/.pypirc on the machine running this.
+    session.run(
+        "twine",
+        "upload",
+        "--repository-url", session.env["DEVPI_INDEX_URL"],
         "--username", "testuser",
         "--password", "123",
-        f"--dist-dir={tmp_build_dir.absolute()}",
-        "--no-cache",
-        external=True,
-        env=poetry_config_env_vars,
+        "--non-interactive",
+        str(sdist),
     )  # fmt: skip
 
     return version
@@ -919,7 +898,7 @@ def build_tests_integration(session):
 def script_tests(session: nox.Session) -> None:
     """Run the script tests."""
     apply_data_caching_environment_variable(session)
-    install_test_dependencies(session)
+    install_test_dependencies(session, extras=["test"])
     session.install("-e", ".", "--no-deps")
 
     # Run the tests. Need to pass arguments to pytest.
@@ -961,7 +940,7 @@ def build_tests_scripts(session: nox.Session) -> None:
 
     with session.chdir(working_dir):
         # Install the package from the devpi server
-        install_test_dependencies(session, poetry_groups=["test"])
+        install_test_dependencies(session, extras=["test"])
 
         # Install the package from the devpi server
         session.install(
@@ -987,7 +966,7 @@ def build_tests_scripts(session: nox.Session) -> None:
 def linting(session: nox.Session) -> None:
     """Run the linters."""
     # Install the test dependencies.
-    install_test_dependencies(session, poetry_groups=["main", "dev"])
+    install_test_dependencies(session, extras=["dev"])
 
     # Run the linters.
     session.run("ruff", "check", ".")
@@ -996,28 +975,8 @@ def linting(session: nox.Session) -> None:
 @nox.session
 def devshell(session: nox.Session) -> None:
     """Create a venv for development."""
-    # Installing poetry within this isolated env to avoid having devs manage
-    # installing a plugin...
-    session.env["POETRY_PREFER_ACTIVE_PYTHON"] = "true"
-    session.env["POETRY_VIRTUALENVS_CREATE"] = "false"
-
-    venv_path = Path(".astrodata_venv/").absolute()
+    venv_path = Path(".astrodata_test_venv/").absolute()
     activate_path = venv_path / "bin" / "activate"
-
-    # Check that poetry is installed
-    try:
-        session.run("poetry", "--version", silent=True, external=True)
-
-    except nox.command.CommandFailed as err:
-        message_lines = (
-            "Poetry is not installed. Please install poetry before running ",
-            "this session.",
-            "Installation instructions can be found at ",
-            "https://python-poetry.org/docs/#installation.",
-        )
-        message = "\n".join(message_lines)
-
-        raise RuntimeError(message) from err
 
     # Remove any existing venv
     if venv_path.exists():
@@ -1028,7 +987,7 @@ def devshell(session: nox.Session) -> None:
         "python", "-m", "venv", str(venv_path), "--prompt", "astrodata_venv"
     )
 
-    req_file_path = get_poetry_dependencies(session, all_deps=True)
+    req_file_path = get_project_dependencies(session, all_deps=True)
     venv_python_bin = venv_path / "bin" / "python"
 
     session.run(
@@ -1089,10 +1048,6 @@ def devconda(session: nox.Session) -> None:
 
     conda_envs_loc = conda_loc.parent.parent / "envs"
 
-    session.env["POETRY_PREFER_ACTIVE_PYTHON"] = "true"
-    session.env["POETRY_VIRTUALENVS_PATH"] = conda_envs_loc
-    session.env["POETRY_VIRTUALENVS_CREATE"] = "false"
-
     # Check that conda is installed
     try:
         session.run("conda", "--version", silent=True)
@@ -1109,7 +1064,7 @@ def devconda(session: nox.Session) -> None:
         raise RuntimeError(message) from err
 
     # Create the requirements file
-    req_file_path = get_poetry_dependencies(session, all_deps=True)
+    req_file_path = get_project_dependencies(session, all_deps=True)
 
     # Remove any existing venv
     session.run("conda", "env", "remove", "--name", conda_venv_name, "--yes")
@@ -1194,14 +1149,12 @@ def dragons_calibration(
     apply_data_caching_environment_variable(session)
     apply_macos_config(session)
 
-    # We install the poetry dependency first, otherwise they will
+    # We install the base dependencies first, otherwise they will
     # wipe clean the dragons conda dependencies. Also install the
     # core dependencies with conda to ensure that numpy and scipy
     # match each other.  (one conda and one pip does not work)
-    install_test_dependencies(
-        session, poetry_groups=["main"], conda_install=True
-    )
-    install_test_dependencies(session, poetry_groups=["test"])
+    install_test_dependencies(session, conda_install=True)
+    install_test_dependencies(session, extras=["test"])
 
     session.conda_install(
         "--quiet",
