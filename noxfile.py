@@ -984,7 +984,7 @@ def devshell(session: nox.Session) -> None:
 
     # Create the venv
     session.run(
-        "python", "-m", "venv", str(venv_path), "--prompt", "astrodata_venv"
+        "python", "-m", "venv", str(venv_path), "--prompt", "astrodata_test_venv"
     )
 
     req_file_path = get_project_dependencies(session, all_deps=True)
