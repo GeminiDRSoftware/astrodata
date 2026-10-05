@@ -1000,11 +1000,12 @@ class AstroData:
 
                     other_objects.append(obj_dict)
 
+            data_type = nd.data.dtype.name if nd.data.shape != () else ""
             main_dict = {
                 "content": "science",
                 "type": type(nd).__name__,
                 "dim": str(nd.data.shape),
-                "data_type": nd.data.dtype.name,
+                "data_type": data_type,
             }
 
             out_dict = {
