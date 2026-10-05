@@ -1,0 +1,103 @@
+AstroData
+=========
+
+.. currentmodule:: astrodata
+
+.. autoclass:: AstroData
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~AstroData.data
+      ~AstroData.descriptors
+      ~AstroData.exposed
+      ~AstroData.ext_tables
+      ~AstroData.filename
+      ~AstroData.hdr
+      ~AstroData.header
+      ~AstroData.id
+      ~AstroData.indices
+      ~AstroData.is_sliced
+      ~AstroData.mask
+      ~AstroData.nddata
+      ~AstroData.orig_filename
+      ~AstroData.path
+      ~AstroData.phu
+      ~AstroData.shape
+      ~AstroData.tables
+      ~AstroData.tags
+      ~AstroData.uncertainty
+      ~AstroData.variance
+      ~AstroData.wcs
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~AstroData.add
+      ~AstroData.append
+      ~AstroData.crop
+      ~AstroData.divide
+      ~AstroData.info
+      ~AstroData.instrument
+      ~AstroData.is_settable
+      ~AstroData.load
+      ~AstroData.matches_data
+      ~AstroData.multiply
+      ~AstroData.object
+      ~AstroData.operate
+      ~AstroData.read
+      ~AstroData.reset
+      ~AstroData.subtract
+      ~AstroData.table
+      ~AstroData.telescope
+      ~AstroData.update_filename
+      ~AstroData.write
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: data
+   .. autoattribute:: descriptors
+   .. autoattribute:: exposed
+   .. autoattribute:: ext_tables
+   .. autoattribute:: filename
+   .. autoattribute:: hdr
+   .. autoattribute:: header
+   .. autoattribute:: id
+   .. autoattribute:: indices
+   .. autoattribute:: is_sliced
+   .. autoattribute:: mask
+   .. autoattribute:: nddata
+   .. autoattribute:: orig_filename
+   .. autoattribute:: path
+   .. autoattribute:: phu
+   .. autoattribute:: shape
+   .. autoattribute:: tables
+   .. autoattribute:: tags
+   .. autoattribute:: uncertainty
+   .. autoattribute:: variance
+   .. autoattribute:: wcs
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add
+   .. automethod:: append
+   .. automethod:: crop
+   .. automethod:: divide
+   .. automethod:: info
+   .. automethod:: instrument
+   .. automethod:: is_settable
+   .. automethod:: load
+   .. automethod:: matches_data
+   .. automethod:: multiply
+   .. automethod:: object
+   .. automethod:: operate
+   .. automethod:: read
+   .. automethod:: reset
+   .. automethod:: subtract
+   .. automethod:: table
+   .. automethod:: telescope
+   .. automethod:: update_filename
+   .. automethod:: write

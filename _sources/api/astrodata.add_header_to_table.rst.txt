@@ -1,0 +1,6 @@
+add_header_to_table
+===================
+
+.. currentmodule:: astrodata
+
+.. autofunction:: add_header_to_table
