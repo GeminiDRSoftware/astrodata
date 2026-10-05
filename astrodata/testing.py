@@ -20,6 +20,8 @@ from typing import Iterable
 
 import numpy as np
 import requests
+import requests.adapters
+import urllib3.util  # For http retries in requests
 from astropy.io import fits
 from astropy.table import Table
 from astropy.utils.data import download_file
@@ -655,6 +657,13 @@ def download_from_archive(
     if url is None:
         url = GEMINI_ARCHIVE_URL + filename
 
+    # Set up a requests session and configure re-tries
+    reqses = requests.Session()
+    retries = urllib3.util.Retry(total=5, backoff_factor=1)
+    reqses.mount(
+        "https://", requests.adapters.HTTPAdapter(max_retries=retries)
+    )
+
     # Now check if the local file exists and download if not
     try:
         download_it = True
@@ -670,7 +679,7 @@ def download_from_archive(
                 fileinfourl = url.replace(
                     "/file/", "/jsonfilelist/present/filename="
                 )
-                fileinfo = requests.get(
+                fileinfo = reqses.get(
                     fileinfourl, headers={"User-Agent": "astropy"}
                 ).json()
                 goa_md5 = fileinfo[0].get("data_md5")
